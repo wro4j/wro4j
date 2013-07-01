@@ -5,6 +5,7 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>   
+    <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-parent</artifactId>
@@ -34,7 +35,7 @@
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
-    </scm>
+  </scm>
     <mailingLists>
         <mailingList>
             <name>Discussion Group</name>

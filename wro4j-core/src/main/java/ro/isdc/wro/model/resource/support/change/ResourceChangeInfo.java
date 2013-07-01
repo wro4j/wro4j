@@ -41,7 +41,7 @@ public final class ResourceChangeInfo {
     notNull(groupName);
     this.currentHash = hash;
     if (isChangedHash()) {
-      LOG.debug("[CHANGE] for group {}", groupName);
+      LOG.debug("Group {} has changed", groupName);
       //remove all persisted groups. Starting over..
       groups.clear();
     }
@@ -73,10 +73,7 @@ public final class ResourceChangeInfo {
     final boolean result = isChangedHash() ? true : !groups.contains(groupName);
     if (result) {
       groups.add(groupName);
-      LOG.debug("ChangeDetails: {}", this);
     }
-    final String changedMessage = result ? "[YES]" : "[NO]";
-    LOG.debug("{} changed for: {}, ", changedMessage , groupName);
     return result;
   }
 
