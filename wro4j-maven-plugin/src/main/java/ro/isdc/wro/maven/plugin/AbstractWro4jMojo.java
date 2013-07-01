@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -113,6 +114,8 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
+  private ClassLoader originalClassLoader;
+  private ClassLoader classLoader;
 
   /**
    * {@inheritDoc}
@@ -229,14 +232,26 @@ public abstract class AbstractWro4jMojo
       throws MojoExecutionException {
     WroManagerFactory managerFactory;
     try {
-      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          wroManagerFactory.trim());
+//      final ClassLoader managerClassLoader = new URLClassLoader(
+//          Collections.list(ClassLoader.getSystemClassLoader().getResources("")).toArray(new URL[] {}), classLoader);
+//
+      final Class<?> wroManagerFactoryClass = loadWroManagerFactoryClass(wroManagerFactory.trim());
       managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
       getLog().error("Cannot instantiate wroManagerFactoryClass", e);
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
     return managerFactory;
+  }
+
+  private Class<?> loadWroManagerFactoryClass(final String className) throws ClassNotFoundException {
+    Class<?> managerClass = null;
+    try {
+      managerClass = originalClassLoader.loadClass(className);
+    } catch (final ClassNotFoundException e) {
+      managerClass = classLoader.loadClass(className);
+    }
+    return managerClass;
   }
 
   /**
@@ -413,8 +428,8 @@ public abstract class AbstractWro4jMojo
     final AtomicBoolean changeDetected = new AtomicBoolean(false);
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      final String previousFingerprint = buildContext != null ? String
-          .valueOf(buildContext.getValue(resource.getUri())) : null;
+      final String previousFingerprint = buildContext != null ? String.valueOf(buildContext.getValue(resource.getUri()))
+          : null;
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
 
       changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
@@ -480,7 +495,12 @@ public abstract class AbstractWro4jMojo
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
-    final ClassLoader classLoader = createClassLoader(classpathElements);
+    if (classLoader == null) {
+      classLoader = createClassLoader(classpathElements);
+    }
+    if (originalClassLoader == null) {
+      originalClassLoader = Thread.currentThread().getContextClassLoader();
+    }
     Thread.currentThread().setContextClassLoader(classLoader);
   }
 
@@ -496,20 +516,32 @@ public abstract class AbstractWro4jMojo
         getLog().debug("Adding element to plugin classpath: " + elementFile.getPath());
         urls.add(elementFile.toURI().toURL());
       }
+      final String thisPluginPath = StringUtils.substringBefore(getClass().getResource("").getFile(), "!");
+      urls.add(new URL(thisPluginPath));
+      // add the location of the compile output directory
     } catch (final Exception e) {
       getLog().error("Error retreiving URL for artifact", e);
       throw new RuntimeException(e);
     }
-
-    return new URLClassLoader(urls.toArray(new URL[] {}), getParentClassLoader());
+    return new URLClassLoader(urls.toArray(new URL[] {}));
   }
 
   /**
    * @return the parent {@link ClassLoader}. The current {@link ClassLoader} cannot be used as parent, since it will
-   *         lead to polluting the entire classpath also with transitive dependencies which were excluded by maven.
+   *         cause pollution the entire classpath also with transitive dependencies which were excluded by maven.
    */
   private ClassLoader getParentClassLoader() {
-    return Thread.currentThread().getContextClassLoader();
+    return getClass().getClassLoader();
+    // return ClassLoader.getSystemClassLoader();
+    // try {
+    // final ClassRealm realm = new ClassWorld().newRealm("maven.plugin." + getClass().getSimpleName(),
+    // Thread.currentThread().getContextClassLoader());
+    // return realm.getClassLoader();
+    // } catch (final Exception e) {
+    // throw WroRuntimeException.wrap(e);
+    // }
+    // return getClass().getClassLoader();
+    // return Thread.currentThread().getContextClassLoader();
   }
 
   /**
