@@ -3,12 +3,12 @@ var Greeter = (function () {
         this.greeting = message;
     }
     Greeter.prototype.greet = function () {
-        return "Hello, " + this.greeting;
+        return this.greeting;
     };
     return Greeter;
 })();
 
-var greeter = new Greeter("world");
+var greeter = new Greeter("Hello, world");
 
 var button = document.createElement('button');
 button.innerText = "Say Hello";

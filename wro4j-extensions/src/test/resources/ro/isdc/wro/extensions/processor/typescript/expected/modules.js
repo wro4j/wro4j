@@ -9,13 +9,14 @@ var Sayings;
         };
         return Greeter;
     })();
-    Sayings.Greeter = Greeter;    
+    Sayings.Greeter = Greeter;
 })(Sayings || (Sayings = {}));
-
 var greeter = new Sayings.Greeter("world");
+
 var button = document.createElement('button');
 button.innerText = "Say Hello";
 button.onclick = function () {
     alert(greeter.greet());
 };
+
 document.body.appendChild(button);

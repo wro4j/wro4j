@@ -1,14 +1,19 @@
-var Student = (function () {
-    function Student(firstname, middleinitial, lastname) {
-        this.firstname = firstname;
-        this.middleinitial = middleinitial;
-        this.lastname = lastname;
-        this.fullname = firstname + " " + middleinitial + " " + lastname;
+class Greeter {
+    greeting: string;
+    constructor(message: string) {
+        this.greeting = message;
     }
-    return Student;
-})();
-function greeter(person) {
-    return "Hello, " + person.firstname + " " + person.lastname;
+    greet() {
+        return "Hello, " + this.greeting;
+    }
 }
-var user = new Student("Jane", "M.", "User");
-document.body.innerHTML = greeter(user);
+
+var greeter = new Greeter("world");
+
+var button = document.createElement('button');
+button.innerText = "Say Hello";
+button.onclick = function() {
+    alert(greeter.greet());
+}
+
+document.body.appendChild(button);
