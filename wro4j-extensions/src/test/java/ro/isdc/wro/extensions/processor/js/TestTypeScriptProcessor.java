@@ -44,7 +44,7 @@ public class TestTypeScriptProcessor {
     victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
-        return new CoffeeScriptProcessor() {
+        return new TypeScriptProcessor() {
 
           @Override
           protected ResourcePreProcessor createFallbackProcessor() {
