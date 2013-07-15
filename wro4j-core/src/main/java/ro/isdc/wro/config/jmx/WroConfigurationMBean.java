@@ -148,10 +148,10 @@ public interface WroConfigurationMBean {
    * @param minifyResources
    *          set to false to override minification settings on all resources
    */
-  void setMinifyResources(boolean minifyResources);
+  void setMinimizeEnabled(boolean minifyResources);
   
   /**
    * @return value of flag that controls override of resource minification
    */
-  boolean isMinifyResources();
+  boolean isMinimizeEnabled();
 }

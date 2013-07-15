@@ -297,7 +297,7 @@ public class TestPreProcessorExecutor {
         final Resource resource = Resource.create("classpath:1.js");
         resource.setMinimize(true);
         resources.add(resource);
-        Context.get().getConfig().setMinifyResources(false);
+        Context.get().getConfig().setMinimizeEnabled(false);
         final ResourcePreProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
             @Override
             public void process(final Resource resource, final Reader reader, final Writer writer)

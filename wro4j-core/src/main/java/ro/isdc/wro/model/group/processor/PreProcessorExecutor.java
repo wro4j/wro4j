@@ -2,7 +2,12 @@ package ro.isdc.wro.model.group.processor;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +44,7 @@ import ro.isdc.wro.util.WroUtil;
  * String.
  * <p>
  * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
- * 
+ *
  * @author Alex Objelean
  */
 public class PreProcessorExecutor {
@@ -58,10 +63,10 @@ public class PreProcessorExecutor {
    * Runs the preProcessing in parallel.
    */
   private ExecutorService executor;
-  
+
   /**
    * Apply preProcessors on resources and merge them after all preProcessors are applied.
-   * 
+   *
    * @param resources
    *          what are the resources to merge.
    * @param minimize
@@ -72,10 +77,10 @@ public class PreProcessorExecutor {
       throws IOException {
     return processAndMerge(resources, ProcessingCriteria.create(ProcessingType.ALL, minimize));
   }
-  
+
   /**
    * Apply preProcessors on resources and merge them.
-   * 
+   *
    * @param resources
    *          what are the resources to merge.
    * @param criteria
@@ -87,8 +92,8 @@ public class PreProcessorExecutor {
     notNull(criteria);
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
-    if (!context.getConfig().isMinifyResources()) {
-      LOG.debug("Minification disabled through mbean");
+    if (!context.getConfig().isMinimizeEnabled()) {
+      LOG.debug("Minimization is disabled");
       criteria.setMinimize(false);
     }
     try {
@@ -108,16 +113,16 @@ public class PreProcessorExecutor {
       callbackRegistry.onAfterMerge();
     }
   }
-  
+
   private boolean shouldRunInParallel(final List<Resource> resources) {
     final boolean isParallel = context.getConfig().isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
-  
+
   /**
    * runs the pre processors in parallel.
-   * 
+   *
    * @return merged and pre processed content.
    */
   private String runInParallel(final List<Resource> resources, final ProcessingCriteria criteria)
@@ -141,7 +146,7 @@ public class PreProcessorExecutor {
       final Callable<String> decoratedCallable = new ContextPropagatingCallable<String>(callable);
       futures.add(exec.submit(decoratedCallable));
     }
-    
+
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -159,7 +164,7 @@ public class PreProcessorExecutor {
     }
     return result.toString();
   }
-  
+
   private ExecutorService getExecutorService() {
     if (executor == null) {
       // use at most the number of available processors (true parallelism)
@@ -170,10 +175,10 @@ public class PreProcessorExecutor {
     }
     return executor;
   }
-  
+
   /**
    * Apply a list of preprocessors on a resource.
-   * 
+   *
    * @param resource
    *          the {@link Resource} on which processors will be applied
    * @param processors
@@ -183,7 +188,7 @@ public class PreProcessorExecutor {
       throws IOException {
     final Collection<ResourcePreProcessor> processors = processorsFactory.getPreProcessors();
     LOG.debug("applying preProcessors: {}", processors);
-    
+
     String resourceContent = null;
     try {
       resourceContent = getResourceContent(resource);
@@ -202,7 +207,7 @@ public class PreProcessorExecutor {
     Writer writer = null;
     for (final ResourcePreProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
-      
+
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
       // decorate and process
@@ -212,7 +217,7 @@ public class PreProcessorExecutor {
     }
     return writer.toString();
   }
-  
+
   /**
    * Decorates preProcessor with mandatory decorators.
    */
@@ -233,7 +238,7 @@ public class PreProcessorExecutor {
     injector.inject(decorated);
     return decorated;
   }
-  
+
   /**
    * @return a Reader for the provided resource.
    * @param resource
