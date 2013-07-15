@@ -92,6 +92,10 @@ public class PreProcessorExecutor {
     notNull(criteria);
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
+    if (!context.getConfig().isMinimizeEnabled()) {
+      LOG.debug("Minimization is disabled");
+      criteria.setMinimize(false);
+    }
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
@@ -166,8 +170,8 @@ public class PreProcessorExecutor {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
       LOG.debug("Parallel thread pool size: {}", threadPoolSize);
-      executor = Executors.newFixedThreadPool(threadPoolSize, WroUtil
-          .createDaemonThreadFactory("parallelPreprocessing"));
+      executor = Executors.newFixedThreadPool(threadPoolSize,
+          WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
     }
     return executor;
   }
