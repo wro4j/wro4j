@@ -90,6 +90,10 @@ public class PreProcessorExecutor {
       throws IOException {
     Validate.notNull(group);
     callbackRegistry.onBeforeMerge();
+    if (!context.getConfig().isMinimizeEnabled()) {
+      LOG.debug("Minimization is disabled");
+      criteria.setMinimize(false);
+    }
     try {
       final List<Resource> resources = group.getResources();
       LOG.debug("process and merge resources: {}", resources);

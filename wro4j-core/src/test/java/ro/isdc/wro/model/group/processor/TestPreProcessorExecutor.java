@@ -284,6 +284,25 @@ public class TestPreProcessorExecutor {
     victim.processAndMerge(group, true);
   }
 
+    @Test
+    public void shouldNotMinimizeResourcesWhenMinificationDisabledThroughMBean() throws IOException {
+        final List<Resource> resources = new ArrayList<Resource>();
+        final Resource resource = Resource.create("classpath:1.js");
+        resource.setMinimize(true);
+        resources.add(resource);
+        Context.get().getConfig().setMinimizeEnabled(false);
+        final ResourceProcessor preProcessor = CopyrightKeeperProcessorDecorator.decorate(new JSMinProcessor() {
+            @Override
+            public void process(final Resource resource, final Reader reader, final Writer writer)
+                    throws IOException {
+                Assert.fail("Should not minimize");
+            }
+        });
+        initExecutor(preProcessor);
+        final Group group = new Group("group").addResource(resource);
+        victim.processAndMerge(group, true);
+    }
+
   /**
    * When an empty resource is processed, the processing should not fail (warn only).
    */
