@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
@@ -12,7 +14,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import ro.isdc.wro.cache.CacheKey;
-import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -38,6 +39,11 @@ public class TestDefaultCacheKeyFactory {
     victim = new DefaultCacheKeyFactory();
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setGroupExtractor(mockGroupExtractor);
     InjectorBuilder.create(managerFactory).build().inject(victim);
+  }
+
+  @Test
+  public void shouldHaveMinimizeEnabledByDefault() {
+    assertEquals(true, Context.get().getConfig().isMinimizeEnabled());
   }
 
   @Test(expected = NullPointerException.class)
@@ -70,5 +76,15 @@ public class TestDefaultCacheKeyFactory {
     when(mockGroupExtractor.getGroupName(mockRequest)).thenReturn("g1");
     when(mockGroupExtractor.getResourceType(mockRequest)).thenReturn(ResourceType.CSS);
     assertEquals(new CacheKey("g1", ResourceType.CSS, true), victim.create(mockRequest));
+  }
+
+  @Test
+  public void shouldHaveMinimizationTurnedOffWhenMinimizeEnabledIsFalse()
+      throws IOException {
+    when(mockGroupExtractor.isMinimized(mockRequest)).thenReturn(true);
+    when(mockGroupExtractor.getGroupName(mockRequest)).thenReturn("g1");
+    when(mockGroupExtractor.getResourceType(mockRequest)).thenReturn(ResourceType.CSS);
+    Context.get().getConfig().setMinimizeEnabled(false);
+    assertEquals(new CacheKey("g1", ResourceType.CSS, false), victim.create(mockRequest));
   }
 }
