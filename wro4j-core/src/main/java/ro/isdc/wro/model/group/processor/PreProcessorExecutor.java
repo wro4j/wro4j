@@ -92,10 +92,6 @@ public class PreProcessorExecutor {
     notNull(criteria);
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
-    if (!context.getConfig().isMinimizeEnabled()) {
-      LOG.debug("Minimization is disabled");
-      criteria.setMinimize(false);
-    }
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
