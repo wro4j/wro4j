@@ -53,12 +53,18 @@ class Wro4jGrailsPlugin {
       'filter-mapping' {
         'filter-name'('wroContextFilter')
         'url-pattern'('/*')
+        'dispatcher'('REQUEST')
+        'dispatcher'('FORWARD')
+        'dispatcher'('ERROR')
       }
     }
     filter[filter.size() - 1] + {
       'filter-mapping' {
         'filter-name'('wroFilter')
         'url-pattern'('/wro/*')
+        'dispatcher'('REQUEST')
+        'dispatcher'('FORWARD')
+        'dispatcher'('ERROR')
       }
     }
   }
