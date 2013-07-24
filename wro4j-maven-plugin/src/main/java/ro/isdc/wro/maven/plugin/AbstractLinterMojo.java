@@ -161,7 +161,8 @@ public abstract class AbstractLinterMojo<T>
    * @return true if the build status is failed.
    */
   private boolean isStatusFailed() {
-    return !failNever && (progressIndicator.getTotalFoundErrors() >= failThreshold);
+    final int foundErrors = progressIndicator.getTotalFoundErrors();
+    return !failNever && foundErrors > 0 && (foundErrors >= failThreshold);
   }
 
   private void validateReportFormat() {
