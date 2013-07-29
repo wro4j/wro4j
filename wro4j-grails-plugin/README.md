@@ -149,7 +149,31 @@ In Config.groovy, just set the Wro4J default ManagerFactory like this :
     wro.managerFactoryClassName = null
 
 
-**I want to use CoffeeScript**
+**Can I change web-app/conf/Wro.groovy at runtime?**
+
+Yes you can. Each time you update the Wro.groovy file, Wro4J is fully reloaded.
+
+
+**Can I change the wro config in web-app/conf/Config.groovy at runtime?**
+
+
+Yes, of course !!!
+
+
+**How to build this plugin**
+
+run 'mvn package'
+
+It will create a plugin archive. Note that the selenium tests require that firefox.exe be on the PATH, so be sure to add it before running anything with runs the tests.
+
+**Releasing a new version of this plugin**
+
+See https://code.google.com/p/wro4j/wiki/ReleaseSteps
+
+Wro Processors
+--------------
+
+### I want to use CoffeeScript ###
 
 CoffeeScript is one of the available Resource Processors in Wro4J (others are : Less, Sass, CSSVariables, ...).
 See the whole list of resource processors here : <http://code.google.com/p/wro4j/wiki/AvailableProcessors>
@@ -199,7 +223,7 @@ And register coffee script files in your model :
       }
     }
 
-**I want to use LessCss**
+### I want to use LessCss ###
 
 It is quite similar to CoffeeScript, so look at it first.
 
@@ -220,7 +244,7 @@ Configure your Config.groovy to add this :
         new SemicolonAppenderPreProcessor(),
         new JSMinProcessor(),
         new JawrCssMinifierProcessor(),
-        new CoffeeScriptProcessor(),  //   <------ Less is here
+        new LessCssProcessor(),  //   <------ Less is here
     ]
 
 Create your less file :
@@ -244,25 +268,4 @@ And register less files in your model :
         js "/js/*.js"
       }
     }
-
-**Can I change web-app/conf/Wro.groovy at runtime? **
-
-Yes you can. Each time you update the Wro.groovy file, Wro4J is fully reloaded.
-
-
-**Can I change the wro config in web-app/conf/Config.groovy at runtime? **
-
-Yes, of course !!!
-
-
-
-**How to build this plugin**
-
-run 'mvn package'
-
-It will create a plugin archive. Note that the selenium tests require that firefox.exe be on the PATH, so be sure to add it before running anything with runs the tests.
-
-**Releasing a new version of this plugin**
-
-See https://code.google.com/p/wro4j/wiki/ReleaseSteps
 
