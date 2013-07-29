@@ -4,9 +4,16 @@ grails.project.dependency.resolution = {
 
   inherits 'global'
   log 'warn'
-
+  
+  pom true
   repositories {
+    mavenLocal()
     grailsCentral()
+    mavenCentral()
+    mavenRepo "http://repository.codehaus.org"
+  }
+/*
+  repositories {
     mavenLocal()
     mavenCentral()
     mavenRepo "http://repository.codehaus.org"
@@ -46,4 +53,5 @@ grails.project.dependency.resolution = {
       export = false
     }
   }
+  */
 }
