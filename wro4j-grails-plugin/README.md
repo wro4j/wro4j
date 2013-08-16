@@ -126,6 +126,9 @@ Step 4: (Optional) Configure Wro in Config.groovy :
       }
       development {
         wro.debug = true
+        // @see
+        // http://stackoverflow.com/questions/17935629/is-there-a-way-to-configure-wro4j-to-pick-up-changed-files-without-restart-durin
+    	wro.resourceWatcherUpdatePeriod=5
       }
       test {
         wro.debug = true
