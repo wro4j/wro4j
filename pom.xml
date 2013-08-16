@@ -239,7 +239,7 @@
                 <artifactId>webjars-locator</artifactId>
                 <version>0.5</version>
             </dependency>
-      <!-- Unit tests -->
+            <!-- Unit tests -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -419,19 +419,6 @@
             </modules>
         </profile>
         <profile>
-            <id>no-examples</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>wro4j-core</module>
-                <module>wro4j-extensions</module>
-                <module>wro4j-maven-plugin</module>
-                <module>wro4j-runner</module>
-                <module>wro4j-grails-plugin</module>
-            </modules>
-        </profile>
-        <profile>
             <id>all</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -441,8 +428,9 @@
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-runner</module>
-                <module>wro4j-examples</module>
+                <!--
                 <module>wro4j-osgi</module>
+                -->
                 <module>wro4j-grails-plugin</module>
             </modules>
         </profile>
