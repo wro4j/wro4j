@@ -1,3 +1,6 @@
 [submodule "wro4j-examples"]
 	path = wro4j-examples
 	url = git@github.com:wro4j/wro4j-examples.git
+[submodule "wro4j-grails-plugin"]
+	path = wro4j-grails-plugin
+	url = git@github.com:wro4j/wro4j-grails-plugin.git
