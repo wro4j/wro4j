@@ -1,0 +1,3 @@
+[submodule "wro4j-examples"]
+	path = wro4j-examples
+	url = git@github.com:wro4j/wro4j-examples.git
