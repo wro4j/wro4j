@@ -64,6 +64,6 @@ public class Less4jProcessor
   }
 
   private String problemAsString(final Problem problem) {
-    return String.format("(Line: %s, Char: %s). Message: %s.", problem.getLine(), problem.getCharacter(), problem.getMessage());
+    return String.format("%s:%s %s.", problem.getLine(), problem.getCharacter(), problem.getMessage());
   }
 }
