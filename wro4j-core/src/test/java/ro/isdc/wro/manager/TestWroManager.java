@@ -519,15 +519,26 @@ public class TestWroManager {
 
   @Test
   public void shouldRegisterCallback() {
-    final WroManager manager = new BaseWroManagerFactory().create();
     final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
-    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+    victim.registerCallback(new ObjectFactory<LifecycleCallback>() {
       public LifecycleCallback create() {
         return mockCallback;
       }
     });
-    manager.getCallbackRegistry().onProcessingComplete();
+    victim.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
+  }
+
+  @Test
+  public void shouldInvokeLifecycleCallbackDestroyWhenManagerDestroyed() {
+    final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
+    victim.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return mockCallback;
+      }
+    });
+    victim.destroy();
+    Mockito.verify(mockCallback, Mockito.atLeastOnce()).onDestroy();
   }
 
   @After

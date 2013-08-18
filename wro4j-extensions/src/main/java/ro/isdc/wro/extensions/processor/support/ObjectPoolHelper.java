@@ -90,10 +90,10 @@ public class ObjectPoolHelper<T> {
       throw new RuntimeException("Cannot get object from the pool", e);
     }
   }
-  
+
   /**
    * Use a custom {@link GenericObjectPool}.
-   * 
+   *
    * @param objectPool
    *          to use.
    */

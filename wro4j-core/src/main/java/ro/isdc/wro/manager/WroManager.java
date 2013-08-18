@@ -211,8 +211,9 @@ public class WroManager
       modelSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
+      callbackRegistry.onDestroy();
     } catch (final Exception e) {
-      LOG.error("Exception occured during manager destroy!!!");
+      LOG.error("Exception occured during manager destroy!!!", e);
     } finally {
       LOG.debug("WroManager destroyed");
     }

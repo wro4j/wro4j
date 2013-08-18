@@ -190,6 +190,20 @@ public class LifecycleCallbackRegistry
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public void onDestroy() {
+    for (final LifecycleCallback callback : getCallbacks()) {
+      try {
+        callback.onDestroy();
+      } catch (final Exception e) {
+        LOG.error("Problem invoking onDestroy", e);
+        onException(e);
+      }
+    }
+  }
+
+  /**
    * Invoked when a callback fails. By default exception is ignored.
    *
    * @param e
