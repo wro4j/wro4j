@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.auth.Destroyable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
@@ -211,11 +214,20 @@ public class WroManager
       modelSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
+      destroyProcessors();
       callbackRegistry.onDestroy();
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!!!", e);
     } finally {
       LOG.debug("WroManager destroyed");
+    }
+  }
+
+  private void destroyProcessors() {
+    for (final ResourcePreProcessor processor : processorsFactory.getPreProcessors()) {
+      if (processor instanceof Destroyable) {
+
+      }
     }
   }
 
