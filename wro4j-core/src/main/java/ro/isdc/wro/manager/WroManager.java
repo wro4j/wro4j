@@ -225,7 +225,7 @@ public class WroManager
   /**
    * Invokes destroy method on all {@link Destroyable} processors.
    */
-  private void destroyProcessors() {
+  private void destroyProcessors() throws Exception {
     for (final ResourcePreProcessor processor : processorsFactory.getPreProcessors()) {
       if (processor instanceof Destroyable) {
         ((Destroyable) processor).destroy();
