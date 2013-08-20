@@ -52,6 +52,7 @@ import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -799,6 +800,19 @@ public class TestWroFilter {
     victim.init(mockFilterConfig);
     victim.destroy();
     verify(mockMBeanServer).unregisterMBean(Mockito.any(ObjectName.class));
+  }
+
+  @Test
+  public void shouldUseProcessorsConfiguredInWroProperties() throws Exception {
+    final WroConfiguration config = new WroConfiguration();
+    config.setWroManagerClassName(ConfigurableWroManagerFactory.class.getName());
+    victim.setWroManagerFactory(null);
+    victim.setConfiguration(config);
+    victim.init(mockFilterConfig);
+
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), config);
+    final WroManagerFactory factory = victim.getWroManagerFactory();
+    assertEquals(1, factory.create().getProcessorsFactory().getPreProcessors().size());
   }
 
   @After
