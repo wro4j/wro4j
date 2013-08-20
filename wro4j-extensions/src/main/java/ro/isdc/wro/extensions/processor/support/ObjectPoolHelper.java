@@ -62,7 +62,7 @@ public class ObjectPoolHelper<T> {
      * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
      */
     pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
-    // make object elligible for eviction after a predefined amount of time.
+    // make object eligible for eviction after a predefined amount of time.
     pool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
     pool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);
     return pool;
@@ -100,5 +100,15 @@ public class ObjectPoolHelper<T> {
   public final void setObjectPool(final GenericObjectPool<T> objectPool) {
     Validate.notNull(objectPool);
     this.objectPool = objectPool;
+  }
+
+  /**
+   * Close the object pool to avoid the memory leak.
+   *
+   * @throws Exception
+   *           if the close operation failed.
+   */
+  public void destroy() throws Exception {
+    objectPool.close();
   }
 }

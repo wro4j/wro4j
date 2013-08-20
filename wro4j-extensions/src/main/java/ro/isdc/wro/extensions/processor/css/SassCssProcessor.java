@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.support.sass.SassCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
@@ -31,7 +32,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class SassCssProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
   public static final String ALIAS_RUBY = "rubySassCss";
@@ -105,4 +106,8 @@ public class SassCssProcessor
     process(null, reader, writer);
   }
 
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }

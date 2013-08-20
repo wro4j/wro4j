@@ -80,9 +80,6 @@ public class TestLifecycleCallbackRegistry {
 
     registry.onProcessingComplete();
     Mockito.verify(callback).onProcessingComplete();
-
-    registry.onDestroy();
-    Mockito.verify(callback).onDestroy();
   }
 
   private ObjectFactory<LifecycleCallback> factoryFor(final LifecycleCallback callback) {
@@ -107,7 +104,6 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onProcessingComplete();
-    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onDestroy();
 
     registry.registerCallback(factoryFor(failingCallback));
     registry.registerCallback(factoryFor(simpleCallback));
@@ -121,7 +117,6 @@ public class TestLifecycleCallbackRegistry {
     registry.onBeforeMerge();
     registry.onAfterMerge();
     registry.onProcessingComplete();
-    registry.onDestroy();
 
     Mockito.verify(simpleCallback).onBeforeModelCreated();
     Mockito.verify(simpleCallback).onAfterModelCreated();
@@ -132,7 +127,6 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(simpleCallback).onBeforeMerge();
     Mockito.verify(simpleCallback).onAfterMerge();
     Mockito.verify(simpleCallback).onProcessingComplete();
-    Mockito.verify(simpleCallback).onDestroy();
   }
 
   /**

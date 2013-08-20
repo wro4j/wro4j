@@ -363,8 +363,9 @@ public class BaseWroManagerFactory
    * @param processorsFactory
    *          the processorsFactory to set
    */
-  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public BaseWroManagerFactory setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+    return this;
   }
 
   public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {

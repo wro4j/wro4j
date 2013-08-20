@@ -84,11 +84,4 @@ public class LifecycleCallbackDecorator
   public void onProcessingComplete() {
     decorated.onProcessingComplete();
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void onDestroy() {
-    decorated.onDestroy();
-  }
 }

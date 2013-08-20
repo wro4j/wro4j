@@ -55,10 +55,4 @@ public interface LifecycleCallback {
    * Called after all postProcessors are applied and overall processing is complete.
    */
   void onProcessingComplete();
-
-  /**
-   * Called when the wro4j is taken out of service. For example: when the servlet container is being stopped (for the
-   * runtime solution).
-   */
-  void onDestroy();
 }
