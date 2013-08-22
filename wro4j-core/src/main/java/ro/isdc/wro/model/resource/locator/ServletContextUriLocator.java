@@ -71,9 +71,10 @@ public class ServletContextUriLocator
    * use the ServletContext to locate the resource. SERVLET_CONTEXT_FIRST is a alternative approach where we will first
    * try to locate the resource VIA the ServletContext first, and then use the dispatcheStreamLocator if not found. In
    * some cases, where you do not rely on dynamic resources this can be a more reliable and a more efficient approach.
+   * If requests should never be forwarded to a servlet, use SERVLET_CONTEXT_ONLY.
    */
   public static enum LocatorStrategy {
-    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST
+    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST, SERVLET_CONTEXT_ONLY
   }
 
   /**
@@ -155,10 +156,16 @@ public class ServletContextUriLocator
 
     InputStream inputStream = null;
     try {
-      if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
-        inputStream = dispatcherFirstStreamLocator(uri);
-      } else {
-        inputStream = servletContextFirstStreamLocator(uri);
+      switch (locatorStrategy) {
+        case DISPATCHER_FIRST:
+          inputStream = dispatcherFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_FIRST:
+          inputStream = servletContextFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_ONLY:
+          inputStream = servletContextBasedStreamLocator(uri);
+          break;
       }
       validateInputStreamIsNotNull(inputStream, uri);
       return inputStream;
