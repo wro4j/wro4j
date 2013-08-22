@@ -381,6 +381,7 @@ public class BaseWroManagerFactory
    * {@inheritDoc}
    */
   public void destroy() {
+    managerInitializer.get().destroy();
     managerInitializer.destroy();
   }
 }

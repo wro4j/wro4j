@@ -10,6 +10,7 @@ import java.io.Writer;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -29,7 +30,7 @@ import ro.isdc.wro.util.AbstractDecorator;
 public abstract class AbstractProcessorDecoratorSupport<T>
     extends AbstractDecorator<T>
     implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware,
-    ImportAware {
+    ImportAware, Destroyable {
   /**
    * @param the
    *          decorated processor. The type of the returned object is {@link Object} because we don't really care and we
@@ -102,6 +103,17 @@ public abstract class AbstractProcessorDecoratorSupport<T>
    */
   public boolean isImportAware() {
     return getDecoratedObject() instanceof ImportAware ? ((ImportAware) getDecoratedObject()).isImportAware() : false;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void destroy()
+      throws Exception {
+    if (getDecoratedObject() instanceof Destroyable) {
+      ((Destroyable) getDecoratedObject()).destroy();
+    }
   }
 
   /**
