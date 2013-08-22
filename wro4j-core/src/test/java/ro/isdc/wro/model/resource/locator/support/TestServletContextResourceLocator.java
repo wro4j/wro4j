@@ -3,12 +3,16 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -27,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
 
 
 /**
@@ -35,7 +40,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
  * @author Alex Objelean
  */
 public class TestServletContextResourceLocator {
-  private ServletContextResourceLocator locator;
+  private ServletContextResourceLocator victim;
   @Mock
   private ServletContext mockServletContext;
   @Mock
@@ -62,56 +67,56 @@ public class TestServletContextResourceLocator {
 
   private void useLocator(final ServletContextResourceLocator locator) {
     Validate.notNull(locator);
-    this.locator = locator;
+    this.victim = locator;
     new InjectorBuilder().build().inject(locator);
   }
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullUri()
       throws Exception {
-    locator = new ServletContextResourceLocator(mockServletContext, null);
+    victim = new ServletContextResourceLocator(mockServletContext, null);
   }
 
   @Test
   public void shouldAcceptNullServletContext()
       throws Exception {
-    locator = new ServletContextResourceLocator(mockServletContext, "");
-    Assert.assertNotNull(locator);
+    victim = new ServletContextResourceLocator(mockServletContext, "");
+    Assert.assertNotNull(victim);
   }
 
   @Test
   public void testWildcard1Resources()
       throws IOException {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.css"));
-    Assert.assertNotNull(locator.getInputStream());
+    victim = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.css"));
+    Assert.assertNotNull(victim.getInputStream());
   }
 
   @Test
   public void testWildcard2Resources()
       throws IOException {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.cs?"));
-    Assert.assertNotNull(locator.getInputStream());
+    victim = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.cs?"));
+    Assert.assertNotNull(victim.getInputStream());
   }
 
   @Test
   public void testWildcard3Resources()
       throws IOException {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.???"));
-    Assert.assertNotNull(locator.getInputStream());
+    victim = new ServletContextResourceLocator(mockServletContext, createUri("/css/*.???"));
+    Assert.assertNotNull(victim.getInputStream());
   }
 
   @Test
   public void testRecursiveWildcardResources()
       throws IOException {
-    locator = new ServletContextResourceLocator(mockServletContext, createUri("/css/**.css"));
-    Assert.assertNotNull(locator.getInputStream());
+    victim = new ServletContextResourceLocator(mockServletContext, createUri("/css/**.css"));
+    Assert.assertNotNull(victim.getInputStream());
   }
 
   @Test(expected = IOException.class)
   public void testWildcardInexistentResources()
       throws IOException {
     useLocator(new ServletContextResourceLocator(mockServletContext, createUri("/css/**.NOTEXIST")));
-    locator.getInputStream();
+    victim.getInputStream();
   }
 
   private String createUri(final String uri)
@@ -131,7 +136,7 @@ public class TestServletContextResourceLocator {
   public void testSomeUri()
       throws Exception {
     useLocator(new ServletContextResourceLocator(mockServletContext, createUri("resourcePath")));
-    locator.getInputStream();
+    victim.getInputStream();
   }
 
   /**
@@ -144,9 +149,9 @@ public class TestServletContextResourceLocator {
     Mockito.when(mockServletContext.getRequestDispatcher(Mockito.anyString())).thenReturn(null);
 
     useLocator(new ServletContextResourceLocator(mockServletContext, "/css/resourcePath.css"));
-    final InputStream is = locator.getInputStream();
+    final InputStream is = victim.getInputStream();
     // the response should be empty
-    Assert.assertEquals(-1, is.read());
+    assertEquals(-1, is.read());
   }
 
   @Test
@@ -156,18 +161,37 @@ public class TestServletContextResourceLocator {
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
 
     useLocator(new ServletContextResourceLocator(mockServletContext, "test.css"));
-    locator.setLocatorStrategy(ServletContextResourceLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
+    victim.setLocatorStrategy(ServletContextResourceLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
 
-    final InputStream actualIs = locator.getInputStream();
+    final InputStream actualIs = victim.getInputStream();
 
     final BufferedReader br = new BufferedReader(new InputStreamReader(actualIs));
-    Assert.assertEquals("a {}", br.readLine());
+    assertEquals("a {}", br.readLine());
+  }
+
+  @Test(expected = IOException.class)
+  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed() throws Exception {
+    final AtomicBoolean dispatcherInvokedFlag = new AtomicBoolean();
+    useLocator(new ServletContextResourceLocator(mockServletContext, "/test.css") {
+      @Override
+      InputStream locateWithDispatcher(final String uri)
+          throws IOException {
+        dispatcherInvokedFlag.set(true);
+        throw new IOException("No resource exist");
+      }
+    });
+    victim.setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_ONLY);
+    try {
+      victim.getInputStream();
+    } finally {
+      assertFalse(dispatcherInvokedFlag.get());
+    }
   }
 
   @Test(expected = NullPointerException.class)
   public void cannotSetNullLocatorStrategy() {
-    locator = new ServletContextResourceLocator(mockServletContext, "/doesntMatter");
-    locator.setLocatorStrategy(null);
+    victim = new ServletContextResourceLocator(mockServletContext, "/doesntMatter");
+    victim.setLocatorStrategy(null);
   }
 
 
@@ -175,7 +199,7 @@ public class TestServletContextResourceLocator {
   public void shouldFindWildcardResourcesForFolderContainingSpaces()
       throws IOException {
     useLocator(new ServletContextResourceLocator(mockServletContext, createUri("/folder with spaces/**.css", "test")));
-    locator.getInputStream();
+    victim.getInputStream();
   }
 
   @After
