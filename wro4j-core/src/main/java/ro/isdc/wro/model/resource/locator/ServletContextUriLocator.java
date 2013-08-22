@@ -3,14 +3,14 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
@@ -71,16 +71,17 @@ public class ServletContextUriLocator
    * use the ServletContext to locate the resource. SERVLET_CONTEXT_FIRST is a alternative approach where we will first
    * try to locate the resource VIA the ServletContext first, and then use the dispatcheStreamLocator if not found. In
    * some cases, where you do not rely on dynamic resources this can be a more reliable and a more efficient approach.
+   * If requests should never be forwarded to a servlet, use SERVLET_CONTEXT_ONLY.
    */
   public static enum LocatorStrategy {
-    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST
+    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST, SERVLET_CONTEXT_ONLY
   }
 
   /**
    * Sets the locator strategy to use.
    */
   public ServletContextUriLocator setLocatorStrategy(final LocatorStrategy locatorStrategy) {
-    Validate.notNull(locatorStrategy);
+    notNull(locatorStrategy);
     this.locatorStrategy = locatorStrategy;
     return this;
   }
@@ -155,10 +156,16 @@ public class ServletContextUriLocator
 
     InputStream inputStream = null;
     try {
-      if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
-        inputStream = dispatcherFirstStreamLocator(uri);
-      } else {
-        inputStream = servletContextFirstStreamLocator(uri);
+      switch (locatorStrategy) {
+        case DISPATCHER_FIRST:
+          inputStream = dispatcherFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_FIRST:
+          inputStream = servletContextFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_ONLY:
+          inputStream = servletContextBasedStreamLocator(uri);
+          break;
       }
       validateInputStreamIsNotNull(inputStream, uri);
       return inputStream;
@@ -174,28 +181,29 @@ public class ServletContextUriLocator
       return servletContextBasedStreamLocator(uri);
     } catch (final IOException e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
-      return dispatcherBasedStreamLocator(uri);
+      return locateWithDispatcher(uri);
     }
   }
 
   private InputStream dispatcherFirstStreamLocator(final String uri)
       throws IOException {
     try {
-      return dispatcherBasedStreamLocator(uri);
+      return locateWithDispatcher(uri);
     } catch (final IOException e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return servletContextBasedStreamLocator(uri);
     }
   }
 
-  private InputStream dispatcherBasedStreamLocator(final String uri)
+  /**
+   * @VisibleForTesting
+   */
+  InputStream locateWithDispatcher(final String uri)
       throws IOException {
     final Context context = Context.get();
-    final HttpServletRequest request = context.getRequest();
-    final HttpServletResponse response = context.getResponse();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    return new DispatcherStreamLocator().getInputStream(request, response, uri);
+    return new DispatcherStreamLocator().getInputStream(context.getRequest(), context.getResponse(), uri);
   }
 
   private InputStream servletContextBasedStreamLocator(final String uri)
