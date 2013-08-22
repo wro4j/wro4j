@@ -22,7 +22,7 @@ public class TestDefaultUriLocatorFactory {
 
   @Test
   public void shouldHaveSeveralDefaultLocators() {
-    assertEquals(5, victim.getLocatorFactories().size());
+    assertEquals(6, victim.getLocatorFactories().size());
   }
 
   @Test

@@ -53,7 +53,7 @@ public class TestConfigurableLocatorFactory {
 
   @Test
   public void shouldHaveNonEmptyListOfAvailableStrategies() {
-    assertEquals(5, victim.getAvailableStrategies().size());
+    assertEquals(6, victim.getAvailableStrategies().size());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -71,9 +71,18 @@ public class TestConfigurableLocatorFactory {
 
   @Test
   public void shouldDetectConfiguredLocator() {
-    final String locatorsAsString = ServletContextResourceLocator.ALIAS_DISPATCHER_FIRST;
-    victim.setProperties(createPropsWithLocators(locatorsAsString));
-    
+    victim.setProperties(createPropsWithLocators(ServletContextResourceLocator.ALIAS_DISPATCHER_FIRST));
+
+    final List<ResourceLocatorFactory> locators = victim.getConfiguredStrategies();
+
+    assertEquals(1, locators.size());
+    assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(locators.iterator().next().getClass()));
+  }
+
+  @Test
+  public void shouldUseServletContextOnlyLocator() {
+    victim.setProperties(createPropsWithLocators(ServletContextResourceLocator.ALIAS_SERVLET_CONTEXT_ONLY));
+
     final List<ResourceLocatorFactory> locators = victim.getConfiguredStrategies();
 
     assertEquals(1, locators.size());
@@ -87,11 +96,11 @@ public class TestConfigurableLocatorFactory {
         ServletContextResourceLocator.ALIAS_SERVLET_CONTEXT_FIRST, ServletContextResourceLocator.ALIAS,
         ClasspathResourceLocator.ALIAS, UrlResourceLocator.ALIAS);
     victim.setProperties(createPropsWithLocators(locatorsAsString));
-    
+
     final List<ResourceLocatorFactory> locatorFactories = victim.getConfiguredStrategies();
-    
+
     assertEquals(5, locatorFactories.size());
-    
+
     final Iterator<ResourceLocatorFactory> iterator = locatorFactories.iterator();
     assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(iterator.next().getClass()));
     assertTrue(ServletContextResourceLocatorFactory.class.isAssignableFrom(iterator.next().getClass()));
@@ -119,7 +128,7 @@ public class TestConfigurableLocatorFactory {
     victim.setProperties(createPropsWithLocators(locatorsAsString));
     final List<ResourceLocatorFactory> locators = victim.getConfiguredStrategies();
     assertEquals(1, locators.size());
-    
+
     final Iterator<ResourceLocatorFactory> iterator = locators.iterator();
     assertSame(mockResourceLocatorFactory, iterator.next());
   }
