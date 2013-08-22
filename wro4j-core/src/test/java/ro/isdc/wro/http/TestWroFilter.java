@@ -42,6 +42,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -65,6 +66,8 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;
@@ -804,13 +807,20 @@ public class TestWroFilter {
 
   @Test
   public void shouldUseProcessorsConfiguredInWroProperties() throws Exception {
-    final WroConfiguration config = new WroConfiguration();
-    config.setWroManagerClassName(ConfigurableWroManagerFactory.class.getName());
+    final ObjectFactory<WroConfiguration> configurationFactory = new PropertiesAndFilterConfigWroConfigurationFactory(mockFilterConfig) {
+      @Override
+      public Properties createProperties() {
+        final Properties props = new Properties();
+        props.setProperty(ConfigConstants.managerFactoryClassName.name(), ConfigurableWroManagerFactory.class.getName());
+        props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, CssMinProcessor.ALIAS);
+        return props;
+      }
+    };
+    victim.setWroConfigurationFactory(configurationFactory);
     victim.setWroManagerFactory(null);
-    victim.setConfiguration(config);
     victim.init(mockFilterConfig);
 
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), config);
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), configurationFactory.create());
     final WroManagerFactory factory = victim.getWroManagerFactory();
     assertEquals(1, factory.create().getProcessorsFactory().getPreProcessors().size());
   }
