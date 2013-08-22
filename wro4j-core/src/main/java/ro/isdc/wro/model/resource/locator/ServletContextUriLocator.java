@@ -51,6 +51,10 @@ public class ServletContextUriLocator
    * of processed by container.
    */
   public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
+  /**
+   * Uses SERVLET_CONTEXT_ONLY strategy, meaning that no dispatching will be performed when there is no servletContext resource available.
+   */
+  public static final String ALIAS_SERVLET_CONTEXT_ONLY = "servletContext.SERVLET_CONTEXT_ONLY";
 
   /**
    * Prefix for url resources.
