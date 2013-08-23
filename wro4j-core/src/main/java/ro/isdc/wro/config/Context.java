@@ -266,6 +266,18 @@ public class Context
   }
 
   /**
+   * Decorates a callable with {@link ContextPropagatingCallable} making it possible to access the {@link Context} from
+   * within the decorated callable.
+   *
+   * @param callable
+   *          the {@link Callable} to decorate.
+   * @return the decorated callable.
+   */
+  public static <T> Callable<T> decorate(final Callable<T> callable) {
+    return new ContextPropagatingCallable<T>(callable);
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

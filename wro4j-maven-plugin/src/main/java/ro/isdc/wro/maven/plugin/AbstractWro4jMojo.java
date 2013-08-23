@@ -45,6 +45,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcess
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.Function;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -113,6 +114,7 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
+  private TaskExecutor<Void> taskExecutor;
 
   /**
    * {@inheritDoc}

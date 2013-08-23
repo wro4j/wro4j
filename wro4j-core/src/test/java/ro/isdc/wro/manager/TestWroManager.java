@@ -5,7 +5,6 @@ package ro.isdc.wro.manager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.io.BufferedInputStream;
@@ -56,7 +55,6 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.GroupExtractor;
-import ro.isdc.wro.model.group.processor.GroupsProcessor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
@@ -84,19 +82,15 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
   @Mock
-  private ResourceAuthorizationManager mockAuthorizationManager;
+  private MutableResourceAuthorizationManager mockAuthorizationManager;
   @Mock
-  private CacheStrategy<CacheEntry, ContentHashEntry> mockCacheStrategy;
+  private CacheStrategy<CacheKey, CacheValue> mockCacheStrategy;
   @Mock
   private WroModelFactory mockModelFactory;
-  @Mock
-  private GroupsProcessor mockGroupsProcessor;
   /**
    * Used to test simple operations.
    */
   private WroManager victim;
-  @Mock
-  private MutableResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test more complex use-cases.
    */
@@ -541,32 +535,15 @@ public class TestWroManager {
     victim.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
   }
-  
+
   @Test
   public void shouldDestroyDependenciesWhenDestoryed() {
-    final SchedulerHelper mockCacheSchedulerHelper = mock(SchedulerHelper.class);
-    final SchedulerHelper mockModelSchedulerHelper = mock(SchedulerHelper.class);
-    final WroManager manager = new WroManager() {
-      @Override
-      SchedulerHelper newCacheSchedulerHelper() {
-        return mockCacheSchedulerHelper;
-      }
-      @Override
-      SchedulerHelper newModelSchedulerHelper() {
-        return mockModelSchedulerHelper;
-      }
-    };
-    manager.setCacheStrategy(mockCacheStrategy);
-    manager.setModelFactory(mockModelFactory);
-    manager.setGroupsProcessor(mockGroupsProcessor);
-    
+    final WroManager manager = new WroManager.Builder().setCacheStrategy(mockCacheStrategy).setModelFactory(mockModelFactory).build();
+
     manager.destroy();
-    
-    verify(mockCacheSchedulerHelper).destroy();
-    verify(mockModelSchedulerHelper).destroy();
+
     verify(mockCacheStrategy).destroy();
     verify(mockModelFactory).destroy();
-    verify(mockGroupsProcessor).destroy();
   }
 
   private static class DestroyableProcessor extends PlaceholderProcessor implements Destroyable {
