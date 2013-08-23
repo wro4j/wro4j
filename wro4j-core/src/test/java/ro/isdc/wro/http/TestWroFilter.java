@@ -66,6 +66,8 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;

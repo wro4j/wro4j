@@ -41,6 +41,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.processor.Destroyable;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
@@ -224,12 +225,12 @@ public class WroManager
    * Invokes destroy method on all {@link Destroyable} processors.
    */
   private void destroyProcessors() throws Exception {
-    for (final ResourcePreProcessor processor : processorsFactory.getPreProcessors()) {
+    for (final ResourceProcessor processor : processorsFactory.getPreProcessors()) {
       if (processor instanceof Destroyable) {
         ((Destroyable) processor).destroy();
       }
     }
-    for (final ResourcePostProcessor processor : processorsFactory.getPostProcessors()) {
+    for (final ResourceProcessor processor : processorsFactory.getPostProcessors()) {
       if (processor instanceof Destroyable) {
         ((Destroyable) processor).destroy();
       }

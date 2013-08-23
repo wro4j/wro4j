@@ -36,7 +36,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssLintProcessor
-  implements ResourceProcessor {
+  implements ResourceProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
   public static final String ALIAS = "cssLint";
   /**
