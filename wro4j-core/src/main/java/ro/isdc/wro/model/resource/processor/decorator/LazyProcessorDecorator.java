@@ -8,13 +8,8 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.Destroyable;
-import ro.isdc.wro.model.resource.processor.ImportAware;
-import ro.isdc.wro.model.resource.processor.MinimizeAware;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SupportAware;
-import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
+import ro.isdc.wro.model.resource.processor.ResourceProcessorAware;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 
@@ -28,8 +23,7 @@ import ro.isdc.wro.util.LazyInitializer;
  */
 public final class LazyProcessorDecorator
     extends AbstractDecorator<LazyInitializer<ResourcePreProcessor>>
-    implements ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware,
-    ImportAware, Destroyable {
+    implements ResourceProcessorAware {
   @Inject
   private Injector injector;
   private ProcessorDecorator processor;
