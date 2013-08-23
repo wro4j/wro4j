@@ -4,8 +4,7 @@
  */
 package ro.isdc.wro.cache;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,15 +17,15 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @author Alex Objelean
  */
 public class TestMemoryCacheStrategy {
-  private CacheStrategy<CacheEntry, String> strategy;
+  private CacheStrategy<CacheKey, String> strategy;
   @Before
   public void setUp() {
-    strategy = new MemoryCacheStrategy<CacheEntry, String>();
+    strategy = new MemoryCacheStrategy<CacheKey, String>();
   }
 
   @Test
   public void testPut() {
-    final CacheEntry key = new CacheEntry("g1", ResourceType.JS, true);
+    final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     final String value = "value";
     strategy.put(key, value);
     Assert.assertEquals(value, strategy.get(key));

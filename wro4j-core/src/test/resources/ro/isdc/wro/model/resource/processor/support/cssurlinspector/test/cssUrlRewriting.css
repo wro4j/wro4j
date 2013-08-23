@@ -1,0 +1,94 @@
+
+.imageWithSrcAttribute {
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/images/tabs/tabContent.png',   sizingMethod='scale' )
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',   sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',  
+       sizingMethod='scale' );
+    filter : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',  sizingMethod='scale' );
+    filter : 
+        progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  ' /images/tabs/tabContent.png ',   sizingMethod='scale' );
+    color:red;
+    background: url(img.gif)
+}
+#outer {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+      src='images/transparent-border.png',
+      sizingMethod='scale');
+}
+@font-face {
+    src: url(btn_icons.png);
+}
+.relativeImageBackgrounds {
+    background: #B3B3B3 url(img.gif);color:red;
+    background: url(img.gif);
+    background: url(folder/img.gif);
+    background: url('folder/img.gif');
+    background: url("folder/img.gif");
+    background: url(folder/folder/img.gif) top left;
+    background: url(../img.gif) repeat-x;
+    background: url(../../img.gif) no-repeat right;
+    BACKGROUND-IMAGE: url(../img1.gif);
+    background-image: url(../img.gif);
+    background-image: 
+     #555 url(../img.gif);
+    background-image: 
+     url(../img.gif);
+    background:
+        url(../themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png)
+        0 1.1em no-repeat !important;color:red;
+}
+.inline {background:#ffffff url('img_tree.png') no-repeat right top;}
+.inlineMinimized {background:#ffffff url('img_tree.png') no-repeat right top;color:red;font-size:large;}.anotherClass{color:blue;background:#ffffff url('img_tree.png') no-repeat right top;}
+.noQuotes {
+    background-IMAGE: URL(/img.gif);
+    background: url(/img.gif) red;
+    background: url(/folder/img.gif) no-repeat right;
+    background: url(http://www.google.com/);
+}
+
+.differentTypeOfQuotes {
+    background: #B3B3B3 url("/images/buttons/button_gry_bg.png") repeat-x 
+        scroll 0 -1px;
+    background: #B3B3B3 url('/images/buttons/button_gry_bg.png') repeat-x
+        scroll 0 -1px;
+    background: #B3B3B3 url(/images/buttons/button_gry_bg.png) repeat-x
+        scroll 0 -1px
+}
+
+.contextPathWithWhitespaces {
+    background-image: url( "/absolute/path/to/image1.png" );
+    background-image: url( '/absolute/path/to/image2.png' );
+    background-image: url( /absolute/path/to/image3.png );
+    background-image: url( "/absolute/path/to/image4.png");
+    background-image: url( '/absolute/path/to/image5.png');
+    background-image: url( /absolute/path/to/image6.png);
+    background-image: url( "absolute/path/to/image7.png" );
+    background-image: url( 'absolute/path/to/image8.png' );
+    background-image: url( absolute/path/to/image9.png );
+    background-image: url("absolute/path/to/image10.png");
+    background-image: url('absolute/path/to/image11.png');
+    background-image: url("absolute/path/to/image11a.png" );
+    background-image: url('absolute/path/to/image11b.png' );
+    background-image: url(absolute/path/to/image12.png);
+}
+
+.relativePathWithWhitespaces {
+    background-image: url( "path/to/image.png" );
+    background-image: url( 'path/to/image.png' );
+    background-image: url( path/to/image.png );
+}
+
+.specialCharacters {
+    background-image: url( path/with/$pecial/character.png);
+}
+@font-face {
+    font-family: 'Trade Gothic Condensed Bold';
+    src: url('fonts/tradegothic-boldcondtwenty-webfont.eot');
+    src: url('fonts/tradegothic-boldcondtwenty-webfont.eot?#iefix') format('embedded-opentype'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.woff') format('woff'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.ttf') format('truetype'),
+    url('fonts/tradegothic-boldcondtwenty-webfont.svg#tradegothic-boldcondtwenty-webfont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

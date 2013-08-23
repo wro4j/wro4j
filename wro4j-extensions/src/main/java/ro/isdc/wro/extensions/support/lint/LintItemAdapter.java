@@ -10,7 +10,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * 
  * @author Alex Objelean
  * @created 17 Sep 2012
- * @since 1.4.10
+ * @since 1.5.0
  */
 @SuppressWarnings("serial")
 public class LintItemAdapter

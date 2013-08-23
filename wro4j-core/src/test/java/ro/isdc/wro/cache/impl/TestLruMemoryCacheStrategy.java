@@ -3,14 +3,13 @@ package ro.isdc.wro.cache.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ro.isdc.wro.cache.CacheEntry;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
@@ -23,35 +22,35 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  * @since 1.3.6
  */
 public class TestLruMemoryCacheStrategy {
-  private LruMemoryCacheStrategy<CacheEntry, ContentHashEntry> cache;
+  private LruMemoryCacheStrategy<CacheKey, CacheValue> cache;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    cache = new LruMemoryCacheStrategy<CacheEntry, ContentHashEntry>(3);
+    cache = new LruMemoryCacheStrategy<CacheKey, CacheValue>(3);
   }
 
   @Test
   public void testLruCache() throws IOException {
-    HashStrategy builder = new CRC32HashStrategy();
-    CacheEntry key1 = new CacheEntry("testGroup01", ResourceType.JS, false);
-    CacheEntry key2 = new CacheEntry("testGroup02", ResourceType.CSS, false);
-    CacheEntry key3 = new CacheEntry("testGroup03", ResourceType.JS, false);
-    CacheEntry key4 = new CacheEntry("testGroup04", ResourceType.CSS, false);
+    final HashStrategy builder = new CRC32HashStrategy();
+    final CacheKey key1 = new CacheKey("testGroup01", ResourceType.JS, false);
+    final CacheKey key2 = new CacheKey("testGroup02", ResourceType.CSS, false);
+    final CacheKey key3 = new CacheKey("testGroup03", ResourceType.JS, false);
+    final CacheKey key4 = new CacheKey("testGroup04", ResourceType.CSS, false);
 
-    String content = "var foo = 'Hello World';";
-    String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
+    final String content = "var foo = 'Hello World';";
+    final String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
 
-    cache.put(key1, ContentHashEntry.valueOf(content, hash));
-    cache.put(key2, ContentHashEntry.valueOf(content, hash));
-    cache.put(key3, ContentHashEntry.valueOf(content, hash));
+    cache.put(key1, CacheValue.valueOf(content, hash));
+    cache.put(key2, CacheValue.valueOf(content, hash));
+    cache.put(key3, CacheValue.valueOf(content, hash));
     Assert.assertNotNull(cache.get(key1));
     // Removes the 2nd entry because the 1st one was used in the assertion
     // above.
-    cache.put(key4, ContentHashEntry.valueOf(content, hash));
+    cache.put(key4, CacheValue.valueOf(content, hash));
     Assert.assertNull(cache.get(key2));
   }
-  
+
 
   @After
   public void tearDown() {

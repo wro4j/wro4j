@@ -13,32 +13,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.sass.RubySassEngine;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
  * A processor using the ruby sass engine:
- * 
+ *
  * @author Simon van der Sluis
  * @since 1.4.6
  * @created 2/03/12
  */
 @SupportedResourceType(ResourceType.CSS)
 public class RubySassCssProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassCssProcessor.class);
   public static final String ALIAS = "rubySassCss";
-  
-  /**
-   * Engine.
-   */
-  private RubySassEngine engine;
-  
+  private ObjectPoolHelper<RubySassEngine> enginePool;
+
+  public RubySassCssProcessor() {
+    enginePool = new ObjectPoolHelper<RubySassEngine>(new ObjectFactory<RubySassEngine>() {
+      @Override
+      public RubySassEngine create() {
+        return newEngine();
+      }
+    });
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -46,8 +54,9 @@ public class RubySassCssProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
+    final RubySassEngine engine = enginePool.getObject();
     try {
-      writer.write(getEngine().process(content));
+      writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
       onException(e);
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
@@ -56,26 +65,33 @@ public class RubySassCssProcessor
     } finally {
       reader.close();
       writer.close();
+      enginePool.returnObject(engine);
     }
   }
-  
+
   /**
    * Invoked when a processing exception occurs. By default propagates the runtime exception.
    */
   protected void onException(final WroRuntimeException e) {
     throw e;
   }
-  
+
   /**
    * A getter used for lazy loading.
+   * @deprecated use {@link #newEngine()} instead.
    */
+  @Deprecated
   protected RubySassEngine getEngine() {
-    if (engine == null) {
-      engine = new RubySassEngine();
-    }
-    return engine;
+      return newEngine();
   }
-  
+
+  /**
+   * @return a fresh instance of {@link RubySassEngine}
+   */
+  protected RubySassEngine newEngine() {
+    return new RubySassEngine();
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -84,5 +100,9 @@ public class RubySassCssProcessor
       throws IOException {
     process(null, reader, writer);
   }
-  
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }

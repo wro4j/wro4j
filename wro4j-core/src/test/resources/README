@@ -1,0 +1,2 @@
+# Change the version number
+find ./* -name pom.xml -exec sed -i 's/<version>1.6.1<\/version>/<version>1.6.1-SNAPSHOT<\/version>/g' {} \;

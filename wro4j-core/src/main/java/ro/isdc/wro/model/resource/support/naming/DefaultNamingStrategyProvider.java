@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Default implementation of {@link NamingStrategyProvider} providing all {@link NamingStrategy} implementations from
  * core module.
- * 
+ *
  * @author Alex Objelean
  * @created 16 Jun 2012
  * @since 1.4.7
@@ -22,7 +22,6 @@ public class DefaultNamingStrategyProvider
     map.put(TimestampNamingStrategy.ALIAS, new TimestampNamingStrategy());
     map.put(NoOpNamingStrategy.ALIAS, new NoOpNamingStrategy());
     map.put(DefaultHashEncoderNamingStrategy.ALIAS, new DefaultHashEncoderNamingStrategy());
-    map.put(HashEncoderNamingStrategy.ALIAS, new HashEncoderNamingStrategy());
     map.put(FolderHashEncoderNamingStrategy.ALIAS, new FolderHashEncoderNamingStrategy());
     return map;
   }

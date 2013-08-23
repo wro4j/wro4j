@@ -88,7 +88,6 @@ public class JsonHPack {
     stopWatch.stop();
 
     stopWatch.start("json.hpack");
-
     final boolean isEnclosedInArray = isEnclosedInArray(rawData);
     String data = rawData;
     if (!isEnclosedInArray) {
@@ -113,12 +112,9 @@ public class JsonHPack {
 
   /**
    * Remove first and last occurrence of '[' and ']' characters.
-   * @param resultAsString
-   * @return
    */
-  private String removeEnclosedArray(String resultAsString) {
-    resultAsString = resultAsString.replaceFirst("(?ims)\\[", "").replaceFirst("(?ims)\\](?!.*\\])", "");
-    return resultAsString;
+  private String removeEnclosedArray(final String resultAsString) {
+    return resultAsString.replaceFirst("(?ims)\\[", "").replaceFirst("(?ims)\\](?!.*\\])", "");
   }
 
 

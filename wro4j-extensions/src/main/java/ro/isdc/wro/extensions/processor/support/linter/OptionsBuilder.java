@@ -7,9 +7,10 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -30,16 +31,15 @@ public class OptionsBuilder {
   public String[] splitOptions(final String optionAsString) {
     return optionAsString == null ? ArrayUtils.EMPTY_STRING_ARRAY : optionAsString.split("(?ims),(?![^\\[\\]]*\\])");
   }
-  
+
   /**
    * Builds options json representation from a set of options encoded in a string, each of them being separated by a
    * comma.
-   * 
+   *
    * @param optionsAsCsv
    * @return json representation of options.
    */
   public String buildFromCsv(final String optionsAsCsv) {
-    Validate.notNull(optionsAsCsv);
     return build(splitOptions(optionsAsCsv));
   }
 
@@ -70,6 +70,12 @@ public class OptionsBuilder {
   private String processSingleOption(final String option) {
     String optionName = option;
     String optionValue = Boolean.TRUE.toString();
+    if (option.contains(":")) {
+      final String message = String.format("Invalid option: '%s'. Expected format: key=value or key=['v1','v2']",
+          option);
+      LOG.error(message);
+      throw new WroRuntimeException(message);
+    }
     if (option.contains("=")) {
       final String[] optionEntry = option.split("=");
       if (optionEntry.length != 2) {

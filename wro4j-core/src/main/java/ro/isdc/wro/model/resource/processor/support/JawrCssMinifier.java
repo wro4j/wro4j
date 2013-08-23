@@ -1,15 +1,10 @@
 /**
- * Copyright 2007-2011 Jordi Hernández Sellés, Ibrahim Chaehoi
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific language governing permissions
- * and limitations under the License.
+ * Copyright 2007-2011 Jordi Hernández Sellés, Ibrahim Chaehoi Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and limitations under the
+ * License.
  */
 
 package ro.isdc.wro.model.resource.processor.support;
@@ -42,9 +37,6 @@ public class JawrCssMinifier {
   // quoted braces will fool it.
   private static final String RULES_REGEX = "([^\\{\\}]*)(\\{[^\\{\\}]*})";
 
-  // Captures newlines and tabs
-  private static final String NEW_LINE_TABS_REGEX = "\\r|\\n|\\t|\\f";
-
   // This regex captures, in order:
   // (\\s*\\{\\s*)|(\\s*\\}\\s*)|(\\s*\\(\\s*)|(\\s*;\\s*)|(\\s*\\))
   // brackets, parentheses,colons and semicolons and any spaces around them
@@ -64,8 +56,7 @@ public class JawrCssMinifier {
 
   private static final Pattern QUOTED_CONTENT_PATTERN = Pattern.compile(QUOTED_CONTENT_REGEX);
   private static final Pattern RULES_PATTERN = Pattern.compile(RULES_REGEX, Pattern.DOTALL);
-  private static final Pattern NEW_LINES_TAB_PATTERN = Pattern.compile(NEW_LINE_TABS_REGEX, Pattern.DOTALL);
-  private static final Pattern STRING_PLACE_HOLDE_PATTERN = Pattern.compile(STRING_PLACEHOLDER, Pattern.DOTALL);
+  private static final Pattern STRING_PLACE_HOLDER_PATTERN = Pattern.compile(STRING_PLACEHOLDER, Pattern.DOTALL);
 
   private static final String SPACE = " ";
   private static final String BRACKET_OPEN = "{";
@@ -89,19 +80,17 @@ public class JawrCssMinifier {
       return sb.toString();
     }
 
-
     abstract String matchCallback(Matcher matcher);
   }
 
-
   /**
-   * @param data CSS to minify
+   * @param data
+   *          CSS to minify
    * @return StringBuffer Minified CSS.
    */
   public StringBuffer minifyCSS(final StringBuffer data) {
     // Remove comments and carriage returns
     String compressed = COMMENTS_PATTERN.matcher(data.toString()).replaceAll("");
-
 
     // Temporarily replace the strings with a placeholder
     final List<String> strings = new ArrayList<String>();
@@ -121,14 +110,14 @@ public class JawrCssMinifier {
     compressed = new MatcherProcessorCallback() {
       @Override
       String matchCallback(final Matcher matcher) {
-        final String match = matcher.group(1);
-        final String spaced = NEW_LINES_TAB_PATTERN.matcher(match.toString()).replaceAll(SPACE).trim();
-        return spaced + matcher.group(2);
+        return matcher.group(1) + matcher.group(2);
       }
     }.processWithMatcher(rulesmatcher);
 
-    // Replace all linefeeds and tabs
-    compressed = NEW_LINES_TAB_PATTERN.matcher(compressed).replaceAll(" ");
+    /**
+     * At this point original minifier replaced the new lines with empty space. This was removed, since it causes issues
+     * related to "constant string too long". More details {@see http://code.google.com/p/wro4j/issues/detail?id=603}
+     */
 
     // Match all empty space we can minify
     final Matcher matcher = SPACES_PATTERN.matcher(compressed);
@@ -138,30 +127,30 @@ public class JawrCssMinifier {
         String replacement = SPACE;
         final String match = matcher.group();
 
-        if (match.indexOf(BRACKET_OPEN) != -1)
+        if (match.indexOf(BRACKET_OPEN) != -1) {
           replacement = BRACKET_OPEN;
-        else if (match.indexOf(BRACKET_CLOSE) != -1)
+        } else if (match.indexOf(BRACKET_CLOSE) != -1) {
           replacement = BRACKET_CLOSE;
-        else if (match.indexOf(PAREN_OPEN) != -1)
+        } else if (match.indexOf(PAREN_OPEN) != -1) {
           replacement = PAREN_OPEN;
-        else if (match.indexOf(COLON) != -1)
+        } else if (match.indexOf(COLON) != -1) {
           replacement = COLON;
-        else if (match.indexOf(SEMICOLON) != -1)
+        } else if (match.indexOf(SEMICOLON) != -1) {
           replacement = SEMICOLON;
-        else if (match.indexOf(PAREN_CLOSE) != -1)
+        } else if (match.indexOf(PAREN_CLOSE) != -1) {
           replacement = PAREN_CLOSE;
+        }
 
         return replacement;
       }
     }.processWithMatcher(matcher);
 
     // Restore all Strings
-    final Matcher restoreMatcher = STRING_PLACE_HOLDE_PATTERN.matcher(compressed);
+    final Matcher restoreMatcher = STRING_PLACE_HOLDER_PATTERN.matcher(compressed);
     final Iterator<String> it = strings.iterator();
     compressed = new MatcherProcessorCallback() {
       @Override
       String matchCallback(final Matcher matcher) {
-
         final String replacement = it.next();
         return replacement;
       }
@@ -169,7 +158,6 @@ public class JawrCssMinifier {
 
     return new StringBuffer(compressed);
   }
-
 
   /**
    * Fixes a bad problem with regular expression replacement strings. Replaces \ and $ for escaped versions for regex

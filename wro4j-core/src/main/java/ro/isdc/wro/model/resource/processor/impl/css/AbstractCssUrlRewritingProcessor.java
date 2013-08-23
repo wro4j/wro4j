@@ -5,12 +5,12 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
+import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,28 +25,28 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector.ItemHandler;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
  * A processor responsible for rewriting url's from inside the css resources.
- * 
+ *
  * @author Alex Objelean
  * @created Created on 9 May, 2010
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, ImportAware {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCssUrlRewritingProcessor.class);
-  /**
-   * Compiled pattern.
-   */
-  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
+
   @Inject
   private ReadOnlyContext context;
+
   /**
    * {@inheritDoc}
    */
@@ -54,71 +54,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
-  
-  /**
-   * Parse the css content and transform found url's.
-   * 
-   * @param cssContent
-   *          to parse.
-   * @param cssUri
-   *          Uri of the css to parse.
-   * @return parsed css.
-   */
-  private String parseCss(final String cssContent, final String cssUri) {
-    final Matcher matcher = PATTERN.matcher(cssContent);
-    final StringBuffer sb = new StringBuffer();
-    while (matcher.find()) {
-      // index of the group containing entire declaration (Ex: background: url(/path/to/image.png);)
-      final int declarationIndex = 1;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       * 
-       * <pre>
-       * body {
-       *   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/tabs/tabContent.png', sizingMethod='scale' );
-       * }
-       * </pre>
-       * or
-       * <pre>
-       * @font-face {
-       *   src: url(btn_icons.png);
-       * }
-       */
-      final int urlIndexA = 2;
-      /**
-       * index of the group containing an url inside a declaration of this form:
-       * 
-       * <pre>
-       * body {
-       *     background: #B3B3B3 url(img.gif);color:red;
-       * }
-       * </pre>
-       * </pre>
-       */
-      final int urlIndexB = 3;
-      final String originalDeclaration = matcher.group(declarationIndex);
-      final String originalUrl = matcher.group(urlIndexA) != null ? matcher.group(urlIndexA) : matcher.group(urlIndexB);
-      LOG.debug("urlGroup: {}", originalUrl);
-      
-      Validate.notNull(originalUrl);
-      if (isReplaceNeeded(originalUrl)) {
-        final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
-        LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
-        /**
-         * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
-         * from stackoverflow: @see
-         * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
-         */
-        final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
-            modifiedUrl));
-        onUrlReplaced(modifiedUrl);
-        matcher.appendReplacement(sb, replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration));
-      }
-    }
-    matcher.appendTail(sb);
-    return sb.toString();
-  }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -129,7 +65,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       final String cssUri = resource.getUri();
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
-      final String result = parseCss(css, cssUri);
+      final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));
       writer.write(result);
       onProcessCompleted();
     } finally {
@@ -137,23 +73,51 @@ public abstract class AbstractCssUrlRewritingProcessor
       writer.close();
     }
   }
-  
+
+  private ItemHandler createUrlItemHandler(final String cssUri) {
+    return new ItemHandler() {
+      public String replace(final String originalDeclaration, final String originalUrl) {
+        Validate.notNull(originalUrl);
+        String replacement = originalDeclaration;
+        if (isReplaceNeeded(originalUrl)) {
+          final String modifiedUrl = replaceImageUrl(cssUri.trim(), cleanImageUrl(originalUrl));
+          LOG.debug("replaced old Url: [{}] with: [{}].", originalUrl, modifiedUrl);
+          /**
+           * prevent the IllegalArgumentException because of invalid characters like $ (@see issue381) The solution is
+           * from stackoverflow: @see
+           * http://stackoverflow.com/questions/947116/matcher-appendreplacement-with-literal-text
+           */
+          final String modifiedDeclaration = Matcher.quoteReplacement(originalDeclaration.replace(originalUrl,
+              modifiedUrl));
+          onUrlReplaced(modifiedUrl);
+          replacement = replaceDeclaration(originalDeclaration.trim(), modifiedDeclaration);
+        }
+        return replacement;
+      }
+    };
+  }
+
+  protected CssUrlInspector newCssUrlInspector() {
+    return new CssUrlInspector();
+  }
+
   /**
    * Invoked when the process operation is completed. Useful to invoke some post processing logic or for custom logging.
    */
   protected void onProcessCompleted() {
   }
-  
+
   /**
    * Invoked to replace the entire css declaration.
-   * <p/> 
+   * <p/>
    * An example of css declaration:
+   *
    * <pre>
    * background: url(/image.png);
    * </pre>
-   * Useful when the css declaration should be changed. The use-case is:
-   * {@link FallbackCssDataUriProcessor}.
-   * 
+   *
+   * Useful when the css declaration should be changed. The use-case is: {@link FallbackCssDataUriProcessor}.
+   *
    * @param originalDeclaration
    *          the original, unchanged declaration.
    * @param modifiedDeclaration
@@ -163,19 +127,19 @@ public abstract class AbstractCssUrlRewritingProcessor
   protected String replaceDeclaration(final String originalDeclaration, final String modifiedDeclaration) {
     return modifiedDeclaration;
   }
-  
+
   /**
    * Invoked when an url is replaced. Useful if you need to do something with newly replaced url.
-   * 
+   *
    * @param replacedUrl
    *          the newly computed url created as a result of url rewriting.
    */
   protected void onUrlReplaced(final String replacedUrl) {
   }
-  
+
   /**
    * Replace provided url with the new url if needed.
-   * 
+   *
    * @param cssUri
    *          Uri of the parsed css.
    * @param imageUrl
@@ -183,34 +147,22 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @return replaced url.
    */
   protected abstract String replaceImageUrl(final String cssUri, final String imageUrl);
-  
+
   /**
-   * Cleans the image url by triming result and removing \' or \" characters if such exists.
-   * 
-   * @param imageUrl
-   *          to clean.
-   * @return cleaned image URL.
-   */
-  protected final String cleanImageUrl(final String imageUrl) {
-    return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
-  }
-  
-  /**
-   * Check if url must be replaced or not.
-   * 
+   * Check if url must be replaced or not. The replacement is not needed if the url of the image is absolute (can be
+   * resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
+   *
    * @param url
    *          to check.
    * @return true if url needs to be replaced or remain unchanged.
    */
   protected boolean isReplaceNeeded(final String url) {
-    // The replacement is not needed if the url of the image is absolute (can be
-    // resolved by urlResourceLocator) or if the url is a data uri (base64 encoded value).
     return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
   }
-  
+
   /**
    * This method has protected modifier in order to be accessed by unit test class.
-   * 
+   *
    * @return urlPrefix value.
    * @VisibleForTesting
    */
@@ -218,14 +170,14 @@ public abstract class AbstractCssUrlRewritingProcessor
     final String requestURI = context.getRequest().getRequestURI();
     return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
   }
-  
+
   /**
    * @return the part of the url used to identify a proxy resource.
    */
   private String getProxyResourcePath() {
     return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
-  
+
   /**
    * @param url
    *          of the resource to check.
@@ -234,5 +186,13 @@ public abstract class AbstractCssUrlRewritingProcessor
   final boolean isProxyResource(final String url) {
     Validate.notNull(url);
     return url.contains(getProxyResourcePath());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isImportAware() {
+    // We want this processor to be applied when processing resources referred with @import directive
+    return true;
   }
 }

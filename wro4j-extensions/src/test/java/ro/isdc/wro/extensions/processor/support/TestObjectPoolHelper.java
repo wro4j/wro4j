@@ -3,9 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor.support;
 
-import junit.framework.Assert;
-
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -21,7 +20,7 @@ public class TestObjectPoolHelper {
       throws Exception {
     new ObjectPoolHelper<Void>(null);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotReturnNullObjectToPool()
       throws Exception {
@@ -34,7 +33,7 @@ public class TestObjectPoolHelper {
     final Integer object = pool.getObject();
     pool.returnObject(object);
   }
-  
+
   @Test
   public void shouldReuseExistingObject()
       throws Exception {
@@ -48,7 +47,7 @@ public class TestObjectPoolHelper {
     Assert.assertEquals(Integer.valueOf(3), object);
     pool.returnObject(object);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotSetNullObjectPool()
       throws Exception {
@@ -60,7 +59,7 @@ public class TestObjectPoolHelper {
     });
     pool.setObjectPool(null);
   }
-  
+
   @Test
   public void shouldUseCustomObjectPool()
       throws Exception {

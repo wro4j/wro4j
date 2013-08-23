@@ -6,10 +6,8 @@ package ro.isdc.wro.extensions.processor.support.csslint;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +23,8 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * CssLint script engine utility. The underlying implementation uses CSSLint script utility<br/>
- * {@link https ://github.com/stubbornella/csslint}. The underlying csslint version is 0.9.9.
- * 
+ * {@link https ://github.com/stubbornella/csslint}. The underlying csslint version is 0.9.10.
+ *
  * @author Alex Objelean
  * @since 1.3.8
  * @created 19 Jun 2011
@@ -39,11 +37,11 @@ public class CssLint {
   private static final String DEFAULT_CSSLINT_JS = "csslint.min.js";
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
-   * Options to apply to js hint processing
+   * CSV Options to apply.
    */
-  private String[] options;
+  private String options;
   private ScriptableObject scope;
-  
+
   /**
    * Initialize script builder for evaluation.
    */
@@ -61,18 +59,18 @@ public class CssLint {
       throw new IllegalStateException("Failed reading init script", ex);
     }
   }
-  
+
   /**
    * @return the stream of the csslint script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
     return CssLint.class.getResourceAsStream(DEFAULT_CSSLINT_JS);
   }
-  
+
   /**
    * Validates a js using jsHint and throws {@link CssLintException} if the js is invalid. If no exception is thrown,
    * the js is valid.
-   * 
+   *
    * @param data
    *          js content to process.
    * @throws CssLintException
@@ -85,8 +83,8 @@ public class CssLint {
     final RhinoScriptBuilder builder = initScriptBuilder();
     watch.stop();
     watch.start("cssLint");
-    LOG.debug("options: {}", Arrays.toString(this.options));
-    final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data), this.options);
+    LOG.debug("options: {}", this.options);
+    final String script = buildCssLintScript(WroUtil.toJSMultiLineString(data));
     LOG.debug("script: {}", script);
     builder.evaluate(script, "CSSLint.verify").toString();
     final boolean valid = Boolean.parseBoolean(builder.evaluate("result.length == 0", "checkNoErrors").toString());
@@ -102,23 +100,31 @@ public class CssLint {
     watch.stop();
     LOG.debug(watch.prettyPrint());
   }
-  
-  private String buildCssLintScript(final String data, final String... options) {
-    return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.build(options));
+
+  private String buildCssLintScript(final String data) {
+    return String.format("var result = CSSLint.verify(%s,%s).messages", data, optionsBuilder.buildFromCsv(options));
   }
-  
+
   /**
-   * @param options
-   *          the options to set
+   * @param options CSV representation of the options.
    */
-  public CssLint setOptions(final String... options) {
-    LOG.debug("setOptions: {}", options);
-    if (options != null) {
-      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
-    } else {
-      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
-    }
-    
+  public CssLint setOptions(final String options) {
+    this.options = options;
     return this;
   }
+
+//
+//  /**
+//   * @param options
+//   *          the options to set
+//   */
+//  public CssLint setOptions(final String... options) {
+//    if (options != null && options.length > 0) {
+//      this.options = options.length > 1 ? options : optionsBuilder.splitOptions(options[0]);
+//    } else {
+//      this.options = ArrayUtils.EMPTY_STRING_ARRAY;
+//    }
+//    LOG.debug("options: {}", Arrays.asList(this.options));
+//    return this;
+//  }
 }

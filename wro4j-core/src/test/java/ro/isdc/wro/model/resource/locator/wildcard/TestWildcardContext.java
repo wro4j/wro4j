@@ -3,9 +3,10 @@
  */
 package ro.isdc.wro.model.resource.locator.wildcard;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import junit.framework.Assert;
+import java.io.File;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
@@ -17,16 +18,16 @@ public class TestWildcardContext {
   @Test
   public void shouldCreateContextWithNullArguments() {
     final WildcardContext context = new WildcardContext(null, null);
-    Assert.assertNull(context.getUri());
-    Assert.assertNull(context.getFolder());
-    Assert.assertNull(context.getWildcard());
+    assertNull(context.getUri());
+    assertNull(context.getFolder());
+    assertNull(context.getWildcard());
   }
 
   @Test
   public void shouldCreateContextWithNotNullArguments() {
     final WildcardContext context = new WildcardContext("path/to/uri", new File("/path/to/folder/"));
-    Assert.assertEquals(FilenameUtils.separatorsToSystem("path/to/uri"), FilenameUtils.separatorsToSystem(context.getUri()));
-    Assert.assertEquals(FilenameUtils.separatorsToSystem("/path/to/folder"), context.getFolder().getPath());
-    Assert.assertEquals("uri", context.getWildcard());
+    assertEquals(FilenameUtils.separatorsToSystem("path/to/uri"), FilenameUtils.separatorsToSystem(context.getUri()));
+    assertEquals(FilenameUtils.separatorsToSystem("/path/to/folder"), context.getFolder().getPath());
+    assertEquals("uri", context.getWildcard());
   }
 }

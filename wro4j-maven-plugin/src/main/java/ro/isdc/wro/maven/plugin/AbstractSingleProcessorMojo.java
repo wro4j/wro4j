@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -17,15 +16,18 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContextAwareManagerFactory;
+import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
- * Maven plugin which use a singe processor.
+ * Maven plugin which use a single processor.
  * 
  * @author Alex Objelean
  */
@@ -53,7 +55,6 @@ public abstract class AbstractSingleProcessorMojo
   public final void doExecute()
       throws Exception {
     getLog().info("options: " + options);
-    getLog().info("failNever: " + failNever);
 
     boolean parallel = true;
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
@@ -94,7 +95,7 @@ public abstract class AbstractSingleProcessorMojo
     Mockito.when(request.getRequestURI()).thenReturn(group);
     // mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
     
     // init context
     final WroConfiguration config = Context.get().getConfig();
@@ -109,11 +110,13 @@ public abstract class AbstractSingleProcessorMojo
    * {@inheritDoc}
    */
   @Override
-  protected StandaloneContextAwareManagerFactory getManagerFactory()
-      throws Exception {
-    final StandaloneContextAwareManagerFactory factory = super.getManagerFactory();
-    factory.setProcessorsFactory(createSingleProcessorsFactory());
-    return factory;
+  protected WroManagerFactory getManagerFactory() {
+    return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+      @Override
+      protected void onBeforeBuild(final Builder builder) {
+        builder.setProcessorsFactory(createSingleProcessorsFactory());
+      }
+    };
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {
@@ -123,12 +126,16 @@ public abstract class AbstractSingleProcessorMojo
     return factory;
   }
 
+  /**
+   * Factory method responsible for creating the processor which will be applied for this build.
+   */
   protected abstract ResourcePreProcessor createResourceProcessor();
+
 
   /**
    * @return raw representation of the option value.
    */
-  public String getOptions() {
+  protected String getOptions() {
     return options;
   }
 

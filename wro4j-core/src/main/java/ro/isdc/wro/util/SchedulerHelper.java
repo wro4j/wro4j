@@ -23,7 +23,7 @@ public class SchedulerHelper {
   private static final Logger LOG = LoggerFactory.getLogger(SchedulerHelper.class);
 
 
-  private LazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new LazyInitializer<ScheduledThreadPoolExecutor>() {
+  private final LazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new LazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
       return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(SchedulerHelper.this.name)) {
@@ -117,8 +117,11 @@ public class SchedulerHelper {
       Validate.notNull(runnable);
       // avoid reject when this method is accessed concurrently.
       if (!poolInitializer.get().isShutdown()) {
-        LOG.debug("[START] Scheduling thread with period of {} seconds. ThreadId:  {}", period, Thread.currentThread().getId());
-        future = poolInitializer.get().scheduleWithFixedDelay(runnable, 0, period, timeUnit);
+        LOG.debug("[START] Scheduling thread with period of {} {}. ThreadId:  {}", period, timeUnit,
+            Thread.currentThread().getId());
+        // do not execute immediately. Use period also for initial delay.
+        final long initialDelay = period;
+        future = poolInitializer.get().scheduleWithFixedDelay(runnable, initialDelay, period, timeUnit);
       }
     }
   }

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
@@ -10,18 +12,20 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-import junit.framework.Assert;
-
-import org.junit.Assume;
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.css.NodeLessCssProcessor;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.model.resource.processor.support.ChainedProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -44,9 +48,15 @@ public class TestNodeLessCssProcessor {
    */
   @Before
   public void beforeMethod() {
-    Assume.assumeTrue(isSupported);
+    Context.set(Context.standaloneContext());
+    assumeTrue(isSupported);
   }
-  
+
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void testFromFolder()
       throws Exception {
@@ -58,6 +68,16 @@ public class TestNodeLessCssProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
+  @Test
+  public void shouldWorkProperlyWithCssImportPreProcessor()
+      throws Exception {
+    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new NodeLessCssProcessor());
+    final URL url = getClass().getResource("lesscss");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedUrlRewriting");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+  }
 
   @Test
   public void shouldBeThreadSafe() throws Exception {

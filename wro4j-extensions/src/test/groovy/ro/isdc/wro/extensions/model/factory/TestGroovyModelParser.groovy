@@ -17,6 +17,7 @@ package ro.isdc.wro.extensions.model.factory
 
 import org.junit.Test
 import ro.isdc.wro.model.WroModel
+import ro.isdc.wro.model.WroModelInspector
 import ro.isdc.wro.model.resource.ResourceType
 import ro.isdc.wro.WroRuntimeException
 
@@ -232,6 +233,31 @@ class TestGroovyModelParser {
     WroModel wroModel = GroovyModelParser.parse(dsl)
 
     //then:
-    assert ["g2", "g1"] == wroModel.groupNames
+    assert ["g1", "g2"] == new WroModelInspector(wroModel).groupNames
   }
+
+    @Test
+    public void testAbstractGroup() {
+        //setup:
+        def groupDelegate = new GroupDelegate()
+
+        //when:
+        groupDelegate.g1(abstract: true) {
+            js("/js1")
+        }
+
+        groupDelegate.g2 {
+            groupRef('g1')
+            js("/js2")
+        }
+
+        //then:
+        def groups = groupDelegate.resolveGroupResources()
+        assert 1 == groups.size()
+        assert "g2" == groups[0].name
+        assert 2 == groups[0].resources.size()
+        assert "/js1" == groups[0].resources[0].uri;
+        assert "/js2" == groups[0].resources[1].uri;
+
+    }
 }

@@ -52,25 +52,27 @@ public class PerformanceLoggerCallback
 
   @Override
   public void onAfterModelCreated() {
-    stopWatchIfRunning();
+    //stopWatchIfRunning();
+    getWatch().stop();
   }
 
   @Override
   public void onBeforeMerge() {
-    stopWatchIfRunning();
     getWatch().start("PreProcessing");
   }
 
   @Override
   public void onAfterMerge() {
-    stopWatchIfRunning();
+    //stopWatchIfRunning();
+    getWatch().stop();
     getWatch().start("PostProcessing");
   }
 
   @Override
   public void onProcessingComplete() {
-    stopWatchIfRunning();
-    if (getWatch().isRunning() && getWatch().getTaskCount() > 0) {
+    //stopWatchIfRunning();
+    getWatch().stop();
+    if (getWatch().getTaskCount() > 0) {
       LOG.debug(getWatch().prettyPrint());
     }
   }

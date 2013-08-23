@@ -65,10 +65,16 @@ class WroModelDelegate {
 
 class GroupDelegate {
   Map<String, Closure> closures = [:]
+  Map<String, HashMap> params = [:]
 
   def methodMissing(String name, args) {
     if (closures.containsKey(name)) throw new WroRuntimeException("This group is already defined : $name")
-    closures.put(name, args[0])
+    int clIndex = 0
+      if (args.length == 2 && args[0] instanceof Map) {
+          clIndex++
+          params.put(name,args[0])
+      }
+    closures.put(name, args[clIndex])
   }
 
   List<Group> resolveGroupResources() {
@@ -77,7 +83,9 @@ class GroupDelegate {
       cl.delegate = new ResourceDelegate(groupDelegate: this)
       cl.resolveStrategy = Closure.DELEGATE_ONLY
       cl()
-      groups.add(new Group(name: name, resources: cl.resources))
+
+      boolean abstractGroup = !params.containsKey(name) ? false : !params.get(name).containsKey("abstract") ? false : params.get(name).get("abstract")
+      if (!abstractGroup) groups.add(new Group(name: name, resources: cl.resources))
     }
     groups
   }

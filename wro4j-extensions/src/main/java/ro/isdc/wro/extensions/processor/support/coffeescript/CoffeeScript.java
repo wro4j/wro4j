@@ -1,18 +1,19 @@
 /*
- *  Copyright 2010 Alex Objelean.
+ * Copyright 2010.
  */
 package ro.isdc.wro.extensions.processor.support.coffeescript;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
-import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -21,17 +22,18 @@ import ro.isdc.wro.util.WroUtil;
  * semicolons, JavaScript has always had a gorgeous object model at its heart. CoffeeScript is an attempt to expose the
  * good parts of JavaScript in a simple way.
  * <p/>
- * The underlying implementation use the coffee-script version <code>1.3.3</code> project: {@link https
- * ://github.com/jashkenas/coffee-script}.
- * 
+ * This processor loads coffee-script library from the webjar.
+ *
  * @author Alex Objelean
  * @since 1.3.6
  */
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
+  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.js";
   private String[] options;
   private ScriptableObject scope;
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
+  private WebjarUriLocator webjarLocator;
+
   /**
    * Initialize script builder for evaluation.
    */
@@ -57,34 +59,33 @@ public class CoffeeScript {
    *
    * @return The stream of the CoffeeScript.
    */
-  protected InputStream getCoffeeScriptAsStream() {
-    return CoffeeScript.class.getResourceAsStream(DEFAULT_COFFE_SCRIPT);
+  protected InputStream getCoffeeScriptAsStream() throws IOException {
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
   }
 
+  /**
+   * @return {@link WebjarUriLocator} instance to retrieve webjars.
+   */
+  private WebjarUriLocator getWebjarLocator() {
+    if (webjarLocator == null) {
+      webjarLocator = new WebjarUriLocator();
+    }
+    return webjarLocator;
+  }
 
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the
    * js is valid.
    *
-   * @param data js content to process.
+   * @param data
+   *          js content to process.
    */
   public String compile(final String data) {
-    final StopWatch watch = new StopWatch();
-    watch.start("init");
-    try {
-      final RhinoScriptBuilder builder = initScriptBuilder();
-      watch.stop();
-      watch.start("compile");
-      final String compileScript = String.format("CoffeeScript.compile(%s, %s);", WroUtil.toJSMultiLineString(data),
+    final RhinoScriptBuilder builder = initScriptBuilder();
+    final String compileScript = String.format("CoffeeScript.compile(%s, %s);", WroUtil.toJSMultiLineString(data),
         buildOptions());
-      final String result = (String)builder.evaluate(compileScript, "CoffeeScript.compile");
-      return result;
-    } finally {
-      watch.stop();
-      LOG.debug(watch.prettyPrint());
-    }
+    return (String) builder.evaluate(compileScript, "CoffeeScript.compile");
   }
-
 
   /**
    * @return A javascript representation of the options. The result is a json object.
@@ -93,7 +94,7 @@ public class CoffeeScript {
     final StringBuffer sb = new StringBuffer("{");
     if (options != null) {
       for (int i = 0; i < options.length; i++) {
-        sb.append(options[i] + ": true");
+        sb.append(options[i]).append(": true");
         if (i < options.length - 1) {
           sb.append(",");
         }
@@ -103,13 +104,13 @@ public class CoffeeScript {
     return sb.toString();
   }
 
-
   /**
-   * @param options the options to set
+   * @param options
+   *          the options to set
    */
   public CoffeeScript setOptions(final String... options) {
-    LOG.debug("setOptions: {}", options);
     this.options = options == null ? new String[] {} : options;
+    LOG.debug("setOptions: {}", Arrays.asList(this.options));
     return this;
   }
 }

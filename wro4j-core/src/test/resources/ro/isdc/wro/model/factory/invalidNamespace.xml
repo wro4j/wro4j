@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<groups xmlns="httpwww.isdc.rowro">
+  <group name='all'>
+    <css>/static/css/lib/global-whitespace-reset.css</css>
+    <js>/staticjslibsite.js</js>
+  </group>
+</groups>

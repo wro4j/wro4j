@@ -3,21 +3,21 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.model.group.Inject;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -37,7 +37,7 @@ public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ServletContextUriLocator.class);
   /**
-   * Alias used to register this locator with {@link LocatorProvider}. 
+   * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "servletContext";
   /**
@@ -51,7 +51,11 @@ public class ServletContextUriLocator
    * of processed by container.
    */
   public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
-  
+  /**
+   * Uses SERVLET_CONTEXT_ONLY strategy, meaning that no dispatching will be performed when there is no servletContext resource available.
+   */
+  public static final String ALIAS_SERVLET_CONTEXT_ONLY = "servletContext.SERVLET_CONTEXT_ONLY";
+
   /**
    * Prefix for url resources.
    */
@@ -61,15 +65,9 @@ public class ServletContextUriLocator
    */
   private static final String PROTECTED_PREFIX = "/WEB-INF/";
   /**
-   * Locates a stream using request dispatcher.
-   */
-  private final DispatcherStreamLocator dispatcherStreamLocator = new DispatcherStreamLocator();
-  /**
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
-  @Inject
-  private ReadOnlyContext context;
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
    * locate resource via the dispatcher stream locator. This will include dynamic resources produces by servlet's or
@@ -77,16 +75,17 @@ public class ServletContextUriLocator
    * use the ServletContext to locate the resource. SERVLET_CONTEXT_FIRST is a alternative approach where we will first
    * try to locate the resource VIA the ServletContext first, and then use the dispatcheStreamLocator if not found. In
    * some cases, where you do not rely on dynamic resources this can be a more reliable and a more efficient approach.
+   * If requests should never be forwarded to a servlet, use SERVLET_CONTEXT_ONLY.
    */
   public static enum LocatorStrategy {
-    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST
+    DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST, SERVLET_CONTEXT_ONLY
   }
 
   /**
    * Sets the locator strategy to use.
    */
   public ServletContextUriLocator setLocatorStrategy(final LocatorStrategy locatorStrategy) {
-    Validate.notNull(locatorStrategy);
+    notNull(locatorStrategy);
     this.locatorStrategy = locatorStrategy;
     return this;
   }
@@ -131,7 +130,7 @@ public class ServletContextUriLocator
 
     try {
       if (getWildcardStreamLocator().hasWildcard(uri)) {
-        final ServletContext servletContext = context.getServletContext();
+        final ServletContext servletContext = Context.get().getServletContext();
         final String fullPath = FilenameUtils.getFullPath(uri);
         final String realPath = servletContext.getRealPath(fullPath);
         if (realPath == null) {
@@ -139,7 +138,7 @@ public class ServletContextUriLocator
           LOG.debug(message);
           throw new IOException(message);
         }
-        return getWildcardStreamLocator().locateStream(uri, new File(realPath));
+        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, "UTF-8")));
       }
     } catch (final IOException e) {
       /**
@@ -155,20 +154,26 @@ public class ServletContextUriLocator
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
       }
-      LOG.warn("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
+      LOG.debug("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
-    
+
     InputStream inputStream = null;
     try {
-      if (locatorStrategy.equals(LocatorStrategy.DISPATCHER_FIRST)) {
-        inputStream = dispatcherFirstStreamLocator(uri);
-      } else {
-        inputStream = servletContextFirstStreamLocator(uri);
+      switch (locatorStrategy) {
+        case DISPATCHER_FIRST:
+          inputStream = dispatcherFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_FIRST:
+          inputStream = servletContextFirstStreamLocator(uri);
+          break;
+        case SERVLET_CONTEXT_ONLY:
+          inputStream = servletContextBasedStreamLocator(uri);
+          break;
       }
       validateInputStreamIsNotNull(inputStream, uri);
       return inputStream;
-    } catch (IOException e) {
+    } catch (final IOException e) {
       LOG.debug("Wrong or empty resource with location: {}", uri);
       throw e;
     }
@@ -180,33 +185,38 @@ public class ServletContextUriLocator
       return servletContextBasedStreamLocator(uri);
     } catch (final IOException e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
-      return dispatcherBasedStreamLocator(uri);
+      return locateWithDispatcher(uri);
     }
   }
 
   private InputStream dispatcherFirstStreamLocator(final String uri)
       throws IOException {
     try {
-      return dispatcherBasedStreamLocator(uri);
+      return locateWithDispatcher(uri);
     } catch (final IOException e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return servletContextBasedStreamLocator(uri);
     }
   }
 
-  private InputStream dispatcherBasedStreamLocator(final String uri)
+  /**
+   * @VisibleForTesting
+   */
+  InputStream locateWithDispatcher(final String uri)
       throws IOException {
-    final HttpServletRequest request = context.getRequest();
-    final HttpServletResponse response = context.getResponse();
+    final Context context = Context.get();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    return dispatcherStreamLocator.getInputStream(request, response, uri);
+    return new DispatcherStreamLocator().getInputStream(context.getRequest(), context.getResponse(), uri);
   }
 
   private InputStream servletContextBasedStreamLocator(final String uri)
       throws IOException {
-    final ServletContext servletContext = context.getServletContext();
-    return servletContext.getResourceAsStream(uri);
+    try {
+      return Context.get().getServletContext().getResourceAsStream(uri);
+    } catch (final Exception e) {
+      throw new IOException("Could not locate uri: " + uri, e);
+    }
   }
 
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
@@ -215,5 +225,13 @@ public class ServletContextUriLocator
       LOG.debug("[FAIL] reading resource from {}", uri);
       throw new IOException("Exception while reading resource from " + uri);
     }
+  }
+
+  /**
+   * @return the strategy used by this locator.
+   * @VisibleForTesting
+   */
+  public LocatorStrategy getLocatorStrategy() {
+    return locatorStrategy;
   }
 }

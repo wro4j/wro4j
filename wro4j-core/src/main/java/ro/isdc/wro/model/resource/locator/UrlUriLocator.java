@@ -10,12 +10,13 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
@@ -29,11 +30,9 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
   /**
-   * Alias used to register this locator with {@link LocatorProvider}. 
+   * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "uri";
-  @Inject
-  private WroConfiguration config;
   /**
    * {@inheritDoc}
    */
@@ -68,26 +67,27 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
-      return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+      return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
     }
     final URL url = new URL(uri);
     final URLConnection connection = url.openConnection();
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
-    
+
     final int timeout = getConnectionTimeout();
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
     connection.setConnectTimeout(timeout);
     connection.setReadTimeout(timeout);
-    
+
     return new BufferedInputStream(connection.getInputStream());
   }
-  
+
   /**
    * @return connection timeout in milliseconds. By default uses connection timeout from {@link WroConfiguration}.
    */
   private int getConnectionTimeout() {
-    return config != null ? config.getConnectionTimeout() : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+    return Context.isContextSet() ? Context.get().getConfig().getConnectionTimeout()
+        : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
   }
 }

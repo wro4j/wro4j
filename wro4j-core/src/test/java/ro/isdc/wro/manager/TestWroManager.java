@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.manager;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -22,10 +23,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,9 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.cache.CacheEntry;
+import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.ContentHashEntry;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
@@ -47,7 +47,6 @@ import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.PerformanceLoggerCallback;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.manager.factory.InjectableWroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.runnable.ReloadModelRunnable;
@@ -62,12 +61,15 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.PlaceholderProcessor;
+import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
 import ro.isdc.wro.util.AbstractDecorator;
-import ro.isdc.wro.util.SchedulerHelper;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -75,7 +77,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 /**
  * TestWroManager.java.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
@@ -93,23 +95,25 @@ public class TestWroManager {
    * Used to test simple operations.
    */
   private WroManager victim;
+  @Mock
+  private MutableResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test more complex use-cases.
    */
   private WroManagerFactory managerFactory;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class),
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    final Context context = Context.webContext(Mockito.mock(HttpServletRequest.class), Mockito.mock(
+        HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
 
     Context.set(context, newConfigWithUpdatePeriodValue(0));
-    
-    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory());
-    
-    final Injector injector = new InjectorBuilder(managerFactory).setResourceAuthorizationManager(
-        mockAuthorizationManager).build();
+
+    managerFactory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setResourceAuthorizationManager(mockAuthorizationManager);
+
+    final Injector injector = new InjectorBuilder(managerFactory).build();
     victim = managerFactory.create();
     injector.inject(victim);
   }
@@ -120,38 +124,42 @@ public class TestWroManager {
    */
   private static final class WroManagerProcessor
       implements ResourcePreProcessor {
-    
+
     private BaseWroManagerFactory createManagerFactory(final Resource resource) {
       return new BaseWroManagerFactory() {
         @Override
         protected void onAfterInitializeManager(final WroManager manager) {
-          manager.registerCallback(new PerformanceLoggerCallback());
+          manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+            public LifecycleCallback create() {
+              return new PerformanceLoggerCallback();
+            }
+          });
         };
-        
+
         @Override
         protected WroModelFactory newModelFactory() {
           return WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("group").addResource(resource)));
         }
       };
     }
-    
+
     public void process(final Resource resource, final Reader reader, final Writer writer)
         throws IOException {
       LOG.debug("resource: {}", resource);
-      
+
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       final HttpServletResponse response = Context.get().getResponse();
-      
+
       Mockito.when(response.getOutputStream()).thenReturn(
           new DelegatingServletOutputStream(new WriterOutputStream(writer)));
       Mockito.when(request.getRequestURI()).thenReturn("");
-      
+
       final WroConfiguration config = new WroConfiguration();
       // we don't need caching here, otherwise we'll have clashing during unit tests.
       config.setDebug(true);
       config.setDisableCache(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-      
+
       // create a groupExtractor which always return the same group name.
       final String groupName = "group";
       final GroupExtractor groupExtractor = new DefaultGroupExtractor() {
@@ -159,23 +167,22 @@ public class TestWroManager {
         public String getGroupName(final HttpServletRequest request) {
           return groupName;
         }
-        
+
         @Override
         public ResourceType getResourceType(final HttpServletRequest request) {
           return resource.getType();
         }
       };
       // this manager will make sure that we always process a model holding one group which has only one resource.
-      WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
-      managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+      final WroManagerFactory managerFactory = createManagerFactory(resource).setGroupExtractor(groupExtractor);
       managerFactory.create().process();
     }
   }
-  
+
   private class GenericTestBuilder {
     /**
      * Perform a processing on a group extracted from requestUri and compares with the expectedResourceUri content.
-     * 
+     *
      * @param requestUri
      *          contains the group name to process.
      * @param expectedResourceUri
@@ -185,36 +192,36 @@ public class TestWroManager {
         throws Exception {
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
       final HttpServletResponse response = Context.get().getResponse();
-      
+
       final ByteArrayOutputStream out = new ByteArrayOutputStream();
       Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
       Mockito.when(request.getRequestURI()).thenReturn(requestUri);
-      
+
       final WroConfiguration config = new WroConfiguration();
       config.setIgnoreFailingProcessor(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-      
+
       onBeforeProcess();
-      
+
       managerFactory.create().process();
-      
+
       // compare written bytes to output stream with the content from specified css.
-      final InputStream expectedInputStream = new UnclosableBufferedInputStream(
-          WroTestUtils.getInputStream(expectedResourceUri));
+      final InputStream expectedInputStream = new UnclosableBufferedInputStream(WroTestUtils
+          .getInputStream(expectedResourceUri));
       final InputStream actualInputStream = new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
       expectedInputStream.reset();
       WroTestUtils.compare(expectedInputStream, actualInputStream);
       expectedInputStream.close();
       actualInputStream.close();
     }
-    
+
     /**
      * Allow to execute custom logic before the actual processing is done.
      */
     protected void onBeforeProcess() {
     }
   }
-  
+
   /**
    * @return a {@link XmlModelFactory} pointing to a valid config resource.
    */
@@ -226,13 +233,13 @@ public class TestWroManager {
       }
     };
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotRegisterNullCallback() {
-    WroManager manager = new WroManager();
+    final WroManager manager = new BaseWroManagerFactory().create();
     manager.registerCallback(null);
   }
-  
+
   /**
    * Ignored because it fails when running the test from command line.
    */
@@ -241,12 +248,12 @@ public class TestWroManager {
       throws Exception {
     final ResourcePreProcessor processor = new WroManagerProcessor();
     final URL url = getClass().getResource("wroManager");
-    
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
-  
+
   /**
    * Initialize {@link WroConfiguration} object with cacheUpdatePeriod & modelUpdatePeriod equal with provided argument.
    */
@@ -263,71 +270,70 @@ public class TestWroManager {
     victim.onCachePeriodChanged(1);
     verify(mockAuthorizationManager, atLeastOnce()).clear();
   }
-  
+
   @Test
   public void shouldClearAuthorizationManagerWhenModelPeriodChanged() {
     victim.onModelPeriodChanged(1);
     verify(mockAuthorizationManager, atLeastOnce()).clear();
   }
-  
+
   @Test
   public void testNoProcessorWroManagerFactory()
       throws IOException {
-    WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
-    factory = new InjectableWroManagerFactoryDecorator(factory);
-    
+    final WroManagerFactory factory = new NoProcessorsWroManagerFactory().setModelFactory(getValidModelFactory());
+
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
-    
+
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(out));
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     factory.create().process();
-    
+
     // compare written bytes to output stream with the content from specified css.
     WroTestUtils.compare(WroTestUtils.getInputStream("classpath:ro/isdc/wro/manager/noProcessorsResult.css"),
         new ByteArrayInputStream(out.toByteArray()));
   }
-  
+
   @Test
   public void testDuplicatedResourcesShouldBeSkipped()
       throws Exception {
-    new GenericTestBuilder().processAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
+    new GenericTestBuilder()
+        .processAndCompare("/repeatedResources.js", "classpath:ro/isdc/wro/manager/repeated-out.js");
   }
-  
+
   @Test
   public void testWildcardDuplicatedResourcesShouldBeSkiped()
       throws Exception {
     new GenericTestBuilder().processAndCompare("/wildcardRepeatedResources.js",
         "classpath:ro/isdc/wro/manager/wildcardRepeated-out.js");
   }
-  
+
   @Test
   public void testMinimizeAttributeIsFalseOnResource()
       throws Exception {
     new GenericTestBuilder().processAndCompare("/resourceMinimizeFalse.js", "classpath:ro/isdc/wro/manager/sample.js");
   }
-  
+
   @Test
   public void testMinimizeAttributeIsTrueOnResource()
       throws Exception {
     new GenericTestBuilder().processAndCompare("/resourceMinimizeTrue.js",
         "classpath:ro/isdc/wro/manager/sample.min.js");
   }
-  
+
   @Test
   public void testWildcardGroupResources()
       throws Exception {
-    new GenericTestBuilder().processAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
+    new GenericTestBuilder()
+        .processAndCompare("/wildcardResources.js", "classpath:ro/isdc/wro/manager/wildcard-out.js");
   }
-  
+
   /**
    * Test that when ignoreMissingResource is true and IOException is thrown by a processor, no exception is thrown.
-   * 
-   * @throws Exception
    */
   @Test
   public void testCssWithInvalidImport()
@@ -335,19 +341,19 @@ public class TestWroManager {
     new GenericTestBuilder().processAndCompare("/invalidImport.css",
         "classpath:ro/isdc/wro/manager/invalidImport-out.css");
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void shouldNotIgnoreInvalidImportWhenImportedResourceIsMissing()
       throws Exception {
     genericIgnoreMissingResourceTest(false);
   }
-  
+
   @Test
   public void shouldIgnoreInvalidImportWhenImportedResourceIsMissing()
       throws Exception {
     genericIgnoreMissingResourceTest(true);
   }
-  
+
   private void genericIgnoreMissingResourceTest(final boolean ignoreFlag)
       throws Exception {
     new GenericTestBuilder() {
@@ -359,14 +365,14 @@ public class TestWroManager {
       };
     }.processAndCompare("/invalidImport.css", "classpath:ro/isdc/wro/manager/invalidImport-out.css");
   }
-  
+
   @Test
   public void processValidModel()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    
+
     // Test also that ETag header value contains quotes
     Mockito.doAnswer(new Answer<Void>() {
       public Void answer(final InvocationOnMock invocation)
@@ -380,33 +386,33 @@ public class TestWroManager {
         return null;
       }
     }).when(response).setHeader(Mockito.anyString(), Mockito.anyString());
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     managerFactory.create().process();
   }
-  
+
   @Test
   public void testManagerWithSchedulerAndUpdatePeriodSet()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    final Context context = Context.webContext(request,
-        Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
+    final Context context = Context.webContext(request, Mockito.mock(HttpServletResponse.class,
+        Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     final WroConfiguration config = new WroConfiguration();
     // make it run each 1 second
     config.setModelUpdatePeriod(1);
     config.setCacheUpdatePeriod(1);
     Context.set(context, config);
-    
+
     managerFactory.create().process();
     // let scheduler run a while
     Thread.sleep(1100);
   }
-  
+
   /**
    * Test how manager behaves when the update period value is greater than zero and the scheduler starts.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -416,80 +422,80 @@ public class TestWroManager {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/app/g1.css");
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     managerFactory.create().process();
     // allow thread to do its job
     Thread.sleep(500);
   }
-  
+
   @Test
   public void testAggregatedComputedFolder()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/g1.css");
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     managerFactory.create().process();
-    
+
     Assert.assertEquals("/wro4j/wro/", Context.get().getAggregatedFolderPath());
   }
-  
+
   @Test
   public void testAggregatedComputedFolder2()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/wro4j/wro/path/to/g1.css");
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     managerFactory.create().process();
-    
+
     Assert.assertEquals("/wro4j/wro/path/to/", Context.get().getAggregatedFolderPath());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void shouldNotProcessGroupWithNoResources()
       throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Context.get().getResponse();
     Mockito.when(request.getRequestURI()).thenReturn("/noResources.css");
-    
-    WroConfiguration config = new WroConfiguration();
+
+    final WroConfiguration config = new WroConfiguration();
     config.setIgnoreEmptyGroup(false);
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-    
-    WroModel model = new WroModel();
+
+    final WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
     WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
-    managerFactory = new InjectableWroManagerFactoryDecorator(managerFactory);
+    managerFactory = managerFactory;
     managerFactory.create().process();
   }
-  
+
   @Test
   public void testCRC32Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
-        new CRC32HashStrategy()));
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setHashStrategy(new CRC32HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
-    Assert.assertEquals("daa1bb3c/g3.css?minimize=true", path);
+    assertEquals("daa1bb3c/g3.css?minimize=true", path);
   }
-  
+
   @Test
   public void testMD5Fingerprint()
       throws Exception {
-    WroManagerFactory factory = new InjectableWroManagerFactoryDecorator(new BaseWroManagerFactory().setModelFactory(getValidModelFactory()).setHashStrategy(
-        new MD5HashStrategy()));
+    final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(getValidModelFactory())
+        .setHashStrategy(new MD5HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
   }
-  
+
   @Test
   public void testSHA1DefaultHashBuilder()
       throws Exception {
@@ -497,38 +503,42 @@ public class TestWroManager {
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
     Assert.assertEquals("51e6de8dde498cb0bf082b2cd80323fca19eef5/g3.css?minimize=true", path);
   }
-  
+
   @Test
-  public void cacheShouldBeClearedAfterModelReload()
+  public void cacheShouldNotBeClearedAfterModelReload()
       throws IOException {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.when(request.getRequestURI()).thenReturn("/app/g3.css");
-    
+
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(true);
     config.setDisableCache(false);
-    
+
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-    
+
     final WroManager wroManager = managerFactory.create();
     wroManager.process();
-    
+
     // use original decorated object because the decorated one trigger the processing for each cache lookup.
-    final CacheStrategy<CacheEntry, ContentHashEntry> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager.getCacheStrategy());
-    Assert.assertNotNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
-    
-    final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager);
+    final CacheStrategy<CacheKey, CacheValue> cacheStrategy = AbstractDecorator.getOriginalDecoratedObject(wroManager
+        .getCacheStrategy());
+    Assert.assertNotNull(cacheStrategy.get(new CacheKey("g3", ResourceType.CSS, true)));
+
+    final ReloadModelRunnable reloadModelRunnable = new ReloadModelRunnable(wroManager.getModelFactory());
     reloadModelRunnable.run();
-    Assert.assertNull(cacheStrategy.get(new CacheEntry("g3", ResourceType.CSS, true)));
+    Assert.assertNotNull(cacheStrategy.get(new CacheKey("g3", ResourceType.CSS, true)));
   }
 
   @Test
   public void shouldRegisterCallback() {
-    final WroManager manager = new WroManager();
-    LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
-    manager.registerCallback(mockCallback);
-    manager.getCallbackRegistry().onProcessingComplete();
+    final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
+    victim.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return mockCallback;
+      }
+    });
+    victim.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
   }
   
@@ -558,7 +568,23 @@ public class TestWroManager {
     verify(mockModelFactory).destroy();
     verify(mockGroupsProcessor).destroy();
   }
-  
+
+  private static class DestroyableProcessor extends PlaceholderProcessor implements Destroyable {
+    public void destroy() {
+    }
+  }
+
+  @Test
+  public void shouldDestroyDestroyableProcessorWhenManagerIsDestroyed() {
+    final DestroyableProcessor preProcessor = Mockito.mock(DestroyableProcessor.class);
+    final DestroyableProcessor postProcessor = Mockito.mock(DestroyableProcessor.class);
+    victim = new BaseWroManagerFactory().setProcessorsFactory(
+        new SimpleProcessorsFactory().addPreProcessor(preProcessor).addPostProcessor(postProcessor)).create();
+    victim.destroy();
+    Mockito.verify(preProcessor, Mockito.times(1)).destroy();
+    Mockito.verify(postProcessor, Mockito.times(1)).destroy();
+  }
+
   @After
   public void tearDown() {
     managerFactory.destroy();

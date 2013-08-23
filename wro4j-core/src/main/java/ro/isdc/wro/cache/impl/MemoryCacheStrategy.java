@@ -23,6 +23,10 @@ import ro.isdc.wro.cache.CacheStrategy;
  */
 public class MemoryCacheStrategy<K, V> implements CacheStrategy<K, V> {
   /**
+   * Aliased used by provider for this implementation
+   */
+  public static final String ALIAS = "memory";
+  /**
    * Map containing cached items.
    */
   private final Map<K, V> map;

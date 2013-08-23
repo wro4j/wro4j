@@ -1,7 +1,7 @@
 package ro.isdc.wro.http.support;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 
 /**
  * Test the behavior of {@link ResponseHeadersConfigurer}
- * 
+ *
  * @author Alex Objelean
  */
 public class TestResponseHeadersConfigurer {
@@ -31,20 +31,20 @@ public class TestResponseHeadersConfigurer {
   @Mock
   private FilterChain chain;
   private ResponseHeadersConfigurer victim;
-  
+
   @Before
   public void setUp()
       throws Exception {
     MockitoAnnotations.initMocks(this);
     victim = new ResponseHeadersConfigurer();
   }
-  
+
   @Test
   public void shouldHaveNoConfiguredHeadersWhenDefaultHeadersAreNotSet() {
     victim = ResponseHeadersConfigurer.emptyHeaders();
     assertTrue(victim.getHeadersMap().entrySet().isEmpty());
   }
-  
+
   @Test
   public void shouldUseConfiguredDefaultHeaders() {
     final String etag = "123";
@@ -58,7 +58,7 @@ public class TestResponseHeadersConfigurer {
     assertEquals(1, map.size());
     assertEquals(etag, map.get(HttpHeader.ETAG.getHeaderName()));
   }
-  
+
   @Test
   public void shouldHaveNoCacheHeadersInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
@@ -71,7 +71,7 @@ public class TestResponseHeadersConfigurer {
     assertEquals("no-cache", map.get(HttpHeader.CACHE_CONTROL.getHeaderName()));
     assertEquals("0", map.get(HttpHeader.EXPIRES.getHeaderName()));
   }
-  
+
   @Test
   public void shouldSetCacheControlForOneYearWhenDebugModeIsFalse() {
     final WroConfiguration config = new WroConfiguration();
@@ -82,7 +82,7 @@ public class TestResponseHeadersConfigurer {
     assertEquals(3, map.size());
     assertEquals("public, max-age=315360000", map.get(HttpHeader.CACHE_CONTROL.getHeaderName()));
   }
-  
+
   @Test
   public void shouldUseHeadersSetAsString() {
     victim = ResponseHeadersConfigurer.withHeadersSet("h1:v1 | h2:v2");
@@ -92,7 +92,7 @@ public class TestResponseHeadersConfigurer {
     assertEquals("v2", map.get("h2"));
     assertEquals(2, map.size());
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void cannotUseHeadersSetWronglyAsString() {
     final WroConfiguration config = new WroConfiguration();

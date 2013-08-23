@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -22,18 +24,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.decorator.MinimizeAwareProcessorDecorator;
+import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
-import ro.isdc.wro.model.resource.processor.support.ProcessorsUtils;
-import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
+import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.concurrent.TaskExecutor;
 
@@ -43,7 +45,7 @@ import ro.isdc.wro.util.concurrent.TaskExecutor;
  * String.
  * <p>
  * This is useful when you want to preProcess a resource which is not a part of the model (css import use-case).
- * 
+ *
  * @author Alex Objelean
  */
 public class PreProcessorExecutor {
@@ -53,7 +55,7 @@ public class PreProcessorExecutor {
   @Inject
   private ProcessorsFactory processorsFactory;
   @Inject
-  private WroConfiguration config;
+  private ReadOnlyContext context;
   @Inject
   private LifecycleCallbackRegistry callbackRegistry;
   @Inject
@@ -63,10 +65,10 @@ public class PreProcessorExecutor {
    */
   private ExecutorService executor;
   private TaskExecutor<String> taskExecutor;
-  
+
   /**
-   * Apply preProcessors on resources and merge them.
-   * 
+   * Apply preProcessors on resources and merge them after all preProcessors are applied.
+   *
    * @param resources
    *          what are the resources to merge.
    * @param minimize
@@ -75,17 +77,33 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final List<Resource> resources, final boolean minimize)
       throws IOException {
+    return processAndMerge(resources, ProcessingCriteria.create(ProcessingType.ALL, minimize));
+  }
+
+  /**
+   * Apply preProcessors on resources and merge them.
+   *
+   * @param resources
+   *          what are the resources to merge.
+   * @param criteria
+   *          {@link ProcessingCriteria} used to identify the processors to apply and those to skip.
+   * @return preProcessed merged content.
+   */
+  public String processAndMerge(final List<Resource> resources, final ProcessingCriteria criteria)
+      throws IOException {
+    notNull(criteria);
+    LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
       Validate.notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
-        result.append(runInParallel(resources, minimize));
+        result.append(runInParallel(resources, criteria));
       } else {
         for (final Resource resource : resources) {
           LOG.debug("\tmerging resource: {}", resource);
-          result.append(applyPreProcessors(resource, minimize));
+          result.append(applyPreProcessors(resource, criteria));
         }
       }
       return result.toString();
@@ -93,39 +111,40 @@ public class PreProcessorExecutor {
       callbackRegistry.onAfterMerge();
     }
   }
-  
+
   private boolean shouldRunInParallel(final List<Resource> resources) {
-    final boolean isParallel = config.isParallelPreprocessing();
+    final boolean isParallel = context.getConfig().isParallelPreprocessing();
     final int availableProcessors = Runtime.getRuntime().availableProcessors();
     return isParallel && resources.size() > 1 && availableProcessors > 1;
   }
-  
+
   /**
    * runs the pre processors in parallel.
-   * 
+   *
    * @return merged and pre processed content.
    */
-  private String runInParallel(final List<Resource> resources, final boolean minimize)
+  private String runInParallel(final List<Resource> resources, final ProcessingCriteria criteria)
       throws IOException {
     LOG.debug("Running preProcessing in Parallel");
     final StringBuffer result = new StringBuffer();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
-      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
-      callables.add(new ContextPropagatingCallable<String>(new Callable<String>() {
+      callables.add(new Callable<String>() {
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
-          return applyPreProcessors(resource, minimize);
+          return applyPreProcessors(resource, criteria);
         }
-      }));
+      });
     }
     final ExecutorService exec = getExecutorService();
     final List<Future<String>> futures = new ArrayList<Future<String>>();
     for (final Callable<String> callable : callables) {
-      futures.add(exec.submit(callable));
+      // decorate with ContextPropagatingCallable in order to allow spawn threads to access the Context
+      final Callable<String> decoratedCallable = new ContextPropagatingCallable<String>(callable);
+      futures.add(exec.submit(decoratedCallable));
     }
-    
+
     for (final Future<String> future : futures) {
       try {
         result.append(future.get());
@@ -137,7 +156,7 @@ public class PreProcessorExecutor {
         } else if (cause instanceof IOException) {
           throw (IOException) cause;
         } else {
-          throw new WroRuntimeException("Problem during parallel pre processing", e.getCause());
+          throw new WroRuntimeException("Problem during parallel pre processing", e);
         }
       }
     }
@@ -175,28 +194,26 @@ public class PreProcessorExecutor {
     }
     return executor;
   }
-  
+
   /**
    * Apply a list of preprocessors on a resource.
-   * 
+   *
    * @param resource
    *          the {@link Resource} on which processors will be applied
    * @param processors
    *          the list of processor to apply on the resource.
    */
-  private String applyPreProcessors(final Resource resource, final boolean minimize)
+  private String applyPreProcessors(final Resource resource, final ProcessingCriteria criteria)
       throws IOException {
-    //TODO: apply filtering inside a specialized decorator
-    final Collection<ResourcePreProcessor> processors = ProcessorsUtils.filterProcessorsToApply(minimize,
-        resource.getType(), processorsFactory.getPreProcessors());
+    final Collection<ResourcePreProcessor> processors = processorsFactory.getPreProcessors();
     LOG.debug("applying preProcessors: {}", processors);
-    
+
     String resourceContent = null;
     try {
       resourceContent = getResourceContent(resource);
     } catch (final IOException e) {
       LOG.debug("Invalid resource found: {}", resource);
-      if (config.isIgnoreMissingResources()) {
+      if (Context.get().getConfig().isIgnoreMissingResources()) {
         return StringUtils.EMPTY;
       } else {
         LOG.error("Cannot ignore missing resource:  {}", resource);
@@ -207,40 +224,40 @@ public class PreProcessorExecutor {
       return resourceContent;
     }
     Writer writer = null;
-    final StopWatch stopWatch = new StopWatch();
     for (final ResourcePreProcessor processor : processors) {
-      stopWatch.start("Processor: " + processor.getClass().getSimpleName());
-      
-      callbackRegistry.onBeforePreProcess();
-      
+      final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
+
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      try {
-        //decorate and process
-        decoratePreProcessor(processor).process(resource, reader, writer);
-        //use the outcome for next input
-        resourceContent = writer.toString();
-      } finally {
-        stopWatch.stop();
-        callbackRegistry.onAfterPreProcess();
-        reader.close();
-        writer.close();
-      }
+      // decorate and process
+      decoratedProcessor.process(resource, reader, writer);
+      // use the outcome for next input
+      resourceContent = writer.toString();
     }
-    LOG.debug(stopWatch.prettyPrint());
     return writer.toString();
   }
-  
+
   /**
    * Decorates preProcessor with mandatory decorators.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor) {
-    ResourcePreProcessor decorated = new ExceptionHandlingProcessorDecorator(new MinimizeAwareProcessorDecorator(
-        processor));
+  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
+      final ProcessingCriteria criteria) {
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria) {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        try {
+          callbackRegistry.onBeforePreProcess();
+          super.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPreProcess();
+        }
+      }
+    };
     injector.inject(decorated);
     return decorated;
   }
-  
+
   /**
    * @return a Reader for the provided resource.
    * @param resource
@@ -253,7 +270,7 @@ public class PreProcessorExecutor {
     InputStream is = null;
     try {
       is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
-      final String result = IOUtils.toString(is, config.getEncoding());
+      final String result = IOUtils.toString(is, context.getConfig().getEncoding());
       if (StringUtils.isEmpty(result)) {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }

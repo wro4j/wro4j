@@ -5,7 +5,7 @@ package ro.isdc.wro.util;
 
 
 /**
- * A clone of {@link LazyInitializer}, which doesn't throw any checked exception when get method is invoked. 
+ * A clone of {@link LazyInitializer}, which doesn't throw any checked exception when get method is invoked.
  *
  * @author Alex Objelean
  * @created 10 Apr 2012

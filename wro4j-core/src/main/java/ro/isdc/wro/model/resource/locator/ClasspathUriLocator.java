@@ -3,10 +3,14 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
@@ -37,7 +41,15 @@ public class ClasspathUriLocator
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
-  public static final String PREFIX = "classpath:";
+  public static final String PREFIX = format("%s:", ALIAS);
+
+  /**
+   * @return the uri which is acceptable by this locator.
+   */
+  public static String createUri(final String path) {
+    notNull(path);
+    return PREFIX + path;
+  }
   
   /**
    * {@inheritDoc}
@@ -90,7 +102,7 @@ public class ClasspathUriLocator
     LOG.debug("Attempting to find resource {} at the following location: {}", uri, fullPath);
     try {
       return locateWildcardStream(uri, url);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       //do not attempt unless exception is of this type
       if (e instanceof NoMoreAttemptsIOException) {
         throw e;
@@ -102,13 +114,13 @@ public class ClasspathUriLocator
     }
   }
   
-  private InputStream locateWildcardStream(final String uri, URL url)
+  private InputStream locateWildcardStream(final String uri, final URL url)
       throws IOException {
     if (url == null) {
       LOG.debug("Failed to locate stream for {} because URL is null", uri);
       throw new IOException("Cannot locate stream for null URL");
     }
-    return getWildcardStreamLocator().locateStream(uri, new File(url.getFile()));
+    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
   }
   
   /**
