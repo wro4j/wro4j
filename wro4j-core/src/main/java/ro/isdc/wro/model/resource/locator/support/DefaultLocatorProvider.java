@@ -31,6 +31,8 @@ public class DefaultLocatorProvider
         new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.DISPATCHER_FIRST));
     map.put(ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_FIRST,
         new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_FIRST));
+    map.put(ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_ONLY,
+        new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_ONLY));
     map.put(UrlUriLocator.ALIAS, new UrlUriLocator());
     return map;
   }
