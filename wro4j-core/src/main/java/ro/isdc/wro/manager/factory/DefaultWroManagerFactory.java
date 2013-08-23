@@ -10,7 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.PropertiesFactory;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -31,9 +33,18 @@ public class DefaultWroManagerFactory
    *          {@link WroConfiguration} to get the {@link ConfigConstants#managerFactoryClassName} from.
    */
   public static DefaultWroManagerFactory create(final WroConfiguration configuration) {
-    notNull(configuration);
-    final Properties properties = new Properties();
-    final String wroManagerClassName = configuration.getWroManagerClassName();
+    return create(new ObjectFactory<WroConfiguration>() {
+      public WroConfiguration create() {
+        return configuration;
+      }
+    });
+  }
+
+  public static DefaultWroManagerFactory create(final ObjectFactory<WroConfiguration> configurationFactory) {
+    notNull(configurationFactory);
+    final Properties properties = configurationFactory instanceof PropertiesFactory ? ((PropertiesFactory) configurationFactory).createProperties()
+        : new Properties();
+    final String wroManagerClassName = configurationFactory.create().getWroManagerClassName();
     if (wroManagerClassName != null) {
       properties.setProperty(ConfigConstants.managerFactoryClassName.name(), wroManagerClassName);
     }

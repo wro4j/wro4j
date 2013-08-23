@@ -6,7 +6,6 @@ package ro.isdc.wro.manager.callback;
 import org.apache.commons.lang3.Validate;
 
 
-
 /**
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
  *
@@ -67,18 +66,18 @@ public class LifecycleCallbackDecorator
 
   /**
    * {@inheritDoc}
-   */  
+   */
   public void onBeforeMerge() {
     decorated.onBeforeMerge();
   }
 
   /**
    * {@inheritDoc}
-   */  
+   */
   public void onAfterMerge() {
     decorated.onAfterMerge();
   }
-  
+
   /**
    * {@inheritDoc}
    */

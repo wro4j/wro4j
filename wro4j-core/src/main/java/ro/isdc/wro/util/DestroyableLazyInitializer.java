@@ -16,7 +16,7 @@ public abstract class DestroyableLazyInitializer<T> extends LazyInitializer<T> {
    * Destroy the initialized object. This will trigger the re-initialization when
    * {@link DestroyableLazyInitializer#get()} method is invoked.
    */
-  public final void destroy() {
+  public void destroy() {
     object = null;
   }
 }

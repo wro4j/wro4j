@@ -59,7 +59,10 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.PlaceholderProcessor;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.hash.CRC32HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.MD5HashStrategy;
@@ -519,15 +522,30 @@ public class TestWroManager {
 
   @Test
   public void shouldRegisterCallback() {
-    final WroManager manager = new BaseWroManagerFactory().create();
     final LifecycleCallback mockCallback = Mockito.mock(LifecycleCallback.class);
-    manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
+    victim.registerCallback(new ObjectFactory<LifecycleCallback>() {
       public LifecycleCallback create() {
         return mockCallback;
       }
     });
-    manager.getCallbackRegistry().onProcessingComplete();
+    victim.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
+  }
+
+  private static class DestroyableProcessor extends PlaceholderProcessor implements Destroyable {
+    public void destroy() {
+    }
+  }
+
+  @Test
+  public void shouldDestroyDestroyableProcessorWhenManagerIsDestroyed() {
+    final DestroyableProcessor preProcessor = Mockito.mock(DestroyableProcessor.class);
+    final DestroyableProcessor postProcessor = Mockito.mock(DestroyableProcessor.class);
+    victim = new BaseWroManagerFactory().setProcessorsFactory(
+        new SimpleProcessorsFactory().addPreProcessor(preProcessor).addPostProcessor(postProcessor)).create();
+    victim.destroy();
+    Mockito.verify(preProcessor, Mockito.times(1)).destroy();
+    Mockito.verify(postProcessor, Mockito.times(1)).destroy();
   }
 
   @After
