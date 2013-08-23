@@ -4,6 +4,9 @@
 package ro.isdc.wro.manager.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -17,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -106,14 +108,14 @@ public class TestConfigurableWroManagerFactory {
   @Test
   public void shouldHaveNoLocatorsWhenNoUriLocatorsParamSet() {
     createManager();
-    Assert.assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
+    assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
   }
 
   @Test
   public void shouldHaveNoLocatorsWhenNoLocatorsInitParamSet() {
     createManager();
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableLocatorFactory.PARAM_URI_LOCATORS)).thenReturn("");
-    Assert.assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
+    assertTrue(uriLocatorFactory.getConfiguredStrategies().isEmpty());
   }
 
 
@@ -123,8 +125,8 @@ public class TestConfigurableWroManagerFactory {
 
     createManager();
 
-    Assert.assertEquals(1, uriLocatorFactory.getConfiguredStrategies().size());
-    Assert.assertSame(ServletContextResourceLocatorFactory.class,
+    assertEquals(1, uriLocatorFactory.getConfiguredStrategies().size());
+    assertSame(ServletContextResourceLocatorFactory.class,
         uriLocatorFactory.getConfiguredStrategies().iterator().next().getClass());
   }
 
@@ -136,10 +138,10 @@ public class TestConfigurableWroManagerFactory {
 
     createManager();
 
-    Assert.assertEquals(2, uriLocatorFactory.getConfiguredStrategies().size());
+    assertEquals(2, uriLocatorFactory.getConfiguredStrategies().size());
     final Iterator<ResourceLocatorFactory> locatorsIterator = uriLocatorFactory.getConfiguredStrategies().iterator();
-    Assert.assertSame(ClasspathResourceLocatorFactory.class, locatorsIterator.next().getClass());
-    Assert.assertSame(ServletContextResourceLocatorFactory.class, locatorsIterator.next().getClass());
+    assertSame(ClasspathResourceLocatorFactory.class, locatorsIterator.next().getClass());
+    assertSame(ServletContextResourceLocatorFactory.class, locatorsIterator.next().getClass());
   }
 
 
@@ -157,7 +159,7 @@ public class TestConfigurableWroManagerFactory {
   public void shouldHaveCorrectLocatorsSet() {
     configureValidUriLocators(mockFilterConfig);
     createManager();
-    Assert.assertEquals(3, uriLocatorFactory.getConfiguredStrategies().size());
+    assertEquals(3, uriLocatorFactory.getConfiguredStrategies().size());
   }
 
   /**
@@ -177,9 +179,9 @@ public class TestConfigurableWroManagerFactory {
         AbstractConfigurableMultipleStrategy.createItemsAsString(JSMinProcessor.ALIAS, CssImportPreProcessor.ALIAS,
             CssVariablesProcessor.ALIAS));
     final List<ResourceProcessor> list = (List<ResourceProcessor>) processorsFactory.getPreProcessors();
-    Assert.assertEquals(JSMinProcessor.class, list.get(0).getClass());
-    Assert.assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
-    Assert.assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
+    assertEquals(JSMinProcessor.class, list.get(0).getClass());
+    assertEquals(CssImportPreProcessor.class, list.get(1).getClass());
+    assertEquals(CssVariablesProcessor.class, list.get(2).getClass());
   }
 
   @Test
@@ -187,7 +189,7 @@ public class TestConfigurableWroManagerFactory {
     createManager();
     
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn("");
-    Assert.assertTrue(processorsFactory.getPreProcessors().isEmpty());
+    assertTrue(processorsFactory.getPreProcessors().isEmpty());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -207,7 +209,7 @@ public class TestConfigurableWroManagerFactory {
     
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS)).thenReturn(
         "cssUrlRewriting");
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
+    assertEquals(1, processorsFactory.getPreProcessors().size());
   }
 
   @Test
@@ -215,7 +217,7 @@ public class TestConfigurableWroManagerFactory {
     createManager();
     
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn("");
-    Assert.assertTrue(processorsFactory.getPostProcessors().isEmpty());
+    assertTrue(processorsFactory.getPostProcessors().isEmpty());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -233,7 +235,7 @@ public class TestConfigurableWroManagerFactory {
     
     Mockito.when(mockFilterConfig.getInitParameter(ConfigurableProcessorsFactory.PARAM_POST_PROCESSORS)).thenReturn(
         "cssMinJawr, jsMin, cssVariables");
-    Assert.assertEquals(3, processorsFactory.getPostProcessors().size());
+    assertEquals(3, processorsFactory.getPostProcessors().size());
   }
 
   @Test
@@ -245,8 +247,8 @@ public class TestConfigurableWroManagerFactory {
     createManager();
     
     Collection<ResourceProcessor> list = processorsFactory.getPreProcessors();
-    Assert.assertEquals(1, list.size());
-    Assert.assertEquals(CssMinProcessor.class, list.iterator().next().getClass());
+    assertEquals(1, list.size());
+    assertEquals(CssMinProcessor.class, list.iterator().next().getClass());
   }
 
   @Test
@@ -257,8 +259,8 @@ public class TestConfigurableWroManagerFactory {
 
     createManager();
 
-    Assert.assertEquals(1, processorsFactory.getPostProcessors().size());
-    Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
+    assertEquals(1, processorsFactory.getPostProcessors().size());
+    assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
   }
 
   @Test
@@ -269,8 +271,8 @@ public class TestConfigurableWroManagerFactory {
 
     createManager();
 
-    Assert.assertEquals(2, processorsFactory.getPostProcessors().size());
-    Assert.assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
+    assertEquals(2, processorsFactory.getPostProcessors().size());
+    assertEquals(JSMinProcessor.class, processorsFactory.getPostProcessors().iterator().next().getClass());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -288,8 +290,8 @@ public class TestConfigurableWroManagerFactory {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "jsMin.js");
     victim.setConfigProperties(configProperties);
-    Assert.assertEquals(1, processorsFactory.getPreProcessors().size());
-    Assert.assertTrue(processorsFactory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
+    assertEquals(1, processorsFactory.getPreProcessors().size());
+    assertTrue(processorsFactory.getPreProcessors().iterator().next() instanceof ExtensionsAwareProcessorDecorator);
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -317,7 +319,7 @@ public class TestConfigurableWroManagerFactory {
     configProperties.setProperty(ConfigurableNamingStrategy.KEY, TimestampNamingStrategy.ALIAS);
     victim.setConfigProperties(configProperties);
     final NamingStrategy actual = ((ConfigurableNamingStrategy) victim.create().getNamingStrategy()).getConfiguredStrategy();
-    Assert.assertEquals(TimestampNamingStrategy.class, actual.getClass());
+    assertEquals(TimestampNamingStrategy.class, actual.getClass());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -334,7 +336,7 @@ public class TestConfigurableWroManagerFactory {
     configProperties.setProperty(ConfigurableHashStrategy.KEY, MD5HashStrategy.ALIAS);
     victim.setConfigProperties(configProperties);
     final HashStrategy actual = ((ConfigurableHashStrategy) victim.create().getHashStrategy()).getConfiguredStrategy();
-    Assert.assertEquals(MD5HashStrategy.class, actual.getClass());
+    assertEquals(MD5HashStrategy.class, actual.getClass());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -353,7 +355,7 @@ public class TestConfigurableWroManagerFactory {
 
     final CacheStrategy<?, ?> actual = ((ConfigurableCacheStrategy) AbstractDecorator.getOriginalDecoratedObject(victim
         .create().getCacheStrategy())).getConfiguredStrategy();
-    Assert.assertEquals(MemoryCacheStrategy.class, actual.getClass());
+    assertEquals(MemoryCacheStrategy.class, actual.getClass());
   }
 
   /**
@@ -396,7 +398,6 @@ public class TestConfigurableWroManagerFactory {
         .create().getModelFactory())).getConfiguredStrategy();
   }
 
-
   @Test
   public void shouldConsiderContributeMethodsWhenManagerFactoryIsExtended() {
     final String alias = "contributed";
@@ -421,8 +422,8 @@ public class TestConfigurableWroManagerFactory {
     victim.setConfigProperties(configProperties);
     final WroManager manager = victim.create();
 
-    Assert.assertFalse(manager.getProcessorsFactory().getPostProcessors().isEmpty());
-    Assert.assertFalse(manager.getProcessorsFactory().getPreProcessors().isEmpty());
+    assertFalse(manager.getProcessorsFactory().getPostProcessors().isEmpty());
+    assertFalse(manager.getProcessorsFactory().getPreProcessors().isEmpty());
   }
 
   @After

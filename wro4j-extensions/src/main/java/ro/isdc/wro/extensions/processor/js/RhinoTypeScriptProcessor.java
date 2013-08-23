@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.support.typescript.TypeScriptCompiler;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -32,7 +33,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.JS)
 public class RhinoTypeScriptProcessor
-    implements ResourceProcessor {
+    implements ResourceProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(RhinoLessCssProcessor.class);
 
   public static final String ALIAS = "rhinoTypeScript";
@@ -82,5 +83,10 @@ public class RhinoTypeScriptProcessor
    */
   protected TypeScriptCompiler newCompiler() {
     return new TypeScriptCompiler();
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
   }
 }

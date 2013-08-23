@@ -40,6 +40,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
@@ -211,10 +212,27 @@ public class WroManager
       modelSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
+      destroyProcessors();
     } catch (final Exception e) {
-      LOG.error("Exception occured during manager destroy!!!");
+      LOG.error("Exception occured during manager destroy!", e);
     } finally {
       LOG.debug("WroManager destroyed");
+    }
+  }
+
+  /**
+   * Invokes destroy method on all {@link Destroyable} processors.
+   */
+  private void destroyProcessors() throws Exception {
+    for (final ResourcePreProcessor processor : processorsFactory.getPreProcessors()) {
+      if (processor instanceof Destroyable) {
+        ((Destroyable) processor).destroy();
+      }
+    }
+    for (final ResourcePostProcessor processor : processorsFactory.getPostProcessors()) {
+      if (processor instanceof Destroyable) {
+        ((Destroyable) processor).destroy();
+      }
     }
   }
 
@@ -404,7 +422,6 @@ public class WroManager
       this.metaDataFactory = metaDataFactory;
       return this;
     }
-
 
     private List<Transformer<WroModel>> createDefaultTransformers() {
       final List<Transformer<WroModel>> list = new ArrayList<Transformer<WroModel>>();

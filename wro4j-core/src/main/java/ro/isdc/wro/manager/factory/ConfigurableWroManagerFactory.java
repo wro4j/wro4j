@@ -236,7 +236,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     try {
       return new ServletContextPropertyWroConfigurationFactory(Context.get().getServletContext()).createProperties();
     } catch (final Exception e) {
-      LOG.debug("No configuration property file found.");
+      LOG.warn("No configuration property file found. Using default values.", e);
     }
     return props;
   }

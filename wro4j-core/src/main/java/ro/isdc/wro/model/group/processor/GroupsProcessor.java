@@ -100,6 +100,7 @@ public class GroupsProcessor {
   private String applyPostProcessors(final CacheKey cacheKey, final String content)
       throws IOException {
     final Collection<ResourceProcessor> processors = processorsFactory.getPostProcessors();
+    LOG.debug("appying post processors: {}", processors);
     if (processors.isEmpty()) {
       return content;
     }

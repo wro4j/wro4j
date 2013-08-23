@@ -41,6 +41,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -51,6 +52,7 @@ import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -802,6 +804,26 @@ public class TestWroFilter {
     victim.init(mockFilterConfig);
     victim.destroy();
     verify(mockMBeanServer).unregisterMBean(Mockito.any(ObjectName.class));
+  }
+
+  @Test
+  public void shouldUseProcessorsConfiguredInWroProperties() throws Exception {
+    final ObjectFactory<WroConfiguration> configurationFactory = new PropertiesAndFilterConfigWroConfigurationFactory(mockFilterConfig) {
+      @Override
+      public Properties createProperties() {
+        final Properties props = new Properties();
+        props.setProperty(ConfigConstants.managerFactoryClassName.name(), ConfigurableWroManagerFactory.class.getName());
+        props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, CssMinProcessor.ALIAS);
+        return props;
+      }
+    };
+    victim.setWroConfigurationFactory(configurationFactory);
+    victim.setWroManagerFactory(null);
+    victim.init(mockFilterConfig);
+
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), configurationFactory.create());
+    final WroManagerFactory factory = victim.getWroManagerFactory();
+    assertEquals(1, factory.create().getProcessorsFactory().getPreProcessors().size());
   }
 
   @After

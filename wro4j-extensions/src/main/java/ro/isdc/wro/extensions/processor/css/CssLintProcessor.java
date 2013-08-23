@@ -20,6 +20,7 @@ import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -139,5 +140,10 @@ public class CssLintProcessor
    */
   protected String createDefaultOptions() {
     return "";
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
   }
 }

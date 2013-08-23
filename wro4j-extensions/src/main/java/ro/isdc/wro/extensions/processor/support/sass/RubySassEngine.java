@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.util.StopWatch;
 
 
 /**
@@ -63,16 +62,11 @@ public class RubySassEngine {
     if (StringUtils.isEmpty(content)) {
       return StringUtils.EMPTY;
     }
-    final StopWatch stopWatch = new StopWatch();
     try {
-      stopWatch.start("process SCSS");
       final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
       return rubyEngine.eval(buildUpdateScript(content)).toString();
     } catch (final ScriptException e) {
       throw new WroRuntimeException(e.getMessage(), e);
-    } finally {
-      stopWatch.stop();
-      LOG.debug(stopWatch.prettyPrint());
     }
   }
 
@@ -86,9 +80,6 @@ public class RubySassEngine {
     for (final String require : requires) {
       script.println("  require '" + require + "'                                   ");
     }
-    // if (LOG.isDebugEnabled()) {
-    // debugRubyEnvironment(script);
-    // }
     final String scriptAsString = String.format("result = Sass::Engine.new('%s', {%s}).render",
         content.replace("'", "\""),
         sb.toString());
@@ -97,15 +88,4 @@ public class RubySassEngine {
     script.flush();
     return raw.toString();
   }
-//
-//  private void debugRubyEnvironment(final PrintWriter script) {
-//    script.println("  dir_contents = Dir.entries(Dir.pwd)    ");
-//    script.println("  puts dir_contents   ");
-//    script.println("  puts '--classpath--'   ");
-//    script.println("  puts $:   ");
-//    script.println("  puts '--classpath--'   ");
-//    script.println(" puts '--working dir--'  ");
-//    script.println("  puts Dir.pwd  ");
-//    script.println(" puts '--working dir--'  ");
-//  }
 }

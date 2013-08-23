@@ -19,6 +19,7 @@ import ro.isdc.wro.extensions.processor.support.uglify.UglifyJs;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -32,7 +33,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.JS)
 public class BeautifyJsProcessor
-  implements ResourceProcessor {
+  implements ResourceProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(BeautifyJsProcessor.class);
   public static final String ALIAS_BEAUTIFY = "beautifyJs";
   /**
@@ -65,6 +66,7 @@ public class BeautifyJsProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     final String content = IOUtils.toString(reader);
@@ -90,5 +92,19 @@ public class BeautifyJsProcessor
    */
   protected void onException(final WroRuntimeException e) {
     throw e;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public void process(final Reader reader, final Writer writer)
+    throws IOException {
+    process(null, reader, writer);
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
   }
 }

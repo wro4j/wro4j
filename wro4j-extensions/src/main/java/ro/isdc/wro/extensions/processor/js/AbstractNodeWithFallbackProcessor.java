@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
 
@@ -24,7 +25,7 @@ import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
  * @created 21 Jan 2013
  */
 public abstract class AbstractNodeWithFallbackProcessor
-    implements ResourceProcessor {
+    implements ResourceProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeWithFallbackProcessor.class);
   @Inject
   private Injector injector;
@@ -70,4 +71,16 @@ public abstract class AbstractNodeWithFallbackProcessor
    * @VisibleFortesTesting
    */
   protected abstract ResourceProcessor createFallbackProcessor();
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void destroy()
+      throws Exception {
+    if (getProcessor() instanceof Destroyable) {
+      ((Destroyable) getProcessor()).destroy();
+    }
+  }
 }

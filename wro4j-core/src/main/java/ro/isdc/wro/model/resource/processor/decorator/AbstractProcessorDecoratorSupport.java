@@ -10,9 +10,11 @@ import java.io.Writer;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.MinimizeAware;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessorAware;
 import ro.isdc.wro.model.resource.processor.SupportAware;
 import ro.isdc.wro.model.resource.processor.SupportedResourceTypeAware;
 import ro.isdc.wro.util.AbstractDecorator;
@@ -26,8 +28,7 @@ import ro.isdc.wro.util.AbstractDecorator;
  * @since 1.4.6
  */
 public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorator<ResourceProcessor>
-  implements ResourceProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware {
-
+  implements ResourceProcessorAware {
   public AbstractProcessorDecoratorSupport(final ResourceProcessor decorated) {
     super(decorated);
   }
@@ -97,6 +98,16 @@ public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorato
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public void destroy()
+      throws Exception {
+    if (getDecoratedObject() instanceof Destroyable) {
+      ((Destroyable) getDecoratedObject()).destroy();
+    }
+  }
+
+  /**
    * @return true if passed processor is minimize aware.
    */
   final boolean isMinimizeForProcessor(final Object processor) {
@@ -121,6 +132,6 @@ public abstract class AbstractProcessorDecoratorSupport extends AbstractDecorato
    */
   public final void process(final Reader reader, final Writer writer)
       throws IOException {
-      process(null, reader, writer);
+    process(null, reader, writer);
   }
 }

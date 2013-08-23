@@ -18,6 +18,7 @@ import ro.isdc.wro.extensions.processor.support.sass.SassCss;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -30,7 +31,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.CSS)
 public class SassCssProcessor
-  implements ResourceProcessor {
+  implements ResourceProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(SassCssProcessor.class);
   public static final String ALIAS = "sassCss";
   
@@ -93,4 +94,8 @@ public class SassCssProcessor
   protected SassCss newEngine() {
     return new SassCss();
   }   
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }
