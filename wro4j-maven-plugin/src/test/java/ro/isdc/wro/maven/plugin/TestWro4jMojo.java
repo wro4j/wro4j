@@ -537,7 +537,6 @@ public class TestWro4jMojo {
         }
       });
 
-
       assertEquals(1, victim.getTargetGroupsAsList().size());
       victim.execute();
 

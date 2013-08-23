@@ -38,7 +38,7 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * A build-time solution for organizing and minimizing static resources. By default uses the same configuration as the
  * run-time solution. Additionally, allows you to change the processors used by changing the wroManagerFactory
  * implementation used by the plugin.
- * 
+ *
  * @goal run
  * @phase compile
  * @requiresDependencyResolution runtime
@@ -48,7 +48,7 @@ public class Wro4jMojo
     extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
-   * 
+   *
    * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
    * @optional
    */
@@ -65,14 +65,14 @@ public class Wro4jMojo
   private File jsDestinationFolder;
   /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
-   * 
+   *
    * @parameter default-value="${project.build.directory}"
    * @optional
    */
   private File buildDirectory;
   /**
    * This parameter is not meant to be used. The only purpose is to hold the final build name of the artifact
-   * 
+   *
    * @parameter default-value="${project.build.directory}/${project.build.finalName}"
    * @optional
    */
@@ -126,11 +126,11 @@ public class Wro4jMojo
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
-    boolean parallel = true;
+    final boolean parallel = false;
     final Collection<String> groupsAsList = getTargetGroupsAsList();
-    StopWatch watch = new StopWatch();
+    final StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
-    
+
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     for (final String group : groupsAsList) {
@@ -183,7 +183,7 @@ public class Wro4jMojo
 
   /**
    * Encodes a version using some logic.
-   * 
+   *
    * @param group
    *          the name of the resource to encode.
    * @param input
@@ -203,7 +203,7 @@ public class Wro4jMojo
 
   /**
    * Computes the destination folder based on resource type.
-   * 
+   *
    * @param resourceType
    *          {@link ResourceType} to process.
    * @return destinationFoder where the result of resourceType will be copied.
@@ -300,7 +300,7 @@ public class Wro4jMojo
    * the cssTargetFolder (the folder where aggregated css files are located) with build directory or contextFolder. If
    * rootFolder is null, then the result is also null (equivalent to using the cssTargetFolder the same as the root
    * folder.
-   * 
+   *
    * @return the aggregated folder path, based on the cssDestinationFolder (if set) and the build folder or the
    *         contextFolder.
    */
@@ -358,7 +358,7 @@ public class Wro4jMojo
 
   /**
    * The folder where the project is built.
-   * 
+   *
    * @param buildDirectory
    *          the buildDirectory to set
    * @VisibleForTesting

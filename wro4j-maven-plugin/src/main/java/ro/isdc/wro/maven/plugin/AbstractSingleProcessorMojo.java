@@ -28,21 +28,21 @@ import ro.isdc.wro.util.io.NullOutputStream;
 
 /**
  * Maven plugin which use a single processor.
- * 
+ *
  * @author Alex Objelean
  */
 public abstract class AbstractSingleProcessorMojo
     extends AbstractWro4jMojo {
   /**
    * Comma separated options. This field is optional. If no value is provided, no options will be used..
-   * 
+   *
    * @parameter expression="${options}"
    * @optional
    */
   private String options;
   /**
    * When true, all the plugin won't stop its execution and will log all found errors.
-   * 
+   *
    * @parameter default-value="false" expression="${failNever}"
    * @optional
    */
@@ -56,14 +56,14 @@ public abstract class AbstractSingleProcessorMojo
       throws Exception {
     getLog().info("options: " + options);
 
-    boolean parallel = true;
+    final boolean parallel = false;
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        
+
         if (parallel) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
@@ -89,14 +89,14 @@ public abstract class AbstractSingleProcessorMojo
   private void processGroup(final String group)
       throws Exception {
     getLog().info("processing group: " + group);
-    
+
     // mock request
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
     // mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
-    
+
     // init context
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
@@ -141,7 +141,7 @@ public abstract class AbstractSingleProcessorMojo
 
   /**
    * Used for tests only.
-   * 
+   *
    * @param options
    *          the options to set
    */
