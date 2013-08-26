@@ -279,6 +279,23 @@ public class TestWro4jMojo {
   }
 
   @Test
+  public void shouldBeFasterWhenRunningPostProcessingInParallel() throws Exception {
+    final long begin = System.currentTimeMillis();
+    victim.setParallelPostprocessing(false);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    final long endSerial = System.currentTimeMillis();
+    victim.setParallelPostprocessing(true);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    final long endParallel = System.currentTimeMillis();
+
+    final long serial = endSerial - begin;
+    final long parallel = endParallel - endSerial;
+    LOG.info("serial took: {}ms", serial);
+    LOG.info("parallel took: {}ms", parallel);
+    assertTrue(serial > parallel);
+  }
+
+  @Test
   public void testComputedAggregatedFolder()
       throws Exception {
     setWroWithValidResources();
@@ -317,7 +334,7 @@ public class TestWro4jMojo {
     final Properties groupNames = new Properties();
     groupNames.load(new FileInputStream(groupNameMappingFile));
     LOG.debug("groupNames: {}", groupNames);
-    Assert.assertEquals("g1.js", groupNames.get("g1.js"));
+    assertEquals("g1.js", groupNames.get("g1.js"));
 
     FileUtils.deleteQuietly(groupNameMappingFile);
   }

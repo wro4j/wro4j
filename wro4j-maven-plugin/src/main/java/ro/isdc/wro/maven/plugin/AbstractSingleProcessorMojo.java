@@ -56,7 +56,6 @@ public abstract class AbstractSingleProcessorMojo
       throws Exception {
     getLog().info("options: " + options);
 
-    final boolean parallel = false;
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
@@ -64,7 +63,7 @@ public abstract class AbstractSingleProcessorMojo
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 
-        if (parallel) {
+        if (isParallelPostprocessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
@@ -77,7 +76,7 @@ public abstract class AbstractSingleProcessorMojo
         }
       }
     }
-    if (parallel) {
+    if (isParallelPostprocessing()) {
       getTaskExecutor().submit(callables);
     }
   }

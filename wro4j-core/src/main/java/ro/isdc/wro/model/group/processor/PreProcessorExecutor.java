@@ -19,7 +19,6 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.WroUtil;
-import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -64,7 +62,6 @@ public class PreProcessorExecutor {
    * Runs the preProcessing in parallel.
    */
   private ExecutorService executor;
-  private TaskExecutor<String> taskExecutor;
 
   /**
    * Apply preProcessors on resources and merge them after all preProcessors are applied.
@@ -95,7 +92,7 @@ public class PreProcessorExecutor {
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
-      Validate.notNull(resources);
+      notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
@@ -163,27 +160,6 @@ public class PreProcessorExecutor {
     return result.toString();
   }
 
-  /**
-   * TODO find a way to collect results in the same order they are submitted.
-   */
-  private TaskExecutor<String> getTaskExecutor() {
-    if (taskExecutor == null) {
-      taskExecutor = new TaskExecutor<String>() {
-        @Override
-        protected void onException(final Exception e) {
-          // propagate original cause
-          final Throwable cause = e.getCause();
-          if (cause instanceof WroRuntimeException) {
-            throw (WroRuntimeException) cause;
-          } else {
-            throw new WroRuntimeException("Problem during parallel pre processing", e.getCause());
-          }
-        }
-      };
-    }
-    return taskExecutor;
-  }
-  
   private ExecutorService getExecutorService() {
     if (executor == null) {
       // use at most the number of available processors (true parallelism)
@@ -279,11 +255,11 @@ public class PreProcessorExecutor {
       IOUtils.closeQuietly(is);
     }
   }
-  
+
   /**
    * Perform cleanUp on service shut down.
    */
   public void destroy() {
-    getTaskExecutor().destroy();
+    getExecutorService().shutdownNow();
   }
 }

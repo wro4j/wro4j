@@ -34,7 +34,8 @@ public class TestTaskExecutor {
   @Test(expected = NullPointerException.class)
   public void cannotSubmitNullCallables()
       throws Exception {
-    victim.submit(null);
+    final Collection<Callable<Void>> callables = null;
+    victim.submit(callables);
   }
 
   private Callable<Void> createSlowCallable(final long millis) {
@@ -83,6 +84,7 @@ public class TestTaskExecutor {
     LOG.debug("Execution took: {}", delta);
     assertTrue(delta < delay * times);
   }
+
 
   private static void printDate() {
     LOG.debug(new SimpleDateFormat("HH:ss:S").format(new Date()));

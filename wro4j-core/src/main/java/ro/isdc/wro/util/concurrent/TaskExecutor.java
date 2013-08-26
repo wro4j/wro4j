@@ -1,11 +1,6 @@
 package ro.isdc.wro.util.concurrent;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
@@ -22,7 +17,7 @@ import ro.isdc.wro.util.StopWatch;
 
 /**
  * Hides the details of running tasks in parallel.
- * 
+ *
  * @author Alex Objelean
  */
 public class TaskExecutor<T> {
@@ -57,36 +52,40 @@ public class TaskExecutor<T> {
   protected ExecutorService newExecutor() {
     return Executors.newFixedThreadPool(3);
   }
-  
+
   /**
+   * Submits a chunk of jobs for parallel execution. This is a blocking operation - it will end execution when all
+   * submitted tasks are finished.
+   *
    * @param callables
-   *          a {@link Collection} of {@link Callable} to execute.
+   *          a {@link Collection} of {@link Callable} to execute. When the provided collection contains only one item,
+   *          the task will be executed synchronously.
    * @throws Exception
-   *           if an exception occured during callable execution.
+   *           if an exception occurred during callable execution.
    */
   public final void submit(final Collection<Callable<T>> callables)
       throws Exception {
     Validate.notNull(callables);
-    
-    StopWatch watch = new StopWatch();
+
+    final StopWatch watch = new StopWatch();
     watch.start("init");
     final long start = System.currentTimeMillis();
     final AtomicLong totalTime = new AtomicLong();
     LOG.debug("running {} tasks", callables.size());
-    
+
     if (callables.size() == 1) {
       final T result = callables.iterator().next().call();
       onResultAvailable(result);
     } else {
       LOG.debug("Running tasks in parallel");
       watch.stop();
-      
+
       watch.start("submit tasks");
       for (final Callable<T> callable : callables) {
         getCompletionService().submit(decorate(callable, totalTime));
       }
       watch.stop();
-      
+
       watch.start("consume results");
       for (int i = 0; i < callables.size(); i++) {
         doConsumeResult();
@@ -95,15 +94,14 @@ public class TaskExecutor<T> {
     watch.stop();
     destroy();
 
-    
     LOG.debug("Number of Tasks: {}", callables.size());
     LOG.debug("Average Execution Time: {}", totalTime.longValue()/callables.size());
     LOG.debug("Total Task Time: {}", totalTime);
     LOG.debug("Grand Total Execution Time: {}", System.currentTimeMillis() - start);
     LOG.debug(watch.prettyPrint());
   }
-  
-  private <T> Callable<T> decorate(final Callable<T> decorated, final AtomicLong totalTime) {
+
+  private Callable<T> decorate(final Callable<T> decorated, final AtomicLong totalTime) {
     return new Callable<T>() {
       public T call()
           throws Exception {
@@ -120,17 +118,17 @@ public class TaskExecutor<T> {
 
   /**
    * Invoked when an exception occurs during task execution. By default exception is ignored.
-   * 
+   *
    * @param e
    *          {@link Exception} caught during execution.
    */
   protected void onException(final Exception e)
       throws Exception {
   }
-  
+
   /**
    * A callback invoked when a result is available.
-   * 
+   *
    * @param result
    *          the available processed result.
    * @throws Exception
@@ -139,7 +137,7 @@ public class TaskExecutor<T> {
   protected void onResultAvailable(final T result)
       throws Exception {
   }
-  
+
   private void doConsumeResult()
       throws Exception {
     try {
@@ -150,7 +148,7 @@ public class TaskExecutor<T> {
       LOG.error("Exception while consuming result", e);
     }
   }
-  
+
   /**
    * Shutdown all executors used by this class.
    */

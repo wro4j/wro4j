@@ -115,6 +115,11 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
+  /**
+   * @parameter default-value="false" expression="${parallelPostprocessing}"
+   * @optional
+   */
+  private boolean parallelPostprocessing;
   private TaskExecutor<Void> taskExecutor;
 
   /**
@@ -507,6 +512,9 @@ public abstract class AbstractWro4jMojo
     return new URLClassLoader(urls.toArray(new URL[] {}), Thread.currentThread().getContextClassLoader());
   }
 
+  /**
+   * @return The {@link TaskExecutor} responsible for running multiple tasks in parallel.
+   */
   protected final TaskExecutor<Void> getTaskExecutor() {
     if (taskExecutor == null) {
       taskExecutor = new ForkJoinTaskExecutor<Void>() {
@@ -519,6 +527,7 @@ public abstract class AbstractWro4jMojo
     }
     return taskExecutor;
   }
+
   /**
    * @param contextFolder
    *          the servletContextFolder to set
@@ -569,6 +578,20 @@ public abstract class AbstractWro4jMojo
    */
   void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  protected final boolean isParallelPostprocessing() {
+    return parallelPostprocessing;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  final void setParallelPostprocessing(final boolean parallelPostprocessing) {
+    this.parallelPostprocessing = parallelPostprocessing;
   }
 
   /**

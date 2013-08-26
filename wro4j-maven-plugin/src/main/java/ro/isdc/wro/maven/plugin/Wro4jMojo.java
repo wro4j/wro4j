@@ -126,7 +126,6 @@ public class Wro4jMojo
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
-    final boolean parallel = false;
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     final StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
@@ -137,7 +136,8 @@ public class Wro4jMojo
       for (final ResourceType resourceType : ResourceType.values()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        if (parallel) {
+
+        if (isParallelPostprocessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
@@ -150,7 +150,7 @@ public class Wro4jMojo
         }
       }
     }
-    if (parallel) {
+    if (isParallelPostprocessing()) {
       getTaskExecutor().submit(callables);
     }
     watch.stop();
