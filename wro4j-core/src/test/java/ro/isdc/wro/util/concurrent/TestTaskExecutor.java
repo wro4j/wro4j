@@ -1,5 +1,8 @@
 package ro.isdc.wro.util.concurrent;
 
+import static org.junit.Assert.assertTrue;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
