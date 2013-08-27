@@ -6,6 +6,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.Validate;
@@ -19,6 +20,8 @@ import ro.isdc.wro.util.StopWatch;
  * Hides the details of running tasks in parallel.
  *
  * @author Alex Objelean
+ * @since 1.7.1
+ * @date 26 Aug 2013
  */
 public class TaskExecutor<T> {
   private static final Logger LOG = LoggerFactory.getLogger(TaskExecutor.class);
@@ -47,10 +50,20 @@ public class TaskExecutor<T> {
   }
 
   /**
+   * The implementation uses jsr166 {@link ForkJoinPool} implementation in case it is available and can be used,
+   * otherwise the default {@link ExecutorService} is used.
+   *
    * @return the {@link ExecutorService} responsible for running the tasks.
    */
   protected ExecutorService newExecutor() {
-    return Executors.newFixedThreadPool(3);
+    try {
+      final ExecutorService executor = (ExecutorService) Class.forName("java.util.concurrent.ForkJoinPool").newInstance();
+      LOG.debug("Using ForkJoinPool as task executor.");
+      return executor;
+    } catch (final Exception e) {
+      LOG.debug("ForkJoinPool class is not available, using default executor. ", e);
+      return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    }
   }
 
   /**

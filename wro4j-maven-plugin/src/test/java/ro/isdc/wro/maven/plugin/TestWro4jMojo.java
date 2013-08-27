@@ -47,7 +47,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
-import ro.isdc.wro.maven.plugin.support.ForkJoinTaskExecutor;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
@@ -303,7 +302,7 @@ public class TestWro4jMojo {
   @Test
   public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
     final AtomicBoolean invoked = new AtomicBoolean();
-    final TaskExecutor<Void> taskExecutor = new ForkJoinTaskExecutor<Void>() {
+    final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
       @Override
       public void submit(final Collection<Callable<Void>> callables)
           throws Exception {

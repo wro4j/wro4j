@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
-import ro.isdc.wro.maven.plugin.support.ForkJoinTaskExecutor;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -124,7 +123,7 @@ public abstract class AbstractTestLinterMojo {
   @Test
   public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
     final AtomicBoolean invoked = new AtomicBoolean();
-    final TaskExecutor<Void> taskExecutor = new ForkJoinTaskExecutor<Void>() {
+    final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
       @Override
       public void submit(final Collection<Callable<Void>> callables)
           throws Exception {

@@ -32,7 +32,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
-import ro.isdc.wro.maven.plugin.support.ForkJoinTaskExecutor;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
@@ -519,7 +518,7 @@ public abstract class AbstractWro4jMojo
    */
   protected final TaskExecutor<Void> getTaskExecutor() {
     if (taskExecutor == null) {
-      taskExecutor = new ForkJoinTaskExecutor<Void>() {
+      taskExecutor = new TaskExecutor<Void>() {
         @Override
         protected void onException(final Exception e) {
           // propagate exception

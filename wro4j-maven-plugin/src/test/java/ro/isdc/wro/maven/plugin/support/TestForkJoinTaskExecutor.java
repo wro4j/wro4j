@@ -24,7 +24,7 @@ public class TestForkJoinTaskExecutor {
 
   @Before
   public void setUp() {
-    victim = new ForkJoinTaskExecutor<Void>();
+    victim = new TaskExecutor<Void>();
   }
 
   private Callable<Void> createSlowCallable(final long millis) {
