@@ -134,6 +134,7 @@ public abstract class AbstractWro4jMojo
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
+    getLog().info("parallelPostprocessing: " + isParallelPostprocessing());
     getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
     getLog().debug("extraConfig: " + extraConfigFile);
 
