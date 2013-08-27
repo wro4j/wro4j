@@ -48,6 +48,8 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.concurrent.TaskExecutor;
 
+import com.google.common.annotations.VisibleForTesting;
+
 
 /**
  * Defines most common properties used by wro4j build-time solution infrastructure.
@@ -526,6 +528,11 @@ public abstract class AbstractWro4jMojo
       };
     }
     return taskExecutor;
+  }
+
+  @VisibleForTesting
+  void setTaskExecutor(final TaskExecutor<Void> taskExecutor) {
+    this.taskExecutor = taskExecutor;
   }
 
   /**

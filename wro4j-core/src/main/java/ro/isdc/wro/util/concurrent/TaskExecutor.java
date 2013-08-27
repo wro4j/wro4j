@@ -63,7 +63,7 @@ public class TaskExecutor<T> {
    * @throws Exception
    *           if an exception occurred during callable execution.
    */
-  public final void submit(final Collection<Callable<T>> callables)
+  public void submit(final Collection<Callable<T>> callables)
       throws Exception {
     Validate.notNull(callables);
 
@@ -95,7 +95,8 @@ public class TaskExecutor<T> {
     destroy();
 
     LOG.debug("Number of Tasks: {}", callables.size());
-    LOG.debug("Average Execution Time: {}", totalTime.longValue()/callables.size());
+    final long averageExecutionTime = callables.size() != 0 ? totalTime.longValue() / callables.size() : 0;
+    LOG.debug("Average Execution Time: {}", averageExecutionTime);
     LOG.debug("Total Task Time: {}", totalTime);
     LOG.debug("Grand Total Execution Time: {}", System.currentTimeMillis() - start);
     LOG.debug(watch.prettyPrint());

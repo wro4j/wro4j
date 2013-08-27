@@ -19,8 +19,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -44,6 +47,7 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
+import ro.isdc.wro.maven.plugin.support.ForkJoinTaskExecutor;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
@@ -61,6 +65,7 @@ import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -293,6 +298,29 @@ public class TestWro4jMojo {
     LOG.info("serial took: {}ms", serial);
     LOG.info("parallel took: {}ms", parallel);
     assertTrue(serial > parallel);
+  }
+
+  @Test
+  public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
+    final AtomicBoolean invoked = new AtomicBoolean();
+    final TaskExecutor<Void> taskExecutor = new ForkJoinTaskExecutor<Void>() {
+      @Override
+      public void submit(final Collection<Callable<Void>> callables)
+          throws Exception {
+        invoked.set(true);
+        super.submit(callables);
+      }
+    };
+    victim.setTaskExecutor(taskExecutor);
+    victim.setIgnoreMissingResources(true);
+
+    victim.setParallelPostprocessing(false);
+    victim.execute();
+    assertFalse(invoked.get());
+
+    victim.setParallelPostprocessing(true);
+    victim.execute();
+    assertTrue(invoked.get());
   }
 
   @Test
