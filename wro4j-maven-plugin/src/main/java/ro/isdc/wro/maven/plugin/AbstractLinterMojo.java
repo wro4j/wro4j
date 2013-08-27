@@ -186,6 +186,7 @@ public abstract class AbstractLinterMojo<T>
   /**
    * @param failNever the failFast to set.
    */
+  @Override
   public void setFailNever(final boolean failNever) {
     this.failNever = failNever;
   }
@@ -199,7 +200,8 @@ public abstract class AbstractLinterMojo<T>
    * @return the failNever flag.
    * @VisibleForTesting
    */
-  boolean isFailNever() {
+  @Override
+  public boolean isFailNever() {
     return failNever;
   }
 

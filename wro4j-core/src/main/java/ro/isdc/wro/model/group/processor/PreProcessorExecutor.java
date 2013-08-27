@@ -19,7 +19,6 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +92,7 @@ public class PreProcessorExecutor {
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
-      Validate.notNull(resources);
+      notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
@@ -255,5 +254,12 @@ public class PreProcessorExecutor {
     } finally {
       IOUtils.closeQuietly(is);
     }
+  }
+
+  /**
+   * Perform cleanUp on service shut down.
+   */
+  public void destroy() {
+    getExecutorService().shutdownNow();
   }
 }

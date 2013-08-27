@@ -71,6 +71,22 @@ public class TestJsHintMojo
   }
 
   @Test
+  public void shouldProcessMultipleGroupsMore()
+      throws Exception {
+    for (int i = 0; i < 10; i++) {
+      shouldProcessMultipleGroups();
+    }
+  }
+
+
+  @Test
+  public void shouldProcessMultipleGroups()
+      throws Exception {
+    getMojo().setTargetGroups("undef,valid,g3");
+    getMojo().execute();
+  }
+
+  @Test
   public void testEmptyOptions()
       throws Exception {
     getMojo().setOptions("");

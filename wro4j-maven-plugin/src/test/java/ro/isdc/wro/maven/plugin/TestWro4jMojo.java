@@ -19,8 +19,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -61,6 +64,7 @@ import ro.isdc.wro.model.resource.support.naming.FolderHashEncoderNamingStrategy
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -279,6 +283,46 @@ public class TestWro4jMojo {
   }
 
   @Test
+  public void shouldBeFasterWhenRunningPostProcessingInParallel() throws Exception {
+    final long begin = System.currentTimeMillis();
+    victim.setParallelPostprocessing(false);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    final long endSerial = System.currentTimeMillis();
+    victim.setParallelPostprocessing(true);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    final long endParallel = System.currentTimeMillis();
+
+    final long serial = endSerial - begin;
+    final long parallel = endParallel - endSerial;
+    LOG.info("serial took: {}ms", serial);
+    LOG.info("parallel took: {}ms", parallel);
+    assertTrue(serial > parallel);
+  }
+
+  @Test
+  public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
+    final AtomicBoolean invoked = new AtomicBoolean();
+    final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
+      @Override
+      public void submit(final Collection<Callable<Void>> callables)
+          throws Exception {
+        invoked.set(true);
+        super.submit(callables);
+      }
+    };
+    victim.setTaskExecutor(taskExecutor);
+    victim.setIgnoreMissingResources(true);
+
+    victim.setParallelPostprocessing(false);
+    victim.execute();
+    assertFalse(invoked.get());
+
+    victim.setParallelPostprocessing(true);
+    victim.execute();
+    assertTrue(invoked.get());
+  }
+
+  @Test
   public void testComputedAggregatedFolder()
       throws Exception {
     setWroWithValidResources();
@@ -317,7 +361,7 @@ public class TestWro4jMojo {
     final Properties groupNames = new Properties();
     groupNames.load(new FileInputStream(groupNameMappingFile));
     LOG.debug("groupNames: {}", groupNames);
-    Assert.assertEquals("g1.js", groupNames.get("g1.js"));
+    assertEquals("g1.js", groupNames.get("g1.js"));
 
     FileUtils.deleteQuietly(groupNameMappingFile);
   }
@@ -536,7 +580,6 @@ public class TestWro4jMojo {
           return victim.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
         }
       });
-
 
       assertEquals(1, victim.getTargetGroupsAsList().size());
       victim.execute();
