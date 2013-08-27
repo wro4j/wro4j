@@ -6,7 +6,6 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang3.Validate;
@@ -50,7 +49,7 @@ public class TaskExecutor<T> {
   }
 
   /**
-   * The implementation uses jsr166 {@link ForkJoinPool} implementation in case it is available and can be used,
+   * The implementation uses jsr166 ForkJoinPool implementation in case it is available and can be used,
    * otherwise the default {@link ExecutorService} is used.
    *
    * @return the {@link ExecutorService} responsible for running the tasks.
