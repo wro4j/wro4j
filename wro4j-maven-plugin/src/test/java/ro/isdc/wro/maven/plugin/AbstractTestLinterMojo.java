@@ -119,7 +119,6 @@ public abstract class AbstractTestLinterMojo {
     }
   }
 
-
   @Test
   public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
     final AtomicBoolean invoked = new AtomicBoolean();
@@ -131,6 +130,7 @@ public abstract class AbstractTestLinterMojo {
         super.submit(callables);
       }
     };
+    mojo.setFailNever(true);
     mojo.setTaskExecutor(taskExecutor);
     mojo.setIgnoreMissingResources(true);
 
