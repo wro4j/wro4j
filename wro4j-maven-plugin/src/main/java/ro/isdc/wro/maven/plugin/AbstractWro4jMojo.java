@@ -117,10 +117,13 @@ public abstract class AbstractWro4jMojo
    */
   private BuildContext buildContext;
   /**
-   * @parameter default-value="false" expression="${parallelPostprocessing}"
+   * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
+   * resulting in faster overall plugin execution time.
+   *
+   * @parameter default-value="false" expression="${parallelProcessing}"
    * @optional
    */
-  private boolean parallelPostprocessing;
+  private boolean parallelProcessing;
   private TaskExecutor<Void> taskExecutor;
 
   /**
@@ -134,8 +137,8 @@ public abstract class AbstractWro4jMojo
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
-    getLog().info("parallelPostprocessing: " + isParallelPostprocessing());
-    getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
+    getLog().info("parallelProcessing: " + isParallelProcessing());
+    getLog().debug("wroManagerFactory: " + wroManagerFactory);
     getLog().debug("extraConfig: " + extraConfigFile);
 
     extendPluginClasspath();
@@ -291,7 +294,6 @@ public abstract class AbstractWro4jMojo
       }
     }
   }
-
 
   private void persistResourceFingerprints(final Resource resource) {
     final WroManager manager = getWroManager();
@@ -591,15 +593,15 @@ public abstract class AbstractWro4jMojo
   /**
    * @VisibleForTesting
    */
-  protected final boolean isParallelPostprocessing() {
-    return parallelPostprocessing;
+  protected final boolean isParallelProcessing() {
+    return parallelProcessing;
   }
 
   /**
    * @VisibleForTesting
    */
-  final void setParallelPostprocessing(final boolean parallelPostprocessing) {
-    this.parallelPostprocessing = parallelPostprocessing;
+  final void setParallelProcessing(final boolean parallelProcessing) {
+    this.parallelProcessing = parallelProcessing;
   }
 
   /**
