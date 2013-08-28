@@ -137,7 +137,7 @@ public class Wro4jMojo
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 
-        if (isParallelPostprocessing()) {
+        if (isParallelProcessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
@@ -150,7 +150,7 @@ public class Wro4jMojo
         }
       }
     }
-    if (isParallelPostprocessing()) {
+    if (isParallelProcessing()) {
       getTaskExecutor().submit(callables);
     }
     watch.stop();

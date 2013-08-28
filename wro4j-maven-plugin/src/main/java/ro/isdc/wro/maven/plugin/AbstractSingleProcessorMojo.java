@@ -63,7 +63,7 @@ public abstract class AbstractSingleProcessorMojo
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 
-        if (isParallelPostprocessing()) {
+        if (isParallelProcessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
@@ -76,7 +76,7 @@ public abstract class AbstractSingleProcessorMojo
         }
       }
     }
-    if (isParallelPostprocessing()) {
+    if (isParallelProcessing()) {
       getTaskExecutor().submit(callables);
     }
   }
