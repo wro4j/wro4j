@@ -3,7 +3,9 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +33,8 @@ import ro.isdc.wro.util.io.NullOutputStream;
  * @since 1.3.8
  * @created 20 Jun 2011
  */
-public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
+public abstract class AbstractSingleProcessorMojo
+    extends AbstractWro4jMojo {
   /**
    * Comma separated options. This field is optional. If no value is provided, no options will be used..
    *
@@ -52,36 +55,54 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
    */
   @Override
   public final void doExecute()
-    throws Exception {
+      throws Exception {
     getLog().info("options: " + options);
     getLog().info("failNever: " + failNever);
+
+    final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        processGroup(groupWithExtension);
+
+        if (isParallelPostprocessing()) {
+          callables.add(Context.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              processGroup(groupWithExtension);
+              return null;
+            }
+          }));
+        } else {
+          processGroup(groupWithExtension);
+        }
       }
+    }
+    if (isParallelPostprocessing()) {
+      getTaskExecutor().submit(callables);
     }
   }
 
   /**
-   * @param group the name of the group to process.
+   * @param group
+   *          the name of the group to process.
    */
-  private void processGroup(final String group) throws Exception {
+  private void processGroup(final String group)
+      throws Exception {
     getLog().info("processing group: " + group);
 
-    //mock request
+    // mock request
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn(group);
-    //mock response
+    // mock response
     final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
     Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
-    //init context
+    // init context
     final WroConfiguration config = Context.get().getConfig();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-    //perform processing
+    // perform processing
     getManagerFactory().create().process();
 
     getLog().debug("Processing group: " + group + " [OK]");
@@ -121,25 +142,26 @@ public abstract class AbstractSingleProcessorMojo extends AbstractWro4jMojo {
 
   /**
    * Used for tests only.
-   * @param options the options to set
+   *
+   * @param options
+   *          the options to set
    */
   void setOptions(final String options) {
     this.options = options;
   }
 
   /**
-   * @param failNever the failFast to set
-   * @VisibleForTesting
+   * @param failNever
+   *          the failFast to set
    */
-  void setFailNever(final boolean failNever) {
+  public void setFailNever(final boolean failNever) {
     this.failNever = failNever;
   }
 
   /**
    * @return the failNever
-   * @VisibleForTesting
    */
-  boolean isFailNever() {
+  public boolean isFailNever() {
     return failNever;
   }
 }

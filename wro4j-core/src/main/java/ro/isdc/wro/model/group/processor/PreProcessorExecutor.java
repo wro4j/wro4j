@@ -17,7 +17,6 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +87,7 @@ public class PreProcessorExecutor {
    */
   public String processAndMerge(final Group group, final ProcessingCriteria criteria)
       throws IOException {
-    Validate.notNull(group);
+    notNull(group);
     callbackRegistry.onBeforeMerge();
     try {
       final List<Resource> resources = group.getResources();
@@ -253,5 +252,12 @@ public class PreProcessorExecutor {
     } finally {
       IOUtils.closeQuietly(is);
     }
+  }
+
+  /**
+   * Perform cleanUp on service shut down.
+   */
+  public void destroy() {
+    getExecutorService().shutdownNow();
   }
 }

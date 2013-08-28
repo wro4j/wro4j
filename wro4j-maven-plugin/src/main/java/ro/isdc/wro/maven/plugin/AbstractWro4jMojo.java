@@ -45,6 +45,9 @@ import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcess
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.Function;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -113,6 +116,12 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
+  /**
+   * @parameter default-value="false" expression="${parallelPostprocessing}"
+   * @optional
+   */
+  private boolean parallelPostprocessing;
+  private TaskExecutor<Void> taskExecutor;
 
   /**
    * {@inheritDoc}
@@ -125,6 +134,7 @@ public abstract class AbstractWro4jMojo
     getLog().info("targetGroups: " + getTargetGroups());
     getLog().info("minimize: " + isMinimize());
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
+    getLog().info("parallelPostprocessing: " + isParallelPostprocessing());
     getLog().debug("wroManagerFactory: " + this.wroManagerFactory);
     getLog().debug("extraConfig: " + extraConfigFile);
 
@@ -134,6 +144,7 @@ public abstract class AbstractWro4jMojo
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
+      getLog().error("Exception occured while executing maven plugin", e);
       final String message = "Exception occured while processing: " + e.toString() + ", class: "
           + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
       getLog().error(message, e);
@@ -505,6 +516,27 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
+   * @return The {@link TaskExecutor} responsible for running multiple tasks in parallel.
+   */
+  protected final TaskExecutor<Void> getTaskExecutor() {
+    if (taskExecutor == null) {
+      taskExecutor = new TaskExecutor<Void>() {
+        @Override
+        protected void onException(final Exception e) {
+          // propagate exception
+          throw new RuntimeException(e);
+        }
+      };
+    }
+    return taskExecutor;
+  }
+
+  @VisibleForTesting
+  void setTaskExecutor(final TaskExecutor<Void> taskExecutor) {
+    this.taskExecutor = taskExecutor;
+  }
+
+  /**
    * @param contextFolder
    *          the servletContextFolder to set
    * @VisibleForTesting
@@ -554,6 +586,20 @@ public abstract class AbstractWro4jMojo
    */
   void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  protected final boolean isParallelPostprocessing() {
+    return parallelPostprocessing;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  final void setParallelPostprocessing(final boolean parallelPostprocessing) {
+    this.parallelPostprocessing = parallelPostprocessing;
   }
 
   /**

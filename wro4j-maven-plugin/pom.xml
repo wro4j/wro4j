@@ -12,6 +12,10 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>wro4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>wro4j-extensions</artifactId>
         </dependency>
         <dependency>
@@ -40,6 +44,12 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-plugin-testing-harness</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jsr166-mirror</groupId>
+            <artifactId>jsr166</artifactId>
+            <version>1.7.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.sonatype.plexus</groupId>

@@ -83,12 +83,16 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  */
 public class TestWroManager {
   private static final Logger LOG = LoggerFactory.getLogger(TestWroManager.class);
+  @Mock
+  private MutableResourceAuthorizationManager mockAuthorizationManager;
+  @Mock
+  private CacheStrategy<CacheKey, CacheValue> mockCacheStrategy;
+  @Mock
+  private WroModelFactory mockModelFactory;
   /**
    * Used to test simple operations.
    */
   private WroManager victim;
-  @Mock
-  private MutableResourceAuthorizationManager mockAuthorizationManager;
   /**
    * Used to test more complex use-cases.
    */
@@ -532,6 +536,16 @@ public class TestWroManager {
     });
     victim.getCallbackRegistry().onProcessingComplete();
     Mockito.verify(mockCallback, Mockito.atLeastOnce()).onProcessingComplete();
+  }
+
+  @Test
+  public void shouldDestroyDependenciesWhenDestoryed() {
+    final WroManager manager = new WroManager.Builder().setCacheStrategy(mockCacheStrategy).setModelFactory(mockModelFactory).build();
+
+    manager.destroy();
+
+    verify(mockCacheStrategy).destroy();
+    verify(mockModelFactory).destroy();
   }
 
   private static class DestroyableProcessor extends PlaceholderProcessor implements Destroyable {
