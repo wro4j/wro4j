@@ -29,7 +29,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.factory.DefaultProcesorsFactory;
+import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
@@ -146,6 +146,17 @@ public class BaseWroManagerFactory
       onAfterInitializeManager(manager);
       return manager;
     }
+
+    /**
+     * Avoid unnecessary initialization when destroying the object.
+     */
+    @Override
+    public void destroy() {
+      if (this.object != null) {
+        this.object.destroy();
+      }
+      super.destroy();
+    };
   };
 
   /**
@@ -196,7 +207,7 @@ public class BaseWroManagerFactory
    * @return {@link ProcessorsFactory} object.
    */
   protected ProcessorsFactory newProcessorsFactory() {
-    return new DefaultProcesorsFactory();
+    return new DefaultProcessorsFactory();
   }
 
   /**
@@ -309,17 +320,6 @@ public class BaseWroManagerFactory
   }
 
   /**
-   * @deprecated use {@link BaseWroManagerFactory#setHashStrategy(HashStrategy)}
-   * @param hashBuilder
-   *          the hashBuilder to set
-   */
-  @Deprecated
-  public BaseWroManagerFactory setHashBuilder(final HashStrategy hashBuilder) {
-    this.hashStrategy = hashBuilder;
-    return this;
-  }
-
-  /**
    * @param hashBuilder
    *          the hashBuilder to set
    */
@@ -374,8 +374,9 @@ public class BaseWroManagerFactory
    * @param processorsFactory
    *          the processorsFactory to set
    */
-  public void setProcessorsFactory(final ProcessorsFactory processorsFactory) {
+  public BaseWroManagerFactory setProcessorsFactory(final ProcessorsFactory processorsFactory) {
     this.processorsFactory = processorsFactory;
+    return this;
   }
 
   public BaseWroManagerFactory setResourceAuthorizationManager(final ResourceAuthorizationManager authorizationManager) {

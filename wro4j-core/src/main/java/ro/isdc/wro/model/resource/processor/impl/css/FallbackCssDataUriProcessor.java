@@ -4,7 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.model.resource.processor.support.CssUrlInspector;
+import ro.isdc.wro.model.resource.processor.support.FallbackCssDataUriUrlInspector;
 
 
 /**
@@ -60,35 +61,8 @@ public class FallbackCssDataUriProcessor
     return originalDeclaration + separator + modifiedDeclaration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  protected String getPattern() {
-    return WroUtil.loadRegexpWithKey("cssUrlRewrite.fallbackCssDataUri");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public int getDeclarationGroupIndex() {
-    return 1;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int getUrlIndexA() {
-    return 2;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected int getUrlIndexB() {
-    return 3;
+  protected CssUrlInspector newCssUrlInspector() {
+    return new FallbackCssDataUriUrlInspector();
   }
 }

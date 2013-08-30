@@ -37,9 +37,7 @@ public class DefaultGroupExtractor
    * {@inheritDoc}
    */
   public String getGroupName(final HttpServletRequest request) {
-    if (request == null) {
-      throw new IllegalArgumentException("Request cannot be NULL!");
-    }
+    Validate.notNull(request);
     String uri = request.getRequestURI();
     // check if include or uri path are present and use one of these as request uri.
     final String includeUriPath = (String) request.getAttribute(ATTR_INCLUDE_PATH);
@@ -90,9 +88,7 @@ public class DefaultGroupExtractor
    *         otherwise returns true.
    */
   public boolean isMinimized(final HttpServletRequest request) {
-    if (request == null) {
-      throw new IllegalArgumentException("Request cannot be NULL!");
-    }
+    Validate.notNull(request);
     final String minimizeAsString = request.getParameter(PARAM_MINIMIZE);
     return !(Context.get().getConfig().isDebug() && "false".equalsIgnoreCase(minimizeAsString));
   }

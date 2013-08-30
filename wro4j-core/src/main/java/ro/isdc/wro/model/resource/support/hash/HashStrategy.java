@@ -4,6 +4,9 @@
  */
 package ro.isdc.wro.model.resource.support.hash;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 
 /**
  * Creates a fingerprint representation of the resource content.
@@ -12,5 +15,11 @@ package ro.isdc.wro.model.resource.support.hash;
  * @since 1.4.7
  * @created 17 Jun 2012
  */
-public interface HashStrategy extends HashBuilder {
+public interface HashStrategy {
+  /**
+   * @param inputStream to digest.
+   * @return the hash of the content.
+   * @throws IOException if there was an error during reading the stream content.
+   */
+  public String getHash(final InputStream inputStream) throws IOException;
 }

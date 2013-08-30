@@ -35,14 +35,12 @@ public class TestJsLintProcessor
   @Test(expected = LinterException.class)
   public void testWithOptionsSet()
       throws Exception {
-    final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
-
     final ResourcePostProcessor processor = new JsLintProcessor() {
       @Override
       protected void onLinterException(final LinterException e, final Resource resource) {
         throw e;
       };
-    }.setOptions("maxerr=1");
+    }.setOptionsAsString("maxerr=1");
 
     processor.process(new StringReader("alert(;"), new StringWriter());
   }
@@ -50,8 +48,6 @@ public class TestJsLintProcessor
   @Test(expected = LinterException.class)
   public void shouldFailWhenScriptContainsErrors()
       throws Exception {
-    final ThreadLocal<Throwable> cause = new ThreadLocal<Throwable>();
-
     final ResourcePostProcessor processor = new JsLintProcessor() {
       @Override
       protected void onLinterException(final LinterException e, final Resource resource) {

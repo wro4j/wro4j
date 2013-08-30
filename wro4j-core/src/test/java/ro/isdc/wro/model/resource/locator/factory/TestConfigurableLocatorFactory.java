@@ -1,8 +1,8 @@
 package ro.isdc.wro.model.resource.locator.factory;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class TestConfigurableLocatorFactory {
 
   @Test
   public void shouldHaveNonEmptyListOfAvailableStrategies() {
-    assertEquals(5, victim.getAvailableStrategies().size());
+    assertEquals(6, victim.getAvailableStrategies().size());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -67,9 +67,16 @@ public class TestConfigurableLocatorFactory {
 
   @Test
   public void shouldDetectConfiguredLocator() {
-    final String locatorsAsString = ServletContextUriLocator.ALIAS_DISPATCHER_FIRST;
-    victim.setProperties(createPropsWithLocators(locatorsAsString));
+    victim.setProperties(createPropsWithLocators(ServletContextUriLocator.ALIAS_DISPATCHER_FIRST));
+    final List<UriLocator> locators = victim.getConfiguredStrategies();
 
+    assertEquals(1, locators.size());
+    assertEquals(ServletContextUriLocator.class, locators.iterator().next().getClass());
+  }
+
+  @Test
+  public void shouldUseServletContextOnlyLocator() {
+    victim.setProperties(createPropsWithLocators(ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_ONLY));
     final List<UriLocator> locators = victim.getConfiguredStrategies();
 
     assertEquals(1, locators.size());

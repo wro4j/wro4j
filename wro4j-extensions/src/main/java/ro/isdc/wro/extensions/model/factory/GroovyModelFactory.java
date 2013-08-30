@@ -34,7 +34,7 @@ import ro.isdc.wro.util.StopWatch;
  * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
  * <p/>
  * This class is thread-safe because it doesn't have any state.
- * 
+ *
  * @author Romain Philibert
  * @created 19 Jul 2011
  * @since 1.4.0
@@ -46,6 +46,10 @@ public class GroovyModelFactory
    * Default name of the file used to retrieve the model.
    */
   private static final String DEFAULT_FILE_NAME = "wro.groovy";
+  /**
+   * Alias for this model factory used by provider.
+   */
+  public static final String ALIAS = "groovy";
 
 
   /**
@@ -60,7 +64,7 @@ public class GroovyModelFactory
       script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));
       LOG.debug("Parsing groovy script to build the model");
       stopWatch.stop();
-      
+
       stopWatch.start("parseScript");
       final WroModel model = GroovyModelParser.parse(script);
       stopWatch.stop();

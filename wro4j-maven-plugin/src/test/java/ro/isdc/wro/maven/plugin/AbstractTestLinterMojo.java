@@ -3,11 +3,18 @@
  */
 package ro.isdc.wro.maven.plugin;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +26,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 
 /**
@@ -27,26 +35,27 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * @author Alex Objelean
  */
 public abstract class AbstractTestLinterMojo {
-  private AbstractSingleProcessorMojo mojo;
+  private AbstractLinterMojo mojo;
 
   @Before
   public void setUp()
       throws Exception {
     mojo = newLinterMojo();
+    mojo.setLog(new SilentLog());
     mojo.setIgnoreMissingResources(false);
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
   }
 
-  protected final AbstractSingleProcessorMojo getMojo() {
+  protected final AbstractLinterMojo getMojo() {
     return mojo;
   }
 
   /**
    * @return Mojo to test.
    */
-  protected abstract AbstractSingleProcessorMojo newLinterMojo();
+  protected abstract AbstractLinterMojo newLinterMojo();
 
   private void setWroFile(final String classpathResourceName)
       throws URISyntaxException {
@@ -108,6 +117,30 @@ public abstract class AbstractTestLinterMojo {
     } catch (final MojoExecutionException e) {
       throw e.getCause();
     }
+  }
+
+  @Test
+  public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
+    final AtomicBoolean invoked = new AtomicBoolean();
+    final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
+      @Override
+      public void submit(final Collection<Callable<Void>> callables)
+          throws Exception {
+        invoked.set(true);
+        super.submit(callables);
+      }
+    };
+    mojo.setFailNever(true);
+    mojo.setTaskExecutor(taskExecutor);
+    mojo.setIgnoreMissingResources(true);
+
+    mojo.setParallelProcessing(false);
+    mojo.execute();
+    assertFalse(invoked.get());
+
+    mojo.setParallelProcessing(true);
+    mojo.execute();
+    assertTrue(invoked.get());
   }
 
   private static class CustomException

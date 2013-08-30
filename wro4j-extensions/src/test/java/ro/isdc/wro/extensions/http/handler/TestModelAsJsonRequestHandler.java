@@ -1,9 +1,7 @@
 package ro.isdc.wro.extensions.http.handler;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -57,51 +55,51 @@ public class TestModelAsJsonRequestHandler {
   private HttpServletResponse mockResponse;
   @Mock
   private WroModelFactory mockModelFactory;
-  
+
   private OutputStream outputStream;
-  
+
   @Before
   public void setUp()
       throws Exception {
     Context.set(Context.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
-    
+
     MockitoAnnotations.initMocks(this);
-    
+
     victim = new ModelAsJsonRequestHandler();
-    
+
     final WroModel wroModel = createSimpleModelStub();
-    
+
     when(mockModelFactory.create()).thenReturn(wroModel);
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(mockModelFactory);
-    Injector injector = InjectorBuilder.create(managerFactory).build();
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
-    
+
     // Setup response writer
     outputStream = new ByteArrayOutputStream();
-    OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-    PrintWriter printWriter = new PrintWriter(writer);
+    final OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+    final PrintWriter printWriter = new PrintWriter(writer);
     when(mockResponse.getWriter()).thenReturn(printWriter);
 
     when(mockRequest.getRequestURI()).thenReturn("/wro/wroApi/model");
   }
-  
+
   @Test
   public void shouldBeEnabledByDefault() {
     Assert.assertTrue(victim.isEnabled());
   }
-  
+
   @Test
   public void shouldAcceptRequestsWithCorrectURI() {
     when(mockRequest.getRequestURI()).thenReturn(ModelAsJsonRequestHandler.ENDPOINT_URI);
     assertTrue(victim.accept(mockRequest));
   }
-  
+
   @Test
   public void shouldNotAcceptRequestsWithWrongURI() {
     when(mockRequest.getRequestURI()).thenReturn("/path/to/anotherURI");
     assertFalse(victim.accept(mockRequest));
   }
-  
+
   @Test
   public void shouldGenerateModelAsJson()
       throws Exception {
@@ -121,16 +119,16 @@ public class TestModelAsJsonRequestHandler {
   @Test
   public void shouldAcceptUri() {
     when(mockRequest.getRequestURI()).thenReturn("wroApi/model");
-    boolean accept = victim.accept(mockRequest);
-    assertThat(accept, is(true));
+    final boolean accept = victim.accept(mockRequest);
+    assertTrue(accept);
   }
-  
+
   @Test
   public void shouldNotProvideProxyUriForExternalResources() throws IOException {
     when(mockModelFactory.create()).thenReturn(createWroModelExternalModelStub());
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(mockModelFactory);
     victim = new ModelAsJsonRequestHandler();
-    Injector injector = InjectorBuilder.create(managerFactory).build();
+    final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
 
     victim.handle(mockRequest, mockResponse);
@@ -139,16 +137,16 @@ public class TestModelAsJsonRequestHandler {
   }
 
   private WroModel createWroModelExternalModelStub() {
-    WroModel wroModel = new WroModel();
-    List<Group> wroGroups = new ArrayList<Group>();
+    final WroModel wroModel = new WroModel();
+    final List<Group> wroGroups = new ArrayList<Group>();
     wroGroups.addAll(createSimpleModelStub().getGroups());
 
-    Group extGroup = new Group("external");
-    Resource resource = new Resource();
+    final Group extGroup = new Group("external");
+    final Resource resource = new Resource();
     resource.setType(ResourceType.JS);
     resource.setUri("https://www.site.com/style.js");
     resource.setMinimize(false);
-    
+
     extGroup.addResource(resource);
     extGroup.addResource(Resource.create("http://www.site.com/style.css"));
     wroGroups.add(extGroup);
@@ -158,10 +156,10 @@ public class TestModelAsJsonRequestHandler {
   }
 
   private WroModel createSimpleModelStub() {
-    WroModel wroModel = new WroModel();
-    List<Group> wroGroups = new ArrayList<Group>();
-    Group group = new Group("test");
-    Resource resource = new Resource();
+    final WroModel wroModel = new WroModel();
+    final List<Group> wroGroups = new ArrayList<Group>();
+    final Group group = new Group("test");
+    final Resource resource = new Resource();
     resource.setType(ResourceType.JS);
     resource.setUri("test.js");
     resource.setMinimize(true);
@@ -171,12 +169,12 @@ public class TestModelAsJsonRequestHandler {
     return wroModel;
   }
 
-  private String readJsonFile(String filename)
+  private String readJsonFile(final String filename)
       throws IOException {
-    String packagePath = WroUtil.toPackageAsFolder(this.getClass());
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-    StringBuilder sb = new StringBuilder();
+    final String packagePath = WroUtil.toPackageAsFolder(this.getClass());
+    final InputStream is = this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    final StringBuilder sb = new StringBuilder();
     String line = null;
     while ((line = reader.readLine()) != null) {
       sb.append(line + "\n");

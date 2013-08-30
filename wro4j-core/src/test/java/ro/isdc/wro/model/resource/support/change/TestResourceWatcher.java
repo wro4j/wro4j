@@ -1,7 +1,7 @@
 package ro.isdc.wro.model.resource.support.change;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,12 +41,22 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestResourceWatcher {
+  /**
+   * The uri to the first resource in a group.
+   */
+  private static final String RESOURCE_FIRST = "/path/1.js";
   private static final String RESOURCE_URI = "/test.css";
   private static final String GROUP_NAME = "g1";
+  /**
+   * Group containing two js resources.
+   */
+  private static final String GROUP_2 = "g2";
   private final CacheKey cacheEntry = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
-  private ResourceWatcher victim;
+  private final CacheKey cacheEntry2 = new CacheKey(GROUP_2, ResourceType.JS, true);
   @Mock
   private UriLocator mockLocator;
+
+  private ResourceWatcher victim;
 
   @Before
   public void setUp() {
@@ -65,11 +74,12 @@ public class TestResourceWatcher {
         return true;
       }
     });
+
     victim = new ResourceWatcher();
-    createInjector().inject(victim);
+    createDefaultInjector().inject(victim);
   }
 
-  public Injector createInjector() {
+  public Injector createDefaultInjector() {
     final UriLocatorFactory locatorFactory = new AbstractUriLocatorFactory() {
       public UriLocator getInstance(final String uri) {
         return mockLocator;
@@ -77,6 +87,8 @@ public class TestResourceWatcher {
     };
 
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
+    model.addGroup(new Group(GROUP_2).addResource(Resource.create(RESOURCE_FIRST)).addResource(
+        Resource.create("/path/2.js")));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
     final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setUriLocatorFactory(
         locatorFactory);
@@ -109,7 +121,7 @@ public class TestResourceWatcher {
         flag.set(true);
       }
     };
-    createInjector().inject(victim);
+    createDefaultInjector().inject(victim);
     victim.check(cacheEntry);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
 
@@ -131,7 +143,7 @@ public class TestResourceWatcher {
         Assert.fail("Should not detect the change");
       }
     };
-    createInjector().inject(victim);
+    createDefaultInjector().inject(victim);
     final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
 
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
@@ -156,7 +168,7 @@ public class TestResourceWatcher {
         groupChanged.set(true);
       }
     };
-    createInjector().inject(victim);
+    createDefaultInjector().inject(victim);
     when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent("initial"));
     when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(answerWithContent(String.format("@import url(%s)", importResourceUri)));
 
@@ -168,6 +180,43 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertTrue(groupChanged.get());
     assertTrue(importResourceChanged.get());
+  }
+
+  /**
+   * Fix the issue described <a href="https://github.com/alexo/wro4j/issues/72">here</a>.
+   */
+  @Test
+  public void shouldNotDetectErroneouslyChange() throws Exception {
+    final AtomicBoolean groupChanged = new AtomicBoolean(false);
+    final AtomicBoolean resourceChanged = new AtomicBoolean(false);
+    victim = new ResourceWatcher() {
+      @Override
+      void onResourceChanged(final Resource resource) {
+        resourceChanged.set(true);
+      }
+      @Override
+      void onGroupChanged(final CacheKey key) {
+        groupChanged.set(true);
+      }
+    };
+
+    createDefaultInjector().inject(victim);
+    //first check will always detect changes.
+    victim.check(cacheEntry2);
+
+    when(mockLocator.locate(RESOURCE_FIRST)).thenAnswer(answerWithContent("changed"));
+
+    victim.check(cacheEntry2);
+    assertTrue(groupChanged.get());
+    assertTrue(resourceChanged.get());
+
+    groupChanged.set(false);
+    resourceChanged.set(false);
+
+    //next check should find no change
+    victim.check(cacheEntry2);
+    assertFalse(groupChanged.get());
+    assertFalse(resourceChanged.get());
   }
 
   private Answer<InputStream> answerWithContent(final String content) {

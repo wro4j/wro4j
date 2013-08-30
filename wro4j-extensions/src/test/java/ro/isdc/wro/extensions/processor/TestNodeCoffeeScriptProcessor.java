@@ -12,8 +12,7 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,13 +50,29 @@ public class TestNodeCoffeeScriptProcessor {
   }
 
   @Test
-  public void testFromFolder()
+  public void shouldCompileAllFromFolder()
       throws Exception {
     final ResourcePreProcessor processor = new NodeCoffeeScriptProcessor();
     final URL url = getClass().getResource("coffeeScript/advanced");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedNode");
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
+  }
+
+  @Test
+  public void shouldCompileAllFromFolderUsingBareOption()
+      throws Exception {
+    final ResourcePreProcessor processor = new NodeCoffeeScriptProcessor() {
+      @Override
+      protected String[] buildOptionalArguments() {
+        return new String[] {"--bare"};
+      }
+    };
+    final URL url = getClass().getResource("coffeeScript/advanced");
+
+    final File testFolder = new File(url.getFile(), "test");
+    final File expectedFolder = new File(url.getFile(), "expectedNodeBareOption");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 

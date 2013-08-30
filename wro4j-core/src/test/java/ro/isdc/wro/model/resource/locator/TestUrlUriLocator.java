@@ -63,12 +63,12 @@ public class TestUrlUriLocator {
     victim.locate(createUri("*.NOTEXIST"));
   }
 
-  /**
-   * @param string
-   * @return
-   */
   private String createUri(final String uri) {
-    final URL url = Thread.currentThread().getContextClassLoader().getResource("ro/isdc/wro/model/resource/locator/");
+    return createUri(uri, "ro/isdc/wro/model/resource/locator/");
+  }
+
+  private String createUri(final String uri, final String path) {
+    final URL url = Thread.currentThread().getContextClassLoader().getResource(path);
     return url.getProtocol() + ":" + url.getPath() + uri;
   }
 
@@ -100,5 +100,11 @@ public class TestUrlUriLocator {
   public void testWildcardUsingInvalidResource()
       throws IOException {
     victim.locate(createUri("http://www.google.com/*.js"));
+  }
+
+  @Test
+  public void shouldFindWildcardResourcesForFolderContainingSpaces()
+      throws IOException {
+    victim.locate(createUri("/folder with spaces/**.css", "test"));
   }
 }

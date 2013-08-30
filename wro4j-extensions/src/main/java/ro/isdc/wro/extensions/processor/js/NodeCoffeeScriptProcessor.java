@@ -17,6 +17,7 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,17 +200,31 @@ public class NodeCoffeeScriptProcessor
    * @return arguments required to run lessc on non Windows platform.
    */
   private String[] buildArgumentsForUnix(final String filePath) {
-    return new String[] {
-      SHELL_COMMAND, OPTION_COMPILE, filePath
-    };
+    return buildCommonArguments(filePath);
+  }
+
+  /**
+   * @return arguments required to run lessc on Windows platform.
+   */
+  private String[] buildCommonArguments(final String filePath) {
+    final String[] optionalArguments = buildOptionalArguments();
+    final String[] arguments = ArrayUtils.addAll(new String[] {SHELL_COMMAND, OPTION_COMPILE}, optionalArguments);
+    return ArrayUtils.add(arguments, filePath);
+  }
+
+  /**
+   * @return an array of optional arguments.
+   */
+  protected String[] buildOptionalArguments() {
+    return null;
   }
 
   /**
    * @return arguments required to run lessc on Windows platform.
    */
   private String[] buildArgumentsForWindows(final String filePath) {
-    return new String[] {
-      "cmd", "/c", SHELL_COMMAND, OPTION_COMPILE, filePath
-    };
+    final String[] optionalArguments = buildOptionalArguments();
+    final String[] arguments = ArrayUtils.addAll(new String[] {"cmd", "/c", SHELL_COMMAND, OPTION_COMPILE}, optionalArguments);
+    return ArrayUtils.add(arguments, filePath);
   }
 }

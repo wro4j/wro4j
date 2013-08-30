@@ -8,8 +8,7 @@ import java.util.Properties;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,7 +29,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
   @Mock
   private ServletContext mockServletContext;
   private PropertiesAndFilterConfigWroConfigurationFactory factory;
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -42,7 +41,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       }
     };
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotUseNullArgument() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(null) {
@@ -52,7 +51,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       }
     };
   }
-  
+
   @Test
   public void testConfigureCacheUpdatePeriod() {
     Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
@@ -60,7 +59,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(true, config.isDebug());
   }
-  
+
   @Test
   public void testConfigureCacheUpdatePeriodWithPropertiesFileSet() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig) {
@@ -81,14 +80,14 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     // This value should be the same as defined in properties
     Assert.assertEquals(30, config.getModelUpdatePeriod());
   }
-  
+
   @Test
   public void testConfigureDebug() {
     Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn("false");
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
-  
+
   @Test
   public void testConfigureDebugWithPropertiesFileSet() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig) {
@@ -103,7 +102,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
-  
+
   @Test
   public void testConfigureDebugWithOnlyPropertiesFileSet() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig) {
@@ -117,7 +116,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     final WroConfiguration config = factory.create();
     Assert.assertEquals(true, config.isDebug());
   }
-  
+
   /**
    * This test ensures that when "configuration" init-param is used, it will override the debug property for backward
    * compatibility.
@@ -130,7 +129,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
-  
+
   @Test
   public void testConfigurationTypeBackwardCompatibilityWithPropertiesFileSet() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig) {
@@ -146,7 +145,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
-  
+
   @Test
   public void shouldBuildConfigurationEvenWhenDefaultPropertiesFileIsNotAvailable() {
     factory = new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig) {

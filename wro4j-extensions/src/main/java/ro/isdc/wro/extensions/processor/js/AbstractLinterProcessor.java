@@ -20,6 +20,7 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
@@ -35,7 +36,7 @@ import ro.isdc.wro.util.ObjectFactory;
  */
 @SupportedResourceType(ResourceType.JS)
 public abstract class AbstractLinterProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor {
+  implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinterProcessor.class);
   private ObjectPoolHelper<AbstractLinter> enginePool;
   /**
@@ -122,6 +123,9 @@ public abstract class AbstractLinterProcessor
     return "";
   }
 
+  /**
+   * @param options comma separated list of options.
+   */
   public AbstractLinterProcessor setOptionsAsString(final String options) {
     this.options = options;
     return this;
@@ -142,4 +146,10 @@ public abstract class AbstractLinterProcessor
    * @return the linter to use for js code validation.
    */
   protected abstract AbstractLinter newLinter();
+
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }

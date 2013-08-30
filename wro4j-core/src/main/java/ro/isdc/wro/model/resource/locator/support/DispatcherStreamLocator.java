@@ -54,8 +54,10 @@ public class DispatcherStreamLocator {
   public InputStream getInputStream(final HttpServletRequest request, final HttpServletResponse response,
       final String location)
       throws IOException {
-    Validate.notNull(request);
-    Validate.notNull(response);
+    if (request == null || response == null || location == null) {
+      throw new IOException("Cannot get stream for location: " + location
+          + " because either request, response or location is not available");
+    }
 
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();

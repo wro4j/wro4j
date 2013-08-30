@@ -10,7 +10,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 
 
 /**
- * Compiles EmberJS templates to javascript.
+ * Compiles EmberJS templates to javascript. The processor loads emberJs library and all its dependencies from the webjar.
  *
  * @author blemoine
  */

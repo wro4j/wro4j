@@ -58,10 +58,7 @@ public class ResourceBundleProcessor {
     OutputStream os = null;
     try {
 
-      final CacheKey cacheKey = cacheKeyFactory.create(request);
-      if (cacheKey == null) {
-        throw new WroRuntimeException("Cannot build valid CacheKey from request: " + request.getRequestURI());
-      }
+      final CacheKey cacheKey = getSafeCacheKey(request);
       initAggregatedFolderPath(request, cacheKey.getType());
       final CacheValue cacheValue = cacheStrategy.get(cacheKey);
 
@@ -108,15 +105,16 @@ public class ResourceBundleProcessor {
     }
   }
 
-  private boolean isGzipAllowed() {
-    return context.getConfig().isGzipEnabled() && isGzipSupported();
+  private CacheKey getSafeCacheKey(final HttpServletRequest request) {
+    final CacheKey cacheKey = cacheKeyFactory.create(request);
+    if (cacheKey == null) {
+      throw new WroRuntimeException("Cannot build valid CacheKey from request: " + request.getRequestURI());
+    }
+    return cacheKey;
   }
 
-  /**
-   * @return true if Gzip is Supported
-   */
-  private boolean isGzipSupported() {
-    return WroUtil.isGzipSupported(context.getRequest());
+  private boolean isGzipAllowed() {
+    return context.getConfig().isGzipEnabled() && WroUtil.isGzipSupported(context.getRequest());
   }
 
   /**

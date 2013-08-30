@@ -19,7 +19,6 @@ import java.util.concurrent.Future;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +92,7 @@ public class PreProcessorExecutor {
     LOG.debug("criteria: {}", criteria);
     callbackRegistry.onBeforeMerge();
     try {
-      Validate.notNull(resources);
+      notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
       final StringBuffer result = new StringBuffer();
       if (shouldRunInParallel(resources)) {
@@ -166,8 +165,8 @@ public class PreProcessorExecutor {
       // use at most the number of available processors (true parallelism)
       final int threadPoolSize = Runtime.getRuntime().availableProcessors();
       LOG.debug("Parallel thread pool size: {}", threadPoolSize);
-      executor = Executors.newFixedThreadPool(threadPoolSize, WroUtil
-          .createDaemonThreadFactory("parallelPreprocessing"));
+      executor = Executors.newFixedThreadPool(threadPoolSize,
+          WroUtil.createDaemonThreadFactory("parallelPreprocessing"));
     }
     return executor;
   }
@@ -204,20 +203,12 @@ public class PreProcessorExecutor {
     for (final ResourcePreProcessor processor : processors) {
       final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
 
-      callbackRegistry.onBeforePreProcess();
-
       writer = new StringWriter();
       final Reader reader = new StringReader(resourceContent);
-      try {
-        // decorate and process
-        decoratedProcessor.process(resource, reader, writer);
-        // use the outcome for next input
-        resourceContent = writer.toString();
-      } finally {
-        callbackRegistry.onAfterPreProcess();
-        reader.close();
-        writer.close();
-      }
+      // decorate and process
+      decoratedProcessor.process(resource, reader, writer);
+      // use the outcome for next input
+      resourceContent = writer.toString();
     }
     return writer.toString();
   }
@@ -227,7 +218,18 @@ public class PreProcessorExecutor {
    */
   private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
       final ProcessingCriteria criteria) {
-    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria);
+    final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria) {
+      @Override
+      public void process(final Resource resource, final Reader reader, final Writer writer)
+          throws IOException {
+        try {
+          callbackRegistry.onBeforePreProcess();
+          super.process(resource, reader, writer);
+        } finally {
+          callbackRegistry.onAfterPreProcess();
+        }
+      }
+    };
     injector.inject(decorated);
     return decorated;
   }
@@ -252,5 +254,12 @@ public class PreProcessorExecutor {
     } finally {
       IOUtils.closeQuietly(is);
     }
+  }
+
+  /**
+   * Perform cleanUp on service shut down.
+   */
+  public void destroy() {
+    getExecutorService().shutdownNow();
   }
 }

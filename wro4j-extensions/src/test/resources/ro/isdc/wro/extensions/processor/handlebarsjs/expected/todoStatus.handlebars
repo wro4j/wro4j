@@ -1,24 +1,25 @@
 (function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template(function (Handlebars,depth0,helpers,partials,data) {
-  helpers = helpers || Handlebars.helpers; data = data || {};
-  var buffer = "", stack1, stack2, foundHelper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  this.compilerInfo = [3,'>= 1.0.0-rc.4'];
+helpers = helpers || Handlebars.helpers; data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
   
-  return "s";}
+  return "s";
+  }
 
   buffer += "<div class=\"row-fluid span5\">\n  <strong>";
-  foundHelper = helpers.remaining;
-  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{},data:data}); }
+  if (stack1 = helpers.remaining) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.remaining; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1) + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>";
-  foundHelper = helpers.finished;
-  if (foundHelper) { stack1 = foundHelper.call(depth0, {hash:{},data:data}); }
+  buffer += escapeExpression(stack1)
+    + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>";
+  if (stack1 = helpers.finished) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.finished; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1) + "</strong> completed item";
-  stack1 = depth0.oneFinished;
-  stack2 = {};
-  stack1 = helpers.unless.call(depth0, stack1, {hash:stack2,inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  buffer += escapeExpression(stack1)
+    + "</strong> completed item";
+  stack1 = helpers.unless.call(depth0, depth0.oneFinished, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </button>\n</div>";
-  return buffer;} ); })();
+  return buffer;
+  } ); })();

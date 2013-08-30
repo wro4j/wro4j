@@ -20,7 +20,7 @@ public class HoganJs
    */
   @Override
   public String compile(final String content, final String optionalArgument) {
-    return String.format("Hogan.cache['%s'] = %s", optionalArgument, super.compile(content, ""));
+    return String.format("Hogan.cache['%s'] = %s;", optionalArgument, super.compile(content, ""));
   }
 
   /**

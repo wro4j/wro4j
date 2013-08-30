@@ -3,21 +3,22 @@
  */
 package ro.isdc.wro.http;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
 import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -27,9 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,6 +42,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
+import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -52,6 +53,7 @@ import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -64,10 +66,13 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -95,6 +100,8 @@ public class TestWroFilter {
   @Mock
   private UriLocatorFactory mockUriLocatorFactory;
   @Mock
+  private MBeanServer mockMBeanServer;
+  @Mock
   private UriLocator mockUriLocator;
 
   @Before
@@ -110,16 +117,20 @@ public class TestWroFilter {
     when(mockRequest.getAttribute(Mockito.anyString())).thenReturn(null);
     when(mockManagerFactory.create()).thenReturn(new BaseWroManagerFactory().create());
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new ByteArrayOutputStream()));
+    when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
     victim = new WroFilter() {
       @Override
       protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
         throw WroRuntimeException.wrap(e);
       }
+
+      @Override
+      protected MBeanServer getMBeanServer() {
+        return mockMBeanServer;
+      }
     };
     victim.setWroManagerFactory(mockManagerFactory);
-    // victim.init(mockFilterConfig);
   }
 
   private WroManagerFactory createValidManagerFactory() {
@@ -386,9 +397,9 @@ public class TestWroFilter {
   private void initVictimWithMockAuthManager() {
     victim = new WroFilter() {
       @Override
-      protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
+      protected void onException(final Exception e, final HttpServletResponse response,
           final FilterChain chain) {
-        throw e;
+        throw WroRuntimeException.wrap(e);
       }
 
       @Override
@@ -784,6 +795,34 @@ public class TestWroFilter {
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verifyChainIsNotCalled(mockFilterChain);
+  }
+
+  @Test
+  public void shouldUnregisterMBeanOnDestroy() throws Exception {
+    when(mockMBeanServer.isRegistered(Mockito.any(ObjectName.class))).thenReturn(true);
+    victim.init(mockFilterConfig);
+    victim.destroy();
+    verify(mockMBeanServer).unregisterMBean(Mockito.any(ObjectName.class));
+  }
+
+  @Test
+  public void shouldUseProcessorsConfiguredInWroProperties() throws Exception {
+    final ObjectFactory<WroConfiguration> configurationFactory = new PropertiesAndFilterConfigWroConfigurationFactory(mockFilterConfig) {
+      @Override
+      public Properties createProperties() {
+        final Properties props = new Properties();
+        props.setProperty(ConfigConstants.managerFactoryClassName.name(), ConfigurableWroManagerFactory.class.getName());
+        props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, CssMinProcessor.ALIAS);
+        return props;
+      }
+    };
+    victim.setWroConfigurationFactory(configurationFactory);
+    victim.setWroManagerFactory(null);
+    victim.init(mockFilterConfig);
+
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), configurationFactory.create());
+    final WroManagerFactory factory = victim.getWroManagerFactory();
+    assertEquals(1, factory.create().getProcessorsFactory().getPreProcessors().size());
   }
 
   @After

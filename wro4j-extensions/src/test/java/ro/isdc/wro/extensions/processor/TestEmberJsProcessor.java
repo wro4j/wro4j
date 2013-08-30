@@ -1,6 +1,6 @@
 package ro.isdc.wro.extensions.processor;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,23 +22,23 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test EmberJs processor.
- * 
+ *
  * @author blemoine
  */
 public class TestEmberJsProcessor {
   private ResourcePreProcessor processor;
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new EmberJsProcessor();
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
   }
-  
+
   @Test
   public void testSimpleString()
       throws Exception {
@@ -48,17 +48,17 @@ public class TestEmberJsProcessor {
     assertTrue(result.startsWith("(function() {Ember.TEMPLATES["));
     assertTrue(result.contains("data.buffer.push(\"Hello {name}!\\n\");"));
   }
-  
+
   @Test
   public void shouldTransformFilesFromFolder()
       throws IOException {
     final URL url = getClass().getResource("emberjs");
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    
+
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "embbars", processor);
   }
-  
+
   @Test
   public void shouldBeThreadSafe()
       throws Exception {
@@ -76,7 +76,7 @@ public class TestEmberJsProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);

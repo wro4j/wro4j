@@ -6,9 +6,8 @@ package ro.isdc.wro.extensions.processor.support.csslint;
 import java.io.FileInputStream;
 import java.net.URL;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 
 /**
  * A {@link ProcessorsFactory} implementation which is easy to configure using a {@link Properties} object.
- * 
+ *
  * @author Alex Objelean
  * @created 30 Jul 2011
  * @since 1.4.0
@@ -34,8 +34,8 @@ public class ConfigurableLocatorFactory
    * Name of init param used to specify uri locators.
    */
   public static final String PARAM_URI_LOCATORS = "uriLocators";
-  
-  private final UriLocatorFactory locatorFactory = newUriLocatorFactory();
+
+  private final UriLocatorFactory locatorFactory = newLocatorFactory();
 
   /**
    * {@inheritDoc}
@@ -44,7 +44,7 @@ public class ConfigurableLocatorFactory
   protected String getStrategyKey() {
     return PARAM_URI_LOCATORS;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -52,7 +52,7 @@ public class ConfigurableLocatorFactory
   protected Map<String, UriLocator> getStrategies(final LocatorProvider provider) {
     return provider.provideLocators();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -60,15 +60,15 @@ public class ConfigurableLocatorFactory
       throws IOException {
     return new AutoCloseInputStream(locatorFactory.locate(uri));
   }
-  
+
   /**
    * {@inheritDoc}
    */
-  private UriLocatorFactory newUriLocatorFactory() {
+  private UriLocatorFactory newLocatorFactory() {
     final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
     final List<UriLocator> locators = getConfiguredStrategies();
     for (final UriLocator locator : locators) {
-      factory.addUriLocator(locator);
+      factory.addLocator(locator);
     }
     // use default when none provided
     if (locators.isEmpty()) {
@@ -84,7 +84,7 @@ public class ConfigurableLocatorFactory
   public UriLocator getInstance(final String uri) {
     return locatorFactory.getInstance(uri);
   }
-  
+
   /**
    * {@inheritDoc}
    */

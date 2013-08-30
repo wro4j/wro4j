@@ -1,0 +1,32 @@
+div.import1a {
+  color: red;
+}
+div.import1b {
+  color: red;
+}
+
+
+div.import1 {
+  color: red;
+}
+div.import2 {
+  color: red;
+}
+div.import3 {
+  color: red;
+}
+
+
+
+ul li {
+  list-style: none;
+}
+.center {
+  text-align: center;
+}
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}

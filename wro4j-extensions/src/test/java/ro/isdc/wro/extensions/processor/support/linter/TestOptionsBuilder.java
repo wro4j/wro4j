@@ -3,13 +3,15 @@
  */
 package ro.isdc.wro.extensions.processor.support.linter;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
+
+import ro.isdc.wro.WroRuntimeException;
 
 
 /**
@@ -139,5 +141,10 @@ public class TestOptionsBuilder {
     final String option = "ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes";
     final String[] result = optionsBuilder.splitOptions(option);
     assertEquals(28, result.length);
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void cannotBuildCSVWheInvalidOptionsFormatProvided() {
+    optionsBuilder.buildFromCsv("var:unused");
   }
 }

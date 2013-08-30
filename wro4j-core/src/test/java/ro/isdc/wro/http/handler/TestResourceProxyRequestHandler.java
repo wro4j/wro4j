@@ -1,7 +1,8 @@
 package ro.isdc.wro.http.handler;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -29,6 +31,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -108,19 +111,19 @@ public class TestResourceProxyRequestHandler {
 
   @Test
   public void shouldAlwaysBeEnabled() {
-    assertThat(victim.isEnabled(), is(true));
+    assertTrue(victim.isEnabled());
   }
 
   @Test
   public void shouldAcceptCallsTo_wroResources() {
     when(request.getRequestURI()).thenReturn("/wro/wroResources?id=test.css");
-    assertThat(victim.accept(request), is(true));
+    assertTrue(victim.accept(request));
   }
 
   @Test
   public void shouldNotAcceptCallsTo_OtherUris() {
     when(request.getRequestURI()).thenReturn("/wro/someOtherUri");
-    assertThat(victim.accept(request), is(false));
+    assertFalse(victim.accept(request));
   }
 
   @Test
@@ -136,7 +139,7 @@ public class TestResourceProxyRequestHandler {
     final String body = outputStream.toString();
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test(expected = UnauthorizedRequestException.class)
@@ -166,7 +169,7 @@ public class TestResourceProxyRequestHandler {
     final String expectedBody = IOUtils.toString(getInputStream("test.css"));
 
     verify(mockUriLocator, times(1)).locate(resourceUri);
-    assertThat(body, is(expectedBody));
+    assertEquals(expectedBody, body);
   }
 
   @Test
@@ -217,6 +220,36 @@ public class TestResourceProxyRequestHandler {
     victim.handle(request, response);
 
     verify(response, times(1)).setContentType("image/png");
+  }
+
+  @Test
+  public void shouldSetCorrectResopnsCodeBasedOnResourceChangeState()
+      throws IOException {
+    final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+
+    final long timeInFuture = new Date().getTime() + 10000;
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenReturn(timeInFuture);
+    victim.handle(request, response);
+    verify(response).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+
+
+    final long longTimeAgo = 123L;
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenReturn(longTimeAgo);
+    victim.handle(request, response);
+    verify(response).setStatus(Mockito.eq(HttpServletResponse.SC_OK));
+  }
+
+  @Test
+  public void shouldAssumeResourceChangedWhenModifiedSinceHeaderExtractionFails() throws Exception {
+    final String resourceUri = "classpath:" + packagePath + "/" + "test.css";
+    when(mockAuthorizationManager.isAuthorized(resourceUri)).thenReturn(true);
+    when(request.getParameter(ResourceProxyRequestHandler.PARAM_RESOURCE_ID)).thenReturn(resourceUri);
+
+    when(request.getDateHeader(HttpHeader.IF_MODIFIED_SINCE.toString())).thenThrow(new IllegalArgumentException("BOOM!"));
+    victim.handle(request, response);
+    verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
   private InputStream getInputStream(final String filename)

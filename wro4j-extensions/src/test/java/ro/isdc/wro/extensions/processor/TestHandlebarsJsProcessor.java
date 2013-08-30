@@ -1,6 +1,6 @@
 package ro.isdc.wro.extensions.processor;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
-import ro.isdc.wro.extensions.processor.support.handlebarsjs.HandlebarsJs;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -43,11 +42,10 @@ public class TestHandlebarsJsProcessor {
   @Test
   public void testSimpleString()
       throws Exception {
-    StringWriter writer = new StringWriter();
+    final StringWriter writer = new StringWriter();
     processor.process(null, new StringReader("Hello {name}!"), writer);
-    String result = writer.toString();
-    assertTrue(result.startsWith(HandlebarsJs.HANDLEBARS_JS_TEMPLATES_INIT));
-    assertTrue(result.contains("return \"Hello {name}!\\n\";} );"));
+    final String result = writer.toString();
+    assertTrue(result.contains("return \"Hello {name}!\\n\";"));
   }
 
   @Test
@@ -77,7 +75,7 @@ public class TestHandlebarsJsProcessor {
     };
     WroTestUtils.runConcurrently(task);
   }
-  
+
 
   @Test
   public void shouldSupportCorrectResourceTypes() {

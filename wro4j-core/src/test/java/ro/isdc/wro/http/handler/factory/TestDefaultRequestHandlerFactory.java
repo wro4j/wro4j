@@ -1,7 +1,6 @@
 package ro.isdc.wro.http.handler.factory;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 
@@ -17,15 +16,15 @@ import ro.isdc.wro.http.handler.RequestHandler;
  */
 public class TestDefaultRequestHandlerFactory {
   private DefaultRequestHandlerFactory victim;
-  
+
   @Before
   public void setup() {
     victim = new DefaultRequestHandlerFactory();
   }
-  
+
   @Test
   public void shouldCreateListOfDefaultRequestHandlers() {
-    Collection<RequestHandler> requestHandlers = victim.create();
-    assertThat(requestHandlers.isEmpty(), is(false));
+    final Collection<RequestHandler> requestHandlers = victim.create();
+    assertEquals(false, requestHandlers.isEmpty());
   }
 }

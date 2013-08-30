@@ -3,8 +3,8 @@
  */
 package ro.isdc.wro.http;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.util.Properties;
@@ -16,9 +16,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,9 +29,13 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
+import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
@@ -57,6 +60,7 @@ public class TestConfigurableWroFilter {
   private ServletContext mockServletContext;
   @Mock
   private ServletOutputStream mockServletOutputStream;
+  private final ConfigurableWroFilter victim = new ConfigurableWroFilter();
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -95,7 +99,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseDefaultEncodingWhenNoEncodingIsSet()
       throws Exception {
@@ -109,7 +113,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseConfiguredEncodingWhenSet()
       throws Exception {
@@ -124,7 +128,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseConfiguredMBeanNameWhenSet()
       throws Exception {
@@ -139,7 +143,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-  
+
   @Test
   public void shouldUseNullMBeanWhenNotSet()
       throws Exception {
@@ -186,8 +190,8 @@ public class TestConfigurableWroFilter {
           return original;
         }
         @Override
-        protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
-          throw e;
+        protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+          throw WroRuntimeException.wrap(e);
         }
       };
       final Properties properties = new Properties();
@@ -202,20 +206,44 @@ public class TestConfigurableWroFilter {
       throw processorsCreationException.get();
     }
   }
-  
+
   private static class SampleConfigurableWroFilter extends ConfigurableWroFilter {
     @Override
     protected WroManagerFactory newWroManagerFactory() {
-      final BaseWroManagerFactory factory = (BaseWroManagerFactory) super.newWroManagerFactory();
-      factory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some"))));
-      return factory;
+      final WroManagerFactory factory = super.newWroManagerFactory();
+      return new WroManagerFactoryDecorator(factory) {
+        @Override
+        protected void onBeforeBuild(final Builder builder) {
+          final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("some")));
+          builder.setModelFactory(modelFactory);
+        }
+      };
     }
-    
+
     @Override
-    protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response, final FilterChain chain) {
-      throw e;
+    protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
+      throw WroRuntimeException.wrap(e);
     }
   };
+
+  @Test
+  public void shouldUseCorrectWroManagerFactoryWhenPropertiesAreLoadedFromCustomLocation() throws Exception {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), NoProcessorsWroManagerFactory.class.getName());
+    victim.setProperties(props);
+    victim.init(mockFilterConfig);
+    final WroManagerFactory actual = ((DefaultWroManagerFactory)victim.getWroManagerFactory()).getFactory();
+    assertEquals(NoProcessorsWroManagerFactory.class, actual.getClass());
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailWhenAnInvalidWroManagerClassNameIsLoadedFromCustomLocation() throws Exception {
+    final Properties props = new Properties();
+    props.setProperty(ConfigConstants.managerFactoryClassName.name(), "invalid");
+    victim.setProperties(props);
+    victim.init(mockFilterConfig);
+  }
+
 
   @After
   public void tearDown() {

@@ -3,9 +3,8 @@ package ro.isdc.wro.cache.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,17 +32,17 @@ public class TestMemoryCacheStrategy {
 
   @Test
   public void testCache() throws IOException {
-    HashStrategy builder = new CRC32HashStrategy();
-    CacheKey key = new CacheKey("testGroup", ResourceType.JS, false);
+    final HashStrategy builder = new CRC32HashStrategy();
+    final CacheKey key = new CacheKey("testGroup", ResourceType.JS, false);
 
-    String content = "var foo = 'Hello World';";
-    String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
+    final String content = "var foo = 'Hello World';";
+    final String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
 
     Assert.assertNull(cache.get(key));
 
     cache.put(key, CacheValue.valueOf(content, hash));
 
-    CacheValue entry = cache.get(key);
+    final CacheValue entry = cache.get(key);
 
     Assert.assertNotNull(entry);
     Assert.assertEquals(hash, entry.getHash());
@@ -57,7 +56,7 @@ public class TestMemoryCacheStrategy {
     cache.destroy();
     Assert.assertNull(cache.get(key));
   }
-  
+
 
   @After
   public void tearDown() {
