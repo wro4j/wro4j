@@ -192,6 +192,9 @@ public class TestJsHintMojo
     jsHintMojo.setFailFast(false);
     try {
       executeResourcesWithErrors();
+    } catch(final Exception e) {
+      e.printStackTrace();
+      throw e;
     } finally {
       final LintReport<?> lintReport = jsHintMojo.getLintReport();
       assertEquals(2, lintReport.getReports().size());

@@ -538,7 +538,8 @@ public abstract class AbstractWro4jMojo
 
   private BuildContextHolder getBuildContextHolder() {
     if (buildContextHolder == null) {
-      buildContextHolder = new BuildContextHolder(buildContext, new File(mavenProject.getBuild().getOutputDirectory()));
+      //new File(mavenProject.getBuild().getOutputDirectory())
+      buildContextHolder = new BuildContextHolder(buildContext, null);
     }
     return buildContextHolder;
   }
