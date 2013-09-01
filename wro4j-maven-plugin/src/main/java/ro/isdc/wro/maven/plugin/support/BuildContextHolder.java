@@ -39,8 +39,16 @@ public class BuildContextHolder {
     return null;
   }
 
+  /**
+   * @param key to associate with the value to be persisted.
+   * @param value to persist.
+   */
   public void setValue(final String key, final Object value) {
+    if (buildContext != null) {
+      buildContext.setValue(key, value);
+    } else {
 
+    }
   }
 
 }
