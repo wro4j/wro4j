@@ -31,6 +31,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
+import ro.isdc.wro.maven.plugin.support.BuildContextHolder;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
@@ -117,6 +118,10 @@ public abstract class AbstractWro4jMojo
    */
   private BuildContext buildContext;
   /**
+   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
+   */
+  private BuildContextHolder buildContextHolder;
+  /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
    *
@@ -125,6 +130,7 @@ public abstract class AbstractWro4jMojo
    */
   private boolean parallelProcessing;
   private TaskExecutor<Void> taskExecutor;
+
 
   /**
    * {@inheritDoc}
@@ -282,14 +288,12 @@ public abstract class AbstractWro4jMojo
    * Store digest for all resources contained inside the list of provided groups.
    */
   private void persistResourceFingerprints(final List<String> groupNames) {
-    if (buildContext != null) {
-      final WroModelInspector modelInspector = new WroModelInspector(getModel());
-      for (final String groupName : groupNames) {
-        final Group group = modelInspector.getGroupByName(groupName);
-        if (group != null) {
-          for (final Resource resource : group.getResources()) {
-            persistResourceFingerprints(resource);
-          }
+    final WroModelInspector modelInspector = new WroModelInspector(getModel());
+    for (final String groupName : groupNames) {
+      final Group group = modelInspector.getGroupByName(groupName);
+      if (group != null) {
+        for (final Resource resource : group.getResources()) {
+          persistResourceFingerprints(resource);
         }
       }
     }
@@ -301,7 +305,7 @@ public abstract class AbstractWro4jMojo
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      buildContext.setValue(resource.getUri(), fingerprint);
+      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
       getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
       if (resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
@@ -427,8 +431,7 @@ public abstract class AbstractWro4jMojo
     final AtomicBoolean changeDetected = new AtomicBoolean(false);
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      final String previousFingerprint = buildContext != null ? String
-          .valueOf(buildContext.getValue(resource.getUri())) : null;
+      final String previousFingerprint = getBuildContextHolder().getValue(resource.getUri());
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
 
       changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
@@ -450,7 +453,7 @@ public abstract class AbstractWro4jMojo
    * @return true if the build was triggered by an incremental change.
    */
   protected final boolean isIncrementalBuild() {
-    return buildContext != null && buildContext.isIncremental();
+    return getBuildContextHolder().isIncrementalBuild();
   }
 
   private List<String> getAllModelGroupNames() {
@@ -531,6 +534,13 @@ public abstract class AbstractWro4jMojo
       };
     }
     return taskExecutor;
+  }
+
+  private BuildContextHolder getBuildContextHolder() {
+    if (buildContextHolder == null) {
+      buildContextHolder = new BuildContextHolder(buildContext, new File(mavenProject.getBuild().getOutputDirectory()));
+    }
+    return buildContextHolder;
   }
 
   @VisibleForTesting
