@@ -388,6 +388,14 @@ public class TestWro4jMojo {
   }
 
   @Test
+  public void shouldSkipSecondProcessingWhenIncrementalBuildEnabled() throws Exception {
+    victim.setBuildContext(null);
+    victim.setIncrementalBuildEnabled(true);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+  }
+
+  @Test
   public void shouldUseConfiguredNamingStrategy()
       throws Exception {
     setWroWithValidResources();

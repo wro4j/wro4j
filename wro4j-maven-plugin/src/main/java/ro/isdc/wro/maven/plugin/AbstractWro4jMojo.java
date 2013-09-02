@@ -280,7 +280,11 @@ public abstract class AbstractWro4jMojo
       result = Arrays.asList(getTargetGroups().split(","));
     }
     persistResourceFingerprints(result);
-    getLog().info("The following groups will be processed: " + result);
+    if (result.isEmpty()) {
+      getLog().info("Nothing to process (nothing configured or nothing changed since last build).");
+    } else {
+      getLog().info("The following groups will be processed: " + result);
+    }
     return result;
   }
 
