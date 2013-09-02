@@ -129,6 +129,13 @@ public abstract class AbstractWro4jMojo
    * @optional
    */
   private boolean parallelProcessing;
+  /**
+   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be changed to true if no unexpected problems are detected..
+   *
+   * @parameter default-value="false" expression="${incrementalBuildEnabled}"
+   * @optional
+   */
+  private boolean incrementalBuildEnabled;
   private TaskExecutor<Void> taskExecutor;
 
 
@@ -540,6 +547,7 @@ public abstract class AbstractWro4jMojo
     if (buildContextHolder == null) {
       //new File(mavenProject.getBuild().getOutputDirectory())
       buildContextHolder = new BuildContextHolder(buildContext, null);
+      buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
     }
     return buildContextHolder;
   }
@@ -613,6 +621,14 @@ public abstract class AbstractWro4jMojo
    */
   final void setParallelProcessing(final boolean parallelProcessing) {
     this.parallelProcessing = parallelProcessing;
+  }
+
+
+  /**
+   * @VisibleForTesting
+   */
+  final void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+    this.incrementalBuildEnabled = incrementalBuildEnabled;
   }
 
   /**

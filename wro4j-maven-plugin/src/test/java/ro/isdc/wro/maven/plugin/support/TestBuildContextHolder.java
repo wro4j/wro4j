@@ -72,7 +72,13 @@ public class TestBuildContextHolder {
   }
 
   @Test
-  public void shouldBeIncrementalBuildByDefault() {
+  public void shouldDisableIncrementalBuildByDefault() {
+    assertFalse(victim.isIncrementalBuild());
+  }
+
+  @Test
+  public void shouldEnableIncrementalBuildWhenConfigured() {
+    victim.setIncrementalBuildEnabled(true);
     assertTrue(victim.isIncrementalBuild());
   }
 

@@ -28,6 +28,7 @@ public class BuildContextHolder {
   private final BuildContext buildContext;
   private final File buildDirectory;
   private Properties fallbackStorage;
+  private boolean incrementalBuildEnabled;
 
   /**
    * @return an instance of {@link BuildContextHolder} which uses temp folder as root location of persisted data.
@@ -106,12 +107,17 @@ public class BuildContextHolder {
     }
   }
 
+
+  public void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+    this.incrementalBuildEnabled = incrementalBuildEnabled;
+  }
+
   /**
    * @return the flag indicating the incremental build change. A build is incremental, when the modified resources
    *         should be processed only. Useful to avoid unnecessary processing when there is actually no change detected.
    */
   public boolean isIncrementalBuild() {
-    return buildContext != null ? buildContext.isIncremental() : true;
+    return buildContext != null ? buildContext.isIncremental() : incrementalBuildEnabled;
   }
 
   /**
