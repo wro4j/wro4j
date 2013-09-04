@@ -17,7 +17,7 @@ import ro.isdc.wro.model.resource.Resource;
  * @created 27 May 2013
  */
 public class ProgressIndicator {
-  private static final int DEFAULT_TIMEOUT_DELAY = 5000;
+  private static final int DEFAULT_TIMEOUT_DELAY = 1000;
   /**
    * Counts total number of processed resources.
    */
@@ -71,11 +71,11 @@ public class ProgressIndicator {
    * A method which should be invoked on each new resource processing, having as a side effect an increment of the
    * counter holding the number of total processed resources.
    */
-  public void onProcessingResource(final Resource resource) {
+  public synchronized void onProcessingResource(final Resource resource) {
     totalResources++;
     log.debug("processing resource: " + resource.getUri());
     if (isLogRequired()) {
-      log.info("Resources processed: " + getTotalResources() + ". Last processed: " + resource.getUri());
+      log.info("Processed until now: " + getTotalResources() + ". Last being processed: " + resource.getUri());
     }
     updateLastInvocation();
   }
