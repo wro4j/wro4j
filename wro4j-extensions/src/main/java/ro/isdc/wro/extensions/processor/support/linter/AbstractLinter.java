@@ -51,7 +51,8 @@ public abstract class AbstractLinter {
   private RhinoScriptBuilder initScriptBuilder() {
     try {
       RhinoScriptBuilder builder = null;
-      if (scope == null) {
+      final boolean reuseScope = true;
+      if (!reuseScope || scope == null) {
         builder = RhinoScriptBuilder.newChain().evaluateChain(DEFINE_WINDOW, "window").evaluateChain(
             getScriptAsStream(), "linter.js");
         scope = builder.getScope();
