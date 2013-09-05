@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,13 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
+  /**
+   * Required to make jshint not complain.
+   */
+  private static final String DEFINE_WINDOW = "var window = {};";
   private WebjarUriLocator webjarLocator;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
+  private ScriptableObject scope;
   /**
    * Options to apply to js hint processing
    */
@@ -44,10 +50,15 @@ public abstract class AbstractLinter {
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
-      // function Object() { [native code for Object.Object, arity=1] }
-      // TODO investigate why
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(getScriptAsStream(), "linter.js");
+      RhinoScriptBuilder builder = null;
+      if (scope == null) {
+        builder = RhinoScriptBuilder.newChain().evaluateChain(DEFINE_WINDOW, "window").evaluateChain(
+            getScriptAsStream(), "linter.js");
+        scope = builder.getScope();
+      } else {
+        builder = RhinoScriptBuilder.newChain(scope);
+      }
+      return builder;
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
     }
