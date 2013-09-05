@@ -9,7 +9,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,6 @@ public abstract class AbstractLinter {
   private static final String DEFINE_WINDOW = "var window = {};";
   private WebjarUriLocator webjarLocator;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
-  private ScriptableObject scope;
   /**
    * Options to apply to js hint processing
    */
