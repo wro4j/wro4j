@@ -44,20 +44,16 @@ public abstract class AbstractLinter {
    * Options to apply to js hint processing
    */
   private String options;
+  private RhinoScriptBuilder builder;
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      RhinoScriptBuilder builder = null;
-      final boolean reuseScope = true;
-      if (!reuseScope || scope == null) {
+      if (builder == null) {
         builder = RhinoScriptBuilder.newChain().evaluateChain(DEFINE_WINDOW, "window").evaluateChain(
             getScriptAsStream(), "linter.js");
-        scope = builder.getScope();
-      } else {
-        builder = RhinoScriptBuilder.newChain(scope);
       }
       return builder;
     } catch (final IOException e) {
@@ -77,9 +73,11 @@ public abstract class AbstractLinter {
 
   /**
    * @return the stream of the linter script. Override this method to provide a different script version.
-   * @throws IOException if the stream is invalid or unavailable.
+   * @throws IOException
+   *           if the stream is invalid or unavailable.
    */
-  protected abstract InputStream getScriptAsStream() throws IOException;
+  protected abstract InputStream getScriptAsStream()
+      throws IOException;
 
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the
@@ -98,8 +96,8 @@ public abstract class AbstractLinter {
     final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), getOptions());
     final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
     if (!valid) {
-      final String json = builder.addJSON().evaluate(String.format("JSON.stringify(JSON.decycle(%s.errors))", getLinterName()),
-          "stringify errors").toString();
+      final String json = builder.addJSON().evaluate(
+          String.format("JSON.stringify(JSON.decycle(%s.errors))", getLinterName()), "stringify errors").toString();
       LOG.debug("json {}", json);
       final Type type = new TypeToken<List<LinterError>>() {}.getType();
       final List<LinterError> errors = new Gson().fromJson(json, type);
@@ -138,7 +136,6 @@ public abstract class AbstractLinter {
     LOG.debug("setOptions: {}", this.options);
     return this;
   }
-
 
   /**
    * @return an options as CSV.
