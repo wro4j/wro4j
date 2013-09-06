@@ -213,16 +213,25 @@ public abstract class AbstractWro4jMojo
    */
   protected WroManagerFactory getManagerFactory() {
     if (managerFactory == null) {
+      WroManagerFactory localManagerFactory = null;
       try {
-        managerFactory = newWroManagerFactory();
+        localManagerFactory = newWroManagerFactory();
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
       // initialize before process.
-      if (managerFactory instanceof StandaloneContextAware) {
-        ((StandaloneContextAware) managerFactory).initialize(createStandaloneContext());
+      if (localManagerFactory instanceof StandaloneContextAware) {
+        ((StandaloneContextAware) localManagerFactory).initialize(createStandaloneContext());
       }
+      managerFactory = decorateManagerFactory(localManagerFactory);
     }
+    return managerFactory;
+  }
+
+  /**
+   * Allows the initialized manager factory to be decorated.
+   */
+  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
     return managerFactory;
   }
 
