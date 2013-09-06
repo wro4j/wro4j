@@ -71,13 +71,13 @@ public class ProgressIndicator {
    * A method which should be invoked on each new resource processing, having as a side effect an increment of the
    * counter holding the number of total processed resources.
    */
-  public void onProcessingResource(final Resource resource) {
+  public synchronized void onProcessingResource(final Resource resource) {
     totalResources++;
     log.debug("processing resource: " + resource.getUri());
     if (isLogRequired()) {
-      log.info("Resources processed: " + getTotalResources() + ". Last processed: " + resource.getUri());
+      log.info("Processed until now: " + getTotalResources() + ". Last processed: " + resource.getUri());
+      updateLastInvocation();
     }
-    updateLastInvocation();
   }
 
   private boolean isLogRequired() {

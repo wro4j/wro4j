@@ -33,22 +33,28 @@ import com.google.gson.reflect.TypeToken;
  */
 public abstract class AbstractLinter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLinter.class);
+  /**
+   * Required to make jshint not complain.
+   */
+  private static final String DEFINE_WINDOW = "var window = {};";
   private ResourceLocatorFactory webjarLocatorFactory;
   private final OptionsBuilder optionsBuilder = new OptionsBuilder();
   /**
    * Options to apply to js hint processing
    */
   private String options;
+  private RhinoScriptBuilder builder;
 
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
     try {
-      // reusing the scope doesn't work here. Get the following error: TypeError: Cannot find function create in object
-      // function Object() { [native code for Object.Object, arity=1] }
-      // TODO investigate why
-      return RhinoScriptBuilder.newClientSideAwareChain().evaluateChain(getScriptAsStream(), "linter.js");
+      if (builder == null) {
+        builder = RhinoScriptBuilder.newChain().evaluateChain(DEFINE_WINDOW, "window").evaluateChain(
+            getScriptAsStream(), "linter.js");
+      }
+      return builder;
     } catch (final IOException e) {
       throw new WroRuntimeException("Failed reading init script", e);
     }
@@ -66,9 +72,11 @@ public abstract class AbstractLinter {
 
   /**
    * @return the stream of the linter script. Override this method to provide a different script version.
-   * @throws IOException if the stream is invalid or unavailable.
+   * @throws IOException
+   *           if the stream is invalid or unavailable.
    */
-  protected abstract InputStream getScriptAsStream() throws IOException;
+  protected abstract InputStream getScriptAsStream()
+      throws IOException;
 
   /**
    * Validates a js using jsHint and throws {@link LinterException} if the js is invalid. If no exception is thrown, the
@@ -87,8 +95,8 @@ public abstract class AbstractLinter {
     final String packIt = buildLinterScript(WroUtil.toJSMultiLineString(data), getOptions());
     final boolean valid = Boolean.parseBoolean(builder.evaluate(packIt, "check").toString());
     if (!valid) {
-      final String json = builder.addJSON().evaluate(String.format("JSON.stringify(JSON.decycle(%s.errors))", getLinterName()),
-          "stringify errors").toString();
+      final String json = builder.addJSON().evaluate(
+          String.format("JSON.stringify(JSON.decycle(%s.errors))", getLinterName()), "stringify errors").toString();
       LOG.debug("json {}", json);
       final Type type = new TypeToken<List<LinterError>>() {}.getType();
       final List<LinterError> errors = new Gson().fromJson(json, type);
@@ -127,7 +135,6 @@ public abstract class AbstractLinter {
     LOG.debug("setOptions: {}", this.options);
     return this;
   }
-
 
   /**
    * @return an options as CSV.

@@ -109,11 +109,11 @@ public abstract class AbstractSingleProcessorMojo
   }
 
   /**
-   * {@inheritDoc}
+   * Initialize the manager factory with a processor factory using a single processor.
    */
   @Override
-  protected WroManagerFactory getManagerFactory() {
-    return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
+    return new WroManagerFactoryDecorator(managerFactory) {
       @Override
       protected void onBeforeBuild(final Builder builder) {
         builder.setProcessorsFactory(createSingleProcessorsFactory());

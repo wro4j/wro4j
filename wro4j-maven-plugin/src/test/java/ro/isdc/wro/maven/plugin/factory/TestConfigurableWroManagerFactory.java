@@ -26,6 +26,7 @@ import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
@@ -225,5 +226,12 @@ public class TestConfigurableWroManagerFactory {
     initFactory(mockFilterConfig, props);
     final ConfigurableModelFactory configurableModelFactory = (ConfigurableModelFactory) AbstractDecorator.getOriginalDecoratedObject(victim.create().getModelFactory());
     assertEquals(XmlModelFactory.class, configurableModelFactory.getConfiguredStrategy().getClass());
+  }
+
+  @Test
+  public void shouldUseConfiguredParallelPreProcessingFlagFromExtraConfigFile() {
+    final Properties props = createProperties(ConfigConstants.parallelPreprocessing.name(), Boolean.TRUE.toString());
+    initFactory(mockFilterConfig, props);
+    assertTrue(Context.get().getConfig().isParallelPreprocessing());
   }
 }
