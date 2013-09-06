@@ -288,7 +288,7 @@ public class WroFilter
     // Destroy the cached model after the processing is done if cache flag is disabled
     if (wroConfiguration.isDisableCache()) {
       LOG.debug("Disable Cache is true. Destroying model...");
-      final WroManager manager = this.wroManagerFactory.create();
+      final WroManager manager = wroManagerFactory.create();
       manager.getModelFactory().destroy();
       manager.getCacheStrategy().clear();
     }
