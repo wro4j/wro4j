@@ -26,7 +26,7 @@ public class WroManagerFactoryDecorator
 
     @Override
     public void destroy() {
-      get().destroy();
+      getDecoratedObject().destroy();
       super.destroy();
     };
   };

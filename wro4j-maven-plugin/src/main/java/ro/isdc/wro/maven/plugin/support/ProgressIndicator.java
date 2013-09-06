@@ -75,7 +75,7 @@ public class ProgressIndicator {
     totalResources++;
     log.debug("processing resource: " + resource.getUri());
     if (isLogRequired()) {
-      log.info("Processed until now: " + getTotalResources() + ". Last being processed: " + resource.getUri());
+      log.info("Processed until now: " + getTotalResources() + ". Last processed: " + resource.getUri());
       updateLastInvocation();
     }
   }
