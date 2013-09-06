@@ -48,16 +48,15 @@ public class BuildContextHolder {
     this.buildContext = buildContext;
     this.buildDirectory = buildDirectory == null ? FileUtils.getTempDirectory() : buildDirectory;
 
-    if (buildContext == null) {
-      try {
-        initFallbackStorage();
-      } catch (final IOException e) {
-        LOG.warn("Cannot use fallback storage. No build context storage will be used.", e);
-      }
+    try {
+      initFallbackStorage();
+    } catch (final IOException e) {
+      LOG.warn("Cannot use fallback storage. No build context storage will be used.", e);
     }
   }
 
-  private void initFallbackStorage() throws IOException {
+  private void initFallbackStorage()
+      throws IOException {
     final File fallbackStorageFile = getFallbackStorageFile();
     if (!fallbackStorageFile.exists()) {
       fallbackStorageFile.getParentFile().mkdirs();
@@ -82,7 +81,14 @@ public class BuildContextHolder {
    * @return the persisted value stored under the provided key. If no value exist, the returned result will be null.
    */
   public String getValue(final String key) {
-    return buildContext != null ? (String) buildContext.getValue(key) : fallbackStorage.getProperty(key);
+    String value = null;
+    if (buildContext != null) {
+      value = (String) buildContext.getValue(key);
+    }
+    if (value == null) {
+      value = fallbackStorage.getProperty(key);
+    }
+    return value;
   }
 
   /**
@@ -95,18 +101,17 @@ public class BuildContextHolder {
     LOG.debug("storing key: '{}' and value: '{}'", key, value);
     if (buildContext != null) {
       buildContext.setValue(key, value);
-    } else {
-      fallbackStorage.setProperty(key, value);
-      try {
-        // immediately persist
-        fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");
-        LOG.debug("fallback storage updated");
-      } catch (final IOException e) {
-        LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
-      }
+    }
+    //always use fallback
+    fallbackStorage.setProperty(key, value);
+    try {
+      // immediately persist
+      fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");
+      LOG.debug("fallback storage updated");
+    } catch (final IOException e) {
+      LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
     }
   }
-
 
   public void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
     this.incrementalBuildEnabled = incrementalBuildEnabled;
@@ -117,7 +122,7 @@ public class BuildContextHolder {
    *         should be processed only. Useful to avoid unnecessary processing when there is actually no change detected.
    */
   public boolean isIncrementalBuild() {
-    return buildContext != null ? buildContext.isIncremental() : incrementalBuildEnabled;
+    return buildContext != null ? buildContext.isIncremental() || incrementalBuildEnabled : incrementalBuildEnabled;
   }
 
   /**

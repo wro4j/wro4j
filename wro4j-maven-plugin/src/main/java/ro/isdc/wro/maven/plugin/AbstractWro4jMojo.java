@@ -159,6 +159,7 @@ public abstract class AbstractWro4jMojo
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().info("parallelProcessing: " + isParallelProcessing());
     getLog().debug("wroManagerFactory: " + wroManagerFactory);
+    getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
     getLog().debug("extraConfig: " + extraConfigFile);
 
     extendPluginClasspath();

@@ -49,7 +49,7 @@ public class Wro4jMojo
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
+   * @parameter default-value="${project.build.directory}" expression="${destinationFolder}"
    * @optional
    */
   private File destinationFolder;
