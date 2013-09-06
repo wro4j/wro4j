@@ -118,6 +118,13 @@ public abstract class AbstractWro4jMojo
    */
   private BuildContext buildContext;
   /**
+   * This parameter is not meant to be used. The only purpose is to hold project build directory
+   *
+   * @parameter default-value="${project.build.directory}"
+   * @optional
+   */
+  private File buildDirectory;
+  /**
    * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
    */
   private BuildContextHolder buildContextHolder;
@@ -207,7 +214,7 @@ public abstract class AbstractWro4jMojo
   /**
    * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}. When
    * overriding this method, ensure that creating managerFactory performs injection during manager creation, otherwise
-   * the manager won't be initialized porperly.
+   * the manager won't be initialized properly.
    *
    * @return {@link WroManagerFactory} implementation.
    */
@@ -559,7 +566,7 @@ public abstract class AbstractWro4jMojo
   private BuildContextHolder getBuildContextHolder() {
     if (buildContextHolder == null) {
       //new File(mavenProject.getBuild().getOutputDirectory())
-      buildContextHolder = new BuildContextHolder(buildContext, null);
+      buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
       buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
     }
     return buildContextHolder;
