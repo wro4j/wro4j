@@ -283,12 +283,12 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void shouldBeFasterWhenRunningPostProcessingInParallel() throws Exception {
+  public void shouldBeFasterWhenRunningProcessingInParallel() throws Exception {
     final long begin = System.currentTimeMillis();
-    victim.setParallelPostprocessing(false);
+    victim.setParallelProcessing(false);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
     final long endSerial = System.currentTimeMillis();
-    victim.setParallelPostprocessing(true);
+    victim.setParallelProcessing(true);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
     final long endParallel = System.currentTimeMillis();
 
@@ -313,11 +313,11 @@ public class TestWro4jMojo {
     victim.setTaskExecutor(taskExecutor);
     victim.setIgnoreMissingResources(true);
 
-    victim.setParallelPostprocessing(false);
+    victim.setParallelProcessing(false);
     victim.execute();
     assertFalse(invoked.get());
 
-    victim.setParallelPostprocessing(true);
+    victim.setParallelProcessing(true);
     victim.execute();
     assertTrue(invoked.get());
   }

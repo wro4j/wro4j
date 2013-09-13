@@ -134,11 +134,11 @@ public abstract class AbstractTestLinterMojo {
     mojo.setTaskExecutor(taskExecutor);
     mojo.setIgnoreMissingResources(true);
 
-    mojo.setParallelPostprocessing(false);
+    mojo.setParallelProcessing(false);
     mojo.execute();
     assertFalse(invoked.get());
 
-    mojo.setParallelPostprocessing(true);
+    mojo.setParallelProcessing(true);
     mojo.execute();
     assertTrue(invoked.get());
   }

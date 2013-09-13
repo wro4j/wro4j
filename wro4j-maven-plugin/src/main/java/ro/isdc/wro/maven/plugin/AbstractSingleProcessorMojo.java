@@ -63,7 +63,7 @@ public abstract class AbstractSingleProcessorMojo
       for (final ResourceType resourceType : ResourceType.values()) {
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 
-        if (isParallelPostprocessing()) {
+        if (isParallelProcessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
@@ -76,7 +76,7 @@ public abstract class AbstractSingleProcessorMojo
         }
       }
     }
-    if (isParallelPostprocessing()) {
+    if (isParallelProcessing()) {
       getTaskExecutor().submit(callables);
     }
   }
@@ -106,11 +106,11 @@ public abstract class AbstractSingleProcessorMojo
   }
 
   /**
-   * {@inheritDoc}
+   * Initialize the manager factory with a processor factory using a single processor.
    */
   @Override
-  protected WroManagerFactory getManagerFactory() {
-    return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
+    return new WroManagerFactoryDecorator(managerFactory) {
       @Override
       protected void onBeforeBuild(final Builder builder) {
         builder.setProcessorsFactory(createSingleProcessorsFactory());
