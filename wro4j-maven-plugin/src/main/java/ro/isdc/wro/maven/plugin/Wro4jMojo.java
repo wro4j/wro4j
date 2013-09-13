@@ -154,7 +154,7 @@ public class Wro4jMojo
       getTaskExecutor().submit(callables);
     }
     watch.stop();
-    System.out.println(watch.prettyPrint());
+    getLog().debug(watch.prettyPrint());
     writeGroupNameMap();
   }
 
