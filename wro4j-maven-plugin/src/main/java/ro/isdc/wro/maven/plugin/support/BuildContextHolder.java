@@ -129,6 +129,7 @@ public class BuildContextHolder {
    * Destroy the persisted storage and all stored data.
    */
   public void destroy() {
+    fallbackStorage.clear();
     FileUtils.deleteQuietly(getFallbackStorageFile());
   }
 }

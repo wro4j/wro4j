@@ -719,4 +719,13 @@ public abstract class AbstractWro4jMojo
   void setBuildContext(final BuildContext buildContext) {
     this.buildContext = buildContext;
   }
+
+  /**
+   * Removes any persisted data creating during the build.
+   *
+   * @VisibleForTesting
+   */
+  void clean() {
+    getBuildContextHolder().destroy();
+  }
 }
