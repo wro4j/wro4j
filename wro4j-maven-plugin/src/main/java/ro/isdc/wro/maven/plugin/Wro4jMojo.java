@@ -49,7 +49,7 @@ public class Wro4jMojo
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
+   * @parameter default-value="${project.build.directory}" expression="${destinationFolder}"
    * @optional
    */
   private File destinationFolder;
@@ -255,6 +255,8 @@ public class Wro4jMojo
 
       // init context
       final WroConfiguration config = Context.get().getConfig();
+      //the maven plugin should ignore empty groups, since it will try to process all types of resources.
+      config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());

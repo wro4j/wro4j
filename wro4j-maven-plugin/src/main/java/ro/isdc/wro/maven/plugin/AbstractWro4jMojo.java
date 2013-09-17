@@ -31,6 +31,7 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
+import ro.isdc.wro.maven.plugin.support.BuildContextHolder;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
@@ -117,6 +118,17 @@ public abstract class AbstractWro4jMojo
    */
   private BuildContext buildContext;
   /**
+   * This parameter is not meant to be used. The only purpose is to hold project build directory
+   *
+   * @parameter default-value="${project.build.directory}"
+   * @optional
+   */
+  private File buildDirectory;
+  /**
+   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
+   */
+  private BuildContextHolder buildContextHolder;
+  /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
    *
@@ -124,7 +136,15 @@ public abstract class AbstractWro4jMojo
    * @optional
    */
   private boolean parallelProcessing;
+  /**
+   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be changed to true if no unexpected problems are detected..
+   *
+   * @parameter default-value="false" expression="${incrementalBuildEnabled}"
+   * @optional
+   */
+  private boolean incrementalBuildEnabled;
   private TaskExecutor<Void> taskExecutor;
+
 
   /**
    * {@inheritDoc}
@@ -139,6 +159,7 @@ public abstract class AbstractWro4jMojo
     getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
     getLog().info("parallelProcessing: " + isParallelProcessing());
     getLog().debug("wroManagerFactory: " + wroManagerFactory);
+    getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
     getLog().debug("extraConfig: " + extraConfigFile);
 
     extendPluginClasspath();
@@ -194,7 +215,7 @@ public abstract class AbstractWro4jMojo
   /**
    * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}. When
    * overriding this method, ensure that creating managerFactory performs injection during manager creation, otherwise
-   * the manager won't be initialized porperly.
+   * the manager won't be initialized properly.
    *
    * @return {@link WroManagerFactory} implementation.
    */
@@ -276,7 +297,11 @@ public abstract class AbstractWro4jMojo
       result = Arrays.asList(getTargetGroups().split(","));
     }
     persistResourceFingerprints(result);
-    getLog().info("The following groups will be processed: " + result);
+    if (result.isEmpty()) {
+      getLog().info("Nothing to process (nothing configured or nothing changed since last build).");
+    } else {
+      getLog().info("The following groups will be processed: " + result);
+    }
     return result;
   }
 
@@ -291,14 +316,12 @@ public abstract class AbstractWro4jMojo
    * Store digest for all resources contained inside the list of provided groups.
    */
   private void persistResourceFingerprints(final List<String> groupNames) {
-    if (buildContext != null) {
-      final WroModelInspector modelInspector = new WroModelInspector(getModel());
-      for (final String groupName : groupNames) {
-        final Group group = modelInspector.getGroupByName(groupName);
-        if (group != null) {
-          for (final Resource resource : group.getResources()) {
-            persistResourceFingerprints(resource);
-          }
+    final WroModelInspector modelInspector = new WroModelInspector(getModel());
+    for (final String groupName : groupNames) {
+      final Group group = modelInspector.getGroupByName(groupName);
+      if (group != null) {
+        for (final Resource resource : group.getResources()) {
+          persistResourceFingerprints(resource);
         }
       }
     }
@@ -310,7 +333,7 @@ public abstract class AbstractWro4jMojo
     final ResourceLocatorFactory locatorFactory = manager.getResourceLocatorFactory();
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      buildContext.setValue(resource.getUri(), fingerprint);
+      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
       getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
       if (resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
@@ -436,8 +459,7 @@ public abstract class AbstractWro4jMojo
     final AtomicBoolean changeDetected = new AtomicBoolean(false);
     try {
       final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      final String previousFingerprint = buildContext != null ? String
-          .valueOf(buildContext.getValue(resource.getUri())) : null;
+      final String previousFingerprint = getBuildContextHolder().getValue(resource.getUri());
       getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
 
       changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
@@ -459,7 +481,7 @@ public abstract class AbstractWro4jMojo
    * @return true if the build was triggered by an incremental change.
    */
   protected final boolean isIncrementalBuild() {
-    return buildContext != null && buildContext.isIncremental();
+    return getBuildContextHolder().isIncrementalBuild();
   }
 
   private List<String> getAllModelGroupNames() {
@@ -542,6 +564,15 @@ public abstract class AbstractWro4jMojo
     return taskExecutor;
   }
 
+  private BuildContextHolder getBuildContextHolder() {
+    if (buildContextHolder == null) {
+      //new File(mavenProject.getBuild().getOutputDirectory())
+      buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
+      buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
+    }
+    return buildContextHolder;
+  }
+
   @VisibleForTesting
   void setTaskExecutor(final TaskExecutor<Void> taskExecutor) {
     this.taskExecutor = taskExecutor;
@@ -613,6 +644,14 @@ public abstract class AbstractWro4jMojo
     this.parallelProcessing = parallelProcessing;
   }
 
+
+  /**
+   * @VisibleForTesting
+   */
+  final void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+    this.incrementalBuildEnabled = incrementalBuildEnabled;
+  }
+
   /**
    * @return the minimize
    * @VisibleForTesting
@@ -679,5 +718,14 @@ public abstract class AbstractWro4jMojo
    */
   void setBuildContext(final BuildContext buildContext) {
     this.buildContext = buildContext;
+  }
+
+  /**
+   * Removes any persisted data creating during the build.
+   *
+   * @VisibleForTesting
+   */
+  void clean() {
+    getBuildContextHolder().destroy();
   }
 }
