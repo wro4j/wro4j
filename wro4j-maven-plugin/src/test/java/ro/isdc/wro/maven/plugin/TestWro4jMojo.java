@@ -388,6 +388,14 @@ public class TestWro4jMojo {
   }
 
   @Test
+  public void shouldSkipSecondProcessingWhenIncrementalBuildEnabled() throws Exception {
+    victim.setBuildContext(null);
+    victim.setIncrementalBuildEnabled(true);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+  }
+
+  @Test
   public void shouldUseConfiguredNamingStrategy()
       throws Exception {
     setWroWithValidResources();
@@ -563,23 +571,19 @@ public class TestWro4jMojo {
       setUpMojo(victim);
 
       victim.setGroupNameMappingFile(groupNameMappingFile);
-      when(mockBuildContext.isIncremental()).thenReturn(true);
 
       assertEquals(2, victim.getTargetGroupsAsList().size());
       victim.execute();
+
+      //Now mark it as incremental
+      when(mockBuildContext.isIncremental()).thenReturn(true);
+
       final Properties groupNames = new Properties();
       groupNames.load(new FileInputStream(groupNameMappingFile));
       assertEquals(4, groupNames.entrySet().size());
 
-      //change the uri of the resource from group a (equivalent to changing its content.
+      //change the uri of the resource from group a (equivalent to changing its content).
       when(g1Resource.getUri()).thenReturn("1a.js");
-      when(mockBuildContext.getValue(Mockito.eq("1a.js"))).thenAnswer(new Answer<Object>() {
-        public Object answer(final InvocationOnMock invocation)
-            throws Throwable {
-          final String key = (String) invocation.getArguments()[0];
-          return victim.getManagerFactory().create().getHashStrategy().getHash(new ByteArrayInputStream(key.getBytes()));
-        }
-      });
 
       assertEquals(1, victim.getTargetGroupsAsList().size());
       victim.execute();
@@ -645,6 +649,7 @@ public class TestWro4jMojo {
   @After
   public void tearDown()
       throws Exception {
+    victim.clean();
     FileUtils.deleteDirectory(destinationFolder);
     FileUtils.deleteDirectory(cssDestinationFolder);
     FileUtils.deleteDirectory(jsDestinationFolder);
