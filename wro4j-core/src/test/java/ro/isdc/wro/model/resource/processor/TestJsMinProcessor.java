@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +16,6 @@ import java.net.URL;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,9 +75,8 @@ public class TestJsMinProcessor {
 
   @Test
   public void shouldHandleSlashAndIsolatedSingleQuoteInRegexes() throws Exception {
-      //final String script = "var slashOrDoubleQuote=/[/']/g;";
-    final String script = "return /\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4}/.test(s);";
-      Assert.assertEquals("\n" + script, jsmin(script));
+      final String script = "var slashOrDoubleQuote=/[/']/g;";
+      assertEquals("\n" + script, jsmin(script));
   }
 
   private String jsmin(final String inputScript) throws Exception {
