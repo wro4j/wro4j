@@ -114,10 +114,14 @@ public class JSMin {
   }
 
   /**
-   * action -- do something! What you do is determined by the argument: 1 Output
-   * A. Copy B to A. Get the next B. 2 Copy B to A. Get the next B. (Delete A).
-   * 3 Get the next B. (Delete B). action treats a string as a single character.
-   * Wow! action recognizes a regular expression if it is preceded by ( or , or =.
+   * action -- do something! What you do is determined by the argument:
+   * <ul>
+   *   <li>1 Output A. Copy B to A. Get the next B.</li>
+   *   <li>2 Copy B to A. Get the next B. (Delete A).</li>
+   *   <li>3 Get the next B. (Delete B).</li>
+   * </ul>
+   * action treats a string as a single character. Wow!<br/>
+   * action recognizes a regular expression if it is preceded by ( or , or =.
    */
 
   void action(final int d) throws IOException,
@@ -156,7 +160,22 @@ public class JSMin {
         out.write(theB);
         for (;;) {
           theA = get();
-          if (theA == '/') {
+          if (theA == '[') {
+            for (;;) {
+              out.write(theA);
+              theA = get();
+              if (theA == ']') {
+                break;
+              }
+              if (theA == '\\') {
+                out.write(theA);
+                theA = get();
+              }
+              if (theA <= '\n') {
+                throw new UnterminatedRegExpLiteralException();
+              }
+            }
+          } else if (theA == '/') {
             break;
           } else if (theA == '\\') {
             out.write(theA);

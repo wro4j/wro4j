@@ -3,12 +3,18 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 
+import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +23,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
+import ro.isdc.wro.model.resource.processor.support.JSMin;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -64,5 +71,20 @@ public class TestJsMinProcessor {
   @Test
   public void shouldSupportCorrectResourceTypes() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.JS);
+  }
+
+  @Test
+  public void shouldHandleSlashAndIsolatedSingleQuoteInRegexes() throws Exception {
+      final String script = "var slashOrDoubleQuote=/[/']/g;";
+      assertEquals("\n" + script, jsmin(script));
+  }
+
+  private String jsmin(final String inputScript) throws Exception {
+      final StringReader reader = new StringReader(inputScript);
+      final InputStream is = new ReaderInputStream(reader, "UTF-8");
+      final StringWriter writer = new StringWriter();
+      final OutputStream os = new WriterOutputStream(writer, "UTF-8");
+      new JSMin(is, os).jsmin();
+      return writer.toString();
   }
 }
