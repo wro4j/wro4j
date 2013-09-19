@@ -65,6 +65,7 @@ public class WroFilter
    * Filter config.
    */
   private FilterConfig filterConfig;
+  private ObjectFactory<WroConfiguration> wroConfigurationFactory;
   /**
    * Wro configuration.
    */
@@ -94,7 +95,7 @@ public class WroFilter
       throws ServletException {
     this.filterConfig = config;
     // invoke createConfiguration method only if the configuration was not set.
-    this.wroConfiguration = wroConfiguration == null ? createConfiguration() : wroConfiguration;
+    this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
     headersConfigurer = newResponseHeadersConfigurer();
     registerChangeListeners();
@@ -114,22 +115,24 @@ public class WroFilter
     // Extract config from servletContext (if already configured)
     // TODO use a named helper
     final WroConfiguration configAttribute = ServletContextAttributeHelper.create(filterConfig).getWroConfiguration();
-    return configAttribute != null ? configAttribute : newWroConfigurationFactory(filterConfig).create();
+    if (configAttribute != null) {
+      setConfiguration(configAttribute);
+    }
+    return getWroConfigurationFactory().create();
   }
 
   /**
    * Creates {@link WroManagerFactory}.
    */
   private WroManagerFactory createWroManagerFactory() {
-    if (this.wroManagerFactory == null) {
-      // TODO use a named helper
+    if (wroManagerFactory == null) {
       final WroManagerFactory managerFactoryAttribute = ServletContextAttributeHelper.create(filterConfig)
           .getManagerFactory();
       LOG.debug("managerFactory attribute: {}", managerFactoryAttribute);
-      return managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
+      wroManagerFactory = managerFactoryAttribute != null ? managerFactoryAttribute : newWroManagerFactory();
     }
     LOG.debug("created managerFactory: {}", wroManagerFactory);
-    return this.wroManagerFactory;
+    return wroManagerFactory;
   }
 
   /**
@@ -285,7 +288,7 @@ public class WroFilter
     // Destroy the cached model after the processing is done if cache flag is disabled
     if (wroConfiguration.isDisableCache()) {
       LOG.debug("Disable Cache is true. Destroying model...");
-      final WroManager manager = this.wroManagerFactory.create();
+      final WroManager manager = wroManagerFactory.create();
       manager.getModelFactory().destroy();
       manager.getCacheStrategy().clear();
     }
@@ -408,7 +411,7 @@ public class WroFilter
    * @return {@link WroManagerFactory} instance.
    */
   protected WroManagerFactory newWroManagerFactory() {
-    return new DefaultWroManagerFactory(wroConfiguration);
+    return DefaultWroManagerFactory.create(wroConfigurationFactory);
   }
 
   /**
@@ -416,6 +419,17 @@ public class WroFilter
    */
   protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
     return new PropertiesAndFilterConfigWroConfigurationFactory(filterConfig);
+  }
+
+  private ObjectFactory<WroConfiguration> getWroConfigurationFactory() {
+    if (wroConfigurationFactory == null) {
+      wroConfigurationFactory = newWroConfigurationFactory(filterConfig);
+    }
+    return wroConfigurationFactory;
+  }
+
+  public void setWroConfigurationFactory(final ObjectFactory<WroConfiguration> wroConfigurationFactory) {
+    this.wroConfigurationFactory = wroConfigurationFactory;
   }
 
   /**
@@ -434,7 +448,11 @@ public class WroFilter
    */
   public final void setConfiguration(final WroConfiguration config) {
     Validate.notNull(config);
-    this.wroConfiguration = config;
+    wroConfigurationFactory = new ObjectFactory<WroConfiguration>() {
+      public WroConfiguration create() {
+        return config;
+      }
+    };
   }
 
   /**

@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -20,7 +21,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.7
  * @created 11 May 2012
  */
-public abstract class JsTemplateCompilerProcessor implements ResourcePreProcessor {
+public abstract class JsTemplateCompilerProcessor implements ResourcePreProcessor, Destroyable {
   private final ObjectPoolHelper<AbstractJsTemplateCompiler> enginePool;
 
   public JsTemplateCompilerProcessor() {
@@ -62,4 +63,9 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
    * @return the {@link AbstractJsTemplateCompiler} responsible for compiling the template.
    */
   protected abstract AbstractJsTemplateCompiler createCompiler();
+
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }

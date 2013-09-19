@@ -10,7 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.PropertiesFactory;
 import ro.isdc.wro.manager.WroManager;
+import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
@@ -25,12 +27,28 @@ public class DefaultWroManagerFactory
   private final WroManagerFactory factory;
 
   /**
+   * A factory method which uses {@link WroConfiguration} to get the configured wroManager className.
    *
    * @param configuration
+   *          {@link WroConfiguration} to get the {@link ConfigConstants#managerFactoryClassName} from.
    */
-  public DefaultWroManagerFactory(final WroConfiguration configuration) {
-    notNull(configuration);
-    factory = initFactory(configuration.getWroManagerClassName());
+  public static DefaultWroManagerFactory create(final WroConfiguration configuration) {
+    return create(new ObjectFactory<WroConfiguration>() {
+      public WroConfiguration create() {
+        return configuration;
+      }
+    });
+  }
+
+  public static DefaultWroManagerFactory create(final ObjectFactory<WroConfiguration> configurationFactory) {
+    notNull(configurationFactory);
+    final Properties properties = configurationFactory instanceof PropertiesFactory ? ((PropertiesFactory) configurationFactory).createProperties()
+        : new Properties();
+    final String wroManagerClassName = configurationFactory.create().getWroManagerClassName();
+    if (wroManagerClassName != null) {
+      properties.setProperty(ConfigConstants.managerFactoryClassName.name(), wroManagerClassName);
+    }
+    return new DefaultWroManagerFactory(properties);
   }
 
   /**
@@ -43,13 +61,14 @@ public class DefaultWroManagerFactory
    */
   public DefaultWroManagerFactory(final Properties properties) {
     notNull(properties);
-    factory = initFactory(properties.getProperty(ConfigConstants.managerFactoryClassName.name()));
+    factory = initFactory(properties);
   }
 
   /**
    * Initialized inner factory based on provided configuration.
    */
-  private WroManagerFactory initFactory(final String wroManagerClassName) {
+  private WroManagerFactory initFactory(final Properties properties) {
+    final String wroManagerClassName = properties.getProperty(ConfigConstants.managerFactoryClassName.name());
     if (StringUtils.isEmpty(wroManagerClassName)) {
       // If no context param was specified we return the default factory
       return newManagerFactory();
@@ -59,7 +78,12 @@ public class DefaultWroManagerFactory
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(wroManagerClassName);
         // Instantiate the factory
-        return (WroManagerFactory)factoryClass.newInstance();
+        final WroManagerFactory factory = (WroManagerFactory)factoryClass.newInstance();
+        // inject properties if required
+        if (factory instanceof ConfigurableWroManagerFactory) {
+          ((ConfigurableWroManagerFactory) factory).setConfigProperties(properties);
+        }
+        return factory;
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class:" + wroManagerClassName, e);
       }

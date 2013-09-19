@@ -101,6 +101,7 @@ public class GroupsProcessor {
   private String applyPostProcessors(final CacheKey cacheKey, final String content)
       throws IOException {
     final Collection<ResourcePostProcessor> processors = processorsFactory.getPostProcessors();
+    LOG.debug("appying post processors: {}", processors);
     if (processors.isEmpty()) {
       return content;
     }
@@ -135,5 +136,19 @@ public class GroupsProcessor {
     };
     injector.inject(decorated);
     return decorated;
+  }
+  
+  /**
+   * @VisibleForTesting
+   */
+  final void setPreProcessorExecutor(final PreProcessorExecutor preProcessorExecutor) {
+    this.preProcessorExecutor = preProcessorExecutor;
+  }
+
+  /**
+   * Perform cleanup when taken out of service.
+   */
+  public void destroy() {
+    preProcessorExecutor.destroy();
   }
 }

@@ -10,8 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
 
@@ -39,14 +42,14 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * @goal run
  * @phase compile
  * @requiresDependencyResolution runtime
- *
  * @author Alex Objelean
  */
-public class Wro4jMojo extends AbstractWro4jMojo {
+public class Wro4jMojo
+    extends AbstractWro4jMojo {
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}/wro/" expression="${destinationFolder}"
+   * @parameter default-value="${project.build.directory}" expression="${destinationFolder}"
    * @optional
    */
   private File destinationFolder;
@@ -89,7 +92,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   @Override
   protected void validate()
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     super.validate();
     // additional validation requirements
     if (destinationFolder == null) {
@@ -118,21 +121,40 @@ public class Wro4jMojo extends AbstractWro4jMojo {
    */
   @Override
   protected void doExecute()
-    throws Exception {
+      throws Exception {
     getLog().info("destinationFolder: " + destinationFolder);
     getLog().info("jsDestinationFolder: " + jsDestinationFolder);
     getLog().info("cssDestinationFolder: " + cssDestinationFolder);
     getLog().info("groupNameMappingFile: " + groupNameMappingFile);
-
     final Collection<String> groupsAsList = getTargetGroupsAsList();
+    final StopWatch watch = new StopWatch();
+    watch.start("processGroups: " + groupsAsList);
+
+    final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-        processGroup(groupWithExtension, destinationFolder);
+
+        if (isParallelProcessing()) {
+          callables.add(Context.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              processGroup(groupWithExtension, destinationFolder);
+              return null;
+            }
+          }));
+        } else {
+          processGroup(groupWithExtension, destinationFolder);
+        }
       }
     }
-
+    if (isParallelProcessing()) {
+      getTaskExecutor().submit(callables);
+    }
+    watch.stop();
+    getLog().debug(watch.prettyPrint());
     writeGroupNameMap();
   }
 
@@ -162,12 +184,14 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * Encodes a version using some logic.
    *
-   * @param group the name of the resource to encode.
-   * @param input the stream of the result content.
+   * @param group
+   *          the name of the resource to encode.
+   * @param input
+   *          the stream of the result content.
    * @return the name of the resource with the version encoded.
    */
   private String rename(final String group, final InputStream input)
-    throws Exception {
+      throws Exception {
     try {
       final String newName = getManagerFactory().create().getNamingStrategy().rename(group, input);
       groupNames.setProperty(group, newName);
@@ -177,16 +201,17 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     }
   }
 
-
   /**
    * Computes the destination folder based on resource type.
    *
-   * @param resourceType {@link ResourceType} to process.
+   * @param resourceType
+   *          {@link ResourceType} to process.
    * @return destinationFoder where the result of resourceType will be copied.
-   * @throws MojoExecutionException if computed folder is null.
+   * @throws MojoExecutionException
+   *           if computed folder is null.
    */
   private File computeDestinationFolder(final ResourceType resourceType)
-    throws MojoExecutionException {
+      throws MojoExecutionException {
     File folder = destinationFolder;
     if (resourceType == ResourceType.JS) {
       if (jsDestinationFolder != null) {
@@ -201,8 +226,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     getLog().info("folder: " + folder);
     if (folder == null) {
       throw new MojoExecutionException("Couldn't compute destination folder for resourceType: " + resourceType
-        + ". That means that you didn't define one of the following parameters: "
-        + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
+          + ". That means that you didn't define one of the following parameters: "
+          + "destinationFolder, cssDestinationFolder, jsDestinationFolder");
     }
     if (!folder.exists()) {
       folder.mkdirs();
@@ -210,12 +235,11 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return folder;
   }
 
-
   /**
    * Process a single group.
    */
   private void processGroup(final String group, final File parentFoder)
-    throws Exception {
+      throws Exception {
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
     try {
@@ -231,6 +255,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
 
       // init context
       final WroConfiguration config = Context.get().getConfig();
+      //the maven plugin should ignore empty groups, since it will try to process all types of resources.
+      config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
@@ -241,7 +267,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
       final File parentFolder = destinationFile.getParentFile();
       if (!parentFolder.exists()) {
-        //make directories if required
+        // make directories if required
         parentFolder.mkdirs();
       }
       destinationFile.createNewFile();
@@ -259,8 +285,7 @@ public class Wro4jMojo extends AbstractWro4jMojo {
         destinationFile.delete();
       } else {
         getLog().info("file size: " + destinationFile.getName() + " -> " + destinationFile.length() + " bytes");
-        getLog().info(
-          destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
+        getLog().info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
       }
     } finally {
       if (resultOutputStream != null) {
@@ -271,7 +296,6 @@ public class Wro4jMojo extends AbstractWro4jMojo {
       }
     }
   }
-
 
   /**
    * The idea is to compute the aggregatedFolderPath based on a root folder. The root folder is determined by comparing
@@ -307,27 +331,27 @@ public class Wro4jMojo extends AbstractWro4jMojo {
     return result;
   }
 
-
   /**
-   * @param destinationFolder the destinationFolder to set
+   * @param destinationFolder
+   *          the destinationFolder to set
    * @VisibleForTesting
    */
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
 
-
   /**
-   * @param cssDestinationFolder the cssDestinationFolder to set
+   * @param cssDestinationFolder
+   *          the cssDestinationFolder to set
    * @VisibleForTesting
    */
   void setCssDestinationFolder(final File cssDestinationFolder) {
     this.cssDestinationFolder = cssDestinationFolder;
   }
 
-
   /**
-   * @param jsDestinationFolder the jsDestinationFolder to set
+   * @param jsDestinationFolder
+   *          the jsDestinationFolder to set
    * @VisibleForTesting
    */
   void setJsDestinationFolder(final File jsDestinationFolder) {
@@ -337,7 +361,8 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   /**
    * The folder where the project is built.
    *
-   * @param buildDirectory the buildDirectory to set
+   * @param buildDirectory
+   *          the buildDirectory to set
    * @VisibleForTesting
    */
   void setBuildDirectory(final File buildDirectory) {
@@ -345,7 +370,16 @@ public class Wro4jMojo extends AbstractWro4jMojo {
   }
 
   /**
-   * @param groupNameMappingFile the groupNameMappingFile to set
+   * @param buildFinalName the buildFinalName to set
+   */
+  public void setBuildFinalName(final File buildFinalName) {
+    this.buildFinalName = buildFinalName;
+  }
+
+
+  /**
+   * @param groupNameMappingFile
+   *          the groupNameMappingFile to set
    * @VisibleForTesting
    */
   void setGroupNameMappingFile(final File groupNameMappingFile) {

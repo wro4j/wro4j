@@ -30,7 +30,7 @@ public class PropertiesAndFilterConfigWroConfigurationFactory
   /**
    * The default factory used to load configuration from a default location.
    */
-  private ServletContextPropertyWroConfigurationFactory defaultFactory;
+  private final ServletContextPropertyWroConfigurationFactory defaultFactory;
 
   public PropertiesAndFilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
     super(filterConfig);
@@ -41,7 +41,7 @@ public class PropertiesAndFilterConfigWroConfigurationFactory
    * {@inheritDoc}
    */
   @Override
-  public Properties initProperties() {
+  public Properties createProperties() {
     //Merge Properties file content with the filterConfig content.
     final Properties merged = new Properties();
     try {
@@ -58,7 +58,7 @@ public class PropertiesAndFilterConfigWroConfigurationFactory
   }
 
   /**
-   * @return the {@link Properties} built from the default location. 
+   * @return the {@link Properties} built from the default location.
    */
   protected Properties newDefaultProperties() {
     return defaultFactory.createProperties();

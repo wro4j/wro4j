@@ -4,7 +4,7 @@
     <parent>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-parent</artifactId>
-        <version>1.7.0</version>
+        <version>1.7.1</version>
     </parent>
     <artifactId>wro4j-extensions</artifactId>
     <packaging>jar</packaging>
@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
+            <artifactId>jruby-core</artifactId>
         </dependency>
         <dependency>
             <groupId>me.n4u.sass</groupId>
@@ -90,22 +90,22 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>emberjs</artifactId>
-            <version>1.0.0-rc.2</version>
+            <version>1.0.0-rc.5</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>handlebars</artifactId>
-            <version>1.0.0-rc.3</version>
+            <version>1.0.0-rc.4</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>coffee-script</artifactId>
-            <version>1.6.2-1</version>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jslint</artifactId>
-            <version>1d8c1f8f74</version>
+            <version>c657984cd7</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>

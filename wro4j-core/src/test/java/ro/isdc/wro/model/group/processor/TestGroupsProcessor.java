@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
@@ -103,6 +104,7 @@ public class TestGroupsProcessor {
       public boolean accept(final String uri) {
         return true;
       }
+      
       public InputStream locate(final String uri)
           throws IOException {
         return new ByteArrayInputStream(uri.getBytes());
@@ -152,5 +154,14 @@ public class TestGroupsProcessor {
 
     victim.process(new CacheKey("g1", ResourceType.JS, true));
     verify(cssMinProcessor).process(Mockito.any(Resource.class), Mockito.any(Reader.class), Mockito.any(Writer.class));
+  }
+
+  @Test
+  public void shouldCleanupProperlyWhenDestroyed() {
+    PreProcessorExecutor mockPreProcessorExecutor = mock(PreProcessorExecutor.class);
+    victim.setPreProcessorExecutor(mockPreProcessorExecutor);
+    victim.destroy();
+    
+    verify(mockPreProcessorExecutor).destroy();
   }
 }

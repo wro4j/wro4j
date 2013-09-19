@@ -3,6 +3,7 @@ package ro.isdc.wro.manager.factory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.util.AbstractDecorator;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 
 
 /**
@@ -15,7 +16,20 @@ import ro.isdc.wro.util.AbstractDecorator;
 public class WroManagerFactoryDecorator
     extends AbstractDecorator<WroManagerFactory>
     implements WroManagerFactory {
+  private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
+    @Override
+    protected WroManager initialize() {
+      final WroManager.Builder builder = new WroManager.Builder(getDecoratedObject().create());
+      onBeforeBuild(builder);
+      return builder.build();
+    }
 
+    @Override
+    public void destroy() {
+      getDecoratedObject().destroy();
+      super.destroy();
+    };
+  };
   public WroManagerFactoryDecorator(final WroManagerFactory managerFactory) {
     super(managerFactory);
   }
@@ -24,9 +38,7 @@ public class WroManagerFactoryDecorator
    * {@inheritDoc}
    */
   public WroManager create() {
-    final WroManager.Builder builder = new WroManager.Builder(getDecoratedObject().create());
-    onBeforeBuild(builder);
-    return builder.build();
+    return managerInitializer.get();
   }
 
   /**
@@ -39,20 +51,20 @@ public class WroManagerFactoryDecorator
    * {@inheritDoc}
    */
   public void onCachePeriodChanged(final long value) {
-    getDecoratedObject().onCachePeriodChanged(value);
+    managerInitializer.get().onCachePeriodChanged(value);
   }
 
   /**
    * {@inheritDoc}
    */
   public void onModelPeriodChanged(final long value) {
-    getDecoratedObject().onModelPeriodChanged(value);
+    managerInitializer.get().onModelPeriodChanged(value);
   }
 
   /**
    * {@inheritDoc}
    */
   public void destroy() {
-    getDecoratedObject().destroy();
+    managerInitializer.destroy();
   }
 }

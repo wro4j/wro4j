@@ -19,6 +19,7 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
@@ -34,7 +35,7 @@ import ro.isdc.wro.util.ObjectFactory;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class JsonHPackProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(JsonHPackProcessor.class);
   public static final String ALIAS_PACK = "jsonh-pack";
   public static final String ALIAS_UNPACK = "jsonh-unpack";
@@ -46,8 +47,8 @@ public class JsonHPackProcessor
    * If true, the packing will be used, otherwise unpack.
    */
   private boolean pack;
-  
-  public JsonHPackProcessor(boolean pack) {
+
+  public JsonHPackProcessor(final boolean pack) {
     this.pack = pack;
     enginePool = new ObjectPoolHelper<JsonHPack>(new ObjectFactory<JsonHPack>() {
       @Override
@@ -64,11 +65,12 @@ public class JsonHPackProcessor
   public static JsonHPackProcessor unpackProcessor() {
     return new JsonHPackProcessor(false);
   }
-  
+
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
@@ -85,14 +87,14 @@ public class JsonHPackProcessor
     }
   }
 
-  
+
   private String doProcess(final String content) {
-    JsonHPack engine = enginePool.getObject();
+    final JsonHPack engine = enginePool.getObject();
     try {
       if (pack) {
         return engine.pack(content);
       }
-      return engine.unpack(content);      
+      return engine.unpack(content);
     } finally {
       enginePool.returnObject(engine);
     }
@@ -116,9 +118,14 @@ public class JsonHPackProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
   }
 
+  @Override
+  public void destroy() throws Exception {
+    enginePool.destroy();
+  }
 }

@@ -144,6 +144,15 @@ public abstract class AbstractLinterMojo<T>
   }
 
   /**
+   * Incremental check shouldn't be performed on linter goal, since it can cause a successful build when is should fail
+   * (when there are lint errors and no resource has changed).
+   */
+  @Override
+  protected boolean isIncrementalCheckRequired() {
+    return false;
+  }
+
+  /**
    * @return the file where the report should be written.
    */
   protected abstract File getReportFile();
@@ -161,7 +170,8 @@ public abstract class AbstractLinterMojo<T>
    * @return true if the build status is failed.
    */
   private boolean isStatusFailed() {
-    return !failNever && (progressIndicator.getTotalFoundErrors() >= failThreshold);
+    final int foundErrors = progressIndicator.getTotalFoundErrors();
+    return !failNever && foundErrors > 0 && (foundErrors >= failThreshold);
   }
 
   private void validateReportFormat() {
@@ -185,6 +195,7 @@ public abstract class AbstractLinterMojo<T>
   /**
    * @param failNever the failFast to set.
    */
+  @Override
   public void setFailNever(final boolean failNever) {
     this.failNever = failNever;
   }
@@ -198,7 +209,8 @@ public abstract class AbstractLinterMojo<T>
    * @return the failNever flag.
    * @VisibleForTesting
    */
-  boolean isFailNever() {
+  @Override
+  public boolean isFailNever() {
     return failNever;
   }
 

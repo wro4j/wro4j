@@ -3,9 +3,12 @@
  */
 package ro.isdc.wro.extensions.processor.support;
 
-import org.apache.commons.lang3.Validate;
+import static org.apache.commons.lang3.Validate.notNull;
+
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -20,6 +23,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
+  private static final Logger LOG = LoggerFactory.getLogger(ObjectPoolHelper.class);
   private static final int MAX_IDLE = 2;
   private static final long MAX_WAIT = 5L * 1000L;
   private static final long EVICTABLE_IDLE_TIME = 30 * 1000L;
@@ -28,9 +32,9 @@ public class ObjectPoolHelper<T> {
 
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
-    Validate.notNull(objectFactory);
+    notNull(objectFactory);
     objectPool = createObjectPool(objectFactory);
-    Validate.notNull(objectPool);
+    notNull(objectPool);
   }
 
   /**
@@ -38,7 +42,7 @@ public class ObjectPoolHelper<T> {
    */
   private GenericObjectPool<T> createObjectPool(final ObjectFactory<T> objectFactory) {
     final GenericObjectPool<T> pool = newObjectPool(objectFactory);
-    Validate.notNull(pool);
+    notNull(pool);
     return pool;
   }
 
@@ -62,7 +66,7 @@ public class ObjectPoolHelper<T> {
      * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
      */
     pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
-    // make object elligible for eviction after a predefined amount of time.
+    // make object eligible for eviction after a predefined amount of time.
     pool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
     pool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);
     return pool;
@@ -82,7 +86,7 @@ public class ObjectPoolHelper<T> {
 
 
   public void returnObject(final T engine) {
-    Validate.notNull(engine);
+    notNull(engine);
     try {
       objectPool.returnObject(engine);
     } catch (final Exception e) {
@@ -90,15 +94,26 @@ public class ObjectPoolHelper<T> {
       throw new RuntimeException("Cannot get object from the pool", e);
     }
   }
-  
+
   /**
    * Use a custom {@link GenericObjectPool}.
-   * 
+   *
    * @param objectPool
    *          to use.
    */
   public final void setObjectPool(final GenericObjectPool<T> objectPool) {
-    Validate.notNull(objectPool);
+    notNull(objectPool);
     this.objectPool = objectPool;
+  }
+
+  /**
+   * Close the object pool to avoid the memory leak.
+   *
+   * @throws Exception
+   *           if the close operation failed.
+   */
+  public void destroy() throws Exception {
+    LOG.debug("closing objectPool");
+    objectPool.close();
   }
 }

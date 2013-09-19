@@ -8,7 +8,7 @@
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <packaging>pom</packaging>
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
@@ -34,7 +34,7 @@
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
-      <tag>wro4j-parent-1.7.0</tag>
+      <tag>wro4j-parent-1.7.1</tag>
   </scm>
     <mailingLists>
         <mailingList>
@@ -191,7 +191,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.0.3</version>
+                <version>1.1.3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -205,8 +205,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jruby</groupId>
-                <artifactId>jruby-complete</artifactId>
-                <version>1.6.8</version>
+                <artifactId>jruby-core</artifactId>
+                <version>1.7.4</version>
             </dependency>
             <dependency>
                 <groupId>nz.co.edmi</groupId>
@@ -237,9 +237,9 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>webjars-locator</artifactId>
-                <version>0.4</version>
+                <version>0.5</version>
             </dependency>
-      <!-- Unit tests -->
+            <!-- Unit tests -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -418,18 +418,6 @@
             </modules>
         </profile>
         <profile>
-            <id>no-examples</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>wro4j-core</module>
-                <module>wro4j-extensions</module>
-                <module>wro4j-maven-plugin</module>
-                <module>wro4j-runner</module>
-            </modules>
-        </profile>
-        <profile>
             <id>all</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -439,8 +427,9 @@
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
                 <module>wro4j-runner</module>
-                <module>wro4j-examples</module>
+                <!--
                 <module>wro4j-osgi</module>
+                -->          
             </modules>
         </profile>
     </profiles>

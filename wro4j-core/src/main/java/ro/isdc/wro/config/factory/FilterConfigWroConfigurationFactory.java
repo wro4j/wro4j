@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.PropertiesFactory;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -28,7 +29,7 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.3.7
  */
 public class FilterConfigWroConfigurationFactory
-  implements ObjectFactory<WroConfiguration> {
+  implements ObjectFactory<WroConfiguration>, PropertiesFactory {
   private static final Logger LOG = LoggerFactory.getLogger(FilterConfigWroConfigurationFactory.class);
   /**
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.
@@ -44,19 +45,27 @@ public class FilterConfigWroConfigurationFactory
   /**
    * Filter configuration from where init-params will be read in order to create {@link WroConfiguration} object.
    */
-  private FilterConfig filterConfig;
+  private final FilterConfig filterConfig;
 
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
     Validate.notNull(filterConfig);
     this.filterConfig = filterConfig;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public Properties createProperties() {
+    return initProperties();
+  }
 
   /**
    * Prepares the {@link Properties} object before it is used by the {@link PropertyWroConfigurationFactory}.
    * @return {@link Properties} object used by {@link PropertyWroConfigurationFactory} to create
    *         {@link WroConfiguration}
+   * @deprecated use {@link FilterConfigWroConfigurationFactory#createProperties()}
    */
+  @Deprecated
   protected Properties initProperties() {
     return createPropertiesFromFilterConfig();
   }
@@ -95,6 +104,6 @@ public class FilterConfigWroConfigurationFactory
    * {@inheritDoc}
    */
   public final WroConfiguration create() {
-    return new PropertyWroConfigurationFactory(initProperties()).create();
+    return new PropertyWroConfigurationFactory(createProperties()).create();
   }
 }

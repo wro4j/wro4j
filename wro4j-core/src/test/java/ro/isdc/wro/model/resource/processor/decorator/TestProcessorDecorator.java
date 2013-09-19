@@ -16,10 +16,12 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -228,5 +230,19 @@ public class TestProcessorDecorator {
     public boolean isImportAware() {
       return true;
     }
+  }
+
+  private static class DestroyableProcessor extends CssMinProcessor implements Destroyable {
+    public void destroy()
+        throws Exception {
+    }
+  }
+
+  @Test
+  public void shouldBeDestroyableProcessorWhenDecoratingDestroyable() throws Exception {
+    final DestroyableProcessor originalProcessor = Mockito.spy(new DestroyableProcessor());
+    final ProcessorDecorator decorated = new ProcessorDecorator(originalProcessor);
+    decorated.destroy();
+    Mockito.verify(originalProcessor).destroy();
   }
 }

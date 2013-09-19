@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,16 +85,15 @@ public class ResourceWatcher {
   }
 
   private boolean isGroupChanged(final Group group) {
-    LOG.debug("Checking if group {} is changed..", group.getName());
     // TODO run the check in parallel?
-
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
-      if (isChanged = isChanged(resource, group.getName())) {
+      if (isChanged |= isChanged(resource, group.getName())) {
         onResourceChanged(resource);
       }
     }
+    LOG.debug("isGroup {} changed: {}", group.getName(), BooleanUtils.toStringYesNo(isChanged));
     return isChanged;
   }
 
@@ -115,7 +115,7 @@ public class ResourceWatcher {
    * @VisibleForTesting
    */
   void onGroupChanged(final CacheKey key) {
-    LOG.debug("detected change for cacheKey: {}", key);
+    LOG.debug("Detected change for : {}", key);
     cacheStrategy.put(key, null);
   }
 
@@ -128,7 +128,7 @@ public class ResourceWatcher {
    * @return true if the resource was changed.
    */
   private boolean isChanged(final Resource resource, final String groupName) {
-    LOG.debug("Check change for resource {}", resource.getUri());
+    boolean changed = false;
     try {
       final String uri = resource.getUri();
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
@@ -136,15 +136,16 @@ public class ResourceWatcher {
           groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
-        LOG.debug("Check @import directive from {}", resource);
+        LOG.debug("\t\tCheck @import directive from {}", resource);
         createCssImportProcessor(changeDetected, groupName).process(resource, reader, new StringWriter());
       }
-      return changeDetected.get();
+      changed = changeDetected.get();
     } catch (final IOException e) {
       LOG.debug("[FAIL] Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
-      return false;
     }
+    LOG.debug("\tResource {} isChanged: {}", resource.getUri(), BooleanUtils.toStringYesNo(changed));
+    return changed;
   }
 
   /**
