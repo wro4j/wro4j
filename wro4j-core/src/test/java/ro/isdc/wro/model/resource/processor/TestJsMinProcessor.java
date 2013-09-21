@@ -79,6 +79,13 @@ public class TestJsMinProcessor {
       assertEquals("\n" + script, jsmin(script));
   }
 
+  @Test
+  public void shouldNotMinifyInsideQuasiLiterals() throws Exception {
+    assertEquals(
+      "\nvar a=`x = y`;",
+      jsmin("var a = `x = y`;"));
+  }
+
   private String jsmin(final String inputScript) throws Exception {
       final StringReader reader = new StringReader(inputScript);
       final InputStream is = new ReaderInputStream(reader, "UTF-8");

@@ -133,7 +133,7 @@ public class JSMin {
     case 2:
       theA = theB;
 
-      if (theA == '\'' || theA == '"') {
+      if (theA == '\'' || theA == '"' || theA == '`') {
         for (;;) {
           out.write(theA);
           theA = get();
@@ -247,6 +247,7 @@ public class JSMin {
           case '-':
           case '"':
           case '\'':
+          case '`':
             action(1);
             break;
           default:
