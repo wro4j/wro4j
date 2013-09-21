@@ -198,6 +198,11 @@ public class JSMin {
    */
   public void jsmin() throws IOException, UnterminatedRegExpLiteralException,
       UnterminatedCommentException, UnterminatedStringLiteralException {
+    if (peek() == 0xEF) {
+      get();
+      get();
+      get();
+    }
     theA = '\n';
     action(3);
     while (theA != EOF) {
