@@ -33,6 +33,10 @@ public class JSMin {
 
   private int theB;
 
+  private int theX = EOF;
+
+  private int theY = EOF;
+
   public JSMin(final InputStream in, final OutputStream out) {
     this.in = new PushbackInputStream(in);
     this.out = out;
@@ -86,30 +90,30 @@ public class JSMin {
         for (;;) {
           c = get();
           if (c <= '\n') {
-            return c;
+            break;
           }
         }
-
+        break;
       case '*':
         get();
-        for (;;) {
+        while (c != ' ') {
           switch (get()) {
           case '*':
             if (peek() == '/') {
               get();
-              return ' ';
+              c = ' ';
             }
             break;
           case EOF:
             throw new UnterminatedCommentException();
           }
         }
-
-      default:
-        return c;
+        break;
       }
 
     }
+    theY = theX;
+    theX = c;
     return c;
   }
 
@@ -130,6 +134,9 @@ public class JSMin {
     switch (d) {
     case 1:
       out.write(theA);
+      if (theA == theB && (theA == '+' || theA == '-') && theY != theA) {
+        out.write(' ');
+      }
     case 2:
       theA = theB;
 

@@ -107,6 +107,54 @@ public class TestJsMinProcessor {
       jsmin("var a = 1\n~true\nconsole.log(a)"));
   }
 
+  @Test
+  public void shouldNotRemoveSpaceBetweenPlusSigns() throws Exception {
+    assertEquals(
+        "\nconsole.log(1\n+ +1)",
+        jsmin("console.log(1\n+ +1)"));
+  }
+
+  @Test
+  public void shouldNotRemoveSpaceBetweenMinusSigns() throws Exception {
+    assertEquals(
+        "\nconsole.log(1\n- -1)",
+        jsmin("console.log(1\n- -1)"));
+  }
+
+  @Test
+  public void shouldRemoveInlineComments() throws Exception {
+    assertEquals(
+        "\nvar r=1;",
+        jsmin("var r = 1; // some comment"));
+  }
+
+  @Test
+  public void shouldRemoveBlockComments() throws Exception {
+    assertEquals(
+        "\nvar r=1;",
+        jsmin("var r = 1; /* some comment */"));
+  }
+
+  @Test
+  public void shouldNotProcessRegexpAfterOperator() throws Exception {
+    assertEquals("\n1+/a  a/", jsmin("1 + /a  a/"));
+    assertEquals("\n1-/a  a/", jsmin("1 - /a  a/"));
+    assertEquals("\n1* /a  a/", jsmin("1 * /a  a/"));
+    assertEquals("\n1/ /a  a/", jsmin("1 / /a  a/"));
+    // Not sure why this should work, ~ was added in the original JSMin but the expression below is not valid
+    // Javascript.
+    assertEquals("\n1~/a  a/", jsmin("1 ~ /a  a/"));
+  }
+
+  @Test
+  public void shouldNotProcessRegexpAfterSemiColumnOrClosingBrace() throws Exception {
+    // These cases were removed by Douglas Crockford in the original JSMin ; using a regexp in these locations would be
+    // rejected by JSLint (which use is recommended).
+    // I'm leaving them in since these are valid (albeit weird) Javascript expressions.
+    assertEquals("\nvar a=1;/a  a/", jsmin("var a = 1; /a  a/"));
+    assertEquals("\n{}/a  a/", jsmin("{} /a  a/"));
+  }
+
   private String jsmin(final String inputScript) throws Exception {
       final StringReader reader = new StringReader(inputScript);
       final InputStream is = new ReaderInputStream(reader, "UTF-8");
