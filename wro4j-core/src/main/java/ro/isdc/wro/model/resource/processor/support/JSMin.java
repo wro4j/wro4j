@@ -221,6 +221,8 @@ public class JSMin {
         case '(':
         case '+':
         case '-':
+        case '!':
+        case '~':
           action(1);
           break;
         case ' ':

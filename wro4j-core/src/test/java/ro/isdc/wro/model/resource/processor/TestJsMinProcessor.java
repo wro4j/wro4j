@@ -89,8 +89,22 @@ public class TestJsMinProcessor {
   @Test
   public void shouldRemoveByteOrderMark() throws Exception {
     assertEquals(
-      "\nvar a=1;",
-      jsmin("\uFEFFvar a = 1;"));
+        "\nvar a=1;",
+        jsmin("\uFEFFvar a = 1;"));
+  }
+
+  @Test
+  public void shouldNotRemoveLineBreakBeforeExclamationMark() throws Exception {
+    assertEquals(
+        "\nvar a=1\n!true\nconsole.log(a)",
+        jsmin("var a = 1\n!true\nconsole.log(a)"));
+  }
+
+  @Test
+  public void shouldNotRemoveLineBreakBeforeTilde() throws Exception {
+    assertEquals(
+      "\nvar a=1\n~true\nconsole.log(a)",
+      jsmin("var a = 1\n~true\nconsole.log(a)"));
   }
 
   private String jsmin(final String inputScript) throws Exception {
