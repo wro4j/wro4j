@@ -99,18 +99,12 @@ public class ProviderFinder<T> {
   @SuppressWarnings("unchecked")
   <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
     LOG.debug("searching for providers of type : {}", providerClass);
-    final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-
       final Class<?> serviceLoader = getClass().getClassLoader().loadClass("java.util.ServiceLoader");
       LOG.debug("using {} to lookupProviders", serviceLoader.getName());
       return ((Iterable<P>) serviceLoader.getMethod("load", Class.class).invoke(serviceLoader, providerClass)).iterator();
     } catch (final Exception e) {
       LOG.debug("ServiceLoader is not available. Falling back to ServiceRegistry.", e);
-    } finally {
-      //preserve original classLoader to make it osgi friendly
-      Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
     LOG.debug("using {} to lookupProviders", ServiceRegistry.class.getName());
     return ServiceRegistry.lookupProviders(providerClass);
