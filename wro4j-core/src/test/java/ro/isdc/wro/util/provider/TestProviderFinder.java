@@ -1,7 +1,6 @@
 package ro.isdc.wro.util.provider;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -24,22 +22,29 @@ import ro.isdc.wro.util.Ordered;
 public class TestProviderFinder {
   private ProviderFinder<?> victim;
 
+
+  @Test
+  public void shouldFindConfigurableProviders() {
+    victim = ProviderFinder.of(ConfigurableProvider.class);
+    assertEquals(1, victim.find().size());
+  }
+
   @Test
   public void shouldFindProcessorsProvider() {
     victim = ProviderFinder.of(ProcessorProvider.class);
-    assertFalse(victim.find().isEmpty());
+    assertEquals(3, victim.find().size());
   }
 
   @Test
   public void shouldFindNamingStrategyProviders() {
     victim = ProviderFinder.of(NamingStrategyProvider.class);
-    assertFalse(victim.find().isEmpty());
+    assertEquals(1, victim.find().size());
   }
 
   @Test
   public void shouldFindHashBuilderProviders() {
     victim = ProviderFinder.of(HashStrategyProvider.class);
-    assertFalse(victim.find().isEmpty());
+    assertEquals(1, victim.find().size());
   }
 
   @Test
@@ -62,11 +67,6 @@ public class TestProviderFinder {
       }
     };
     victim.find();
-  }
-
-  @Test
-  public void shouldFindProcessorProviders() {
-    Assert.assertNotNull(ProviderFinder.of(ProcessorProvider.class).find());
   }
 
   @Test
