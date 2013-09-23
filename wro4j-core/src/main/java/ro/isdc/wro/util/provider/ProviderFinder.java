@@ -69,14 +69,15 @@ public class ProviderFinder<T> {
 
   /**
    * Collects also providers of type {@link ConfigurableProvider} if the T type is a supertype of
-   * {@link ConfigurableProvider}.
+   * {@link ConfigurableProvider}. If the type is already {@link ConfigurableProvider}, it will be ignored to avoid
+   * adding of duplicate providers.
    *
    * @param providers
    *          the list where found providers will be added.
    */
   @SuppressWarnings("unchecked")
   private void collectConfigurableProviders(final List<T> providers) {
-    if (type.isAssignableFrom(ConfigurableProvider.class)) {
+    if (type.isAssignableFrom(ConfigurableProvider.class) && (type != ConfigurableProvider.class)) {
       final Iterator<ConfigurableProvider> iterator = lookupProviders(ConfigurableProvider.class);
       for (; iterator.hasNext();) {
         final T provider = (T) iterator.next();
