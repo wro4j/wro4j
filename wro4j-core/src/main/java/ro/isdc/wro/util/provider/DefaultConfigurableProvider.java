@@ -48,7 +48,7 @@ public class DefaultConfigurableProvider
    * {@inheritDoc}
    */
   @Override
-  public java.util.Map<String,ResourceProcessor> providePreProcessors() {
+  public Map<String,ResourceProcessor> providePreProcessors() {
     return processorProvider.providePreProcessors();
   }
 

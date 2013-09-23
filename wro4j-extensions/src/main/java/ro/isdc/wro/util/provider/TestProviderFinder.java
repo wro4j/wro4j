@@ -1,7 +1,6 @@
 package ro.isdc.wro.util.provider;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -65,10 +64,5 @@ public class TestProviderFinder {
       }
     };
     victim.find();
-  }
-
-  @Test
-  public void shouldFindProcessorProviders() {
-    assertNotNull(ProviderFinder.of(ProcessorProvider.class).find());
   }
 }
