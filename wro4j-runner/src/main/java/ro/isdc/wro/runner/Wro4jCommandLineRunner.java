@@ -35,8 +35,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -46,12 +44,13 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.runner.processor.RunnerCssLintProcessor;
+import ro.isdc.wro.runner.processor.RunnerJsHintProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -390,30 +389,4 @@ public class Wro4jCommandLineRunner {
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
-
-  /**
-   * Linter classes with custom exception handling.
-   */
-  private class RunnerCssLintProcessor
-      extends CssLintProcessor {
-    @Override
-    protected void onCssLintException(final CssLintException e, final Resource resource) {
-      super.onCssLintException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
-  private class RunnerJsHintProcessor
-      extends JsHintProcessor {
-    @Override
-    protected void onLinterException(final LinterException e, final Resource resource) {
-      super.onLinterException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
 }
