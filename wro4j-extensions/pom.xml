@@ -118,6 +118,12 @@
             <version>2.0.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- This dependency has provided scope to allow WroTestUtils use Assert -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
