@@ -69,14 +69,15 @@ public class ProviderFinder<T> {
 
   /**
    * Collects also providers of type {@link ConfigurableProvider} if the T type is a supertype of
-   * {@link ConfigurableProvider}.
+   * {@link ConfigurableProvider}. If the type is already {@link ConfigurableProvider}, it will be ignored to avoid
+   * adding of duplicate providers.
    *
    * @param providers
    *          the list where found providers will be added.
    */
   @SuppressWarnings("unchecked")
   private void collectConfigurableProviders(final List<T> providers) {
-    if (type.isAssignableFrom(ConfigurableProvider.class)) {
+    if (type.isAssignableFrom(ConfigurableProvider.class) && (type != ConfigurableProvider.class)) {
       final Iterator<ConfigurableProvider> iterator = lookupProviders(ConfigurableProvider.class);
       for (; iterator.hasNext();) {
         final T provider = (T) iterator.next();
@@ -99,18 +100,12 @@ public class ProviderFinder<T> {
   @SuppressWarnings("unchecked")
   <P> Iterator<P> lookupProviders(final Class<P> providerClass) {
     LOG.debug("searching for providers of type : {}", providerClass);
-    final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-
       final Class<?> serviceLoader = getClass().getClassLoader().loadClass("java.util.ServiceLoader");
       LOG.debug("using {} to lookupProviders", serviceLoader.getName());
       return ((Iterable<P>) serviceLoader.getMethod("load", Class.class).invoke(serviceLoader, providerClass)).iterator();
     } catch (final Exception e) {
       LOG.debug("ServiceLoader is not available. Falling back to ServiceRegistry.", e);
-    } finally {
-      //preserve original classLoader to make it osgi friendly
-      Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
     LOG.debug("using {} to lookupProviders", ServiceRegistry.class.getName());
     return ServiceRegistry.lookupProviders(providerClass);
