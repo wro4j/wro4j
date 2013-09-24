@@ -139,7 +139,8 @@ public class TestJsMinProcessor {
   public void shouldNotProcessRegexpAfterOperator() throws Exception {
     assertEquals("\n1+/a  a/;", jsmin("1 + /a  a/;"));
     assertEquals("\n1-/a  a/;", jsmin("1 - /a  a/;"));
-    assertEquals("\n1*/a  a/;", jsmin("1 * /a  a/;"));
+    assertEquals("\n1* /a  a/;", jsmin("1 * /a  a/;"));
+    assertEquals("\n1/ /a  a/;", jsmin("1 / /a  a/;"));
     // Not sure why this should work, ~ was added in the original JSMin but the expression below is not valid
     // Javascript.
     assertEquals("\n1~/a  a/;", jsmin("1 ~ /a  a/;"));
