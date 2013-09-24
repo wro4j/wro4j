@@ -187,6 +187,11 @@ public class JSMin {
               }
             }
           } else if (theA == '/') {
+            switch (peek()) {
+            case '/':
+            case '*':
+              throw new UnterminatedRegExpLiteralException();
+            }
             break;
           } else if (theA == '\\') {
             out.write(theA);

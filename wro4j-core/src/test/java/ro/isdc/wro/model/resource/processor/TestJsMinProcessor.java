@@ -160,6 +160,19 @@ public class TestJsMinProcessor {
         jsmin("return /a;/.test(s);"));
   }
 
+  @Test(expected = Exception.class)
+  public void shouldFailOnInlineCommentAfterUnclosedRegexp() throws Exception {
+    // Make this fail to be consistent with the original JSMin, although this is in fact valid Javascript if comment is
+    // a defined variable.
+    jsmin("var r = /a //comment");
+  }
+
+  @Test(expected = Exception.class)
+  public void shouldFailOnUnclosedBlockCommentAfterUnclosedRegexp() throws Exception {
+    // same comment as above
+    jsmin("var r = /a/*comment");
+  }
+
   private String jsmin(final String inputScript) throws Exception {
       final StringReader reader = new StringReader(inputScript);
       final InputStream is = new ReaderInputStream(reader, "UTF-8");
