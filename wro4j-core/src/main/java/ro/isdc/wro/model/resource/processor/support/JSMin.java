@@ -162,7 +162,8 @@ public class JSMin {
       if (theB == '/'
           && (theA == '(' || theA == ',' || theA == '=' || theA == ':'
               || theA == '[' || theA == '!' || theA == '&' || theA == '|'
-              || theA == '?' || theA == '{' || theA == '}' || theA == ';' || theA == '\n')) {
+              || theA == '?' || theA == '+' || theA == '-' || theA == '~'
+              || theA == '*' || theA == '{' || theA == '\n')) {
         out.write(theA);
         out.write(theB);
         for (;;) {
