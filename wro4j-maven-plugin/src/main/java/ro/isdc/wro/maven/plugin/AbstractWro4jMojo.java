@@ -69,8 +69,19 @@ public abstract class AbstractWro4jMojo
    * The folder where web application context resides useful for locating resources relative to servletContext .
    *
    * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
+   * @optional
    */
   private File contextFolder;
+  /**
+   * The folder where web application context resides useful for locating resources relative to servletContext. It is
+   * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
+   * servletContext locator will try to search in next contextFolder when a resource could not be located. By default,
+   * a single context folder is configured.
+   *
+   * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
+   * @optional
+   */
+  private String contextFolders;
   /**
    * @parameter default-value="true" expression="${minimize}"
    * @optional
@@ -152,6 +163,7 @@ public abstract class AbstractWro4jMojo
   public final void execute()
       throws MojoExecutionException {
     validate();
+    getLog().info(contextFolders);
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
@@ -508,8 +520,8 @@ public abstract class AbstractWro4jMojo
     if (wroFile == null) {
       throw new MojoExecutionException("contextFolder was not set!");
     }
-    if (contextFolder == null) {
-      throw new MojoExecutionException("contextFolder was not set!");
+    if (contextFolders == null) {
+      throw new MojoExecutionException("no contextFolder was set!");
     }
   }
 
@@ -578,13 +590,22 @@ public abstract class AbstractWro4jMojo
     this.taskExecutor = taskExecutor;
   }
 
+//  /**
+//   * @param contextFolder
+//   *          the servletContextFolder to set
+//   * @VisibleForTesting
+//   */
+//  void setContextFolder(final File contextFolder) {
+//    this.contextFolder = contextFolder;
+//  }
+
   /**
-   * @param contextFolder
-   *          the servletContextFolder to set
+   * @param contextFolders
+   *          a CSV representing contextFolders to use.
    * @VisibleForTesting
    */
-  void setContextFolder(final File contextFolder) {
-    this.contextFolder = contextFolder;
+  void setContextFolders(final String contextFolders) {
+    this.contextFolders = contextFolders;
   }
 
   /**
