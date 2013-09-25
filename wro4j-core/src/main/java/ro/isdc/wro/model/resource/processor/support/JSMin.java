@@ -33,6 +33,10 @@ public class JSMin {
 
   private int theB;
 
+  private int theX = EOF;
+
+  private int theY = EOF;
+
   public JSMin(final InputStream in, final OutputStream out) {
     this.in = new PushbackInputStream(in);
     this.out = out;
@@ -86,30 +90,30 @@ public class JSMin {
         for (;;) {
           c = get();
           if (c <= '\n') {
-            return c;
+            break;
           }
         }
-
+        break;
       case '*':
         get();
-        for (;;) {
+        while (c != ' ') {
           switch (get()) {
           case '*':
             if (peek() == '/') {
               get();
-              return ' ';
+              c = ' ';
             }
             break;
           case EOF:
             throw new UnterminatedCommentException();
           }
         }
-
-      default:
-        return c;
+        break;
       }
 
     }
+    theY = theX;
+    theX = c;
     return c;
   }
 
@@ -130,10 +134,13 @@ public class JSMin {
     switch (d) {
     case 1:
       out.write(theA);
+      if (theA == theB && (theA == '+' || theA == '-') && theY != theA) {
+        out.write(' ');
+      }
     case 2:
       theA = theB;
 
-      if (theA == '\'' || theA == '"') {
+      if (theA == '\'' || theA == '"' || theA == '`') {
         for (;;) {
           out.write(theA);
           theA = get();
@@ -155,8 +162,12 @@ public class JSMin {
       if (theB == '/'
           && (theA == '(' || theA == ',' || theA == '=' || theA == ':'
               || theA == '[' || theA == '!' || theA == '&' || theA == '|'
-              || theA == '?' || theA == '{' || theA == '}' || theA == ';' || theA == '\n')) {
+              || theA == '?' || theA == '+' || theA == '-' || theA == '~'
+              || theA == '*' || theA == '/' || theA == '{' || theA == '\n')) {
         out.write(theA);
+        if (theA == '/' || theA == '*') {
+          out.write(' ');
+        }
         out.write(theB);
         for (;;) {
           theA = get();
@@ -176,6 +187,11 @@ public class JSMin {
               }
             }
           } else if (theA == '/') {
+            switch (peek()) {
+            case '/':
+            case '*':
+              throw new UnterminatedRegExpLiteralException();
+            }
             break;
           } else if (theA == '\\') {
             out.write(theA);
@@ -198,6 +214,11 @@ public class JSMin {
    */
   public void jsmin() throws IOException, UnterminatedRegExpLiteralException,
       UnterminatedCommentException, UnterminatedStringLiteralException {
+    if (peek() == 0xEF) {
+      get();
+      get();
+      get();
+    }
     theA = '\n';
     action(3);
     while (theA != EOF) {
@@ -216,6 +237,8 @@ public class JSMin {
         case '(':
         case '+':
         case '-':
+        case '!':
+        case '~':
           action(1);
           break;
         case ' ':
@@ -247,6 +270,7 @@ public class JSMin {
           case '-':
           case '"':
           case '\'':
+          case '`':
             action(1);
             break;
           default:
