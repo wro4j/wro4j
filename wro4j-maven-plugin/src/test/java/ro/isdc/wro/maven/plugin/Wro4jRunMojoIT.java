@@ -50,7 +50,7 @@ public class Wro4jRunMojoIT
     final URL url = getClass().getClassLoader().getResource("unit/1/src/main/webapp/WEB-INF/wro.xml");
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    mojo.setContextFolders(wroFile.getParentFile().getParentFile().getPath());
 
     mojo.execute();
     assertNotNull(mojo);

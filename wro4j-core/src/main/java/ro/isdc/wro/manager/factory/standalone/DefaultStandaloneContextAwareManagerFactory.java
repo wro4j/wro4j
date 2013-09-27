@@ -83,12 +83,12 @@ public class DefaultStandaloneContextAwareManagerFactory
         //TODO this is duplicated code (from super) -> find a way to reuse it.
         if (getWildcardStreamLocator().hasWildcard(uri)) {
           final String fullPath = FilenameUtils.getFullPath(uri);
-          final String realPath = standaloneContext.getContextFolder().getPath() + fullPath;
+          final String realPath = standaloneContext.getContextFolders() + fullPath;
           return getWildcardStreamLocator().locateStream(uri, new File(realPath));
         }
 
         final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
-        final File file = new File(standaloneContext.getContextFolder(), uriWithoutPrefix);
+        final File file = new File(standaloneContext.getContextFolders(), uriWithoutPrefix);
         LOG.debug("Opening file: " + file.getPath());
         return new FileInputStream(file);
       }

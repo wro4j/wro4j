@@ -134,7 +134,7 @@ public class TestWro4jMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     victim.setWroFile(wroFile);
-    victim.setContextFolder(wroFile.getParentFile().getParentFile());
+    victim.setContextFolders(wroFile.getParentFile().getParentFile().getPath());
   }
 
   private void setWroWithValidResources()

@@ -317,11 +317,12 @@ public class Wro4jMojo
       rootFolder = buildFinalName;
     } else if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
       rootFolder = buildDirectory;
-    } else if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
-      rootFolder = getContextFolder();
+      //TODO iterate through all context folders
+    } else if (cssTargetFolder.getPath().startsWith(getContextFolders())) {
+      rootFolder = new File(getContextFolders());
     }
     getLog().debug("buildDirectory: " + buildDirectory);
-    getLog().debug("contextFolder: " + getContextFolder());
+    getLog().debug("contextFolders: " + getContextFolders());
     getLog().debug("cssTargetFolder: " + cssTargetFolder);
     getLog().debug("rootFolder: " + rootFolder);
     if (rootFolder != null) {

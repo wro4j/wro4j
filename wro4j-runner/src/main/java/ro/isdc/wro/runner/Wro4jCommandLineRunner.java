@@ -375,7 +375,7 @@ public class Wro4jCommandLineRunner {
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(contextFolder);
+    runContext.setContextFolders(contextFolder.getPath());
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
     runContext.setIgnoreMissingResources(ignoreMissingResources);

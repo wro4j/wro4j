@@ -66,17 +66,10 @@ public abstract class AbstractWro4jMojo
    */
   private File wroFile;
   /**
-   * The folder where web application context resides useful for locating resources relative to servletContext .
-   *
-   * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
-   * @optional
-   */
-  private File contextFolder;
-  /**
    * The folder where web application context resides useful for locating resources relative to servletContext. It is
    * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
-   * servletContext locator will try to search in next contextFolder when a resource could not be located. By default,
-   * a single context folder is configured.
+   * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
+   * single context folder is configured.
    *
    * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
    * @optional
@@ -148,14 +141,14 @@ public abstract class AbstractWro4jMojo
    */
   private boolean parallelProcessing;
   /**
-   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be changed to true if no unexpected problems are detected..
+   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be
+   * changed to true if no unexpected problems are detected..
    *
    * @parameter default-value="false" expression="${incrementalBuildEnabled}"
    * @optional
    */
   private boolean incrementalBuildEnabled;
   private TaskExecutor<Void> taskExecutor;
-
 
   /**
    * {@inheritDoc}
@@ -211,7 +204,7 @@ public abstract class AbstractWro4jMojo
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(getContextFolder());
+    runContext.setContextFolders(getContextFolders());
     runContext.setMinimize(isMinimize());
     runContext.setWroFile(getWroFile());
     runContext.setIgnoreMissingResources(isIgnoreMissingResources());
@@ -578,7 +571,7 @@ public abstract class AbstractWro4jMojo
 
   private BuildContextHolder getBuildContextHolder() {
     if (buildContextHolder == null) {
-      //new File(mavenProject.getBuild().getOutputDirectory())
+      // new File(mavenProject.getBuild().getOutputDirectory())
       buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
       buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
     }
@@ -590,14 +583,14 @@ public abstract class AbstractWro4jMojo
     this.taskExecutor = taskExecutor;
   }
 
-//  /**
-//   * @param contextFolder
-//   *          the servletContextFolder to set
-//   * @VisibleForTesting
-//   */
-//  void setContextFolder(final File contextFolder) {
-//    this.contextFolder = contextFolder;
-//  }
+  /**
+   * @param contextFolder
+   *          the servletContextFolder to set
+   * @VisibleForTesting
+   */
+  String getContextFolders() {
+    return contextFolders;
+  }
 
   /**
    * @param contextFolders
@@ -623,14 +616,6 @@ public abstract class AbstractWro4jMojo
    */
   File getWroFile() {
     return this.wroFile;
-  }
-
-  /**
-   * @return the contextFolder
-   * @VisibleForTesting
-   */
-  File getContextFolder() {
-    return this.contextFolder;
   }
 
   /**
@@ -664,7 +649,6 @@ public abstract class AbstractWro4jMojo
   final void setParallelProcessing(final boolean parallelProcessing) {
     this.parallelProcessing = parallelProcessing;
   }
-
 
   /**
    * @VisibleForTesting

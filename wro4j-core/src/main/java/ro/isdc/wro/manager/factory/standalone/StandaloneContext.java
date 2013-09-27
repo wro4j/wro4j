@@ -23,7 +23,7 @@ public class StandaloneContext
    * Exact location of the wro file.
    */
   private File wroFile;
-  private File contextFolder;
+  private String contextFolders;
   private boolean minimize;
   /**
    * Inform the factory about the intention of ignoring the missing resources. If true - the missing resources will be
@@ -48,19 +48,13 @@ public class StandaloneContext
   }
 
 
-  /**
-   * @return the contextFolder
-   */
-  public File getContextFolder() {
-    return contextFolder;
+  public String getContextFolders() {
+    return contextFolders;
   }
 
 
-  /**
-   * @param contextFolder the contextFolder to set
-   */
-  public void setContextFolder(final File contextFolder) {
-    this.contextFolder = contextFolder;
+  public void setContextFolders(final String contextFolders) {
+    this.contextFolders = contextFolders;
   }
 
 
