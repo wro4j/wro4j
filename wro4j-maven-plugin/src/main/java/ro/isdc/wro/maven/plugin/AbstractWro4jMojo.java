@@ -74,7 +74,7 @@ public abstract class AbstractWro4jMojo
    * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
    * @optional
    */
-  private String contextFolders;
+  private String contextFolder;
   /**
    * @parameter default-value="true" expression="${minimize}"
    * @optional
@@ -156,7 +156,7 @@ public abstract class AbstractWro4jMojo
   public final void execute()
       throws MojoExecutionException {
     validate();
-    getLog().info(contextFolders);
+    getLog().info(contextFolder);
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
@@ -204,7 +204,7 @@ public abstract class AbstractWro4jMojo
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolders(getContextFolders());
+    runContext.setContextFoldersAsCSV(getContextFoldersAsCSV());
     runContext.setMinimize(isMinimize());
     runContext.setWroFile(getWroFile());
     runContext.setIgnoreMissingResources(isIgnoreMissingResources());
@@ -513,7 +513,7 @@ public abstract class AbstractWro4jMojo
     if (wroFile == null) {
       throw new MojoExecutionException("contextFolder was not set!");
     }
-    if (contextFolders == null) {
+    if (contextFolder == null) {
       throw new MojoExecutionException("no contextFolder was set!");
     }
   }
@@ -588,8 +588,8 @@ public abstract class AbstractWro4jMojo
    *          the servletContextFolder to set
    * @VisibleForTesting
    */
-  String getContextFolders() {
-    return contextFolders;
+  String getContextFoldersAsCSV() {
+    return contextFolder;
   }
 
   /**
@@ -597,8 +597,8 @@ public abstract class AbstractWro4jMojo
    *          a CSV representing contextFolders to use.
    * @VisibleForTesting
    */
-  void setContextFolders(final String contextFolders) {
-    this.contextFolders = contextFolders;
+  void setContextFolder(final String contextFolder) {
+    this.contextFolder = contextFolder;
   }
 
   /**

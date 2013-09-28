@@ -62,7 +62,7 @@ public abstract class AbstractTestLinterMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolders(wroFile.getParentFile().getParentFile().getPath());
+    mojo.setContextFolder(wroFile.getParentFile().getParentFile().getPath());
   }
 
   private void setWroWithValidResources()

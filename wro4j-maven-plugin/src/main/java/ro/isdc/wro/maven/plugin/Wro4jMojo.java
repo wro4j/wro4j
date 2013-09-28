@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -108,9 +109,9 @@ public class Wro4jMojo
     groupNames.clear();
     if (groupNameMappingFile != null && isIncrementalBuild()) {
       try {
-        //reuse stored properties for incremental build
+        // reuse stored properties for incremental build
         groupNames.load(new FileInputStream(groupNameMappingFile));
-      } catch(final IOException e) {
+      } catch (final IOException e) {
         getLog().debug("Cannot load " + groupNameMappingFile.getPath());
       }
     }
@@ -255,7 +256,7 @@ public class Wro4jMojo
 
       // init context
       final WroConfiguration config = Context.get().getConfig();
-      //the maven plugin should ignore empty groups, since it will try to process all types of resources.
+      // the maven plugin should ignore empty groups, since it will try to process all types of resources.
       config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
@@ -317,12 +318,17 @@ public class Wro4jMojo
       rootFolder = buildFinalName;
     } else if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
       rootFolder = buildDirectory;
-      //TODO iterate through all context folders
-    } else if (cssTargetFolder.getPath().startsWith(getContextFolders())) {
-      rootFolder = new File(getContextFolders());
+    } else {
+      // find first best match
+      for (final String contextFolder : getContextFolders()) {
+        if (cssTargetFolder.getPath().startsWith(getContextFoldersAsCSV())) {
+          rootFolder = new File(contextFolder);
+          break;
+        }
+      }
     }
     getLog().debug("buildDirectory: " + buildDirectory);
-    getLog().debug("contextFolders: " + getContextFolders());
+    getLog().debug("contextFolders: " + getContextFoldersAsCSV());
     getLog().debug("cssTargetFolder: " + cssTargetFolder);
     getLog().debug("rootFolder: " + rootFolder);
     if (rootFolder != null) {
@@ -330,6 +336,15 @@ public class Wro4jMojo
     }
     getLog().debug("computedAggregatedFolderPath: " + result);
     return result;
+  }
+
+  /**
+   * Use {@link StandaloneContext} to tokenize the contextFoldersAsCSV value.
+   */
+  private String[] getContextFolders() {
+    final StandaloneContext context = new StandaloneContext();
+    context.setContextFoldersAsCSV(getContextFoldersAsCSV());
+    return context.getContextFolders();
   }
 
   /**
@@ -371,12 +386,12 @@ public class Wro4jMojo
   }
 
   /**
-   * @param buildFinalName the buildFinalName to set
+   * @param buildFinalName
+   *          the buildFinalName to set
    */
   public void setBuildFinalName(final File buildFinalName) {
     this.buildFinalName = buildFinalName;
   }
-
 
   /**
    * @param groupNameMappingFile
