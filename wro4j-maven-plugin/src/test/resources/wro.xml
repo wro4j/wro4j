@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns="http://www.isdc.ro/wro">
-
-  <group name="g1">
-    <css>classpath:ro/isdc/wro/maven/plugin/css/*.css</css>
-    <group-ref>g2</group-ref>
-    <group-ref>g3</group-ref>
-  </group>
-
-  <group name="valid">
-    <css>classpath:ro/isdc/wro/maven/plugin/css/valid.css</css>
-  </group>
-  
-  <group name="invalidResources">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/invalid.js</js>
-    <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
-    <css>classpath:ro/isdc/wro/maven/plugin/css/invalid.css</css>
-  </group>
-  
-  <group name="undef">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
-  </group>
-  
-  <group name="wildcard">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/**</js>
-    <css>classpath:ro/isdc/wro/maven/**.cs?</css>    
-  </group>
-
-  <group name="g2">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/1.js</js>
-  </group>
-  
-  <group name="g3">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/2.js</js>
-  </group>
-  
-  <group name="g4">
-    <js>classpath:ro/isdc/wro/maven/plugin/js/*.js</js>
-  </group>
-  
-  <group name="invalidWildcardResource">
-    <js>/invalid/path/to/resource/*.js</js>
-  </group>
+    <group name="g1">
+        <css>classpath:ro/isdc/wro/maven/plugin/css/*.css</css>
+        <group-ref>g2</group-ref>
+        <group-ref>g3</group-ref>
+    </group>
+    <group name="valid">
+        <css>classpath:ro/isdc/wro/maven/plugin/css/valid.css</css>
+    </group>
+    <group name="invalidResources">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/invalid.js</js>
+        <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
+        <css>classpath:ro/isdc/wro/maven/plugin/css/invalid.css</css>
+    </group>
+    <group name="undef">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/undef.js</js>
+    </group>
+    <group name="wildcard">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/**</js>
+        <css>classpath:ro/isdc/wro/maven/**.cs?</css>
+    </group>
+    <group name="g2">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/1.js</js>
+    </group>
+    <group name="g3">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/2.js</js>
+    </group>
+    <group name="g4">
+        <js>classpath:ro/isdc/wro/maven/plugin/js/*.js</js>
+    </group>
+    <group name="invalidWildcardResource">
+        <js>/invalid/path/to/resource/*.js</js>
+    </group>
+    <group name="contextRelative">
+         <js>/ro/isdc/wro/maven/plugin/js/1.js</js>
+    </group>
 </groups>
