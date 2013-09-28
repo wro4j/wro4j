@@ -21,15 +21,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.maven.plugin.support.AggregatedFolderPathResolver;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
@@ -260,7 +258,7 @@ public class Wro4jMojo
       config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
-      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+      Context.get().setAggregatedFolderPath(getAggregatedPathResolver().resolve());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file
@@ -298,53 +296,10 @@ public class Wro4jMojo
     }
   }
 
-  /**
-   * The idea is to compute the aggregatedFolderPath based on a root folder. The root folder is determined by comparing
-   * the cssTargetFolder (the folder where aggregated css files are located) with build directory or contextFolder. If
-   * rootFolder is null, then the result is also null (equivalent to using the cssTargetFolder the same as the root
-   * folder.
-   *
-   * @return the aggregated folder path, based on the cssDestinationFolder (if set) and the build folder or the
-   *         contextFolder.
-   */
-  private String computeAggregatedFolderPath() {
-    Validate.notNull(buildDirectory, "Build directory cannot be null!");
-    String result = null;
-    final File cssTargetFolder = cssDestinationFolder == null ? destinationFolder : cssDestinationFolder;
-    File rootFolder = null;
-    Validate.notNull(cssTargetFolder, "cssTargetFolder cannot be null!");
-
-    if (buildFinalName != null && cssTargetFolder.getPath().startsWith(buildFinalName.getPath())) {
-      rootFolder = buildFinalName;
-    } else if (cssTargetFolder.getPath().startsWith(buildDirectory.getPath())) {
-      rootFolder = buildDirectory;
-    } else {
-      // find first best match
-      for (final String contextFolder : getContextFolders()) {
-        if (cssTargetFolder.getPath().startsWith(getContextFoldersAsCSV())) {
-          rootFolder = new File(contextFolder);
-          break;
-        }
-      }
-    }
-    getLog().debug("buildDirectory: " + buildDirectory);
-    getLog().debug("contextFolders: " + getContextFoldersAsCSV());
-    getLog().debug("cssTargetFolder: " + cssTargetFolder);
-    getLog().debug("rootFolder: " + rootFolder);
-    if (rootFolder != null) {
-      result = StringUtils.removeStart(cssTargetFolder.getPath(), rootFolder.getPath());
-    }
-    getLog().debug("computedAggregatedFolderPath: " + result);
-    return result;
-  }
-
-  /**
-   * Use {@link StandaloneContext} to tokenize the contextFoldersAsCSV value.
-   */
-  private String[] getContextFolders() {
-    final StandaloneContext context = new StandaloneContext();
-    context.setContextFoldersAsCSV(getContextFoldersAsCSV());
-    return context.getContextFolders();
+  private AggregatedFolderPathResolver getAggregatedPathResolver() {
+    return new AggregatedFolderPathResolver().setBuildDirectory(buildDirectory).setBuildFinalName(
+        buildFinalName).setContextFoldersAsCSV(getContextFoldersAsCSV()).setCssDestinationFolder(cssDestinationFolder).setDestinationFolder(
+        destinationFolder).setLog(getLog());
   }
 
   /**
