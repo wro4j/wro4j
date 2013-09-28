@@ -39,7 +39,7 @@ public class TestStandaloneServletContextResourceLocatorFactory {
   @Test
   public void shouldLocateValidResource()
       throws Exception {
-    final String validResource = TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
+    final String validResource = "/" + TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
     assertNotNull(victim.locate(validResource));
   }
 
@@ -48,7 +48,7 @@ public class TestStandaloneServletContextResourceLocatorFactory {
       throws Exception {
     final String defaultContextFolder = standaloneContext.getContextFoldersAsCSV();
     standaloneContext.setContextFoldersAsCSV("invalid," + defaultContextFolder);
-    final String validResource = TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
+    final String validResource = "/" + TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
     assertNotNull(victim.locate(validResource));
   }
 
