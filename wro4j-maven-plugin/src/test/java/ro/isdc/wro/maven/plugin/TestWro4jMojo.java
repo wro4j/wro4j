@@ -126,7 +126,7 @@ public class TestWro4jMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     victim.setWroFile(wroFile);
-    victim.setContextFolder(wroFile.getParentFile().getParentFile());
+    victim.setContextFolder(wroFile.getParentFile().getPath());
   }
 
   private void setWroWithValidResources()
@@ -612,7 +612,7 @@ public class TestWro4jMojo {
     setUpMojo(victim);
     victim.setIgnoreMissingResources(true);
 
-    final int totalGroups = 9;
+    final int totalGroups = 10;
 
     assertEquals(totalGroups, victim.getTargetGroupsAsList().size());
 
@@ -624,7 +624,7 @@ public class TestWro4jMojo {
     //delete target folder
     destinationFolder.delete();
 
-    assertEquals(9, victim.getTargetGroupsAsList().size());
+    assertEquals(totalGroups, victim.getTargetGroupsAsList().size());
 
     victim.doExecute();
   }
@@ -636,6 +636,22 @@ public class TestWro4jMojo {
         return new ByteArrayInputStream(content.getBytes());
       }
     };
+  }
+
+  /**
+   * Verify that the plugin execution does not fail when one of the context folder is invalid.
+   */
+  @Test
+  public void shouldUseMultipleContextFolders() throws Exception {
+    final String defaultContextFolder = victim.getContextFoldersAsCSV();
+    victim.setTargetGroups("contextRelative");
+
+    victim.setContextFolder("invalid, " + defaultContextFolder);
+    victim.doExecute();
+
+    //reversed order should work the same
+    victim.setContextFolder(defaultContextFolder + ", invalid");
+    victim.doExecute();
   }
 
   @After

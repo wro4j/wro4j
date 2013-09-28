@@ -45,7 +45,7 @@ public class TestCssLintMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    mojo.setContextFolder(wroFile.getParentFile().getParentFile().getPath());
   }
 
   private void setWroWithValidResources()

@@ -66,11 +66,15 @@ public abstract class AbstractWro4jMojo
    */
   private File wroFile;
   /**
-   * The folder where web application context resides useful for locating resources relative to servletContext .
+   * The folder where web application context resides useful for locating resources relative to servletContext. It is
+   * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
+   * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
+   * single context folder is configured.
    *
    * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
+   * @optional
    */
-  private File contextFolder;
+  private String contextFolder;
   /**
    * @parameter default-value="true" expression="${minimize}"
    * @optional
@@ -137,7 +141,8 @@ public abstract class AbstractWro4jMojo
    */
   private boolean parallelProcessing;
   /**
-   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be changed to true if no unexpected problems are detected..
+   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be
+   * changed to true if no unexpected problems are detected..
    *
    * @parameter default-value="false" expression="${incrementalBuildEnabled}"
    * @optional
@@ -145,13 +150,13 @@ public abstract class AbstractWro4jMojo
   private boolean incrementalBuildEnabled;
   private TaskExecutor<Void> taskExecutor;
 
-
   /**
    * {@inheritDoc}
    */
   public final void execute()
       throws MojoExecutionException {
     validate();
+    getLog().info(contextFolder);
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
     getLog().info("targetGroups: " + getTargetGroups());
@@ -199,7 +204,7 @@ public abstract class AbstractWro4jMojo
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(getContextFolder());
+    runContext.setContextFoldersAsCSV(getContextFoldersAsCSV());
     runContext.setMinimize(isMinimize());
     runContext.setWroFile(getWroFile());
     runContext.setIgnoreMissingResources(isIgnoreMissingResources());
@@ -509,7 +514,7 @@ public abstract class AbstractWro4jMojo
       throw new MojoExecutionException("contextFolder was not set!");
     }
     if (contextFolder == null) {
-      throw new MojoExecutionException("contextFolder was not set!");
+      throw new MojoExecutionException("no contextFolder was set!");
     }
   }
 
@@ -583,7 +588,16 @@ public abstract class AbstractWro4jMojo
    *          the servletContextFolder to set
    * @VisibleForTesting
    */
-  void setContextFolder(final File contextFolder) {
+  String getContextFoldersAsCSV() {
+    return contextFolder;
+  }
+
+  /**
+   * @param contextFolders
+   *          a CSV representing contextFolders to use.
+   * @VisibleForTesting
+   */
+  void setContextFolder(final String contextFolder) {
     this.contextFolder = contextFolder;
   }
 
@@ -602,14 +616,6 @@ public abstract class AbstractWro4jMojo
    */
   File getWroFile() {
     return this.wroFile;
-  }
-
-  /**
-   * @return the contextFolder
-   * @VisibleForTesting
-   */
-  File getContextFolder() {
-    return this.contextFolder;
   }
 
   /**
@@ -643,7 +649,6 @@ public abstract class AbstractWro4jMojo
   final void setParallelProcessing(final boolean parallelProcessing) {
     this.parallelProcessing = parallelProcessing;
   }
-
 
   /**
    * @VisibleForTesting

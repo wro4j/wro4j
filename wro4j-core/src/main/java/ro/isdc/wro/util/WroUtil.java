@@ -357,13 +357,23 @@ public final class WroUtil {
   }
 
   /**
+   * @return a folder with unique name..
+   */
+  public static File createTempDirectory() {
+    final String fileName = String.format("wro4j-%s", UUID.randomUUID().toString());
+    final File file = new File(FileUtils.getTempDirectory(), fileName);
+    file.mkdir();
+    return file;
+  }
+
+  /**
    * Creates a temp file which has a certain extension.
    * @param extension of the created temp file.
    */
   public static File createTempFile(final String extension) {
     try {
       final String fileName = String.format("wro4j-%s.%s", UUID.randomUUID().toString(), extension);
-      final File file = new File(FileUtils.getTempDirectory(), fileName);
+      final File file = new File(createTempDirectory(), fileName);
       file.createNewFile();
       return file;
     } catch (final IOException e) {

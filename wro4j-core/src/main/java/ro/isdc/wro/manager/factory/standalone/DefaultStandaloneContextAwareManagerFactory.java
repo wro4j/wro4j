@@ -1,5 +1,9 @@
 package ro.isdc.wro.manager.factory.standalone;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.Validate;
@@ -16,6 +20,7 @@ import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.factory.DefaultResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.ResourceLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.FileSystemResourceLocator;
+import ro.isdc.wro.model.resource.locator.StandaloneServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
@@ -30,7 +35,7 @@ public class DefaultStandaloneContextAwareManagerFactory
   /**
    * Context used by stand-alone process.
    */
-  private StandaloneContext standaloneContext;
+  StandaloneContext standaloneContext;
   /**
    * {@inheritDoc}
    */
@@ -75,6 +80,8 @@ public class DefaultStandaloneContextAwareManagerFactory
    */
   @Override
   protected ResourceLocatorFactory newLocatorFactory() {
+    //TODO fix 
+    return new StandaloneServletContextUriLocator(standaloneContext);
     return DefaultResourceLocatorFactory.standaloneFactory(standaloneContext.getContextFolder());
   }
 }
