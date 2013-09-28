@@ -13,21 +13,21 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 /**
  * @author Alex Objelean
  */
-public class TestStandaloneServletContextUriLocator {
-  private StandaloneServletContextUriLocator victim;
+public class TestStandaloneServletContextResourceLocatorFactory {
+  private StandaloneServletContextResourceLocatorFactory victim;
   private StandaloneContext standaloneContext;
 
   @Before
   public void setUp() {
     standaloneContext = new StandaloneContext();
-    final String contextFolder = TestStandaloneServletContextUriLocator.class.getResource("").getFile();
+    final String contextFolder = TestStandaloneServletContextResourceLocatorFactory.class.getResource("").getFile();
     standaloneContext.setContextFoldersAsCSV(contextFolder);
-    victim = new StandaloneServletContextUriLocator(standaloneContext);
+    victim = new StandaloneServletContextResourceLocatorFactory(standaloneContext);
   }
 
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullStandaloneContext() {
-    new StandaloneServletContextUriLocator(null);
+    new StandaloneServletContextResourceLocatorFactory(null);
   }
 
   @Test(expected = IOException.class)
@@ -39,7 +39,7 @@ public class TestStandaloneServletContextUriLocator {
   @Test
   public void shouldLocateValidResource()
       throws Exception {
-    final String validResource = TestStandaloneServletContextUriLocator.class.getSimpleName() + ".class";
+    final String validResource = TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
     assertNotNull(victim.locate(validResource));
   }
 
@@ -48,7 +48,7 @@ public class TestStandaloneServletContextUriLocator {
       throws Exception {
     final String defaultContextFolder = standaloneContext.getContextFoldersAsCSV();
     standaloneContext.setContextFoldersAsCSV("invalid," + defaultContextFolder);
-    final String validResource = TestStandaloneServletContextUriLocator.class.getSimpleName() + ".class";
+    final String validResource = TestStandaloneServletContextResourceLocatorFactory.class.getSimpleName() + ".class";
     assertNotNull(victim.locate(validResource));
   }
 
