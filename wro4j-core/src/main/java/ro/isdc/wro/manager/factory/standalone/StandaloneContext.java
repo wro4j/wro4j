@@ -31,9 +31,9 @@ public class StandaloneContext
   private boolean minimize;
   /**
    * Inform the factory about the intention of ignoring the missing resources. If true - the missing resources will be
-   * ignored.
+   * ignored. This value is string, because the null is also accepted (meaning that the default value will be used).
    */
-  private boolean ignoreMissingResources;
+  private String ignoreMissingResourcesAsString;
 
   /**
    * @return the wroFile
@@ -90,15 +90,15 @@ public class StandaloneContext
   /**
    * @return the ignoreMissingResources
    */
-  public boolean isIgnoreMissingResources() {
-    return this.ignoreMissingResources;
+  public String getIgnoreMissingResourcesAsString() {
+    return this.ignoreMissingResourcesAsString;
   }
 
   /**
-   * @param ignoreMissingResources the ignoreMissingResources to set
+   * @param ignoreMissingResourcesAsString the ignoreMissingResources to set
    */
-  public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-    this.ignoreMissingResources = ignoreMissingResources;
+  public void setIgnoreMissingResourcesAsString(final String ignoreMissingResourcesAsString) {
+    this.ignoreMissingResourcesAsString = ignoreMissingResourcesAsString;
   }
 
   /**

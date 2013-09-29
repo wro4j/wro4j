@@ -81,10 +81,10 @@ public abstract class AbstractWro4jMojo
    */
   private boolean minimize;
   /**
-   * @parameter default-value="true" expression="${ignoreMissingResources}"
+   * @parameter expression="${ignoreMissingResources}"
    * @optional
    */
-  private boolean ignoreMissingResources;
+  private String ignoreMissingResources;
   /**
    * Comma separated group names. This field is optional. If no value is provided, a file for each group will be
    * created.
@@ -207,7 +207,7 @@ public abstract class AbstractWro4jMojo
     runContext.setContextFoldersAsCSV(getContextFoldersAsCSV());
     runContext.setMinimize(isMinimize());
     runContext.setWroFile(getWroFile());
-    runContext.setIgnoreMissingResources(isIgnoreMissingResources());
+    runContext.setIgnoreMissingResourcesAsString(isIgnoreMissingResources());
     return runContext;
   }
 
@@ -628,12 +628,16 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
-   * @param ignoreMissingResources
+   * @param ignoreMissingResourcesAsString
    *          the ignoreMissingResources to set
    * @VisibleForTesting
    */
+  void setIgnoreMissingResources(final String ignoreMissingResourcesAsString) {
+    this.ignoreMissingResources = ignoreMissingResourcesAsString;
+  }
+
   void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-    this.ignoreMissingResources = ignoreMissingResources;
+    setIgnoreMissingResources(Boolean.toString(ignoreMissingResources));
   }
 
   /**
@@ -669,7 +673,7 @@ public abstract class AbstractWro4jMojo
    * @return the ignoreMissingResources
    * @VisibleForTesting
    */
-  boolean isIgnoreMissingResources() {
+  String isIgnoreMissingResources() {
     return this.ignoreMissingResources;
   }
 
