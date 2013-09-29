@@ -42,7 +42,7 @@ public abstract class AbstractTestLinterMojo {
       throws Exception {
     mojo = newLinterMojo();
     mojo.setLog(new SilentLog());
-    mojo.setIgnoreMissingResources(false);
+    mojo.setIgnoreMissingResources(Boolean.FALSE.toString());
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
@@ -62,7 +62,7 @@ public abstract class AbstractTestLinterMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    mojo.setContextFolder(wroFile.getParentFile().getParentFile().getPath());
   }
 
   private void setWroWithValidResources()
@@ -79,7 +79,6 @@ public abstract class AbstractTestLinterMojo {
   public void cannotExecuteWhenInvalidResourcesPresentAndDoNotIgnoreMissingResources()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(false);
     mojo.execute();
   }
 
@@ -132,7 +131,7 @@ public abstract class AbstractTestLinterMojo {
     };
     mojo.setFailNever(true);
     mojo.setTaskExecutor(taskExecutor);
-    mojo.setIgnoreMissingResources(true);
+    mojo.setIgnoreMissingResources(Boolean.TRUE.toString());
 
     mojo.setParallelProcessing(false);
     mojo.execute();

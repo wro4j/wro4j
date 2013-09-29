@@ -34,7 +34,7 @@ public class TestCssLintMojo {
   public void setUp()
       throws Exception {
     mojo = new CssLintMojo();
-    mojo.setIgnoreMissingResources(false);
+    mojo.setIgnoreMissingResources(Boolean.FALSE.toString());
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
@@ -45,7 +45,7 @@ public class TestCssLintMojo {
     final URL url = getClass().getClassLoader().getResource(classpathResourceName);
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    mojo.setContextFolder(wroFile.getParentFile().getParentFile().getPath());
   }
 
   private void setWroWithValidResources()
@@ -62,7 +62,7 @@ public class TestCssLintMojo {
   public void testMojoWithPropertiesSet()
       throws Exception {
     mojo.setTargetGroups("valid");
-    mojo.setIgnoreMissingResources(true);
+    mojo.setIgnoreMissingResources(Boolean.TRUE.toString());
     mojo.execute();
   }
 
@@ -70,7 +70,6 @@ public class TestCssLintMojo {
   public void cannotExecuteWhenInvalidResourcesPresentAndDoNotIgnoreMissingResources()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(false);
     mojo.execute();
   }
 
@@ -78,7 +77,7 @@ public class TestCssLintMojo {
   public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
       throws Exception {
     setWroWithInvalidResources();
-    mojo.setIgnoreMissingResources(true);
+    mojo.setIgnoreMissingResources(Boolean.TRUE.toString());
     mojo.execute();
   }
 
@@ -176,7 +175,7 @@ public class TestCssLintMojo {
       // mojo.setOptions("undef, browser");
       mojo.setTargetGroups(null);
       mojo.setFailNever(true);
-      mojo.setIgnoreMissingResources(true);
+      mojo.setIgnoreMissingResources(Boolean.TRUE.toString());
       mojo.execute();
     } finally {
       WroTestUtils.compare(getClass().getResourceAsStream("report/" + expectedReportFileName), new FileInputStream(
