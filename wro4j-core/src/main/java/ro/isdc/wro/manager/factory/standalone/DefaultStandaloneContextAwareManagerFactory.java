@@ -37,8 +37,11 @@ public class DefaultStandaloneContextAwareManagerFactory
   public void initialize(final StandaloneContext standaloneContext) {
     Validate.notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
-    //This is important in order to make plugin aware about ignoreMissingResources option.
-    Context.get().getConfig().setIgnoreMissingResources(standaloneContext.isIgnoreMissingResources());
+    //Override the ignoreMissingResources flag only when explicitly set
+    if (standaloneContext.getIgnoreMissingResourcesAsString() != null) {
+      Context.get().getConfig().setIgnoreMissingResources(Boolean.parseBoolean(standaloneContext.getIgnoreMissingResourcesAsString()));
+    }
+
     LOG.debug("initialize: {}", standaloneContext);
     LOG.debug("config: {}", Context.get().getConfig());
   }

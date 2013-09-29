@@ -377,7 +377,7 @@ public class Wro4jCommandLineRunner {
     runContext.setContextFoldersAsCSV(contextFolder.getPath());
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
-    runContext.setIgnoreMissingResources(ignoreMissingResources);
+    runContext.setIgnoreMissingResourcesAsString(Boolean.toString(ignoreMissingResources));
     return runContext;
   }
 
