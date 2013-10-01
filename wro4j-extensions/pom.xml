@@ -90,12 +90,12 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>emberjs</artifactId>
-            <version>1.0.0-rc.5</version>
+            <version>1.0.0-rc.8</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>handlebars</artifactId>
-            <version>1.0.0-rc.4</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
