@@ -526,7 +526,7 @@ public abstract class AbstractWro4jMojo
   /**
    * @VisibleForTesting
    */
-  final void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+  void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
     this.incrementalBuildEnabled = incrementalBuildEnabled;
   }
 
