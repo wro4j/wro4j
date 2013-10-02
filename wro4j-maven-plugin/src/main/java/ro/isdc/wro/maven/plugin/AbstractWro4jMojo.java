@@ -160,6 +160,10 @@ public abstract class AbstractWro4jMojo
       final String message = "Exception occured while processing: " + e.toString() + ", class: "
           + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
       getLog().error(message, e);
+      if (e instanceof WroRuntimeException) {
+        // Do not keep resources which cause the exception. This is helpful for linter processors.
+        resourceChangeHandler.forget(((WroRuntimeException)e).getResourceUri());
+      }
       throw new MojoExecutionException(message, e);
     } finally {
       try {
@@ -290,7 +294,7 @@ public abstract class AbstractWro4jMojo
       final Group group = modelInspector.getGroupByName(groupName);
       if (group != null) {
         for (final Resource resource : group.getResources()) {
-          getResourceChangeHandler().touch(resource);
+          getResourceChangeHandler().remember(resource);
         }
       }
     }

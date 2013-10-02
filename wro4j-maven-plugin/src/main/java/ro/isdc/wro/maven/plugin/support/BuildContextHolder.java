@@ -106,7 +106,11 @@ public class BuildContextHolder {
       buildContext.setValue(key, value);
     }
     // always use fallback
-    fallbackStorage.setProperty(key, value);
+    if (value != null) {
+      fallbackStorage.setProperty(key, value);
+    } else {
+      fallbackStorage.remove(key);
+    }
     try {
       // immediately persist
       fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");

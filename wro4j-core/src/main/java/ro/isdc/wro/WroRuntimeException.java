@@ -8,23 +8,20 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Base Wro Runtime exception. All exceptions will extend this runtime
- * exception.
+ * Base Wro Runtime exception. All exceptions will extend this runtime exception.
  *
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
-public class WroRuntimeException extends RuntimeException {
+public class WroRuntimeException
+    extends RuntimeException {
   /**
    * serialVersionUID
    */
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
+  private String resourceUri;
 
-  /**
-   * @param message
-   * @param cause
-   */
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
     LOG.debug(message);
@@ -44,20 +41,20 @@ public class WroRuntimeException extends RuntimeException {
     LOG.error(getMessage());
     return this;
   }
-  
+
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
-   * 
+   *
    * @param e
    *          the exception to wrap.
    */
   public static WroRuntimeException wrap(final Exception e) {
     return wrap(e, e.getMessage());
   }
-  
+
   /**
    * Wraps original exception into {@link WroRuntimeException} and throw it.
-   * 
+   *
    * @param e
    *          the exception to wrap.
    * @param message
@@ -68,5 +65,21 @@ public class WroRuntimeException extends RuntimeException {
       return (WroRuntimeException) e;
     }
     return new WroRuntimeException(message, e);
+  }
+
+  /**
+   * @param resourceUri
+   *          The name of the resource being processed when exception occurs.
+   */
+  public WroRuntimeException setResourceUri(final String resourceUri) {
+    this.resourceUri = resourceUri;
+    return this;
+  }
+
+  /**
+   * @return The name of the resource being processed when exception occurs.
+   */
+  public String getResourceUri() {
+    return resourceUri;
   }
 }

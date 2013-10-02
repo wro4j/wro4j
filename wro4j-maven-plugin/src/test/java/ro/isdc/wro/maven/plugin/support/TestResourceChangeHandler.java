@@ -14,6 +14,8 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 
 
 /**
@@ -65,6 +67,21 @@ public class TestResourceChangeHandler {
     victim.setBuildContextHolder(buildContextHolder);
     victim.destroy();
     verify(buildContextHolder).destroy();
+  }
+
+  @Test
+  public void test() {
+    final String resourceUri = ClasspathUriLocator.createUri(getClass().getName().replace(".", "/") + ".class");
+    final Resource resource = Resource.create(resourceUri, ResourceType.JS);
+    assertEquals(true, victim.isResourceChanged(resource));
+    victim.remember(resource);
+    assertEquals(false, victim.isResourceChanged(resource));
+    victim.forget(resource.getUri());
+    assertEquals(true, victim.isResourceChanged(resource));
+    victim.remember(resource);
+    assertEquals(false, victim.isResourceChanged(resource));
+    victim.destroy();
+    assertEquals(true, victim.isResourceChanged(resource));
   }
 
   @After

@@ -114,7 +114,7 @@ public class ResourceChangeHandler {
    * @param resource
    *          {@link Resource} to touch.
    */
-  public void touch(final Resource resource) {
+  public void remember(final Resource resource) {
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
@@ -138,7 +138,7 @@ public class ResourceChangeHandler {
     forEachCssImportApply(new Function<String, Void>() {
       public Void apply(final String importedUri)
           throws Exception {
-        touch(Resource.create(importedUri, ResourceType.CSS));
+        remember(Resource.create(importedUri, ResourceType.CSS));
         return null;
       }
     }, resource, reader);
@@ -165,11 +165,11 @@ public class ResourceChangeHandler {
         getLog().debug("Found @import " + importedUri);
         try {
           func.apply(importedUri);
-          touch(Resource.create(importedUri, ResourceType.CSS));
+          remember(Resource.create(importedUri, ResourceType.CSS));
         } catch (final Exception e) {
           getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
         }
-        touch(Resource.create(importedUri, ResourceType.CSS));
+        remember(Resource.create(importedUri, ResourceType.CSS));
       }
 
       @Override
@@ -243,7 +243,21 @@ public class ResourceChangeHandler {
     return getBuildContextHolder().isIncrementalBuild();
   }
 
+  /**
+   * Destroys all information about resource tracked for changes.
+   */
   public void destroy() {
     getBuildContextHolder().destroy();
+  }
+
+  /**
+   * After invoking this method on a resource, the next invocation of {@link #isResourceChanged(Resource)} will return
+   * true.
+   *
+   * @param resourceUri
+   *          uri of the resource to clear from persisted storage.
+   */
+  public void forget(final String resourceUri) {
+    getBuildContextHolder().setValue(resourceUri, null);
   }
 }
