@@ -2,6 +2,7 @@ package ro.isdc.wro.maven.plugin.support;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.plugin.logging.Log;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
@@ -26,12 +28,18 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.Function;
 
 public class ResourceChangeHandler {
-  private WroManagerFactory wroManagerFactory;
+  private WroManagerFactory managerFactory;
+  /**
+   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
+   */
   private BuildContextHolder buildContextHolder;
   private Log log;
+  private BuildContext buildContext;
+  private File buildDirectory;
+  private boolean incrementalBuildEnabled;
 
   public boolean isResourceChanged(final Resource resource) {
-    notNull(wroManagerFactory);
+    notNull(managerFactory);
     notNull(buildContextHolder);
     notNull(log);
 
@@ -160,8 +168,16 @@ public class ResourceChangeHandler {
     return processor;
   }
 
+  private BuildContextHolder getBuildContextHolder() {
+    if (buildContextHolder == null) {
+      buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
+      buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
+    }
+    return buildContextHolder;
+  }
+
   private WroManagerFactory getManagerFactory() {
-    return wroManagerFactory;
+    return managerFactory;
   }
 
 
@@ -169,20 +185,8 @@ public class ResourceChangeHandler {
     return log;
   }
 
-
-  public BuildContextHolder getBuildContextHolder() {
-    return buildContextHolder;
-  }
-
-
   public ResourceChangeHandler setManagerFactory(final WroManagerFactory wroManagerFactory) {
-    this.wroManagerFactory = wroManagerFactory;
-    return this;
-  }
-
-
-  public ResourceChangeHandler setBuildContextHolder(final BuildContextHolder buildContextHolder) {
-    this.buildContextHolder = buildContextHolder;
+    this.managerFactory = wroManagerFactory;
     return this;
   }
 
@@ -190,5 +194,32 @@ public class ResourceChangeHandler {
   public ResourceChangeHandler setLog(final Log log) {
     this.log = log;
     return this;
+  }
+
+
+  public ResourceChangeHandler setBuildContext(final BuildContext buildContext) {
+    this.buildContext = buildContext;
+    return this;
+  }
+
+
+  public ResourceChangeHandler setBuildDirectory(final File buildDirectory) {
+    this.buildDirectory = buildDirectory;
+    return this;
+  }
+
+
+  public ResourceChangeHandler setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+    this.incrementalBuildEnabled = incrementalBuildEnabled;
+    return this;
+  }
+
+  public boolean isIncrementalBuild() {
+    return getBuildContextHolder().isIncrementalBuild();
+  }
+
+
+  public void destroy() {
+    getBuildContextHolder().destroy();
   }
 }

@@ -25,6 +25,9 @@ public class BuildContextHolder {
   private static final Logger LOG = LoggerFactory.getLogger(BuildContextHolder.class);
   private static final String ROOT_FOLDER_NAME = ".wro4j";
   private static final String FALLBACK_STORAGE_FILE_NAME = "buildContext.properties";
+  /**
+   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
+   */
   private final BuildContext buildContext;
   private final File buildDirectory;
   private Properties fallbackStorage;
@@ -102,7 +105,7 @@ public class BuildContextHolder {
     if (buildContext != null) {
       buildContext.setValue(key, value);
     }
-    //always use fallback
+    // always use fallback
     fallbackStorage.setProperty(key, value);
     try {
       // immediately persist

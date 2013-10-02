@@ -26,7 +26,6 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
-import ro.isdc.wro.maven.plugin.support.BuildContextHolder;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.maven.plugin.support.ResourceChangeHandler;
 import ro.isdc.wro.model.WroModel;
@@ -115,10 +114,6 @@ public abstract class AbstractWro4jMojo
    * @optional
    */
   private File buildDirectory;
-  /**
-   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
-   */
-  private BuildContextHolder buildContextHolder;
   /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
@@ -301,7 +296,6 @@ public abstract class AbstractWro4jMojo
     }
   }
 
-
   /**
    * @return a list of groups changed by incremental builds.
    */
@@ -422,7 +416,7 @@ public abstract class AbstractWro4jMojo
    * @return true if the build was triggered by an incremental change.
    */
   protected final boolean isIncrementalBuild() {
-    return getBuildContextHolder().isIncrementalBuild();
+    return getResourceChangeHandler().isIncrementalBuild();
   }
 
   private List<String> getAllModelGroupNames() {
@@ -443,18 +437,10 @@ public abstract class AbstractWro4jMojo
 
   private ResourceChangeHandler getResourceChangeHandler() {
     if (resourceChangeHandler == null) {
-      resourceChangeHandler = new ResourceChangeHandler().setLog(getLog()).setBuildContextHolder(
-          getBuildContextHolder()).setManagerFactory(getManagerFactory());
+      resourceChangeHandler = new ResourceChangeHandler().setLog(getLog()).setManagerFactory(getManagerFactory()).setBuildContext(
+          buildContext).setBuildDirectory(buildDirectory).setIncrementalBuildEnabled(incrementalBuildEnabled);
     }
     return resourceChangeHandler;
-  }
-
-  private BuildContextHolder getBuildContextHolder() {
-    if (buildContextHolder == null) {
-      buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
-      buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
-    }
-    return buildContextHolder;
   }
 
   @VisibleForTesting
@@ -614,6 +600,11 @@ public abstract class AbstractWro4jMojo
    * @VisibleForTesting
    */
   void clean() {
-    getBuildContextHolder().destroy();
+    try {
+      getResourceChangeHandler().destroy();
+    } catch (final Exception e) {
+      //do not propagate the error during cleanup
+      getLog().error("Failed to destroy resourceChangeHandler", e);
+    }
   }
 }
