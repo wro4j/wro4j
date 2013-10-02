@@ -22,6 +22,11 @@ public class LinterException extends WroRuntimeException {
     super("Linter error detected");
   }
 
+  public LinterException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
+
   /**
    * @return the errors
    */

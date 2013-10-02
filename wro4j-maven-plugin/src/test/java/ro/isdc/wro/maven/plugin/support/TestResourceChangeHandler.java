@@ -32,13 +32,17 @@ public class TestResourceChangeHandler {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     managerFactory = new BaseWroManagerFactory();
-    victim = new ResourceChangeHandler().setManagerFactory(managerFactory).setLog(log);
+    victim = ResourceChangeHandler.create(managerFactory, log);
   }
 
   @Test(expected = NullPointerException.class)
-  public void cannotUseUninitializedInstance() {
-    victim = new ResourceChangeHandler();
-    victim.isResourceChanged(Resource.create("1.js"));
+  public void cannotAcceptInvalidManagerFactory() {
+    victim = ResourceChangeHandler.create(null, log);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptInvalidLog() {
+    victim = ResourceChangeHandler.create(managerFactory, null);
   }
 
   @Test

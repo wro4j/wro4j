@@ -386,7 +386,7 @@ public abstract class AbstractWro4jMojo
         @Override
         protected void onException(final Exception e) {
           // propagate exception
-          throw new RuntimeException(e);
+          throw WroRuntimeException.wrap(e);
         }
       };
     }
@@ -437,8 +437,8 @@ public abstract class AbstractWro4jMojo
 
   private ResourceChangeHandler getResourceChangeHandler() {
     if (resourceChangeHandler == null) {
-      resourceChangeHandler = new ResourceChangeHandler().setLog(getLog()).setManagerFactory(getManagerFactory()).setBuildContext(
-          buildContext).setBuildDirectory(buildDirectory).setIncrementalBuildEnabled(incrementalBuildEnabled);
+      resourceChangeHandler = ResourceChangeHandler.create(getManagerFactory(), getLog()).setBuildContext(buildContext).setBuildDirectory(
+          buildDirectory).setIncrementalBuildEnabled(incrementalBuildEnabled);
     }
     return resourceChangeHandler;
   }

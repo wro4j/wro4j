@@ -76,7 +76,8 @@ public class JsHintMojo
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
         if (isFailAllowed()) {
-          throw new WroRuntimeException("Errors found when validating resource: " + resource);
+          getLog().error("Errors found when validating resource: " + resource);
+          throw e;
         }
       };
     }.setOptionsAsString(getOptions());

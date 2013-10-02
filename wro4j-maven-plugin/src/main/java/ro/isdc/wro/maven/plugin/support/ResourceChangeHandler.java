@@ -48,10 +48,21 @@ public class ResourceChangeHandler {
   private File buildDirectory;
   private boolean incrementalBuildEnabled;
 
-  public boolean isResourceChanged(final Resource resource) {
-    notNull(resource, "Invalid resource provided");
+  /**
+   * Factory method which requires all mandatory fields.
+   */
+  public static ResourceChangeHandler create(final WroManagerFactory managerFactory, final Log log) {
     notNull(managerFactory, "WroManagerFactory was not set");
     notNull(log, "Log was not set");
+    return new ResourceChangeHandler().setManagerFactory(managerFactory).setLog(log);
+  }
+
+  private ResourceChangeHandler() {
+  }
+
+
+  public boolean isResourceChanged(final Resource resource) {
+    notNull(resource, "Invalid resource provided");
 
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
