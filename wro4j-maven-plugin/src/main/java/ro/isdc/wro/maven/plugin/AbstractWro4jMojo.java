@@ -290,7 +290,7 @@ public abstract class AbstractWro4jMojo
       final Group group = modelInspector.getGroupByName(groupName);
       if (group != null) {
         for (final Resource resource : group.getResources()) {
-          getResourceChangeHandler().persistResourceFingerprints(resource);
+          getResourceChangeHandler().touch(resource);
         }
       }
     }
