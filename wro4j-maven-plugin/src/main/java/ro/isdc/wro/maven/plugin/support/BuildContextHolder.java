@@ -25,6 +25,9 @@ public class BuildContextHolder {
   private static final Logger LOG = LoggerFactory.getLogger(BuildContextHolder.class);
   private static final String ROOT_FOLDER_NAME = ".wro4j";
   private static final String FALLBACK_STORAGE_FILE_NAME = "buildContext.properties";
+  /**
+   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
+   */
   private final BuildContext buildContext;
   private final File buildDirectory;
   private Properties fallbackStorage;
@@ -82,11 +85,13 @@ public class BuildContextHolder {
    */
   public String getValue(final String key) {
     String value = null;
-    if (buildContext != null) {
-      value = (String) buildContext.getValue(key);
-    }
-    if (value == null) {
-      value = fallbackStorage.getProperty(key);
+    if (key != null) {
+      if (buildContext != null) {
+        value = (String) buildContext.getValue(key);
+      }
+      if (value == null) {
+        value = fallbackStorage.getProperty(key);
+      }
     }
     return value;
   }
@@ -99,17 +104,25 @@ public class BuildContextHolder {
    */
   public void setValue(final String key, final String value) {
     LOG.debug("storing key: '{}' and value: '{}'", key, value);
-    if (buildContext != null) {
-      buildContext.setValue(key, value);
-    }
-    //always use fallback
-    fallbackStorage.setProperty(key, value);
-    try {
-      // immediately persist
-      fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");
-      LOG.debug("fallback storage updated");
-    } catch (final IOException e) {
-      LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
+    if (key != null) {
+      if (buildContext != null) {
+        buildContext.setValue(key, value);
+      }
+      // always use fallback
+      if (value != null) {
+        fallbackStorage.setProperty(key, value);
+      } else {
+        fallbackStorage.remove(key);
+      }
+      try {
+        // immediately persist
+        fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");
+        LOG.debug("fallback storage updated");
+      } catch (final IOException e) {
+        LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
+      }
+    } else {
+      LOG.debug("Cannot store null key");
     }
   }
 

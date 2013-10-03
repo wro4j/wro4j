@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -35,12 +36,20 @@ import ro.isdc.wro.util.concurrent.TaskExecutor;
  * @author Alex Objelean
  */
 public abstract class AbstractTestLinterMojo {
-  private AbstractLinterMojo mojo;
+  private AbstractLinterMojo<?> mojo;
 
   @Before
   public void setUp()
       throws Exception {
     mojo = newLinterMojo();
+    initializeMojo(mojo);
+  }
+
+  /**
+   * perform default initialization of provided mojo.
+   */
+  private void initializeMojo(final AbstractLinterMojo<?> mojo)
+      throws Exception {
     mojo.setLog(new SilentLog());
     mojo.setIgnoreMissingResources(Boolean.FALSE.toString());
     setWroWithValidResources();
@@ -48,14 +57,14 @@ public abstract class AbstractTestLinterMojo {
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
   }
 
-  protected final AbstractLinterMojo getMojo() {
+  protected final AbstractLinterMojo<?> getMojo() {
     return mojo;
   }
 
   /**
    * @return Mojo to test.
    */
-  protected abstract AbstractLinterMojo newLinterMojo();
+  protected abstract AbstractLinterMojo<?> newLinterMojo();
 
   private void setWroFile(final String classpathResourceName)
       throws URISyntaxException {
@@ -119,7 +128,8 @@ public abstract class AbstractTestLinterMojo {
   }
 
   @Test
-  public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
+  public void shouldUseTaskExecutorWhenRunningInParallel()
+      throws Exception {
     final AtomicBoolean invoked = new AtomicBoolean();
     final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
       @Override
@@ -169,4 +179,8 @@ public abstract class AbstractTestLinterMojo {
     }
   }
 
+  @After
+  public void tearDown() {
+    getMojo().clean();
+  }
 }

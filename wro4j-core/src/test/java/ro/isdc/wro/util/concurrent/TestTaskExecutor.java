@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -28,7 +29,13 @@ public class TestTaskExecutor {
 
   @Before
   public void setUp() {
-    victim = new TaskExecutor<Void>();
+    victim = new TaskExecutor<Void>() {
+      @Override
+      protected void onException(final Exception e)
+          throws Exception {
+        throw e;
+      }
+    };
   }
 
   @Test(expected = NullPointerException.class)
@@ -85,6 +92,23 @@ public class TestTaskExecutor {
     assertTrue(delta < delay * times);
   }
 
+  @Test(expected = WroRuntimeException.class)
+  public void shouldPropagateOriginalException() throws Exception {
+    final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
+    //add at least two, otherwise no concurrency is applied.
+    tasks.add(createFailingCallable());
+    tasks.add(createFailingCallable());
+    victim.submit(tasks);
+  }
+
+  private Callable<Void> createFailingCallable() {
+    return new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        throw new WroRuntimeException("BOOM!");
+      }
+    };
+  }
 
   private static void printDate() {
     LOG.debug(new SimpleDateFormat("HH:ss:S").format(new Date()));

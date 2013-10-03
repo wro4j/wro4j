@@ -104,6 +104,7 @@ public class TestWro4jMojo {
   private void setUpMojo(final Wro4jMojo mojo)
       throws Exception {
     mojo.setIgnoreMissingResources(false);
+    mojo.setParallelProcessing(false);
     mojo.setMinimize(true);
     setWroWithValidResources();
     destinationFolder = new File(FileUtils.getTempDirectory(), "wroTemp-" + new Date().getTime());

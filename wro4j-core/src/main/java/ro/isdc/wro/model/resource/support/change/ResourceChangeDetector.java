@@ -52,8 +52,11 @@ public class ResourceChangeDetector {
 
   /**
    * Check if an uri from a particular group has changed.
-   * @param uri the uri to check for change.
-   * @param groupName the name of the group where the uri belongs to.
+   *
+   * @param uri
+   *          the uri to check for change.
+   * @param groupName
+   *          the name of the group where the uri belongs to.
    * @return true if the change is detected for the provided uri.
    */
   public boolean checkChangeForGroup(final String uri, final String groupName) throws IOException {
