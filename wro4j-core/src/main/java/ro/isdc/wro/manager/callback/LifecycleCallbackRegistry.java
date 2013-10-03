@@ -36,7 +36,9 @@ public class LifecycleCallbackRegistry
 
   /**
    * Register a callback using a factory responsible for callback instantiation.
-   * @param callbackFactory the factory used to instantiate callbacks.
+   *
+   * @param callbackFactory
+   *          the factory used to instantiate callbacks.
    */
   public void registerCallback(final ObjectFactory<LifecycleCallback> callbackFactory) {
     callbackFactoryList.add(callbackFactory);
