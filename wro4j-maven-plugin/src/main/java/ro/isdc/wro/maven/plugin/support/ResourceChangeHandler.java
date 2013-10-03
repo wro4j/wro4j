@@ -257,7 +257,9 @@ public class ResourceChangeHandler {
    * @param resourceUri
    *          uri of the resource to clear from persisted storage.
    */
-  public void forget(final String resourceUri) {
-    getBuildContextHolder().setValue(resourceUri, null);
+  public void forget(final Resource resource) {
+    if (resource != null) {
+      getBuildContextHolder().setValue(resource.getUri(), null);
+    }
   }
 }

@@ -6,6 +6,8 @@ package ro.isdc.wro;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.Resource;
+
 
 /**
  * Base Wro Runtime exception. All exceptions will extend this runtime exception.
@@ -20,7 +22,7 @@ public class WroRuntimeException
    */
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(WroRuntimeException.class);
-  private String resourceUri;
+  private Resource resource;
 
   public WroRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
@@ -71,15 +73,15 @@ public class WroRuntimeException
    * @param resourceUri
    *          The name of the resource being processed when exception occurs.
    */
-  public WroRuntimeException setResourceUri(final String resourceUri) {
-    this.resourceUri = resourceUri;
+  public WroRuntimeException setResource(final Resource resource) {
+    this.resource = resource;
     return this;
   }
 
   /**
-   * @return The name of the resource being processed when exception occurs.
+   * @return The processed {@link Resource} which caused the exception.
    */
-  public String getResourceUri() {
-    return resourceUri;
+  public Resource getResource() {
+    return resource;
   }
 }

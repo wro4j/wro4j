@@ -70,13 +70,13 @@ public class TestResourceChangeHandler {
   }
 
   @Test
-  public void test() {
+  public void shouldIdentifyChangeAfterDestroyOrForgetIsInvoked() {
     final String resourceUri = ClasspathUriLocator.createUri(getClass().getName().replace(".", "/") + ".class");
     final Resource resource = Resource.create(resourceUri, ResourceType.JS);
     assertEquals(true, victim.isResourceChanged(resource));
     victim.remember(resource);
     assertEquals(false, victim.isResourceChanged(resource));
-    victim.forget(resource.getUri());
+    victim.forget(resource);
     assertEquals(true, victim.isResourceChanged(resource));
     victim.remember(resource);
     assertEquals(false, victim.isResourceChanged(resource));

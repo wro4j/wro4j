@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.SilentLog;
 import org.apache.maven.project.MavenProject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -176,5 +177,10 @@ public abstract class AbstractTestLinterMojo {
         }
       };
     }
+  }
+
+  @After
+  public void tearDown() {
+    getMojo().clean();
   }
 }

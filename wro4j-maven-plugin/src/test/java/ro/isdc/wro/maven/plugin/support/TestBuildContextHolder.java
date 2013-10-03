@@ -129,4 +129,10 @@ public class TestBuildContextHolder {
     victim.setValue(KEY, null);
     assertNull(victim.getValue(KEY));
   }
+
+  @Test
+  public void shouldNotStoreValueAssociatedWithNullKey() {
+    victim.setValue(null, VALUE);
+    assertNull(victim.getValue(null));
+  }
 }

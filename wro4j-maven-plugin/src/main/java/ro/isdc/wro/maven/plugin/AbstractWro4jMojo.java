@@ -156,13 +156,13 @@ public abstract class AbstractWro4jMojo
       onBeforeExecute();
       doExecute();
     } catch (final Exception e) {
-      getLog().error("Exception occured while executing maven plugin", e);
       final String message = "Exception occured while processing: " + e.toString() + ", class: "
           + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
       getLog().error(message, e);
       if (e instanceof WroRuntimeException) {
         // Do not keep resources which cause the exception. This is helpful for linter processors.
-        resourceChangeHandler.forget(((WroRuntimeException)e).getResourceUri());
+        final Resource resource = ((WroRuntimeException) e).getResource();
+        forgetResource(resource);
       }
       throw new MojoExecutionException(message, e);
     } finally {
@@ -171,6 +171,16 @@ public abstract class AbstractWro4jMojo
       } catch (final Exception e) {
         throw new MojoExecutionException("Exception in onAfterExecute", e);
       }
+    }
+  }
+
+  /**
+   * Safely invoke {@link ResourceChangeHandler#forget(Resource)}. The safety is required because invoking
+   * {@link #getResourceChangeHandler()} can throw an exception during initialization.
+   */
+  private void forgetResource(final Resource resource) {
+    if (resourceChangeHandler != null) {
+      resourceChangeHandler.forget(resource);
     }
   }
 
@@ -257,7 +267,6 @@ public abstract class AbstractWro4jMojo
           wroManagerFactory.trim());
       managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
-      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
     return managerFactory;

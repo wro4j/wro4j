@@ -64,7 +64,7 @@ public class ExceptionHandlingProcessorDecorator
       } else {
         LOG.error("Failed to process the resource: {} using processor: {}. Reason: {}", resource, processorName, e.getMessage());
         final String resourceUri = resource != null ? resource.getUri() : null;
-        throw WroRuntimeException.wrap(e, "The processor: " + processorName + " failed").setResourceUri(resourceUri);
+        throw WroRuntimeException.wrap(e, "The processor: " + processorName + " failed").setResource(resource);
       }
     } finally {
       reader.close();
