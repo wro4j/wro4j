@@ -52,6 +52,13 @@ public abstract class AbstractWro4jMojo
    */
   private File wroFile;
   /**
+   * Whether to skip executing Wro4j. Allows clients to pass a build-time parameter to skip running wro4j.
+   *
+   * @parameter default-value=false
+   * @optional
+   */
+   private boolean skip;
+  /**
    * The folder where web application context resides useful for locating resources relative to servletContext. It is
    * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
    * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
@@ -139,6 +146,10 @@ public abstract class AbstractWro4jMojo
   public final void execute()
       throws MojoExecutionException {
     validate();
+    if (skip) {
+      getLog().info("Skipping Wro4j execution");
+      return;
+    }
     getLog().info(contextFolder);
     getLog().info("Executing the mojo: ");
     getLog().info("Wro4j Model path: " + wroFile.getPath());
