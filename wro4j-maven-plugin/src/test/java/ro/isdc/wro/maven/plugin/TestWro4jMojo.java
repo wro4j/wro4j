@@ -6,6 +6,7 @@ package ro.isdc.wro.maven.plugin;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -276,7 +277,8 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void shouldBeFasterWhenRunningProcessingInParallel() throws Exception {
+  public void shouldBeFasterWhenRunningProcessingInParallel()
+      throws Exception {
     final long begin = System.currentTimeMillis();
     victim.setParallelProcessing(false);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
@@ -293,7 +295,8 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void shouldUseTaskExecutorWhenRunningInParallel() throws Exception {
+  public void shouldUseTaskExecutorWhenRunningInParallel()
+      throws Exception {
     final AtomicBoolean invoked = new AtomicBoolean();
     final TaskExecutor<Void> taskExecutor = new TaskExecutor<Void>() {
       @Override
@@ -381,7 +384,8 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void shouldSkipSecondProcessingWhenIncrementalBuildEnabled() throws Exception {
+  public void shouldSkipSecondProcessingWhenIncrementalBuildEnabled()
+      throws Exception {
     victim.setBuildContext(null);
     victim.setIncrementalBuildEnabled(true);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
@@ -493,7 +497,8 @@ public class TestWro4jMojo {
     assertFalse(victim.getTargetGroupsAsList().isEmpty());
   }
 
-  private void configureMojoForModelWithImportedCssResource(final String importResource) throws Exception {
+  private void configureMojoForModelWithImportedCssResource(final String importResource)
+      throws Exception {
     final String parentResource = "parent.css";
 
     final WroModel model = new WroModel();
@@ -527,7 +532,8 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void shouldIgnoreChangesOfGroupsWhichAreNotPartOfTargetGroups() throws Exception {
+  public void shouldIgnoreChangesOfGroupsWhichAreNotPartOfTargetGroups()
+      throws Exception {
     final String importResource = "imported.css";
 
     configureMojoForModelWithImportedCssResource(importResource);
@@ -568,14 +574,14 @@ public class TestWro4jMojo {
       assertEquals(2, victim.getTargetGroupsAsList().size());
       victim.execute();
 
-      //Now mark it as incremental
+      // Now mark it as incremental
       when(mockBuildContext.isIncremental()).thenReturn(true);
 
       final Properties groupNames = new Properties();
       groupNames.load(new FileInputStream(groupNameMappingFile));
       assertEquals(4, groupNames.entrySet().size());
 
-      //change the uri of the resource from group a (equivalent to changing its content).
+      // change the uri of the resource from group a (equivalent to changing its content).
       when(g1Resource.getUri()).thenReturn("1a.js");
 
       assertEquals(1, victim.getTargetGroupsAsList().size());
@@ -596,7 +602,8 @@ public class TestWro4jMojo {
    * only that one group. However, if the targetFolder does not exist, all target groups must be processed.
    */
   @Test
-  public void shouldProcessTargetGroupsWhenDestinationFolderDoesNotExist() throws Exception {
+  public void shouldProcessTargetGroupsWhenDestinationFolderDoesNotExist()
+      throws Exception {
     victim = new Wro4jMojo() {
       @Override
       protected WroManagerFactory getManagerFactory() {
@@ -622,7 +629,7 @@ public class TestWro4jMojo {
 
     assertEquals(0, victim.getTargetGroupsAsList().size());
 
-    //delete target folder
+    // delete target folder
     destinationFolder.delete();
 
     assertEquals(totalGroups, victim.getTargetGroupsAsList().size());
@@ -643,16 +650,30 @@ public class TestWro4jMojo {
    * Verify that the plugin execution does not fail when one of the context folder is invalid.
    */
   @Test
-  public void shouldUseMultipleContextFolders() throws Exception {
+  public void shouldUseMultipleContextFolders()
+      throws Exception {
     final String defaultContextFolder = victim.getContextFoldersAsCSV();
     victim.setTargetGroups("contextRelative");
 
     victim.setContextFolder("invalid, " + defaultContextFolder);
     victim.doExecute();
 
-    //reversed order should work the same
+    // reversed order should work the same
     victim.setContextFolder(defaultContextFolder + ", invalid");
     victim.doExecute();
+  }
+
+  @Test
+  public void shouldSkipExecutionWhenSkipIsEnabled()
+      throws Exception {
+    victim.setSkip(false);
+    try {
+      victim.execute();
+      fail("should have failed");
+    } catch (final MojoExecutionException e) {
+    }
+    victim.setSkip(true);
+    victim.execute();
   }
 
   @After

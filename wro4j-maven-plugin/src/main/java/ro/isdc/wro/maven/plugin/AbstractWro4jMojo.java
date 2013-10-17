@@ -52,6 +52,13 @@ public abstract class AbstractWro4jMojo
    */
   private File wroFile;
   /**
+   * Allows clients to pass a build-time parameter to skip the plugin execution..
+   *
+   * @parameter default-value=false
+   * @optional
+   */
+  private boolean skip;
+  /**
    * The folder where web application context resides useful for locating resources relative to servletContext. It is
    * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
    * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
@@ -138,38 +145,42 @@ public abstract class AbstractWro4jMojo
    */
   public final void execute()
       throws MojoExecutionException {
-    validate();
-    getLog().info(contextFolder);
-    getLog().info("Executing the mojo: ");
-    getLog().info("Wro4j Model path: " + wroFile.getPath());
-    getLog().info("targetGroups: " + getTargetGroups());
-    getLog().info("minimize: " + isMinimize());
-    getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
-    getLog().info("parallelProcessing: " + isParallelProcessing());
-    getLog().debug("wroManagerFactory: " + wroManagerFactory);
-    getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
-    getLog().debug("extraConfig: " + extraConfigFile);
+    if (skip) {
+      getLog().info("Skipping execution.");
+    } else {
+      validate();
+      getLog().info(contextFolder);
+      getLog().info("Executing the mojo: ");
+      getLog().info("Wro4j Model path: " + wroFile.getPath());
+      getLog().info("targetGroups: " + getTargetGroups());
+      getLog().info("minimize: " + isMinimize());
+      getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
+      getLog().info("parallelProcessing: " + isParallelProcessing());
+      getLog().debug("wroManagerFactory: " + wroManagerFactory);
+      getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
+      getLog().debug("extraConfig: " + extraConfigFile);
 
-    extendPluginClasspath();
-    Context.set(Context.standaloneContext());
-    try {
-      onBeforeExecute();
-      doExecute();
-    } catch (final Exception e) {
-      final String message = "Exception occured while processing: " + e.toString() + ", class: "
-          + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
-      getLog().error(message, e);
-      if (e instanceof WroRuntimeException) {
-        // Do not keep resources which cause the exception. This is helpful for linter processors.
-        final Resource resource = ((WroRuntimeException) e).getResource();
-        forgetResource(resource);
-      }
-      throw new MojoExecutionException(message, e);
-    } finally {
+      extendPluginClasspath();
+      Context.set(Context.standaloneContext());
       try {
-        onAfterExecute();
+        onBeforeExecute();
+        doExecute();
       } catch (final Exception e) {
-        throw new MojoExecutionException("Exception in onAfterExecute", e);
+        final String message = "Exception occured while processing: " + e.toString() + ", class: "
+            + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+        getLog().error(message, e);
+        if (e instanceof WroRuntimeException) {
+          // Do not keep resources which cause the exception. This is helpful for linter processors.
+          final Resource resource = ((WroRuntimeException) e).getResource();
+          forgetResource(resource);
+        }
+        throw new MojoExecutionException(message, e);
+      } finally {
+        try {
+          onAfterExecute();
+        } catch (final Exception e) {
+          throw new MojoExecutionException("Exception in onAfterExecute", e);
+        }
       }
     }
   }
@@ -608,6 +619,13 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
+   * @VisibleForTesting
+   */
+  void setSkip(final boolean skip) {
+    this.skip = skip;
+  }
+
+  /**
    * Removes any persisted data creating during the build.
    *
    * @VisibleForTesting
@@ -616,7 +634,7 @@ public abstract class AbstractWro4jMojo
     try {
       getResourceChangeHandler().destroy();
     } catch (final Exception e) {
-      //do not propagate the error during cleanup
+      // do not propagate the error during cleanup
       getLog().error("Failed to destroy resourceChangeHandler", e);
     }
   }
