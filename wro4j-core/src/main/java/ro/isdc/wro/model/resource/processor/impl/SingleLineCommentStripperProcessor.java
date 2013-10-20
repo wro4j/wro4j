@@ -30,6 +30,7 @@ public class SingleLineCommentStripperProcessor
    */
   public static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("comment.singleline"),
       Pattern.MULTILINE);
+  public static final String ALIAS = "singlelineStripper";
 
   /**
    * {@inheritDoc}
