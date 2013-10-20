@@ -170,6 +170,9 @@ public class Wro4jMojo
     if (groupNameMappingFile != null) {
       FileOutputStream outputStream = null;
       try {
+        final File mappingFileParent = new File(groupNameMappingFile.getParent());
+        //create missing folders if needed
+        mappingFileParent.mkdirs();
         outputStream = new FileOutputStream(groupNameMappingFile);
         groupNames.store(outputStream, "Mapping of defined group name to renamed group name");
       } catch (final FileNotFoundException ex) {
