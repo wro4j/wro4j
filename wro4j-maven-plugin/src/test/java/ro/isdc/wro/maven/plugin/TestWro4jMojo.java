@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -381,6 +382,26 @@ public class TestWro4jMojo {
     Assert.assertEquals(CustomNamingStrategyWroManagerFactory.PREFIX + "g1.js", groupNames.get("g1.js"));
 
     FileUtils.deleteQuietly(groupNameMappingFile);
+  }
+
+  /**
+   * Uses a not existing folder to store groupNameMappingFile and proves that it is getting created instead of failing.
+   */
+  @Test
+  public void shouldCreateMissingFolderForGroupNameMappingFile()
+      throws Exception {
+    final File parentFolder = new File(FileUtils.getTempDirectory(), "wro4j-" + UUID.randomUUID());
+    try {
+      setWroWithValidResources();
+      final File groupNameMappingFile = new File(parentFolder, "groupMapping-" + new Date().getTime());
+
+      victim.setWroManagerFactory(CustomNamingStrategyWroManagerFactory.class.getName());
+      victim.setGroupNameMappingFile(groupNameMappingFile);
+      victim.setIgnoreMissingResources(true);
+      victim.execute();
+    } finally {
+      FileUtils.deleteQuietly(parentFolder);
+    }
   }
 
   @Test
