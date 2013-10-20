@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
 
 
@@ -21,11 +22,21 @@ public class TestDefaultProcessorProvider {
   public void setUp() {
     victim = new DefaultProcessorProvider();
   }
+
   @Test
   public void shouldContainLessCssImportPreProcessor()
       throws Exception {
+    assertProccessorWithAliasAvailable(LessCssImportPreProcessor.class, LessCssImportPreProcessor.ALIAS);
+  }
+
+  @Test
+  public void shouldHaveSinglineStripperProvided() {
+    assertProccessorWithAliasAvailable(SingleLineCommentStripperProcessor.class, SingleLineCommentStripperProcessor.ALIAS);
+  }
+
+  private void assertProccessorWithAliasAvailable(final Class<?> processorClass, final String alias) {
     final Map<String, ResourceProcessor> map = victim.providePreProcessors();
-    final Class<?> actual = map.get(LessCssImportPreProcessor.ALIAS).getClass();
-    assertEquals(LessCssImportPreProcessor.class, actual);
+    final Class<?> actual = map.get(alias).getClass();
+    assertEquals(processorClass, actual);
   }
 }
