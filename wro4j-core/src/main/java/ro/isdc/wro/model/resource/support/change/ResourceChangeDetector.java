@@ -14,7 +14,10 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
+
 /**
+ * Responsbile for keeping details about resources contents and identify the change of any resource in time.
+ *
  * @author Alex Objelean
  * @since 1.6.0
  * @created 14 Oct 2012
@@ -52,8 +55,11 @@ public class ResourceChangeDetector {
 
   /**
    * Check if an uri from a particular group has changed.
-   * @param uri the uri to check for change.
-   * @param groupName the name of the group where the uri belongs to.
+   *
+   * @param uri
+   *          the uri to check for change.
+   * @param groupName
+   *          the name of the group where the uri belongs to.
    * @return true if the change is detected for the provided uri.
    */
   public boolean checkChangeForGroup(final String uri, final String groupName) throws IOException {

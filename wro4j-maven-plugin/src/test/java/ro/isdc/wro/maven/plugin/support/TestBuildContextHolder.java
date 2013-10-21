@@ -123,4 +123,16 @@ public class TestBuildContextHolder {
     victim.setValue(KEY, VALUE);
     assertEquals(VALUE, victim.getValue(KEY));
   }
+
+  @Test
+  public void shouldRemoveWhenNullValueProvided() {
+    victim.setValue(KEY, null);
+    assertNull(victim.getValue(KEY));
+  }
+
+  @Test
+  public void shouldNotStoreValueAssociatedWithNullKey() {
+    victim.setValue(null, VALUE);
+    assertNull(victim.getValue(null));
+  }
 }

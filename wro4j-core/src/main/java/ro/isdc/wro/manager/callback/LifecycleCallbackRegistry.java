@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -36,7 +38,9 @@ public class LifecycleCallbackRegistry
 
   /**
    * Register a callback using a factory responsible for callback instantiation.
-   * @param callbackFactory the factory used to instantiate callbacks.
+   *
+   * @param callbackFactory
+   *          the factory used to instantiate callbacks.
    */
   public void registerCallback(final ObjectFactory<LifecycleCallback> callbackFactory) {
     callbackFactoryList.add(callbackFactory);
@@ -64,14 +68,13 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onBeforeModelCreated() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onBeforeModelCreated();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onBeforeModelCreated", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onBeforeModelCreated();
+        return null;
       }
-    }
+    });
   }
 
 
@@ -79,14 +82,13 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onAfterModelCreated() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onAfterModelCreated();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onAfterModelCreated", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onAfterModelCreated();
+        return null;
       }
-    }
+    });
   }
 
 
@@ -94,14 +96,13 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onBeforePreProcess() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onBeforePreProcess();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onBeforePreProcess", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onBeforePreProcess();
+        return null;
       }
-    }
+    });
   }
 
 
@@ -109,14 +110,13 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onAfterPreProcess() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onAfterPreProcess();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onAfterPreProcess", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onAfterPreProcess();
+        return null;
       }
-    }
+    });
   }
 
 
@@ -124,13 +124,13 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onBeforePostProcess() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onBeforePostProcess();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onBeforePostProcess", e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onBeforePostProcess();
+        return null;
       }
-    }
+    });
   }
 
 
@@ -138,50 +138,68 @@ public class LifecycleCallbackRegistry
    * {@inheritDoc}
    */
   public void onAfterPostProcess() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onAfterPostProcess();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onAfterPostProcess", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onAfterPostProcess();
+        return null;
       }
-    }
+    });
   }
 
   /**
    * {@inheritDoc}
    */
   public void onBeforeMerge() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onBeforeMerge();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onBeforeMerge", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onBeforeMerge();
+        return null;
       }
-    }
+    });
   }
 
   public void onAfterMerge() {
-    for (final LifecycleCallback callback : getCallbacks()) {
-      try {
-        callback.onAfterMerge();
-      } catch (final Exception e) {
-        LOG.error("Problem invoking onAfterMerge", e);
-        onException(e);
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onAfterMerge();
+        return null;
       }
-    }
+    });
   }
 
   /**
    * {@inheritDoc}
    */
   public void onProcessingComplete() {
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onProcessingComplete();
+        return null;
+      }
+    });
+  }
+
+
+  public void onResourceChanged(final Resource resource) {
+    forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      public Void apply(final LifecycleCallback input)
+          throws Exception {
+        input.onResourceChanged(resource);
+        return null;
+      }
+    });
+  }
+
+  private void forEachCallbackDo(final Function<LifecycleCallback, Void> func) {
     for (final LifecycleCallback callback : getCallbacks()) {
       try {
-        callback.onProcessingComplete();
+        func.apply(callback);
       } catch (final Exception e) {
-        LOG.error("Problem invoking onProcessingComplete", e);
+        LOG.error("Problem invoking callback", e);
         onException(e);
       } finally {
         map.remove(Context.getCorrelationId());

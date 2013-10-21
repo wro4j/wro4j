@@ -65,8 +65,8 @@ public class GroupsProcessor {
   public String process(final CacheKey cacheKey) {
     Validate.notNull(cacheKey);
     try {
-      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(), cacheKey
-          .getGroupName(), cacheKey.getType());
+      LOG.debug("Starting processing group [{}] of type [{}] with minimized flag: " + cacheKey.isMinimize(),
+          cacheKey.getGroupName(), cacheKey.getType());
       // find processed result for a group
       final WroModel model = modelFactory.create();
       final Group group = new WroModelInspector(model).getGroupByName(cacheKey.getGroupName());
@@ -137,7 +137,7 @@ public class GroupsProcessor {
     injector.inject(decorated);
     return decorated;
   }
-  
+
   /**
    * @VisibleForTesting
    */
