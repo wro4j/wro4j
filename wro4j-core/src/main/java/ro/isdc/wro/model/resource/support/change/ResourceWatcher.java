@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
@@ -48,6 +49,8 @@ public class ResourceWatcher {
   private ResourceLocatorFactory locatorFactory;
   @Inject
   private Injector injector;
+  @Inject
+  private LifecycleCallbackRegistry lifecycleCallback;
   private ResourceChangeDetector changeDetector;
 
   /**
@@ -105,6 +108,7 @@ public class ResourceWatcher {
    * @VisibleForTesting
    */
   void onResourceChanged(final Resource resource) {
+    lifecycleCallback.onResourceChanged(resource);
   }
 
   /**

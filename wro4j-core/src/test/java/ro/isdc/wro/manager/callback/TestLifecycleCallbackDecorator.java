@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.util.ObjectFactory;
 
 
@@ -35,6 +36,7 @@ public class TestLifecycleCallbackDecorator {
 
   @Test
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
+    final Resource changedResource = Resource.create("test.js");
     final LifecycleCallback callback = Mockito.spy(new PerformanceLoggerCallback());
     decorator = new LifecycleCallbackDecorator(callback);
 
@@ -54,6 +56,7 @@ public class TestLifecycleCallbackDecorator {
     registry.onBeforeMerge();
     registry.onAfterMerge();
     registry.onProcessingComplete();
+    registry.onResourceChanged(changedResource);
 
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
@@ -64,5 +67,6 @@ public class TestLifecycleCallbackDecorator {
     Mockito.verify(callback).onBeforeMerge();
     Mockito.verify(callback).onAfterMerge();
     Mockito.verify(callback).onProcessingComplete();
+    Mockito.verify(callback).onResourceChanged(Mockito.eq(changedResource));
   }
 }

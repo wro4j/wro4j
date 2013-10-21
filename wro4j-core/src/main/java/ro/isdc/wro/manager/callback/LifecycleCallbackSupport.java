@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.callback;
 
+import ro.isdc.wro.model.resource.Resource;
+
 /**
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
  *
@@ -70,5 +72,11 @@ public class LifecycleCallbackSupport
    * {@inheritDoc}
    */
   public void onDestroy() {
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onResourceChanged(final Resource resource) {
   }
 }
