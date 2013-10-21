@@ -52,6 +52,7 @@ public class TestLifecycleCallbackRegistry {
   @Test
   public void shouldInvokeRegisteredCallbacks() {
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
+    final Resource changedResource = Resource.create("test.js");
     registry.registerCallback(factoryFor(callback));
 
     registry.onBeforeModelCreated();
@@ -80,6 +81,9 @@ public class TestLifecycleCallbackRegistry {
 
     registry.onProcessingComplete();
     Mockito.verify(callback).onProcessingComplete();
+
+    registry.onResourceChanged(changedResource);
+    Mockito.verify(callback).onResourceChanged(Mockito.eq(changedResource));
   }
 
   private ObjectFactory<LifecycleCallback> factoryFor(final LifecycleCallback callback) {
@@ -94,6 +98,7 @@ public class TestLifecycleCallbackRegistry {
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
     final LifecycleCallback simpleCallback = Mockito.spy(new LifecycleCallbackSupport());
+    final Resource changedResource = Resource.create("test.js");
 
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterModelCreated();
@@ -104,6 +109,7 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onProcessingComplete();
+    Mockito.doThrow(new IllegalStateException()).when(failingCallback).onResourceChanged(Mockito.any(Resource.class));
 
     registry.registerCallback(factoryFor(failingCallback));
     registry.registerCallback(factoryFor(simpleCallback));
@@ -117,6 +123,7 @@ public class TestLifecycleCallbackRegistry {
     registry.onBeforeMerge();
     registry.onAfterMerge();
     registry.onProcessingComplete();
+    registry.onResourceChanged(changedResource);
 
     Mockito.verify(simpleCallback).onBeforeModelCreated();
     Mockito.verify(simpleCallback).onAfterModelCreated();
@@ -127,6 +134,7 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(simpleCallback).onBeforeMerge();
     Mockito.verify(simpleCallback).onAfterMerge();
     Mockito.verify(simpleCallback).onProcessingComplete();
+    Mockito.verify(simpleCallback).onResourceChanged(Mockito.eq(changedResource));
   }
 
   /**
