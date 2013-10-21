@@ -226,7 +226,7 @@ public class TestResourceWatcher {
   }
 
   @Test
-  public void shouldInvokeCallbackWhenChangeIsDetected() {
+  public void shouldInvokeCallbackWhenChangeIsDetected() throws Exception {
     final CallbackRegistryHolder callbackRegistryHolder = new CallbackRegistryHolder();
     victim = new ResourceWatcher();
     final AtomicBoolean flag = new AtomicBoolean();
