@@ -116,6 +116,22 @@ public class Wro4jCommandLineRunner {
   }
 
   /**
+   * @return the context folder used by runner.
+   * @VisibleForTesting
+   */
+  protected File getContextFolder() {
+    return contextFolder;
+  }
+
+  /**
+   * @return the destination folder where the result will be written.
+   * @VisibleForTesting
+   */
+  protected File getDestinationFolder() {
+    return contextFolder;
+  }
+
+  /**
    * @param args
    */
   protected void doMain(final String[] args) {
@@ -292,11 +308,11 @@ public class Wro4jCommandLineRunner {
    */
   private String computeAggregatedFolderPath() {
     Validate.notNull(destinationFolder, "DestinationFolder cannot be null!");
-    Validate.notNull(contextFolder, "ContextFolder cannot be null!");
+    Validate.notNull(getContextFolder(), "ContextFolder cannot be null!");
     final File cssTargetFolder = destinationFolder;
     File rootFolder = null;
-    if (cssTargetFolder.getPath().startsWith(contextFolder.getPath())) {
-      rootFolder = contextFolder;
+    if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
+      rootFolder = getContextFolder();
     }
     // compute aggregatedFolderPath
     String aggregatedFolderPath = null;
@@ -374,7 +390,7 @@ public class Wro4jCommandLineRunner {
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFoldersAsCSV(contextFolder.getPath());
+    runContext.setContextFoldersAsCSV(getContextFolder().getPath());
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
     runContext.setIgnoreMissingResourcesAsString(Boolean.toString(ignoreMissingResources));

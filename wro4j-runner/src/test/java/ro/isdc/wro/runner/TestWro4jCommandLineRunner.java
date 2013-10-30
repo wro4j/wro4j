@@ -245,8 +245,41 @@ public class TestWro4jCommandLineRunner {
   }
 
   @Test
-  public void shouldConfigureProcessorInWroProperties() {
+  public void shouldConfigureProcessorInWroProperties()
+      throws Exception {
+    final String[] args = String.format("-m --wroFile %s --contextFolder %s ", new Object[] {
+      getValidWroFile(), getValidContextFolder()
+    }).split(" ");
+    final File wroFile = null;
+    final File contextFolder = null;
+    final File wroConfigurationFile = null;
+    new Wro4jCommandLineRunner() {
+      {
+        {
+          setDestinationFolder(destinationFolder);
+        }
+      }
 
+      @Override
+      protected File getContextFolder() {
+        return contextFolder;
+      };
+
+      @Override
+      protected File newWroConfigurationFile() throws IOException {
+        return wroConfigurationFile;
+      }
+
+      @Override
+      protected File newDefaultWroFile() {
+        return wroFile;
+      };
+
+      @Override
+      protected void onRunnerException(final Exception e) {
+        throw WroRuntimeException.wrap(e);
+      }
+    }.doMain(args);
   }
 
   @Test
