@@ -35,6 +35,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-stdlib</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>me.n4u.sass</groupId>
             <artifactId>sass-gems</artifactId>
             <scope>provided</scope>
