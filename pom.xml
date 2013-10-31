@@ -203,11 +203,16 @@
                 <artifactId>dojo-shrinksafe</artifactId>
                 <version>1.7.2</version>
             </dependency>
-            <dependency>
-                <groupId>org.jruby</groupId>
-                <artifactId>jruby-core</artifactId>
-                <version>1.7.4</version>
-            </dependency>
+          <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-core</artifactId>
+            <version>1.7.6</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-stdlib</artifactId>
+            <version>1.7.6</version>
+          </dependency>
             <dependency>
                 <groupId>nz.co.edmi</groupId>
                 <artifactId>bourbon-gem-jar</artifactId>
@@ -433,4 +438,12 @@
             </modules>
         </profile>
     </profiles>
+  <repositories>
+    <repository>
+      <id>mvnReposistory</id>
+      <name>mvnReposistory</name>
+      <url>http://mvnrepository.com/</url>
+    </repository>
+  </repositories>
+
 </project>
