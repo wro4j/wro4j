@@ -355,7 +355,7 @@ public class WroTestUtils {
             public void process(final Reader reader, final Writer writer)
                 throws IOException {
               // ResourceType doesn't matter here
-              ResourceType resourceType = ResourceType.JS;
+              ResourceType resourceType = ResourceType.CSS;
               try {
                 resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
               } catch (final IllegalArgumentException e) {
