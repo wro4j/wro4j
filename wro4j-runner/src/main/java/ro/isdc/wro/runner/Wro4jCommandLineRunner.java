@@ -84,7 +84,7 @@ public class Wro4jCommandLineRunner {
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
   private final File wroFile = defaultWroFile;
-  @Option(name = "--wroConfigurationFile", metaVar = "PATH_TO_WRO_PROPERTIES", usage = "The path to the wro.properties file. By default the model is searched inse the user current folder.")
+  @Option(name = "--wroConfigurationFile", metaVar = "PATH_TO_WRO_PROPERTIES", usage = "The path to the wro.properties file. By default the configuration file is searched inse the user current folder.")
   private final File wroConfigurationFile = newWroConfigurationFile();
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
