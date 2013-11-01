@@ -37,8 +37,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -48,13 +46,15 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.processor.ResourceProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.runner.processor.RunnerCssLintProcessor;
+import ro.isdc.wro.runner.processor.RunnerJsHintProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -84,7 +84,7 @@ public class Wro4jCommandLineRunner {
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
   private final File wroFile = defaultWroFile;
-  @Option(name = "--wroConfigurationFile", metaVar = "PATH_TO_WRO_PROPERTIES", usage = "The path to the wro.properties file. By default the model is searched inse the user current folder.")
+  @Option(name = "--wroConfigurationFile", metaVar = "PATH_TO_WRO_PROPERTIES", usage = "The path to the wro.properties file. By default the configuration file is searched inse the user current folder.")
   private final File wroConfigurationFile = newWroConfigurationFile();
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
@@ -112,9 +112,9 @@ public class Wro4jCommandLineRunner {
     return new File(userDirectory, "wro.xml");
   }
 
-
   /**
-   * @return the location where wro configuration file is located by default. Default implementation uses current user directory.
+   * @return the location where wro configuration file is located by default. Default implementation uses current user
+   *         directory.
    * @VisibleForTesting
    */
   protected File newWroConfigurationFile() {
@@ -282,7 +282,7 @@ public class Wro4jCommandLineRunner {
       throws IOException {
     final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(getWroConfigurationProperties());
     final WroConfiguration config = factory.create();
-    //keep backward compatibility configuration of some config properties
+    // keep backward compatibility configuration of some config properties
     config.setParallelPreprocessing(parallelPreprocessing);
     return config;
   }
@@ -318,11 +318,11 @@ public class Wro4jCommandLineRunner {
    */
   private String computeAggregatedFolderPath() {
     Validate.notNull(destinationFolder, "DestinationFolder cannot be null!");
-    Validate.notNull(contextFolder, "ContextFolder cannot be null!");
+    Validate.notNull(getContextFolder(), "ContextFolder cannot be null!");
     final File cssTargetFolder = destinationFolder;
     File rootFolder = null;
-    if (cssTargetFolder.getPath().startsWith(contextFolder.getPath())) {
-      rootFolder = contextFolder;
+    if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
+      rootFolder = getContextFolder();
     }
     // compute aggregatedFolderPath
     String aggregatedFolderPath = null;
@@ -357,7 +357,7 @@ public class Wro4jCommandLineRunner {
     managerFactory.setNamingStrategy(createNamingStrategy());
     managerFactory.setModelFactory(createWroModelFactory());
     managerFactory.initialize(createStandaloneContext());
-    //allow created manager to get injected immediately after creation
+    // allow created manager to get injected immediately after creation
     return managerFactory;
   }
 
@@ -385,8 +385,8 @@ public class Wro4jCommandLineRunner {
     }
     return new ConfigurableProcessorsFactory() {
       @Override
-      protected Map<String, ResourceProcessor> newPreProcessorsMap() {
-        final Map<String, ResourceProcessor> map = super.newPreProcessorsMap();
+      protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
+        final Map<String, ResourcePreProcessor> map = super.newPreProcessorsMap();
         // override csslint & jsHint aliases
         map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
         map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
@@ -394,8 +394,8 @@ public class Wro4jCommandLineRunner {
       }
 
       @Override
-      protected Map<String, ResourceProcessor> newPostProcessorsMap() {
-        final Map<String, ResourceProcessor> map = super.newPostProcessorsMap();
+      protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
+        final Map<String, ResourcePostProcessor> map = super.newPostProcessorsMap();
         // override csslint & jsHint aliases
         map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
         map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
@@ -424,30 +424,4 @@ public class Wro4jCommandLineRunner {
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
-
-  /**
-   * Linter classes with custom exception handling.
-   */
-  private class RunnerCssLintProcessor
-      extends CssLintProcessor {
-    @Override
-    protected void onCssLintException(final CssLintException e, final Resource resource) {
-      super.onCssLintException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
-  private class RunnerJsHintProcessor
-      extends JsHintProcessor {
-    @Override
-    protected void onLinterException(final LinterException e, final Resource resource) {
-      super.onLinterException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
 }
