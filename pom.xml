@@ -438,4 +438,12 @@
             </modules>
         </profile>
     </profiles>
+  <repositories>
+    <repository>
+      <id>mvnReposistory</id>
+      <name>mvnReposistory</name>
+      <url>http://mvnrepository.com/</url>
+    </repository>
+  </repositories>
+
 </project>
