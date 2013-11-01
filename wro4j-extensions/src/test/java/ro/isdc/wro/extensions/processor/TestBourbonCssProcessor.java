@@ -39,6 +39,12 @@ public class TestBourbonCssProcessor {
   
   /**
    * Ignore this test since it doesn't pass consistently because of some internal error of jruby.
+   * The error is that the paths used by the sass import directive are based on the current working dir.
+   * This test will pass when run from the wro4j-extensions module, but error if run from the parent (wro4j) project.
+   * It's impossible to change the current working dir from within a running JVM, and I cannot find a maven directive
+   * to make module rnu tests from their module dir, so no fix seems likely.
+   * They can however be run manually from and IDE if the working dir is correctly configured, so are still useful
+   * when making changes to the bourbon sass processor.
    */
   @Ignore
   @Test
