@@ -28,8 +28,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
@@ -43,7 +41,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
-  private static final Logger LOG = LoggerFactory.getLogger(WroUtil.class);
   /**
    * Empty line pattern.
    */
@@ -290,22 +287,6 @@ public final class WroUtil {
   }
 
   /**
-   * Wraps original exception into {@link WroRuntimeException} and throw it.
-   *
-   * @param e
-   *          the exception to wrap.
-   * @deprecated use {@link WroRuntimeException#wrap(Exception)}
-   */
-  @Deprecated
-  public static void wrapWithWroRuntimeException(final Exception e) {
-    LOG.error("Exception occured: " + e.getClass(), e.getCause());
-    if (e instanceof WroRuntimeException) {
-      throw (WroRuntimeException) e;
-    }
-    throw new WroRuntimeException(e.getMessage(), e);
-  }
-
-  /**
    * Load the regular expression stored in in regexp.properties resource file.
    *
    * @param key
@@ -391,5 +372,12 @@ public final class WroUtil {
   public static final String cleanImageUrl(final String imageUrl) {
     notNull(imageUrl);
     return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
+  }
+
+  /**
+   * @return current working directory
+   */
+  public static final File getWorkingDirectory() {
+    return new File(System.getProperty("user.dir"));
   }
 }

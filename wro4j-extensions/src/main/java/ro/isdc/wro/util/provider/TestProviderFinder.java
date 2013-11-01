@@ -13,6 +13,7 @@ import ro.isdc.wro.model.resource.processor.support.ProcessorProvider;
 import ro.isdc.wro.model.resource.support.hash.HashStrategyProvider;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 
+
 /**
  * @author Alex Objelean
  */
@@ -24,7 +25,6 @@ public class TestProviderFinder {
     victim = ProviderFinder.of(ConfigurableProvider.class);
     assertEquals(2, victim.find().size());
   }
-
 
   @Test
   public void shouldFindProcessorsProvider() {
@@ -55,7 +55,7 @@ public class TestProviderFinder {
     assertTrue(victim.find().isEmpty());
   }
 
-  @Test(expected=WroRuntimeException.class)
+  @Test(expected = WroRuntimeException.class)
   public void cannotFindAnyProviderWhenLookupFails() {
     victim = new ProviderFinder<ProcessorProvider>(ProcessorProvider.class) {
       @Override
