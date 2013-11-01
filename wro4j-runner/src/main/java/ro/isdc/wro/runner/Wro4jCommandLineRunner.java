@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.runner;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,8 +37,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.model.factory.SmartWroModelFactory;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
-import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
-import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -46,12 +46,15 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
-import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
+import ro.isdc.wro.runner.processor.RunnerCssLintProcessor;
+import ro.isdc.wro.runner.processor.RunnerJsHintProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -92,7 +95,7 @@ public class Wro4jCommandLineRunner {
   @Option(name = "--postProcessors", metaVar = "POST_PROCESSOR", usage = "Comma separated list of post-processors")
   private String postProcessorsList;
 
-
+  private Properties wroConfigurationAsProperties;
 
   public static void main(final String[] args)
       throws Exception {
@@ -107,13 +110,30 @@ public class Wro4jCommandLineRunner {
     return new File(userDirectory, "wro.xml");
   }
 
-
   /**
-   * @return the location where wro configuration file is located by default. Default implementation uses current user directory.
+   * @return the location where wro configuration file is located by default. Default implementation uses current user
+   *         directory.
    * @VisibleForTesting
    */
-  protected File newWroConfigurationFile() throws IOException {
+  protected File newWroConfigurationFile()
+      throws IOException {
     return new File(userDirectory, "wro.properties");
+  }
+
+  /**
+   * @return the context folder used by runner.
+   * @VisibleForTesting
+   */
+  protected File getContextFolder() {
+    return contextFolder;
+  }
+
+  /**
+   * @return the destination folder where the result will be written.
+   * @VisibleForTesting
+   */
+  protected File getDestinationFolder() {
+    return contextFolder;
   }
 
   /**
@@ -130,6 +150,7 @@ public class Wro4jCommandLineRunner {
       LOG.debug("Options: {}", this);
       process();
     } catch (final Exception e) {
+      e.printStackTrace();
       System.err.println(e.getMessage() + "\n\n");
       System.err.println("=======================================");
       System.err.println("USAGE");
@@ -173,7 +194,8 @@ public class Wro4jCommandLineRunner {
   /**
    * @return a list containing all groups needs to be processed.
    */
-  private List<String> getTargetGroupsAsList() {
+  private List<String> getTargetGroupsAsList()
+      throws IOException {
     if (targetGroups == null) {
       final WroModel model = getManagerFactory().create().getModelFactory().create();
       return new WroModelInspector(model).getGroupNames();
@@ -245,6 +267,7 @@ public class Wro4jCommandLineRunner {
 
   /**
    * Perform actual processing by delegating the process call to {@link WroManager}.
+   *
    * @throws IOException
    * @VisibleForTesting
    */
@@ -258,7 +281,7 @@ public class Wro4jCommandLineRunner {
       throws IOException {
     final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(getWroConfigurationProperties());
     final WroConfiguration config = factory.create();
-    //keep backward compatibility configuration of some config properties
+    // keep backward compatibility configuration of some config properties
     config.setParallelPreprocessing(parallelPreprocessing);
     return config;
   }
@@ -272,20 +295,22 @@ public class Wro4jCommandLineRunner {
    */
   private Properties getWroConfigurationProperties()
       throws IOException {
-    try {
-      final Properties props = new Properties();
-      final File configFile = newWroConfigurationFile();
-      if (configFile.exists()) {
-        LOG.debug("Using {} to load WroConfiguration.", configFile.getPath());
-        props.load(new FileInputStream(configFile));
-      } else {
-        LOG.warn("{} does not exist. Using default configuration.", configFile.getPath());
+    if (wroConfigurationAsProperties == null) {
+      try {
+        wroConfigurationAsProperties = new Properties();
+        final File configFile = newWroConfigurationFile();
+        if (configFile != null && configFile.exists()) {
+          LOG.debug("Using {} to load WroConfiguration.", configFile.getPath());
+          wroConfigurationAsProperties.load(new FileInputStream(configFile));
+        } else {
+          LOG.warn("Configuration file: '{}' does not exist. Using default configuration.", configFile);
+        }
+      } catch (final IOException e) {
+        LOG.error("Problem while loading WroConfiguration", e);
+        throw e;
       }
-      return props;
-    } catch (final IOException e) {
-      LOG.error("Problem while loading WroConfiguration", e);
-      throw e;
     }
+    return wroConfigurationAsProperties;
   }
 
   /**
@@ -293,11 +318,11 @@ public class Wro4jCommandLineRunner {
    */
   private String computeAggregatedFolderPath() {
     Validate.notNull(destinationFolder, "DestinationFolder cannot be null!");
-    Validate.notNull(contextFolder, "ContextFolder cannot be null!");
+    Validate.notNull(getContextFolder(), "ContextFolder cannot be null!");
     final File cssTargetFolder = destinationFolder;
     File rootFolder = null;
-    if (cssTargetFolder.getPath().startsWith(contextFolder.getPath())) {
-      rootFolder = contextFolder;
+    if (cssTargetFolder.getPath().startsWith(getContextFolder().getPath())) {
+      rootFolder = getContextFolder();
     }
     // compute aggregatedFolderPath
     String aggregatedFolderPath = null;
@@ -323,26 +348,35 @@ public class Wro4jCommandLineRunner {
   }
 
   /**
-   * This method will ensure that you have a right and initialized instance of
-   * {@link StandaloneContextAware}.
+   * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}.
    */
-  private WroManagerFactory getManagerFactory() {
+  private WroManagerFactory getManagerFactory()
+      throws IOException {
     final DefaultStandaloneContextAwareManagerFactory managerFactory = new DefaultStandaloneContextAwareManagerFactory();
     managerFactory.setProcessorsFactory(createProcessorsFactory());
+    managerFactory.setNamingStrategy(createNamingStrategy());
     managerFactory.setModelFactory(createWroModelFactory());
     managerFactory.initialize(createStandaloneContext());
-    //allow created manager to get injected immediately after creation
+    // allow created manager to get injected immediately after creation
     return managerFactory;
+  }
+
+  private NamingStrategy createNamingStrategy() throws IOException {
+    final ConfigurableNamingStrategy namingStrategy = new ConfigurableNamingStrategy();
+    namingStrategy.setProperties(getWroConfigurationProperties());
+    return namingStrategy;
   }
 
   private WroModelFactory createWroModelFactory() {
     // autodetect if user didn't specify explicitly the wro file path (aka default is used).
+    notNull(defaultWroFile, "default wroFile cannot be null!");
     final boolean autoDetectWroFile = defaultWroFile.getPath().equals(wroFile.getPath());
     return new SmartWroModelFactory().setWroFile(wroFile).setAutoDetectWroFile(autoDetectWroFile);
   }
 
-  private ProcessorsFactory createProcessorsFactory() {
-    final Properties props = new Properties();
+  private ProcessorsFactory createProcessorsFactory()
+      throws IOException {
+    final Properties props = getWroConfigurationProperties();
     if (preProcessorsList != null) {
       props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, preProcessorsList);
     }
@@ -375,7 +409,7 @@ public class Wro4jCommandLineRunner {
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFoldersAsCSV(contextFolder.getPath());
+    runContext.setContextFoldersAsCSV(getContextFolder().getPath());
     runContext.setMinimize(minimize);
     runContext.setWroFile(wroFile);
     runContext.setIgnoreMissingResourcesAsString(Boolean.toString(ignoreMissingResources));
@@ -390,30 +424,4 @@ public class Wro4jCommandLineRunner {
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
   }
-
-  /**
-   * Linter classes with custom exception handling.
-   */
-  private class RunnerCssLintProcessor
-      extends CssLintProcessor {
-    @Override
-    protected void onCssLintException(final CssLintException e, final Resource resource) {
-      super.onCssLintException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
-  private class RunnerJsHintProcessor
-      extends JsHintProcessor {
-    @Override
-    protected void onLinterException(final LinterException e, final Resource resource) {
-      super.onLinterException(e, resource);
-      System.err.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
-      System.err.println(e.getErrors());
-      onRunnerException(e);
-    }
-  }
-
 }
