@@ -84,6 +84,8 @@ public class Wro4jCommandLineRunner {
   private boolean ignoreMissingResources;
   @Option(name = "--wroFile", metaVar = "PATH_TO_WRO_XML", usage = "The path to the wro model file. By default the model is searched inse the user current folder.")
   private final File wroFile = defaultWroFile;
+  @Option(name = "--wroConfigurationFile", metaVar = "PATH_TO_WRO_PROPERTIES", usage = "The path to the wro.properties file. By default the model is searched inse the user current folder.")
+  private final File wroConfigurationFile = newWroConfigurationFile();
   @Option(name = "--contextFolder", metaVar = "PATH", usage = "Folder used as a root of the context relative resources. By default this is the user current folder.")
   private final File contextFolder = new File(System.getProperty("user.dir"));
   @Option(name = "--destinationFolder", metaVar = "PATH", usage = "Where to store the processed result. By default uses the folder named [wro].")
@@ -115,8 +117,7 @@ public class Wro4jCommandLineRunner {
    *         directory.
    * @VisibleForTesting
    */
-  protected File newWroConfigurationFile()
-      throws IOException {
+  protected File newWroConfigurationFile() {
     return new File(userDirectory, "wro.properties");
   }
 
@@ -298,12 +299,11 @@ public class Wro4jCommandLineRunner {
     if (wroConfigurationAsProperties == null) {
       try {
         wroConfigurationAsProperties = new Properties();
-        final File configFile = newWroConfigurationFile();
-        if (configFile != null && configFile.exists()) {
-          LOG.debug("Using {} to load WroConfiguration.", configFile.getPath());
-          wroConfigurationAsProperties.load(new FileInputStream(configFile));
+        if (wroConfigurationFile != null && wroConfigurationFile.exists()) {
+          LOG.debug("Using {} to load WroConfiguration.", wroConfigurationFile.getPath());
+          wroConfigurationAsProperties.load(new FileInputStream(wroConfigurationFile));
         } else {
-          LOG.warn("Configuration file: '{}' does not exist. Using default configuration.", configFile);
+          LOG.warn("Configuration file: '{}' does not exist. Using default configuration.", wroConfigurationFile);
         }
       } catch (final IOException e) {
         LOG.error("Problem while loading WroConfiguration", e);

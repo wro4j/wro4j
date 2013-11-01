@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.kohsuke.args4j.CmdLineException;
@@ -118,11 +119,10 @@ public class TestWro4jCommandLineRunner {
       throws Exception {
     final String contextFolder = new File(getClass().getResource("").getFile()).getAbsolutePath();
 
-    final String processorsList = AbstractConfigurableMultipleStrategy
-        .createItemsAsString(CssUrlRewritingProcessor.ALIAS);
+    final String processorsList = AbstractConfigurableMultipleStrategy.createItemsAsString(CssUrlRewritingProcessor.ALIAS);
     final String[] args = String.format("--wroFile %s --contextFolder %s -m --preProcessors " + processorsList,
         new Object[] {
-        getValidWroFile(), contextFolder
+          getValidWroFile(), contextFolder
         }).split(" ");
     invokeRunner(args);
   }
@@ -145,7 +145,7 @@ public class TestWro4jCommandLineRunner {
         JSMinProcessor.ALIAS, CssVariablesProcessor.ALIAS);
     final String[] args = String.format(
         "--wroFile %s --contextFolder %s --destinationFolder %s -m %s " + processorsList, new Object[] {
-            getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath(), processorsType
+          getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath(), processorsType
         }).split(" ");
     invokeRunner(args);
   }
@@ -155,7 +155,7 @@ public class TestWro4jCommandLineRunner {
       throws Exception {
     final String[] args = String.format(
         "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + CssLintProcessor.ALIAS, new Object[] {
-            getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
+          getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
         }).split(" ");
     invokeRunner(args);
   }
@@ -176,7 +176,7 @@ public class TestWro4jCommandLineRunner {
       throws Exception {
     final String[] args = String.format(
         "--wroFile %s --contextFolder %s --destinationFolder %s -m -c " + JsHintProcessor.ALIAS, new Object[] {
-            getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
+          getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
         }).split(" ");
     invokeRunner(args);
   }
@@ -185,7 +185,7 @@ public class TestWro4jCommandLineRunner {
   public void shouldProcessTestWroXml()
       throws Exception {
     final String[] args = String.format("-m --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
-        getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
+      getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
     }).split(" ");
     invokeRunner(args);
   }
@@ -233,8 +233,7 @@ public class TestWro4jCommandLineRunner {
     final WroConfiguration expected = new WroConfiguration();
     new Wro4jCommandLineRunner() {
       @Override
-      protected File newWroConfigurationFile()
-          throws IOException {
+      protected File newWroConfigurationFile() {
         return new File("/path/to/invalid/file");
       }
 
@@ -247,6 +246,29 @@ public class TestWro4jCommandLineRunner {
     }.doMain(createValidArguments());
   }
 
+  @Test
+  public void shouldLoadWroConfigurationFromCustomLocation()
+      throws Exception {
+    final File wroConfigurationFile = WroUtil.createTempFile();
+    try {
+      final String[] args = String.format(
+          "-m --wroConfigurationFile %s --wroFile %s --contextFolder %s --destinationFolder %s", new Object[] {
+            wroConfigurationFile.getPath(), getValidWroFile(), getValidContextFolder(), destinationFolder.getAbsolutePath()
+          }).split(" ");
+      invokeRunner(args);
+      try {
+        final String preProcessorsConfig = String.format("%s=%s", ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
+            "invalid");
+        FileUtils.write(wroConfigurationFile, preProcessorsConfig);
+        invokeRunner(args);
+        Assert.fail("should have failed");
+      } catch (final WroRuntimeException e){
+      }
+    } finally {
+      FileUtils.deleteQuietly(wroConfigurationFile);
+    }
+  }
+
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenInvalidProcessorConfiguredInWroProperties()
       throws Exception {
@@ -255,7 +277,8 @@ public class TestWro4jCommandLineRunner {
     final File wroConfigurationFile = WroUtil.createTempFile();
 
     try {
-      final String preProcessorsConfig = String.format("%s=%s", ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "invalid");
+      final String preProcessorsConfig = String.format("%s=%s", ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
+          "invalid");
       FileUtils.write(wroConfigurationFile, preProcessorsConfig);
       executeRunner(wroFile, contextFolder, wroConfigurationFile);
     } finally {
@@ -327,7 +350,7 @@ public class TestWro4jCommandLineRunner {
       };
 
       @Override
-      protected File newWroConfigurationFile() throws IOException {
+      protected File newWroConfigurationFile() {
         return wroConfigurationFile;
       }
 
@@ -353,14 +376,17 @@ public class TestWro4jCommandLineRunner {
     try {
       new Wro4jCommandLineRunner() {
         @Override
-        protected File newWroConfigurationFile()
-            throws IOException {
-          final Properties props = new Properties();
-          props.setProperty(ConfigConstants.connectionTimeout.name(), "10000");
-          props.setProperty(ConfigConstants.disableCache.name(), "true");
-          props.setProperty(ConfigConstants.encoding.name(), "ISO-8859-1");
-          props.list(new PrintStream(new FileOutputStream(temp)));
-          return temp;
+        protected File newWroConfigurationFile() {
+          try {
+            final Properties props = new Properties();
+            props.setProperty(ConfigConstants.connectionTimeout.name(), "10000");
+            props.setProperty(ConfigConstants.disableCache.name(), "true");
+            props.setProperty(ConfigConstants.encoding.name(), "ISO-8859-1");
+            props.list(new PrintStream(new FileOutputStream(temp)));
+            return temp;
+          } catch (final IOException e) {
+            throw WroRuntimeException.wrap(e);
+          }
         }
 
         @Override
