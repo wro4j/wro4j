@@ -30,11 +30,14 @@ import ro.isdc.wro.extensions.processor.css.YUICssCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
+import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
+import ro.isdc.wro.model.resource.support.naming.ConfigurableNamingStrategy;
+import ro.isdc.wro.model.resource.support.naming.TimestampNamingStrategy;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -244,15 +247,73 @@ public class TestWro4jCommandLineRunner {
     }.doMain(createValidArguments());
   }
 
-  @Test
-  public void shouldConfigureProcessorInWroProperties()
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailWhenInvalidProcessorConfiguredInWroProperties()
       throws Exception {
-    final String[] args = String.format("-m --wroFile %s --contextFolder %s ", new Object[] {
-      getValidWroFile(), getValidContextFolder()
-    }).split(" ");
-    final File wroFile = null;
-    final File contextFolder = null;
-    final File wroConfigurationFile = null;
+    final File wroFile = new File(getValidWroFile());
+    final File contextFolder = new File(getValidContextFolder());
+    final File wroConfigurationFile = WroUtil.createTempFile();
+
+    try {
+      final String preProcessorsConfig = String.format("%s=%s", ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, "invalid");
+      FileUtils.write(wroConfigurationFile, preProcessorsConfig);
+      executeRunner(wroFile, contextFolder, wroConfigurationFile);
+    } finally {
+      FileUtils.deleteQuietly(wroConfigurationFile);
+    }
+  }
+
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailWhenInvalidNamingStrategyConfiguredInWroProperties()
+      throws Exception {
+    final File wroFile = new File(getValidWroFile());
+    final File contextFolder = new File(getValidContextFolder());
+    final File wroConfigurationFile = WroUtil.createTempFile();
+
+    try {
+      final String namingStrategyConfig = String.format("%s=%s", ConfigurableNamingStrategy.KEY, "invalid");
+      FileUtils.write(wroConfigurationFile, namingStrategyConfig);
+      executeRunner(wroFile, contextFolder, wroConfigurationFile);
+    } finally {
+      FileUtils.deleteQuietly(wroConfigurationFile);
+    }
+  }
+
+  @Test
+  public void shouldApplyNamingStrategyConfiguredInWroProperties()
+      throws Exception {
+    final File wroFile = new File(getValidWroFile());
+    final File contextFolder = new File(getValidContextFolder());
+    final File wroConfigurationFile = WroUtil.createTempFile();
+
+    try {
+      final String namingStrategyConfig = String.format("%s=%s", ConfigurableNamingStrategy.KEY,
+          TimestampNamingStrategy.ALIAS);
+      FileUtils.write(wroConfigurationFile, namingStrategyConfig);
+      executeRunner(wroFile, contextFolder, wroConfigurationFile);
+    } finally {
+      FileUtils.deleteQuietly(wroConfigurationFile);
+    }
+  }
+
+  @Test
+  public void shouldApplyProcessorConfiguredInWroProperties()
+      throws Exception {
+    final File wroFile = new File(getValidWroFile());
+    final File contextFolder = new File(getValidContextFolder());
+    final File wroConfigurationFile = WroUtil.createTempFile();
+
+    try {
+      final String preProcessorsConfig = String.format("%s=%s", ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS,
+          JSMinProcessor.ALIAS);
+      FileUtils.write(wroConfigurationFile, preProcessorsConfig);
+      executeRunner(wroFile, contextFolder, wroConfigurationFile);
+    } finally {
+      FileUtils.deleteQuietly(wroConfigurationFile);
+    }
+  }
+
+  private void executeRunner(final File wroFile, final File contextFolder, final File wroConfigurationFile) {
     new Wro4jCommandLineRunner() {
       {
         {
@@ -279,7 +340,7 @@ public class TestWro4jCommandLineRunner {
       protected void onRunnerException(final Exception e) {
         throw WroRuntimeException.wrap(e);
       }
-    }.doMain(args);
+    }.doMain(new String[] {});
   }
 
   @Test
