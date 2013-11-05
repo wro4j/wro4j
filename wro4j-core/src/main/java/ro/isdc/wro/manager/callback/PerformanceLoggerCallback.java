@@ -19,7 +19,6 @@ public class PerformanceLoggerCallback
     extends LifecycleCallbackSupport {
   private static final Logger LOG = LoggerFactory.getLogger(PerformanceLoggerCallback.class);
   private static final String SHORT_SUMMARY = "=====Performance Logger Statistics==============";
-  // TODO use ThreadLocal to store watch in order to be threadSafe.
   private StopWatch watch;
 
   /**
@@ -52,8 +51,7 @@ public class PerformanceLoggerCallback
 
   @Override
   public void onAfterModelCreated() {
-    //stopWatchIfRunning();
-    getWatch().stop();
+    stopWatchIfRunning();
   }
 
   @Override
@@ -63,15 +61,13 @@ public class PerformanceLoggerCallback
 
   @Override
   public void onAfterMerge() {
-    //stopWatchIfRunning();
-    getWatch().stop();
+    stopWatchIfRunning();
     getWatch().start("PostProcessing");
   }
 
   @Override
   public void onProcessingComplete() {
-    //stopWatchIfRunning();
-    getWatch().stop();
+    stopWatchIfRunning();
     if (getWatch().getTaskCount() > 0) {
       LOG.debug(getWatch().prettyPrint());
     }

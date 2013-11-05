@@ -22,11 +22,15 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.manager.callback.LifecycleCallback;
+import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
+import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
@@ -34,6 +38,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.AbstractUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -217,6 +222,33 @@ public class TestResourceWatcher {
     victim.check(cacheEntry2);
     assertFalse(groupChanged.get());
     assertFalse(resourceChanged.get());
+  }
+
+  private static class CallbackRegistryHolder {
+    @Inject
+    private LifecycleCallbackRegistry registry;
+  }
+
+  @Test
+  public void shouldInvokeCallbackWhenChangeIsDetected() throws Exception {
+    final CallbackRegistryHolder callbackRegistryHolder = new CallbackRegistryHolder();
+    victim = new ResourceWatcher();
+    final AtomicBoolean flag = new AtomicBoolean();
+    final Injector injector = createDefaultInjector();
+    injector.inject(victim);
+    injector.inject(callbackRegistryHolder);
+    callbackRegistryHolder.registry.registerCallback(new ObjectFactory<LifecycleCallback>() {
+      public LifecycleCallback create() {
+        return new LifecycleCallbackSupport() {
+          @Override
+          public void onResourceChanged(final Resource resource) {
+            flag.set(true);
+          }
+        };
+      }
+    });
+    victim.check(cacheEntry);
+    assertTrue(flag.get());
   }
 
   private Answer<InputStream> answerWithContent(final String content) {

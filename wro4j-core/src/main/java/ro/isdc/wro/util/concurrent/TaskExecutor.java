@@ -3,6 +3,7 @@ package ro.isdc.wro.util.concurrent;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -157,7 +158,14 @@ public class TaskExecutor<T> {
       final T result = getCompletionService().take().get();
       onResultAvailable(result);
     } catch (final Exception e) {
-      onException(e);
+      //propagate the most relevant exception
+      Exception rootException = e;
+      if (e instanceof ExecutionException) {
+        if (e.getCause() instanceof Exception) {
+          rootException = (Exception) e.getCause();
+        }
+      }
+      onException(rootException);
       LOG.error("Exception while consuming result", e);
     }
   }

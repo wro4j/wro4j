@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
+import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.util.WroTestUtils;
@@ -77,7 +78,6 @@ public class TestJsHintMojo
       shouldProcessMultipleGroups();
     }
   }
-
 
   @Test
   public void shouldProcessMultipleGroups()
@@ -192,7 +192,7 @@ public class TestJsHintMojo
     jsHintMojo.setFailFast(false);
     try {
       executeResourcesWithErrors();
-    } catch(final Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
       throw e;
     } finally {
@@ -227,6 +227,26 @@ public class TestJsHintMojo
       WroTestUtils.compare(getClass().getResourceAsStream("report/" + expectedFileName),
           new FileInputStream(reportFile));
       FileUtils.deleteQuietly(reportFile);
+    }
+  }
+
+  @Test(expected = LinterException.class)
+  public void shouldFailWhenThereAreLinterErrorsEvenWhenIncrementBuildIsEnabled()
+      throws Throwable {
+    getMojo().setParallelProcessing(true);
+    getMojo().setIncrementalBuildEnabled(true);
+    getMojo().setTargetGroups("invalidResources");
+    try {
+      getMojo().execute();
+    } catch (final MojoExecutionException e) {
+      assertTrue(e.getCause() instanceof LinterException);
+      try {
+        getMojo().execute();
+      } catch (final MojoExecutionException secondException) {
+        throw secondException.getCause();
+      }
+    } finally {
+      getMojo().clean();
     }
   }
 }

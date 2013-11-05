@@ -5,6 +5,8 @@ package ro.isdc.wro.manager.callback;
 
 import org.apache.commons.lang3.Validate;
 
+import ro.isdc.wro.model.resource.Resource;
+
 
 /**
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
@@ -83,5 +85,12 @@ public class LifecycleCallbackDecorator
    */
   public void onProcessingComplete() {
     decorated.onProcessingComplete();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void onResourceChanged(final Resource resource) {
+    decorated.onResourceChanged(resource);
   }
 }

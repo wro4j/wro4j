@@ -32,7 +32,7 @@ public class Wro4jRunMojoIT
     super.setUp();
     final File testPom = new File(getBasedir(), "/src/test/resources/unit/1/pom.xml");
     mojo = (Wro4jMojo) lookupMojo("run", testPom);
-    mojo.setIgnoreMissingResources(false);
+    mojo.setIgnoreMissingResources(Boolean.FALSE.toString());
     mojo.setMinimize(true);
     mojo.setBuildDirectory(new File(getBasedir()));
   }
@@ -50,7 +50,7 @@ public class Wro4jRunMojoIT
     final URL url = getClass().getClassLoader().getResource("unit/1/src/main/webapp/WEB-INF/wro.xml");
     final File wroFile = new File(url.toURI());
     mojo.setWroFile(wroFile);
-    mojo.setContextFolder(wroFile.getParentFile().getParentFile());
+    mojo.setContextFolder(wroFile.getParentFile().getParentFile().getPath());
 
     mojo.execute();
     assertNotNull(mojo);

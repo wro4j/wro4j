@@ -28,8 +28,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
@@ -46,7 +44,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
-  private static final Logger LOG = LoggerFactory.getLogger(WroUtil.class);
   /**
    * Empty line pattern.
    */
@@ -362,13 +359,23 @@ public final class WroUtil {
   }
 
   /**
+   * @return a folder with unique name..
+   */
+  public static File createTempDirectory() {
+    final String fileName = String.format("wro4j-%s", UUID.randomUUID().toString());
+    final File file = new File(FileUtils.getTempDirectory(), fileName);
+    file.mkdir();
+    return file;
+  }
+
+  /**
    * Creates a temp file which has a certain extension.
    * @param extension of the created temp file.
    */
   public static File createTempFile(final String extension) {
     try {
       final String fileName = String.format("wro4j-%s.%s", UUID.randomUUID().toString(), extension);
-      final File file = new File(FileUtils.getTempDirectory(), fileName);
+      final File file = new File(createTempDirectory(), fileName);
       file.createNewFile();
       return file;
     } catch (final IOException e) {
@@ -386,5 +393,12 @@ public final class WroUtil {
   public static final String cleanImageUrl(final String imageUrl) {
     notNull(imageUrl);
     return imageUrl.replace('\'', ' ').replace('\"', ' ').trim();
+  }
+
+  /**
+   * @return current working directory
+   */
+  public static final File getWorkingDirectory() {
+    return new File(System.getProperty("user.dir"));
   }
 }

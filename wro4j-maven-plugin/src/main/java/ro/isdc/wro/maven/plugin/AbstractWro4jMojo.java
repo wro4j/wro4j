@@ -6,16 +6,11 @@ package ro.isdc.wro.maven.plugin;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,21 +26,12 @@ import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
-import ro.isdc.wro.maven.plugin.support.BuildContextHolder;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
+import ro.isdc.wro.maven.plugin.support.ResourceChangeHandler;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
-import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
-import ro.isdc.wro.model.resource.support.hash.HashStrategy;
-import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.concurrent.TaskExecutor;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -66,21 +52,32 @@ public abstract class AbstractWro4jMojo
    */
   private File wroFile;
   /**
-   * The folder where web application context resides useful for locating resources relative to servletContext .
+   * Allows clients to pass a build-time parameter to skip the plugin execution..
+   *
+   * @parameter default-value=false
+   * @optional
+   */
+  private boolean skip;
+  /**
+   * The folder where web application context resides useful for locating resources relative to servletContext. It is
+   * possible to provide multiple context folders using a CSV. When multiple contextFolders are provided, the
+   * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
+   * single context folder is configured.
    *
    * @parameter default-value="${basedir}/src/main/webapp/" expression="${contextFolder}"
+   * @optional
    */
-  private File contextFolder;
+  private String contextFolder;
   /**
    * @parameter default-value="true" expression="${minimize}"
    * @optional
    */
   private boolean minimize;
   /**
-   * @parameter default-value="true" expression="${ignoreMissingResources}"
+   * @parameter expression="${ignoreMissingResources}"
    * @optional
    */
-  private boolean ignoreMissingResources;
+  private String ignoreMissingResources;
   /**
    * Comma separated group names. This field is optional. If no value is provided, a file for each group will be
    * created.
@@ -125,10 +122,6 @@ public abstract class AbstractWro4jMojo
    */
   private File buildDirectory;
   /**
-   * Responsible for build storage persistence. Uses configured {@link BuildContext} as a primary storage object.
-   */
-  private BuildContextHolder buildContextHolder;
-  /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
    *
@@ -137,61 +130,69 @@ public abstract class AbstractWro4jMojo
    */
   private boolean parallelProcessing;
   /**
-   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be changed to true if no unexpected problems are detected..
+   * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be
+   * changed to true if no unexpected problems are detected..
    *
    * @parameter default-value="false" expression="${incrementalBuildEnabled}"
    * @optional
    */
   private boolean incrementalBuildEnabled;
   private TaskExecutor<Void> taskExecutor;
-
+  private ResourceChangeHandler resourceChangeHandler;
 
   /**
    * {@inheritDoc}
    */
   public final void execute()
       throws MojoExecutionException {
-    validate();
-    getLog().info("Executing the mojo: ");
-    getLog().info("Wro4j Model path: " + wroFile.getPath());
-    getLog().info("targetGroups: " + getTargetGroups());
-    getLog().info("minimize: " + isMinimize());
-    getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
-    getLog().info("parallelProcessing: " + isParallelProcessing());
-    getLog().debug("wroManagerFactory: " + wroManagerFactory);
-    getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
-    getLog().debug("extraConfig: " + extraConfigFile);
+    if (skip) {
+      getLog().info("Skipping execution.");
+    } else {
+      validate();
+      getLog().info(contextFolder);
+      getLog().info("Executing the mojo: ");
+      getLog().info("Wro4j Model path: " + wroFile.getPath());
+      getLog().info("targetGroups: " + getTargetGroups());
+      getLog().info("minimize: " + isMinimize());
+      getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
+      getLog().info("parallelProcessing: " + isParallelProcessing());
+      getLog().debug("wroManagerFactory: " + wroManagerFactory);
+      getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
+      getLog().debug("extraConfig: " + extraConfigFile);
 
-    extendPluginClasspath();
-    Context.set(Context.standaloneContext());
-    try {
-      onBeforeExecute();
-      doExecute();
-    } catch (final Exception e) {
-      getLog().error("Exception occured while executing maven plugin", e);
-      final String message = "Exception occured while processing: " + e.toString() + ", class: "
-          + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
-      getLog().error(message, e);
-      throw new MojoExecutionException(message, e);
-    } finally {
+      extendPluginClasspath();
+      Context.set(Context.standaloneContext());
       try {
-        onAfterExecute();
+        onBeforeExecute();
+        doExecute();
       } catch (final Exception e) {
-        throw new MojoExecutionException("Exception in onAfterExecute", e);
+        final String message = "Exception occured while processing: " + e.toString() + ", class: "
+            + e.getClass().getName() + ",caused by: " + (e.getCause() != null ? e.getCause().getClass().getName() : "");
+        getLog().error(message, e);
+        if (e instanceof WroRuntimeException) {
+          // Do not keep resources which cause the exception. This is helpful for linter processors.
+          final Resource resource = ((WroRuntimeException) e).getResource();
+          forgetResource(resource);
+        }
+        throw new MojoExecutionException(message, e);
+      } finally {
+        try {
+          onAfterExecute();
+        } catch (final Exception e) {
+          throw new MojoExecutionException("Exception in onAfterExecute", e);
+        }
       }
     }
   }
 
   /**
-   * Invoked before execution is performed.
+   * Safely invoke {@link ResourceChangeHandler#forget(Resource)}. The safety is required because invoking
+   * {@link #getResourceChangeHandler()} can throw an exception during initialization.
    */
-  protected void onBeforeExecute() {
-  }
-
-  /**
-   * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
-   */
-  protected void onAfterExecute() {
+  private void forgetResource(final Resource resource) {
+    if (resourceChangeHandler != null) {
+      resourceChangeHandler.forget(resource);
+    }
   }
 
   /**
@@ -199,10 +200,10 @@ public abstract class AbstractWro4jMojo
    */
   private StandaloneContext createStandaloneContext() {
     final StandaloneContext runContext = new StandaloneContext();
-    runContext.setContextFolder(getContextFolder());
+    runContext.setContextFoldersAsCSV(getContextFoldersAsCSV());
     runContext.setMinimize(isMinimize());
     runContext.setWroFile(getWroFile());
-    runContext.setIgnoreMissingResources(isIgnoreMissingResources());
+    runContext.setIgnoreMissingResourcesAsString(isIgnoreMissingResources());
     return runContext;
   }
 
@@ -277,7 +278,6 @@ public abstract class AbstractWro4jMojo
           wroManagerFactory.trim());
       managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
-      getLog().error("Cannot instantiate wroManagerFactoryClass", e);
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
     return managerFactory;
@@ -306,13 +306,6 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
-   * @return true if the only incremental changed group should be used as target groups for next processing.
-   */
-  protected boolean isIncrementalCheckRequired() {
-    return isIncrementalBuild();
-  }
-
-  /**
    * Store digest for all resources contained inside the list of provided groups.
    */
   private void persistResourceFingerprints(final List<String> groupNames) {
@@ -321,101 +314,10 @@ public abstract class AbstractWro4jMojo
       final Group group = modelInspector.getGroupByName(groupName);
       if (group != null) {
         for (final Resource resource : group.getResources()) {
-          persistResourceFingerprints(resource);
+          getResourceChangeHandler().remember(resource);
         }
       }
     }
-  }
-
-  private void persistResourceFingerprints(final Resource resource) {
-    final WroManager manager = getWroManager();
-    final HashStrategy hashStrategy = manager.getHashStrategy();
-    final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
-      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
-      if (resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
-        getLog().debug("Check @import directive from " + resource);
-        // persist fingerprints in imported resources.
-        persistFingerprintsForCssImports(resource, reader);
-      }
-    } catch (final IOException e) {
-      getLog().debug("could not check fingerprint of resource: " + resource);
-    }
-  }
-
-  /**
-   * Invokes the provided function for each detected css import.
-   *
-   * @param func
-   *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
-   *          css.
-   */
-  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
-      throws IOException {
-    final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
-      @Override
-      protected void onImportDetected(final String importedUri) {
-        getLog().debug("Found @import " + importedUri);
-        try {
-          func.apply(importedUri);
-        } catch (final Exception e) {
-          getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
-        }
-        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
-      }
-
-      @Override
-      protected String doTransform(final String cssContent, final List<Resource> foundImports)
-          throws IOException {
-        // no need to build the content, since we are interested in finding imported resources only
-        return "";
-      }
-
-      @Override
-      public String toString() {
-        return CssImportPreProcessor.class.getSimpleName();
-      }
-    };
-    final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
-      @Override
-      protected boolean isIgnoreFailingProcessor() {
-        return true;
-      }
-    };
-    InjectorBuilder.create(getManagerFactory()).build().inject(processor);
-    processor.process(resource, reader, new StringWriter());
-  }
-
-  private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
-      throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
-        persistResourceFingerprints(Resource.create(importedUri, ResourceType.CSS));
-        return null;
-      }
-    }, resource, reader);
-  }
-
-  private void detectChangeForCssImports(final Resource resource, final Reader reader,
-      final AtomicBoolean changeDetected)
-      throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
-        final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
-        getLog().debug("\tisImportChanged: " + isImportChanged);
-        if (isImportChanged) {
-          changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
-        }
-        return null;
-      }
-    }, resource, reader);
   }
 
   /**
@@ -429,7 +331,7 @@ public abstract class AbstractWro4jMojo
       if (isTargetGroup(group)) {
         for (final Resource resource : group.getResources()) {
           getLog().debug("checking delta for resource: " + resource);
-          if (isResourceChanged(resource)) {
+          if (getResourceChangeHandler().isResourceChanged(resource)) {
             getLog().debug("detected change for resource: " + resource + " and group: " + group.getName());
             changedGroupNames.add(group.getName());
             // no need to check rest of resources from this group
@@ -451,55 +353,6 @@ public abstract class AbstractWro4jMojo
     return targetGroups == null || targetGroups.contains(group.getName());
   }
 
-  private boolean isResourceChanged(final Resource resource) {
-    final WroManager manager = getWroManager();
-    final HashStrategy hashStrategy = manager.getHashStrategy();
-    final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-    final AtomicBoolean changeDetected = new AtomicBoolean(false);
-    try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      final String previousFingerprint = getBuildContextHolder().getValue(resource.getUri());
-      getLog().debug("fingerprint <current, prev>: <" + fingerprint + ", " + previousFingerprint + ">");
-
-      changeDetected.set(fingerprint != null && !fingerprint.equals(previousFingerprint));
-
-      if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
-        getLog().debug("Check @import directive from " + resource);
-        // detect changes in imported resources.
-        detectChangeForCssImports(resource, reader, changeDetected);
-      }
-      return changeDetected.get();
-    } catch (final IOException e) {
-      getLog().debug("failed to check for delta resource: " + resource);
-    }
-    return false;
-  }
-
-  /**
-   * @return true if the build was triggered by an incremental change.
-   */
-  protected final boolean isIncrementalBuild() {
-    return getBuildContextHolder().isIncrementalBuild();
-  }
-
-  private List<String> getAllModelGroupNames() {
-    return new WroModelInspector(getModel()).getGroupNames();
-  }
-
-  private WroModel getModel() {
-    return getWroManager().getModelFactory().create();
-  }
-
-  private WroManager getWroManager() {
-    try {
-      return getManagerFactory().create();
-    } catch (final Exception e) {
-      throw WroRuntimeException.wrap(e);
-    }
-  }
-
   /**
    * Checks if all required fields are configured.
    */
@@ -509,7 +362,7 @@ public abstract class AbstractWro4jMojo
       throw new MojoExecutionException("contextFolder was not set!");
     }
     if (contextFolder == null) {
-      throw new MojoExecutionException("contextFolder was not set!");
+      throw new MojoExecutionException("no contextFolder was set!");
     }
   }
 
@@ -557,20 +410,61 @@ public abstract class AbstractWro4jMojo
         @Override
         protected void onException(final Exception e) {
           // propagate exception
-          throw new RuntimeException(e);
+          throw WroRuntimeException.wrap(e);
         }
       };
     }
     return taskExecutor;
   }
 
-  private BuildContextHolder getBuildContextHolder() {
-    if (buildContextHolder == null) {
-      //new File(mavenProject.getBuild().getOutputDirectory())
-      buildContextHolder = new BuildContextHolder(buildContext, buildDirectory);
-      buildContextHolder.setIncrementalBuildEnabled(incrementalBuildEnabled);
+  /**
+   * @return true if the only incremental changed group should be used as target groups for next processing.
+   */
+  protected boolean isIncrementalCheckRequired() {
+    return isIncrementalBuild();
+  }
+
+  /**
+   * Invoked before execution is performed.
+   */
+  protected void onBeforeExecute() {
+  }
+
+  /**
+   * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
+   */
+  protected void onAfterExecute() {
+  }
+
+  /**
+   * @return true if the build was triggered by an incremental change.
+   */
+  protected final boolean isIncrementalBuild() {
+    return getResourceChangeHandler().isIncrementalBuild();
+  }
+
+  private List<String> getAllModelGroupNames() {
+    return new WroModelInspector(getModel()).getGroupNames();
+  }
+
+  private WroModel getModel() {
+    return getWroManager().getModelFactory().create();
+  }
+
+  private WroManager getWroManager() {
+    try {
+      return getManagerFactory().create();
+    } catch (final Exception e) {
+      throw WroRuntimeException.wrap(e);
     }
-    return buildContextHolder;
+  }
+
+  private ResourceChangeHandler getResourceChangeHandler() {
+    if (resourceChangeHandler == null) {
+      resourceChangeHandler = ResourceChangeHandler.create(getManagerFactory(), getLog()).setBuildContext(buildContext).setBuildDirectory(
+          buildDirectory).setIncrementalBuildEnabled(incrementalBuildEnabled);
+    }
+    return resourceChangeHandler;
   }
 
   @VisibleForTesting
@@ -583,7 +477,16 @@ public abstract class AbstractWro4jMojo
    *          the servletContextFolder to set
    * @VisibleForTesting
    */
-  void setContextFolder(final File contextFolder) {
+  String getContextFoldersAsCSV() {
+    return contextFolder;
+  }
+
+  /**
+   * @param contextFolders
+   *          a CSV representing contextFolders to use.
+   * @VisibleForTesting
+   */
+  void setContextFolder(final String contextFolder) {
     this.contextFolder = contextFolder;
   }
 
@@ -605,14 +508,6 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
-   * @return the contextFolder
-   * @VisibleForTesting
-   */
-  File getContextFolder() {
-    return this.contextFolder;
-  }
-
-  /**
    * @param minimize
    *          flag for minimization.
    * @VisibleForTesting
@@ -622,12 +517,16 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
-   * @param ignoreMissingResources
+   * @param ignoreMissingResourcesAsString
    *          the ignoreMissingResources to set
    * @VisibleForTesting
    */
+  void setIgnoreMissingResources(final String ignoreMissingResourcesAsString) {
+    this.ignoreMissingResources = ignoreMissingResourcesAsString;
+  }
+
   void setIgnoreMissingResources(final boolean ignoreMissingResources) {
-    this.ignoreMissingResources = ignoreMissingResources;
+    setIgnoreMissingResources(Boolean.toString(ignoreMissingResources));
   }
 
   /**
@@ -644,11 +543,10 @@ public abstract class AbstractWro4jMojo
     this.parallelProcessing = parallelProcessing;
   }
 
-
   /**
    * @VisibleForTesting
    */
-  final void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
+  void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
     this.incrementalBuildEnabled = incrementalBuildEnabled;
   }
 
@@ -664,7 +562,7 @@ public abstract class AbstractWro4jMojo
    * @return the ignoreMissingResources
    * @VisibleForTesting
    */
-  boolean isIgnoreMissingResources() {
+  String isIgnoreMissingResources() {
     return this.ignoreMissingResources;
   }
 
@@ -721,11 +619,23 @@ public abstract class AbstractWro4jMojo
   }
 
   /**
+   * @VisibleForTesting
+   */
+  void setSkip(final boolean skip) {
+    this.skip = skip;
+  }
+
+  /**
    * Removes any persisted data creating during the build.
    *
    * @VisibleForTesting
    */
   void clean() {
-    getBuildContextHolder().destroy();
+    try {
+      getResourceChangeHandler().destroy();
+    } catch (final Exception e) {
+      // do not propagate the error during cleanup
+      getLog().error("Failed to destroy resourceChangeHandler", e);
+    }
   }
 }

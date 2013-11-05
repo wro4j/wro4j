@@ -8,7 +8,7 @@
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>pom</packaging>
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
@@ -34,7 +34,7 @@
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
-      <tag>wro4j-parent-1.7.1</tag>
+      <tag>wro4j-parent-1.7.2</tag>
   </scm>
     <mailingLists>
         <mailingList>
@@ -191,7 +191,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.1.3</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -206,7 +206,12 @@
             <dependency>
                 <groupId>org.jruby</groupId>
                 <artifactId>jruby-core</artifactId>
-                <version>1.7.4</version>
+                <version>1.7.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jruby</groupId>
+                <artifactId>jruby-stdlib</artifactId>
+                <version>1.7.6</version>
             </dependency>
             <dependency>
                 <groupId>nz.co.edmi</groupId>
@@ -433,4 +438,5 @@
             </modules>
         </profile>
     </profiles>
+
 </project>
