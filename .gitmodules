@@ -6,4 +6,4 @@
 	url = https://github.com/wro4j/wro4j-grails-plugin.git
 [submodule "wro4j-runner"]
 	path = wro4j-runner
-	url = git@github.com:wro4j/wro4j-runner.git
+	url = https://github.com/wro4j/wro4j-runner.git
