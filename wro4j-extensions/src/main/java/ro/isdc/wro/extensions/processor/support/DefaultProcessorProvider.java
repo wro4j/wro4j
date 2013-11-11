@@ -25,6 +25,7 @@ import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.extensions.processor.js.NgMinPreProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
@@ -276,6 +277,12 @@ public class DefaultProcessorProvider
         return new EmberJsProcessor();
       }
     }));
+    map.put(NgMinPreProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new NgMinPreProcessor();
+        }
+      }));
     return map;
   }
 }
