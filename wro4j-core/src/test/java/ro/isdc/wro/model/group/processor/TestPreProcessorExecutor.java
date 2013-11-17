@@ -3,8 +3,10 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static ro.isdc.wro.util.WroTestUtils.compare;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDe
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -198,7 +201,7 @@ public class TestPreProcessorExecutor {
     initExecutor(createProcessorUsingMissingResource());
     final List<Resource> resources = createResources(Resource.create("/uri", ResourceType.JS));
     final String result = victim.processAndMerge(resources, true);
-    Assert.assertEquals("", result);
+    WroTestUtils.compare("", result);
   }
 
 
@@ -220,7 +223,7 @@ public class TestPreProcessorExecutor {
     initExecutor(createProcessorWhichFails());
     final List<Resource> resources = createResources(Resource.create("", ResourceType.JS));
     final String result = victim.processAndMerge(resources, true);
-    Assert.assertEquals("", result);
+    WroTestUtils.compare("", result);
 
   }
 
@@ -317,8 +320,38 @@ public class TestPreProcessorExecutor {
     resources.add(Resource.create("/resource.js"));
     victim.processAndMerge(resources, true);
   }
+  
+  /**
+   * @see https://code.google.com/p/wro4j/issues/detail?id=813
+   */
+  @Test
+  public void shouldNotCommentMergedContentWhenLastLineContainsComment() throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("var a=1;//comment", ResourceType.JS));
+    resources.add(Resource.create("a=2;", ResourceType.JS));
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(WroTestUtils.createResourceMockingLocator());
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory).setProcessorsFactory(
+        new SimpleProcessorsFactory());
+    InjectorBuilder.create(managerFactory).build().inject(victim);
 
+    final String result = victim.processAndMerge(resources, false);
+    compare("var a=1;//comment\na=2;\n", result);
+  }
 
+  @Test
+  public void shouldNotAddRedundantNewLinesAfterMerge() throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("1\n\n", ResourceType.JS));
+    resources.add(Resource.create("2", ResourceType.JS));
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(WroTestUtils.createResourceMockingLocator());
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory).setProcessorsFactory(
+        new SimpleProcessorsFactory());
+    InjectorBuilder.create(managerFactory).build().inject(victim);
+
+    final String result = victim.processAndMerge(resources, false);
+    compare("1\n2", result);
+  }
+  
   private static class AnyTypeProcessor
       implements ResourcePreProcessor, ResourcePostProcessor {
     public void process(final Resource resource, final Reader reader, final Writer writer)
