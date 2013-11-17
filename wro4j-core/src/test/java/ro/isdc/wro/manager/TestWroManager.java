@@ -468,7 +468,6 @@ public class TestWroManager {
     final WroModel model = new WroModel();
     model.addGroup(new Group("noResources"));
     WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(WroUtil.factoryFor(model));
-    managerFactory = managerFactory;
     managerFactory.create().process();
   }
 
@@ -479,7 +478,7 @@ public class TestWroManager {
         .setHashStrategy(new CRC32HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
-    assertEquals("daa1bb3c/g3.css?minimize=true", path);
+    assertEquals("3be24cf6/g3.css?minimize=true", path);
   }
 
   @Test
@@ -489,7 +488,7 @@ public class TestWroManager {
         .setHashStrategy(new MD5HashStrategy());
     final WroManager manager = factory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
-    Assert.assertEquals("42b98f2980dc1366cf1d2677d4891eda/g3.css?minimize=true", path);
+    assertEquals("dcafadd7f368bc95d003eae8e876a324/g3.css?minimize=true", path);
   }
 
   @Test
@@ -497,7 +496,7 @@ public class TestWroManager {
       throws Exception {
     final WroManager manager = managerFactory.create();
     final String path = manager.encodeVersionIntoGroupPath("g3", ResourceType.CSS, true);
-    Assert.assertEquals("51e6de8dde498cb0bf082b2cd80323fca19eef5/g3.css?minimize=true", path);
+    assertEquals("6c76dfce26865e6d47a8038e79350ed87211cfdf/g3.css?minimize=true", path);
   }
 
   @Test

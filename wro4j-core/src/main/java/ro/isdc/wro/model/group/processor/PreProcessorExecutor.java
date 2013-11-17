@@ -196,21 +196,21 @@ public class PreProcessorExecutor {
         throw e;
       }
     }
-    if (processors.isEmpty()) {
-      return resourceContent;
+    if (!processors.isEmpty()) {
+      Writer writer = null;
+      for (final ResourceProcessor processor : processors) {
+        final ResourceProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
+        
+        writer = new StringWriter();
+        final Reader reader = new StringReader(resourceContent);
+        // decorate and process
+        decoratedProcessor.process(resource, reader, writer);
+        // use the outcome for next input
+        resourceContent = writer.toString();
+      }
     }
-    Writer writer = null;
-    for (final ResourceProcessor processor : processors) {
-      final ResourceProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
-
-      writer = new StringWriter();
-      final Reader reader = new StringReader(resourceContent);
-      // decorate and process
-      decoratedProcessor.process(resource, reader, writer);
-      // use the outcome for next input
-      resourceContent = writer.toString();
-    }
-    return writer.toString();
+    // add explicitly new line at the end to avoid unexpected comment issue
+    return String.format("%s%n", resourceContent);
   }
 
   /**

@@ -129,7 +129,7 @@ public class TestGroupsProcessor {
     initVictim(config, managerFactory);
 
     final String actual = victim.process(key);
-    Assert.assertEquals("1.js2.js", actual);
+    WroTestUtils.compare("1.js\n2.js", actual);
   }
 
   @Test

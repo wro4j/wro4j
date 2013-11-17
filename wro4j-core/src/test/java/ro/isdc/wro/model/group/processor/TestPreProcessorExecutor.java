@@ -5,6 +5,7 @@ package ro.isdc.wro.model.group.processor;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static ro.isdc.wro.util.WroTestUtils.compare;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,6 +47,7 @@ import ro.isdc.wro.model.resource.processor.decorator.CopyrightKeeperProcessorDe
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -193,7 +195,7 @@ public class TestPreProcessorExecutor {
     initExecutor(createProcessorUsingMissingResource());
     final Group group = createGroup(Resource.create("/uri", ResourceType.JS));
     final String result = victim.processAndMerge(group, true);
-    Assert.assertEquals("", result);
+    compare("", result);
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -215,7 +217,7 @@ public class TestPreProcessorExecutor {
     initExecutor(createProcessorWhichFails());
     final Group group = createGroup(Resource.create("", ResourceType.JS));
     final String result = victim.processAndMerge(group, true);
-    Assert.assertEquals("", result);
+    compare("", result);
 
   }
 
@@ -316,6 +318,42 @@ public class TestPreProcessorExecutor {
     victim.processAndMerge(group, true);
   }
 
+  
+  /**
+   * @see https://code.google.com/p/wro4j/issues/detail?id=813
+   */
+  @Test
+  public void shouldNotCommentMergedContentWhenLastLineContainsComment() throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("var a=1;//comment", ResourceType.JS));
+    resources.add(Resource.create("a=2;", ResourceType.JS));
+    final ResourceLocatorFactory locatorFactory = WroTestUtils.createResourceMockingLocatorFactory();
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(locatorFactory).setProcessorsFactory(
+        new SimpleProcessorsFactory());
+    InjectorBuilder.create(managerFactory).build().inject(victim);
+    final Group group = new Group("group");
+    group.setResources(resources);
+    
+    final String result = victim.processAndMerge(group, false);
+    compare("var a=1;//comment\na=2;\n", result);
+  }
+
+  @Test
+  public void shouldNotAddRedundantNewLinesAfterMerge() throws Exception {
+    final List<Resource> resources = new ArrayList<Resource>();
+    resources.add(Resource.create("1\n\n", ResourceType.JS));
+    resources.add(Resource.create("2", ResourceType.JS));
+    final ResourceLocatorFactory locatorFactory = WroTestUtils.createResourceMockingLocatorFactory();
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(locatorFactory).setProcessorsFactory(
+        new SimpleProcessorsFactory());
+    InjectorBuilder.create(managerFactory).build().inject(victim);
+    final Group group = new Group("group");
+    group.setResources(resources);
+    
+    
+    final String result = victim.processAndMerge(group, false);
+    compare("1\n2", result);
+  }
 
   private static class AnyTypeProcessor
       implements ResourceProcessor {
