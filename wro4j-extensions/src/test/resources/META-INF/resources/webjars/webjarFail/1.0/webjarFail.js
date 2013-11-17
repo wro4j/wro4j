@@ -1,0 +1,1 @@
+This resource should cause webjar to fail

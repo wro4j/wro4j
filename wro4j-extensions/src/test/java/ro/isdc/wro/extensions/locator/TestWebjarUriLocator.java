@@ -56,7 +56,12 @@ public class TestWebjarUriLocator {
   @Test(expected = IOException.class)
   public void cannotFindInvalidWebjar()
       throws Exception {
-    assertNotEmpty(victim.locate("webjar:invalid.js"));
+    victim.locate("webjar:invalid.js");
+  }
+  
+  @Test
+  public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar() throws IOException {
+	  assertNotEmpty(victim.locate("webjar:webjarFail.js"));
   }
 
   private void assertNotEmpty(final InputStream stream)
