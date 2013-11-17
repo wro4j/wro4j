@@ -99,17 +99,8 @@ public class TestGroupsProcessor {
     final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
     final Group group = new Group(groupName).addResource(Resource.create("1.js")).addResource(Resource.create("2.js"));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(group));
-    // the locator which returns the name of the resource as its content
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(new UriLocator() {
-      public boolean accept(final String uri) {
-        return true;
-      }
-      
-      public InputStream locate(final String uri)
-          throws IOException {
-        return new ByteArrayInputStream(uri.getBytes());
-      }
-    });
+	// the locator which returns the name of the resource as its content
+	final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(WroTestUtils.createResourceMockingLocator());
 
     final ResourcePreProcessor failingPreProcessor = new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -128,7 +119,7 @@ public class TestGroupsProcessor {
     initVictim(config, managerFactory);
 
     final String actual = victim.process(key);
-    Assert.assertEquals("1.js2.js", actual);
+    WroTestUtils.compare("1.js\n2.js", actual);
   }
 
   @Test
