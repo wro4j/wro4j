@@ -1,9 +1,6 @@
-div.import2 {
-  color: red;
+#imported {
+  background: red;
 }
-
-
-
 .test-class {
-    .mixin(#fff);
+  color: #fff;
 }
