@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,10 @@ public class DispatcherStreamLocator {
       throws IOException {
     // Returns the part URL from the protocol name up to the query string and contextPath.
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-    final String absolutePath = servletContextPath + location;
+//    final String servletContextPath = request.getScheme() + "://" + request.getServerName() + ":"
+//        + request.getServerPort() + request.getContextPath();
+    final String locationPath = location.startsWith("/") ? location.replaceFirst("/", "") : location;
+    final String absolutePath = FilenameUtils.getFullPath(servletContextPath) + locationPath;
     return createExternalResourceLocator().locate(absolutePath);
   }
 
