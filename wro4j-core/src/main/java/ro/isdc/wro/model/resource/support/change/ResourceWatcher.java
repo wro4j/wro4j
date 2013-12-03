@@ -5,6 +5,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -15,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -24,11 +28,14 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -39,7 +46,7 @@ import ro.isdc.wro.util.StopWatch;
  * @created 06 Aug 2012
  * @since 1.4.8
  */
-public class ResourceWatcher {
+public class ResourceWatcher implements Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
   @Inject
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
@@ -52,6 +59,22 @@ public class ResourceWatcher {
   @Inject
   private LifecycleCallbackRegistry lifecycleCallback;
   private ResourceChangeDetector changeDetector;
+  /**
+   * Executor responsible for running the check asynchronously.
+   */
+  private final DestroyableLazyInitializer<ExecutorService> executorServiceRef = new DestroyableLazyInitializer<ExecutorService>() {
+    @Override
+    protected ExecutorService initialize() {
+      return Executors.newFixedThreadPool(1, WroUtil.createDaemonThreadFactory(ResourceWatcher.class.getName()));
+    }
+    @Override
+    public void destroy() {
+      if (isInitialized()) {
+        get().shutdownNow();
+      }
+      super.destroy();
+    };
+  };
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
@@ -77,6 +100,24 @@ public class ResourceWatcher {
       LOG.debug("resource watcher info: {}", watch.prettyPrint());
     }
   }
+
+  /**
+   * Asynchronously check for change for the provided {@link CacheKey}. When the check is complete, the callback will be
+   * invoked.
+   *
+   * @param cacheKey {@link CacheKey} to check for change.
+   * @param callack {@link Callable} to invoke after check is completed.
+   */
+  public void checkAsync(final CacheKey cacheKey, final Runnable callack) {
+    final Callable<Void> callable = ContextPropagatingCallable.decorate(new Runnable() {
+      public void run() {
+        check(cacheKey);
+        callack.run();
+      }
+    });
+    executorServiceRef.get().submit(callable);
+  }
+
 
   /**
    * Invoked when exception occurs.
@@ -209,6 +250,11 @@ public class ResourceWatcher {
       injector.inject(changeDetector);
     }
     return changeDetector;
+  }
+
+  public void destroy()
+      throws Exception {
+    executorServiceRef.destroy();
   }
 }
 

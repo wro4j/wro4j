@@ -38,6 +38,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.AbstractUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -249,6 +250,34 @@ public class TestResourceWatcher {
     });
     victim.check(cacheEntry);
     assertTrue(flag.get());
+  }
+
+  @Test
+  public void shouldCheckForChangeAsynchronously() throws Exception {
+    final AtomicBoolean groupChanged = new AtomicBoolean();
+    final AtomicBoolean callbackInvoked = new AtomicBoolean();
+    victim = new ResourceWatcher() {
+      @Override
+      void onGroupChanged(final CacheKey cacheEntry) {
+        super.onGroupChanged(cacheEntry);
+        groupChanged.set(true);
+      }
+    };
+    final Injector injector = createDefaultInjector();
+    injector.inject(victim);
+    victim.checkAsync(cacheEntry, new Runnable() {
+      public void run() {
+        callbackInvoked.set(true);
+        assertTrue(groupChanged.get());
+      }
+    });
+    WroTestUtils.waitUntil(new Function<Void, Boolean>() {
+      public Boolean apply(final Void input)
+          throws Exception {
+        return callbackInvoked.get();
+      }
+    }, 500);
+    victim.destroy();
   }
 
   private Answer<InputStream> answerWithContent(final String content) {

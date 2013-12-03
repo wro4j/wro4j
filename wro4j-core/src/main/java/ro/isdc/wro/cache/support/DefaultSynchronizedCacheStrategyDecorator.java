@@ -133,8 +133,11 @@ public class DefaultSynchronizedCacheStrategyDecorator
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
       LOG.debug("ResourceWatcher check key: {}", key);
-      getResourceWatcher().check(key);
-      checkedKeys.add(key);
+      getResourceWatcher().checkAsync(key, new Runnable() {
+        public void run() {
+          checkedKeys.add(key);
+        }
+      });
     }
   }
 
@@ -159,15 +162,22 @@ public class DefaultSynchronizedCacheStrategyDecorator
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void clear() {
     super.clear();
     // reset authorization manager (clear any stored uri's).
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
+    }
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    try {
+      getResourceWatcher().destroy();
+    } catch (final Exception e) {
+      LOG.warn("Could not destroy resourceWatcher", e);
     }
   }
 }
