@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +84,12 @@ public class TestResourceWatcher {
 
     victim = new ResourceWatcher();
     createDefaultInjector().inject(victim);
+  }
+
+  @After
+  public void tearDown() {
+    victim.destroy();
+    Context.unset();
   }
 
   public Injector createDefaultInjector() {
@@ -277,7 +284,6 @@ public class TestResourceWatcher {
         return callbackInvoked.get();
       }
     }, 500);
-    victim.destroy();
   }
 
   private Answer<InputStream> answerWithContent(final String content) {
