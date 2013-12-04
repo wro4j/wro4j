@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheKey;
-import ro.isdc.wro.cache.CacheStrategy;
-import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
@@ -49,8 +47,6 @@ import ro.isdc.wro.util.WroUtil;
 public class ResourceWatcher implements Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
   @Inject
-  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
-  @Inject
   private WroModelFactory modelFactory;
   @Inject
   private UriLocatorFactory locatorFactory;
@@ -58,7 +54,8 @@ public class ResourceWatcher implements Destroyable {
   private Injector injector;
   @Inject
   private LifecycleCallbackRegistry lifecycleCallback;
-  private ResourceChangeDetector changeDetector;
+  @Inject
+  private ResourceChangeDetector resourceChangeDetector;
   /**
    * Executor responsible for running the check asynchronously.
    */
@@ -92,7 +89,7 @@ public class ResourceWatcher implements Destroyable {
       if (isGroupChanged(group.collectResourcesOfType(cacheEntry.getType()))) {
         onGroupChanged(cacheEntry);
       }
-      changeDetector.reset();
+      resourceChangeDetector.reset();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -134,7 +131,11 @@ public class ResourceWatcher implements Destroyable {
     boolean isChanged = false;
     for (final Resource resource : resources) {
       if (isChanged |= isChanged(resource, group.getName())) {
-        onResourceChanged(resource);
+        try {
+          onResourceChanged(resource);
+        } catch (final Exception e) {
+          LOG.debug("Exception while onResourceChange is invoked", e);
+        }
       }
     }
     LOG.debug("isGroup {} changed: {}", group.getName(), BooleanUtils.toStringYesNo(isChanged));
@@ -159,9 +160,8 @@ public class ResourceWatcher implements Destroyable {
    *          {@link CacheKey} which has to be invalidated because the corresponding group contains stale resources.
    * @VisibleForTesting
    */
-  void onGroupChanged(final CacheKey key) {
+  protected void onGroupChanged(final CacheKey key) {
     LOG.debug("Detected change for : {}", key);
-    cacheStrategy.put(key, null);
   }
 
   /**
@@ -177,8 +177,7 @@ public class ResourceWatcher implements Destroyable {
     try {
       final String uri = resource.getUri();
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(getResourceChangeDetector().checkChangeForGroup(uri,
-          groupName));
+      final AtomicBoolean changeDetected = new AtomicBoolean(resourceChangeDetector.checkChangeForGroup(uri, groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
         LOG.debug("\t\tCheck @import directive from {}", resource);
@@ -241,15 +240,12 @@ public class ResourceWatcher implements Destroyable {
     return processor;
   }
 
+
   /**
    * @VisibleForTesting
    */
   ResourceChangeDetector getResourceChangeDetector() {
-    if (changeDetector == null) {
-      changeDetector = new ResourceChangeDetector();
-      injector.inject(changeDetector);
-    }
-    return changeDetector;
+    return resourceChangeDetector;
   }
 
   public void destroy()

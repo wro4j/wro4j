@@ -105,6 +105,7 @@ public class DispatcherStreamLocator {
     // Returns the part URL from the protocol name up to the query string and contextPath.
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
     final String absolutePath = servletContextPath + location;
+    LOG.debug("locateExternalUri: {}", absolutePath);
     return createExternalResourceLocator().locate(absolutePath);
   }
 

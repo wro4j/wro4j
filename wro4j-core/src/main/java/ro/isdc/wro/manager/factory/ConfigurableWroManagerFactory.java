@@ -45,6 +45,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);
   private Properties configProperties;
+  private Properties additionalConfigProperties;
 
   /**
    * Allow subclasses to contribute with it's own locators.
@@ -217,6 +218,9 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private Properties getConfigProperties() {
     if (configProperties == null) {
       configProperties = newConfigProperties();
+      if (additionalConfigProperties != null) {
+        configProperties.putAll(additionalConfigProperties);
+      }
     }
     return configProperties;
   }
@@ -240,10 +244,16 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return props;
   }
 
+  ConfigurableWroManagerFactory addConfigProperties(final Properties configProperties) {
+    Validate.notNull(configProperties);
+    this.additionalConfigProperties = configProperties;
+    return this;
+  }
+
   /**
    * Setter is useful for unit tests.
    */
-  public ConfigurableWroManagerFactory setConfigProperties(final Properties configProperties) {
+  ConfigurableWroManagerFactory setConfigProperties(final Properties configProperties) {
     Validate.notNull(configProperties);
     this.configProperties = configProperties;
     return this;

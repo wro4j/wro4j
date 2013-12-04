@@ -147,7 +147,13 @@ public class DefaultSynchronizedCacheStrategyDecorator
    */
   ResourceWatcher getResourceWatcher() {
     if (resourceWatcher == null) {
-      resourceWatcher = new ResourceWatcher();
+      resourceWatcher = new ResourceWatcher() {
+        @Override
+        public void onGroupChanged(final CacheKey key) {
+          super.onGroupChanged(key);
+          DefaultSynchronizedCacheStrategyDecorator.this.put(key, null);
+        }
+      };
       injector.inject(resourceWatcher);
     }
     return resourceWatcher;

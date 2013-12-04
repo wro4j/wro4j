@@ -27,6 +27,7 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.change.ResourceChangeDetector;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
@@ -45,6 +46,7 @@ public class InjectorBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorBuilder.class);
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
+  private final ResourceChangeDetector resourceChangeDetector = new ResourceChangeDetector();
   private ResourceBundleProcessor bundleProcessor;
   private Injector injector;
   /**
@@ -96,6 +98,7 @@ public class InjectorBuilder {
     map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
     map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
     map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
+    map.put(ResourceChangeDetector.class, createResourceChangeDetectorProxy());
   }
 
   private Object createResourceBundleProcessorProxy() {
@@ -239,6 +242,15 @@ public class InjectorBuilder {
     return new InjectorObjectFactory<CacheKeyFactory>() {
       public CacheKeyFactory create() {
         return managerFactory.create().getCacheKeyFactory();
+      }
+    };
+  }
+
+
+  private Object createResourceChangeDetectorProxy() {
+    return new InjectorObjectFactory<ResourceChangeDetector>() {
+      public ResourceChangeDetector create() {
+        return resourceChangeDetector;
       }
     };
   }

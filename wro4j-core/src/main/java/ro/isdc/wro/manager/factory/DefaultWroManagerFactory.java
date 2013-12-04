@@ -81,7 +81,7 @@ public class DefaultWroManagerFactory
         final WroManagerFactory factory = (WroManagerFactory)factoryClass.newInstance();
         // inject properties if required
         if (factory instanceof ConfigurableWroManagerFactory) {
-          ((ConfigurableWroManagerFactory) factory).setConfigProperties(properties);
+          ((ConfigurableWroManagerFactory) factory).addConfigProperties(properties);
         }
         return factory;
       } catch (final Exception e) {

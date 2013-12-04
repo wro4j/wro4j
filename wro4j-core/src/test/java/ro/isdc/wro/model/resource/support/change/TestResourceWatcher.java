@@ -128,7 +128,7 @@ public class TestResourceWatcher {
     final AtomicBoolean flag = new AtomicBoolean(false);
     victim = new ResourceWatcher() {
       @Override
-      void onGroupChanged(final CacheKey cacheEntry) {
+      protected void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         Assert.assertEquals(GROUP_NAME, cacheEntry.getGroupName());
         flag.set(true);
@@ -151,7 +151,7 @@ public class TestResourceWatcher {
       throws Exception {
     victim = new ResourceWatcher() {
       @Override
-      void onGroupChanged(final CacheKey cacheEntry) {
+      protected void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         Assert.fail("Should not detect the change");
       }
@@ -177,7 +177,7 @@ public class TestResourceWatcher {
         importResourceChanged.set(true);
       }
       @Override
-      void onGroupChanged(final CacheKey key) {
+      protected void onGroupChanged(final CacheKey key) {
         groupChanged.set(true);
       }
     };
@@ -208,7 +208,7 @@ public class TestResourceWatcher {
         resourceChanged.set(true);
       }
       @Override
-      void onGroupChanged(final CacheKey key) {
+      protected void onGroupChanged(final CacheKey key) {
         groupChanged.set(true);
       }
     };
@@ -265,7 +265,7 @@ public class TestResourceWatcher {
     final AtomicBoolean callbackInvoked = new AtomicBoolean();
     victim = new ResourceWatcher() {
       @Override
-      void onGroupChanged(final CacheKey cacheEntry) {
+      protected void onGroupChanged(final CacheKey cacheEntry) {
         super.onGroupChanged(cacheEntry);
         groupChanged.set(true);
       }
