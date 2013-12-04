@@ -87,7 +87,7 @@ public class TestResourceWatcher {
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
     victim.destroy();
     Context.unset();
   }
