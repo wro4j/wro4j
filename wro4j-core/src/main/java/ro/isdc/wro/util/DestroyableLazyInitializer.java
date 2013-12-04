@@ -1,6 +1,3 @@
-/**
- * Copyright Alex Objelean
- */
 package ro.isdc.wro.util;
 
 

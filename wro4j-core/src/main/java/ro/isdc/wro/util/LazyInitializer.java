@@ -4,6 +4,7 @@
 package ro.isdc.wro.util;
 
 
+
 /**
  * A clone of {@link LazyInitializer}, which doesn't throw any checked exception when get method is invoked.
  *
@@ -36,6 +37,12 @@ public abstract class LazyInitializer<T> {
     return result;
   }
 
+  /**
+   * @return true if the initialize method was already called.
+   */
+  protected final boolean isInitialized() {
+    return object != null;
+  }
 
   /**
    * Creates and initializes the object managed by this {@code LazyInitializer}. This method is called by {@link #get()}
