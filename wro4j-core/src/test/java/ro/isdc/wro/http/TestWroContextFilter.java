@@ -11,12 +11,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -97,5 +103,28 @@ public class TestWroContextFilter {
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verify(mockFilterChain, Mockito.times(1)).doFilter(Mockito.any(HttpServletRequest.class),
         Mockito.any(HttpServletResponse.class));
+  }
+  
+  /**
+   * Test for issue824 (https://code.google.com/p/wro4j/issues/detail?id=824).
+   * Checks that nested requests are properly cleaned up. 
+   */
+  @Test
+  public void shouldNotLeakContextForNestedRequest()
+      throws Exception {
+    
+    final WroFilter innerFilter = new WroFilter();
+    innerFilter.init(mockFilterConfig);
+
+    final FilterChain chain = new FilterChain() {
+      public void doFilter(ServletRequest req, ServletResponse res)
+          throws IOException, ServletException {
+        victim.doFilter(req, res, mockFilterChain);
+      }
+    };
+    
+    victim.init(mockFilterConfig);
+    victim.doFilter(mockRequest, mockResponse, chain);
+    Assert.assertEquals(0, Context.countActive());
   }
 }

@@ -114,7 +114,6 @@ public class Context
     return CORRELATION_ID.get() != null && CONTEXT_MAP.get(CORRELATION_ID.get()) != null;
   }
 
-
   /**
    * Checks if the {@link Context} is accessible from current request cycle.
    */
@@ -130,7 +129,6 @@ public class Context
   public static void set(final Context context) {
     set(context, new WroConfiguration());
   }
-
 
   /**
    * Associate a context with the CURRENT request cycle.
@@ -167,6 +165,62 @@ public class Context
   }
 
 
+  /**
+   * Perform context clean-up.
+   */
+  public static void destroy() {
+    unset();
+    //remove all context objects stored in map
+    CONTEXT_MAP.clear();
+  }
+
+  /**
+   * Set the correlationId to the current thread.
+   */
+  public static void setCorrelationId(final String correlationId) {
+    Validate.notNull(correlationId);
+    CORRELATION_ID.set(correlationId);
+  }
+
+  /**
+   * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
+   * with the correlationId. In order to remove context, call {@link Context#unset()}.
+   * <p/>
+   * Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
+   * parent thread. This simulates the {@link InheritableThreadLocal} functionality.
+   */
+  public static void unsetCorrelationId() {
+    CORRELATION_ID.remove();
+  }
+
+  /**
+   * @return the correlationId associated with this thread.
+   */
+  public static String getCorrelationId() {
+    validateContext();
+    return CORRELATION_ID.get();
+  }
+
+  /**
+   * Decorates a callable with {@link ContextPropagatingCallable} making it possible to access the {@link Context} from
+   * within the decorated callable.
+   *
+   * @param callable
+   *          the {@link Callable} to decorate.
+   * @return the decorated callable.
+   */
+  public static <T> Callable<T> decorate(final Callable<T> callable) {
+    return new ContextPropagatingCallable<T>(callable);
+  }
+  
+  /**
+   * @return number of {@link Context} objects which were created but not yet destroyed. This is useful to detect leaks
+   *         (mostly for unit testing).
+   */
+  public static int countActive() {
+    return CONTEXT_MAP.size();
+  }
+  
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
@@ -227,54 +281,6 @@ public class Context
    */
   public void setAggregatedFolderPath(final String aggregatedFolderPath) {
     this.aggregatedFolderPath = aggregatedFolderPath;
-  }
-
-  /**
-   * Perform context clean-up.
-   */
-  public static void destroy() {
-    unset();
-    //remove all context objects stored in map
-    CONTEXT_MAP.clear();
-  }
-
-  /**
-   * Set the correlationId to the current thread.
-   */
-  public static void setCorrelationId(final String correlationId) {
-    Validate.notNull(correlationId);
-    CORRELATION_ID.set(correlationId);
-  }
-
-  /**
-   * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
-   * with the correlationId. In order to remove context, call {@link Context#unset()}.
-   * <p/>
-   * Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
-   * parent thread. This simulates the {@link InheritableThreadLocal} functionality.
-   */
-  public static void unsetCorrelationId() {
-    CORRELATION_ID.remove();
-  }
-
-  /**
-   * @return the correlationId associated with this thread.
-   */
-  public static String getCorrelationId() {
-    validateContext();
-    return CORRELATION_ID.get();
-  }
-
-  /**
-   * Decorates a callable with {@link ContextPropagatingCallable} making it possible to access the {@link Context} from
-   * within the decorated callable.
-   *
-   * @param callable
-   *          the {@link Callable} to decorate.
-   * @return the decorated callable.
-   */
-  public static <T> Callable<T> decorate(final Callable<T> callable) {
-    return new ContextPropagatingCallable<T>(callable);
   }
 
   /**
