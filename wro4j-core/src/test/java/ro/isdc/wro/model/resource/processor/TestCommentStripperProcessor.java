@@ -3,11 +3,15 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.CommentStripperProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -20,7 +24,12 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestCommentStripperProcessor {
   private final ResourcePreProcessor processor = new CommentStripperProcessor();
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Test
   public void testFromFolder()
       throws Exception {

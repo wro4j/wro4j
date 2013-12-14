@@ -7,15 +7,23 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 
 /**
  * @author Alex Objelean
  */
 public class TestConfigurableModelFactory {
   private ConfigurableModelFactory victim;
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new ConfigurableModelFactory();
