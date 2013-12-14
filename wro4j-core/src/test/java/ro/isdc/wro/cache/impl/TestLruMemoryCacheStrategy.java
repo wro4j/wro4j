@@ -1,11 +1,14 @@
 package ro.isdc.wro.cache.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.cache.CacheKey;
@@ -23,7 +26,12 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  */
 public class TestLruMemoryCacheStrategy {
   private LruMemoryCacheStrategy<CacheKey, CacheValue> cache;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
