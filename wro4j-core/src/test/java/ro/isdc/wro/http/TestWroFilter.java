@@ -24,15 +24,15 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -73,7 +73,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.ObjectFactory;
-import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 import ro.isdc.wro.util.io.NullOutputStream;
 
@@ -106,6 +105,16 @@ public class TestWroFilter {
   private MBeanServer mockMBeanServer;
   @Mock
   private UriLocator mockUriLocator;
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
   
   @Before
   public void setUp()
@@ -576,7 +585,6 @@ public class TestWroFilter {
       public void destroy() {
       }
     });
-    Context.set(Context.standaloneContext());
     
     final WroFilter filter = new WroFilter() {
       @Override
@@ -616,7 +624,7 @@ public class TestWroFilter {
         status.set(sc);
       }
     };
-    
+    Context.unset();
     Context.set(Context.webContext(mockRequest, response, mockFilterConfig));
     victim.init(mockFilterConfig);
     victim.doFilter(Context.get().getRequest(), Context.get().getResponse(), mockFilterChain);
@@ -636,7 +644,7 @@ public class TestWroFilter {
         status.set(sc);
       }
     };
-    
+    Context.unset();
     Context.set(Context.webContext(mockRequest, response, mockFilterConfig));
     victim.init(mockFilterConfig);
     victim.doFilter(Context.get().getRequest(), Context.get().getResponse(), mockFilterChain);
@@ -700,7 +708,7 @@ public class TestWroFilter {
     final WroConfiguration config = new WroConfiguration();
     // we don't need caching here, otherwise we'll have clashing during unit tests.
     config.setDisableCache(true);
-    
+    Context.unset();
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), newConfigWithUpdatePeriodValue(0));
     victim.init(mockFilterConfig);
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
@@ -736,6 +744,7 @@ public class TestWroFilter {
   private void prepareValidRequest(final WroConfiguration config)
       throws ServletException {
     when(mockRequest.getRequestURI()).thenReturn("/resource/g1.css");
+    Context.unset();
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
     victim.setConfiguration(config);
     victim.setWroManagerFactory(createValidManagerFactory());
@@ -827,7 +836,7 @@ public class TestWroFilter {
     victim.setWroConfigurationFactory(configurationFactory);
     victim.setWroManagerFactory(null);
     victim.init(mockFilterConfig);
-    
+    Context.unset();
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), configurationFactory.create());
     final WroManagerFactory factory = victim.getWroManagerFactory();
     assertEquals(1, factory.create().getProcessorsFactory().getPreProcessors().size());

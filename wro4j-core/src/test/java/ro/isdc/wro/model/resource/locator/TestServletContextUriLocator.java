@@ -21,7 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,7 +39,7 @@ import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrate
 
 /**
  * Test for {@link ServletContextUriLocator} class.
- *
+ * 
  * @author Alex Objelean
  */
 public class TestServletContextUriLocator {
@@ -50,25 +52,40 @@ public class TestServletContextUriLocator {
   @Mock
   private ServletContext mockServletContext;
   private ServletContextUriLocator victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-
+    
     when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(""));
     when(mockRequest.getServletPath()).thenReturn("");
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-
+    
     final Context context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
     Context.set(context, config);
-
+    
     victim = new ServletContextUriLocator();
-
+    
     initLocator(victim);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   /**
    * Initialize the locator by injecting all required fields.
    */
@@ -76,61 +93,61 @@ public class TestServletContextUriLocator {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     injector.inject(locator);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullUri()
       throws Exception {
     victim.locate(null);
   }
-
+  
   @Test
   public void testWildcard1Resources()
       throws IOException {
     victim.locate(createUri("/css/*.css"));
   }
-
+  
   @Test
   public void testWildcard2Resources()
       throws IOException {
     victim.locate(createUri("/css/*.cs?"));
   }
-
+  
   @Test
   public void testWildcard3Resources()
       throws IOException {
     victim.locate(createUri("/css/*.???"));
   }
-
+  
   @Test
   public void testRecursiveWildcardResources()
       throws IOException {
     victim.locate(createUri("/css/**.css"));
   }
-
+  
   @Test
   public void shouldFindWildcardResourcesForFolderContainingSpaces()
       throws IOException {
     victim.locate(createUri("/folder with spaces/**.css", "test"));
   }
-
+  
   @Test(expected = IOException.class)
   public void testWildcardInexistentResources()
       throws IOException {
     victim.locate(createUri("/css/**.NOTEXIST"));
   }
-
+  
   private String createUri(final String uri)
       throws IOException {
     return createUri(uri, "ro/isdc/wro/model/resource/locator/");
   }
-
+  
   private String createUri(final String uri, final String path)
       throws IOException {
     final URL url = Thread.currentThread().getContextClassLoader().getResource(path);
     when(mockServletContext.getRealPath(Mockito.anyString())).thenReturn(url.getPath());
     return uri;
   }
-
+  
   /**
    * Make this test method to follow a flow which throws IOException
    */
@@ -139,25 +156,26 @@ public class TestServletContextUriLocator {
       throws Exception {
     victim.locate("/invalid/resource.css");
   }
-
+  
   @Test
   public void shouldPreferServletContextBasedResolving()
       throws IOException {
     final InputStream is = new ByteArrayInputStream("a {}".getBytes());
     Mockito.when(Context.get().getServletContext().getResourceAsStream(Mockito.anyString())).thenReturn(is);
-
+    
     final ServletContextUriLocator locator = new ServletContextUriLocator();
     initLocator(locator);
     locator.setLocatorStrategy(ServletContextUriLocator.LocatorStrategy.SERVLET_CONTEXT_FIRST);
-
+    
     final InputStream actualIs = locator.locate("test.css");
-
+    
     final BufferedReader br = new BufferedReader(new InputStreamReader(actualIs));
     assertEquals("a {}", br.readLine());
   }
-
+  
   @Test(expected = IOException.class)
-  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed() throws Exception {
+  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed()
+      throws Exception {
     final AtomicBoolean dispatcherInvokedFlag = new AtomicBoolean();
     victim = new ServletContextUriLocator() {
       @Override
@@ -175,12 +193,12 @@ public class TestServletContextUriLocator {
       assertFalse(dispatcherInvokedFlag.get());
     }
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotSetNullLocatorStrategy() {
     victim.setLocatorStrategy(null);
   }
-
+  
   @After
   public void resetContext() {
     Context.unset();

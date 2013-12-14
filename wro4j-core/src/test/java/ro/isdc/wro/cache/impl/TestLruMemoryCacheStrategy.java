@@ -1,6 +1,8 @@
 package ro.isdc.wro.cache.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -52,11 +54,11 @@ public class TestLruMemoryCacheStrategy {
     cache.put(key1, CacheValue.valueOf(content, hash));
     cache.put(key2, CacheValue.valueOf(content, hash));
     cache.put(key3, CacheValue.valueOf(content, hash));
-    Assert.assertNotNull(cache.get(key1));
+    assertNotNull(cache.get(key1));
     // Removes the 2nd entry because the 1st one was used in the assertion
     // above.
     cache.put(key4, CacheValue.valueOf(content, hash));
-    Assert.assertNull(cache.get(key2));
+    assertNull(cache.get(key2));
   }
 
 

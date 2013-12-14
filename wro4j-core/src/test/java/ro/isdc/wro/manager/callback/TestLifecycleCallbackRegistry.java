@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.manager.callback;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringWriter;
 import java.util.concurrent.Callable;
 
@@ -12,7 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -32,60 +36,71 @@ import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
 
+
 /**
  * @author Alex Objelean
  */
 public class TestLifecycleCallbackRegistry {
   private LifecycleCallbackRegistry registry;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     registry = new LifecycleCallbackRegistry();
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   @Test
   public void shouldInvokeRegisteredCallbacks() {
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
     final Resource changedResource = Resource.create("test.js");
     registry.registerCallback(factoryFor(callback));
-
+    
     registry.onBeforeModelCreated();
     Mockito.verify(callback).onBeforeModelCreated();
-
+    
     registry.onAfterModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
-
+    
     registry.onBeforePreProcess();
     Mockito.verify(callback).onBeforePreProcess();
-
+    
     registry.onAfterPreProcess();
     Mockito.verify(callback).onAfterPreProcess();
-
+    
     registry.onBeforePostProcess();
     Mockito.verify(callback).onBeforePostProcess();
-
+    
     registry.onAfterPostProcess();
     Mockito.verify(callback).onAfterPostProcess();
-
+    
     registry.onBeforeMerge();
     Mockito.verify(callback).onBeforeMerge();
-
+    
     registry.onAfterMerge();
     Mockito.verify(callback).onAfterMerge();
-
+    
     registry.onProcessingComplete();
     Mockito.verify(callback).onProcessingComplete();
-
+    
     registry.onResourceChanged(changedResource);
     Mockito.verify(callback).onResourceChanged(Mockito.eq(changedResource));
   }
-
+  
   private ObjectFactory<LifecycleCallback> factoryFor(final LifecycleCallback callback) {
     return new ObjectFactory<LifecycleCallback>() {
       public LifecycleCallback create() {
@@ -93,13 +108,13 @@ public class TestLifecycleCallbackRegistry {
       }
     };
   }
-
+  
   @Test
   public void shouldCatchCallbacksExceptionsAndContinueExecution() {
     final LifecycleCallback failingCallback = Mockito.mock(LifecycleCallback.class);
     final LifecycleCallback simpleCallback = Mockito.spy(new LifecycleCallbackSupport());
     final Resource changedResource = Resource.create("test.js");
-
+    
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforeModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterModelCreated();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onBeforePreProcess();
@@ -110,10 +125,10 @@ public class TestLifecycleCallbackRegistry {
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onAfterMerge();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onProcessingComplete();
     Mockito.doThrow(new IllegalStateException()).when(failingCallback).onResourceChanged(Mockito.any(Resource.class));
-
+    
     registry.registerCallback(factoryFor(failingCallback));
     registry.registerCallback(factoryFor(simpleCallback));
-
+    
     registry.onBeforeModelCreated();
     registry.onAfterModelCreated();
     registry.onBeforePreProcess();
@@ -124,7 +139,7 @@ public class TestLifecycleCallbackRegistry {
     registry.onAfterMerge();
     registry.onProcessingComplete();
     registry.onResourceChanged(changedResource);
-
+    
     Mockito.verify(simpleCallback).onBeforeModelCreated();
     Mockito.verify(simpleCallback).onAfterModelCreated();
     Mockito.verify(simpleCallback).onBeforePreProcess();
@@ -136,36 +151,38 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(simpleCallback).onProcessingComplete();
     Mockito.verify(simpleCallback).onResourceChanged(Mockito.eq(changedResource));
   }
-
+  
   /**
    * TODO: Simplify the test and move common usage to utility method.
    */
   @Test
-  public void shouldInvokeCallbackWhenCallingProcess() throws Exception {
+  public void shouldInvokeCallbackWhenCallingProcess()
+      throws Exception {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);;
-
+    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+    
     Mockito.when(response.getOutputStream()).thenReturn(
-      new DelegatingServletOutputStream(new WriterOutputStream(new StringWriter())));
+        new DelegatingServletOutputStream(new WriterOutputStream(new StringWriter())));
     Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(""));
     Mockito.when(request.getRequestURI()).thenReturn("");
     Mockito.when(request.getServletPath()).thenReturn("");
+    Context.unset();
     Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)));
-
+    
     final LifecycleCallback callback = Mockito.mock(LifecycleCallback.class);
-
+    
     final String groupName = "group";
-
+    
     final GroupExtractor groupExtractor = Mockito.mock(GroupExtractor.class);
     Mockito.when(groupExtractor.getGroupName(Mockito.any(HttpServletRequest.class))).thenReturn(groupName);
     Mockito.when(groupExtractor.getResourceType(Mockito.any(HttpServletRequest.class))).thenReturn(ResourceType.JS);
-
+    
     final Group group = new Group(groupName);
     group.addResource(Resource.create("classpath:1.js"));
     final WroModelFactory modelFactory = WroUtil.factoryFor(new WroModel().addGroup(group));
-
-    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setGroupExtractor(groupExtractor)
-        .setModelFactory(modelFactory);
+    
+    final WroManagerFactory managerFactory = new BaseWroManagerFactory().setGroupExtractor(groupExtractor).setModelFactory(
+        modelFactory);
     final WroManager manager = managerFactory.create();
     manager.registerCallback(new ObjectFactory<LifecycleCallback>() {
       public LifecycleCallback create() {
@@ -173,7 +190,7 @@ public class TestLifecycleCallbackRegistry {
       }
     });
     manager.process();
-
+    
     Mockito.verify(callback).onBeforeModelCreated();
     Mockito.verify(callback).onAfterModelCreated();
     Mockito.verify(callback, Mockito.atLeastOnce()).onBeforePreProcess();
@@ -181,13 +198,14 @@ public class TestLifecycleCallbackRegistry {
     Mockito.verify(callback).onBeforeMerge();
     Mockito.verify(callback).onAfterMerge();
     Mockito.verify(callback).onProcessingComplete();
-
-    //This will fail because the callback is invoked also on processors which are skipped
-//    Mockito.verifyNoMoreInteractions(callback);
+    
+    // This will fail because the callback is invoked also on processors which are skipped
+    // Mockito.verifyNoMoreInteractions(callback);
   }
-
+  
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     registry = new LifecycleCallbackRegistry() {
       @Override
       protected void onException(final Exception e) {

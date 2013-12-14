@@ -17,8 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -61,15 +63,26 @@ public class TestConfigurableWroFilter {
   @Mock
   private ServletOutputStream mockServletOutputStream;
   private final ConfigurableWroFilter victim = new ConfigurableWroFilter();
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
-  public void setUp() throws Exception {
+  public void setUp()
+      throws Exception {
     MockitoAnnotations.initMocks(this);
     when(mockRequest.getRequestURI()).thenReturn("/some.js");
     when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
-    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
-
+  
   @Test
   public void testFilterWithPropertiesSet()
       throws Exception {
@@ -85,7 +98,7 @@ public class TestConfigurableWroFilter {
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test
   public void testFilterWithCacheUpdatePeriodSet()
       throws Exception {
@@ -97,9 +110,10 @@ public class TestConfigurableWroFilter {
     };
     filter.setCacheUpdatePeriod(20);
     filter.init(mockFilterConfig);
+    Context.unset();
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test
   public void shouldUseDefaultEncodingWhenNoEncodingIsSet()
       throws Exception {
@@ -111,9 +125,10 @@ public class TestConfigurableWroFilter {
     };
     filter.setEncoding(null);
     filter.init(mockFilterConfig);
+    Context.unset();
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test
   public void shouldUseConfiguredEncodingWhenSet()
       throws Exception {
@@ -126,9 +141,10 @@ public class TestConfigurableWroFilter {
     };
     filter.setEncoding(encoding);
     filter.init(mockFilterConfig);
+    Context.unset();
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test
   public void shouldUseConfiguredMBeanNameWhenSet()
       throws Exception {
@@ -141,9 +157,10 @@ public class TestConfigurableWroFilter {
     };
     filter.setMbeanName(mbeanName);
     filter.init(mockFilterConfig);
+    Context.unset();
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test
   public void shouldUseNullMBeanWhenNotSet()
       throws Exception {
@@ -155,21 +172,23 @@ public class TestConfigurableWroFilter {
     };
     filter.setMbeanName(null);
     filter.init(mockFilterConfig);
+    Context.unset();
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
   }
-
+  
   @Test(expected = WroRuntimeException.class)
   public void cannotAcceptInvalidProcessorNameConfiguration()
       throws Exception {
     genericProcessorNameConfigurationTest("INVALID_PROCESSOR_NAME");
   }
-
+  
   @Test
   public void shouldAcceptValidProcessorNameConfiguration()
       throws Exception {
+    Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
     genericProcessorNameConfigurationTest(CssMinProcessor.ALIAS);
   }
-
+  
   /**
    * To be reused by test from extensions module.
    */
@@ -189,6 +208,7 @@ public class TestConfigurableWroFilter {
           }
           return original;
         }
+        
         @Override
         protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
           throw WroRuntimeException.wrap(e);
@@ -206,8 +226,9 @@ public class TestConfigurableWroFilter {
       throw processorsCreationException.get();
     }
   }
-
-  private static class SampleConfigurableWroFilter extends ConfigurableWroFilter {
+  
+  private static class SampleConfigurableWroFilter
+      extends ConfigurableWroFilter {
     @Override
     protected WroManagerFactory newWroManagerFactory() {
       final WroManagerFactory factory = super.newWroManagerFactory();
@@ -219,35 +240,36 @@ public class TestConfigurableWroFilter {
         }
       };
     }
-
+    
     @Override
     protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
       throw WroRuntimeException.wrap(e);
     }
   };
-
+  
   @Test
-  public void shouldUseCorrectWroManagerFactoryWhenPropertiesAreLoadedFromCustomLocation() throws Exception {
+  public void shouldUseCorrectWroManagerFactoryWhenPropertiesAreLoadedFromCustomLocation()
+      throws Exception {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.managerFactoryClassName.name(), NoProcessorsWroManagerFactory.class.getName());
     victim.setProperties(props);
     victim.init(mockFilterConfig);
-    final WroManagerFactory actual = ((DefaultWroManagerFactory)victim.getWroManagerFactory()).getFactory();
+    final WroManagerFactory actual = ((DefaultWroManagerFactory) victim.getWroManagerFactory()).getFactory();
     assertEquals(NoProcessorsWroManagerFactory.class, actual.getClass());
   }
-
+  
   @Test(expected = WroRuntimeException.class)
-  public void shouldFailWhenAnInvalidWroManagerClassNameIsLoadedFromCustomLocation() throws Exception {
+  public void shouldFailWhenAnInvalidWroManagerClassNameIsLoadedFromCustomLocation()
+      throws Exception {
     final Properties props = new Properties();
     props.setProperty(ConfigConstants.managerFactoryClassName.name(), "invalid");
     victim.setProperties(props);
     victim.init(mockFilterConfig);
   }
-
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
 }
