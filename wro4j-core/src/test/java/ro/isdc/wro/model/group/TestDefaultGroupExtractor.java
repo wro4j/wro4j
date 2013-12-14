@@ -9,7 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -25,7 +28,15 @@ import ro.isdc.wro.model.resource.ResourceType;
  */
 public class TestDefaultGroupExtractor {
   private GroupExtractor groupExtractor;
-
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
   @Before
   public void setUp() {
     // by default configuration is in debug mode
@@ -33,6 +44,11 @@ public class TestDefaultGroupExtractor {
     config.setDebug(true);
     Context.set(Context.standaloneContext(), config);
     groupExtractor = new DefaultGroupExtractor();
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test(expected = NullPointerException.class)

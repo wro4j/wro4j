@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
@@ -19,7 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -57,7 +60,17 @@ public class TestInjectorBuilder {
   private FilterConfig mockFilterConfig;
   @Mock
   private ServletContext mockServletContext;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     initMocks(this);
@@ -68,22 +81,22 @@ public class TestInjectorBuilder {
     when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(null);
     set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullWroManager() {
     new InjectorBuilder(null);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptWhenSettingNullWroManager() {
     new InjectorBuilder(null);
   }
-
+  
   @Test
   public void shouldBuildInjectorWithValidWroManager() {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     assertNotNull(injector);
-
+    
     final Sample sample = new Sample();
     injector.inject(sample);
     assertNotNull(sample.namingStrategy);
@@ -96,12 +109,12 @@ public class TestInjectorBuilder {
     assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.bundleProcessor);
   }
-
+  
   @Test
   public void shouldBuildValidInjectorWithBaseWroManagerFactory() {
     final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     assertNotNull(injector);
-
+    
     final Sample sample = new Sample();
     injector.inject(sample);
     assertNotNull(sample.namingStrategy);
@@ -115,39 +128,40 @@ public class TestInjectorBuilder {
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
   }
-
+  
   @Test
-  public void shouldBuildValidInjectorWithFewFieldsSet() throws Exception {
+  public void shouldBuildValidInjectorWithFewFieldsSet()
+      throws Exception {
     final NamingStrategy mockNamingStrategy = mock(NamingStrategy.class);
     final ProcessorsFactory mockProcessorsFactory = mock(ProcessorsFactory.class);
     final UriLocatorFactory mockLocatorFactory = mock(UriLocatorFactory.class);
     final MetaDataFactory mockMetaDataFactory = Mockito.mock(MetaDataFactory.class);
-
+    
     final BaseWroManagerFactory managerFactroy = new BaseWroManagerFactory();
     managerFactroy.setNamingStrategy(mockNamingStrategy);
     managerFactroy.setProcessorsFactory(mockProcessorsFactory);
     managerFactroy.setUriLocatorFactory(mockLocatorFactory);
     managerFactroy.setMetaDataFactory(mockMetaDataFactory);
-
+    
     final Injector injector = InjectorBuilder.create(managerFactroy).build();
     assertNotNull(injector);
-
+    
     final Sample sample = new Sample();
     injector.inject(sample);
     assertNotNull(sample.preProcessorExecutor);
-
+    
     sample.namingStrategy.rename("", WroUtil.EMPTY_STREAM);
     verify(mockNamingStrategy).rename("", WroUtil.EMPTY_STREAM);
-
+    
     sample.processorsFactory.getPostProcessors();
     verify(mockProcessorsFactory).getPostProcessors();
-
+    
     sample.uriLocatorFactory.getInstance("");
     verify(mockLocatorFactory).getInstance("");
-
+    
     sample.metaDataFactory.create();
     verify(mockMetaDataFactory).create();
-
+    
     assertNotNull(sample.callbackRegistry);
     assertSame(injector, sample.injector);
     assertNotNull(sample.groupsProcessor);
@@ -160,25 +174,25 @@ public class TestInjectorBuilder {
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
   }
-
+  
   @Test(expected = IOException.class)
   public void shouldInjectEachLocatorProvidedByLocatorFactory()
       throws Exception {
     final UriLocatorFactory uriLocatorFactory = new DefaultUriLocatorFactory();
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setUriLocatorFactory(uriLocatorFactory);
     final Injector injector = InjectorBuilder.create(managerFactory).build();
-
+    
     final Sample sample = new Sample();
     injector.inject(sample);
     // this will throw NullPointerException if the uriLocator is not injected.
     sample.uriLocatorFactory.locate("/path/to/servletContext/resource.js");
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   private static class Sample {
     @Inject
     UriLocatorFactory uriLocatorFactory;

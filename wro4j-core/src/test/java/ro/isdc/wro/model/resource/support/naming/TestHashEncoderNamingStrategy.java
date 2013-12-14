@@ -13,7 +13,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -25,13 +28,23 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * Test class for {@link HashEncoderNamingStrategy}
- *
+ * 
  * @author Alex Objelean
  * @created 15 Aug 2012
  */
 public class TestHashEncoderNamingStrategy {
   private NamingStrategy namingStrategy;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -43,38 +56,43 @@ public class TestHashEncoderNamingStrategy {
     };
     WroTestUtils.createInjector().inject(namingStrategy);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullResourceName()
       throws Exception {
     namingStrategy.rename(null, WroUtil.EMPTY_STREAM);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullStream()
       throws Exception {
     namingStrategy.rename("fileName.js", null);
   }
-
+  
   @Test
   public void shouldRenameResourceWithEmptyContent()
       throws Exception {
     final String result = namingStrategy.rename("fileName", WroUtil.EMPTY_STREAM);
     assertEquals("fileName-0", result);
   }
-
+  
   @Test
   public void shouldRenameResourceWithSomeContent()
       throws Exception {
     final String result = namingStrategy.rename("anotherFile.js", new ByteArrayInputStream("someContent".getBytes()));
     assertEquals("anotherFile-b598c484.js", result);
   }
-
+  
   @Test
   public void shouldRenameResourceContainedInAFolder()
       throws Exception {
-    final String result = namingStrategy.rename("folder1/folder2/resource.css", new ByteArrayInputStream("someContent"
-        .getBytes()));
+    final String result = namingStrategy.rename("folder1/folder2/resource.css",
+        new ByteArrayInputStream("someContent".getBytes()));
     assertEquals("folder1/folder2/resource-b598c484.css", result);
   }
 }

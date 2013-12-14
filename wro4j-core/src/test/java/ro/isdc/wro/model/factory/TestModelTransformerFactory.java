@@ -3,11 +3,15 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,32 +29,42 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestModelTransformerFactory {
   @Mock
   private WroModelFactory mockFactory;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockFactory.create()).thenReturn(new WroModel());
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   private ModelTransformerFactory factory;
-
+  
   @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullDecoratedModel() {
     factory = new ModelTransformerFactory(null);
   }
-
+  
   @Test
   public void shouldNotChangeTheModelWhenNoTransformersProvided() {
     factory = new ModelTransformerFactory(mockFactory);
     Assert.assertEquals(new WroModel().getGroups(), factory.create().getGroups());
   }
-
+  
   @Test
   public void shouldChangeTheModelWhenTransformersProvided() {
     final Transformer<WroModel> transformer = new Transformer<WroModel>() {

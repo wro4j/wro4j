@@ -1,5 +1,6 @@
 package ro.isdc.wro.config.support;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -11,7 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -37,24 +40,34 @@ public class TestContextPropagatingCallable {
       return null;
     }
   };
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     initMocks(this);
     context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullCallable() {
     new ContextPropagatingCallable<Void>(null);
   }
-
+  
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenNoContextIsAvailable() {
     Context.unset();
     new ContextPropagatingCallable<Void>(NO_OP_CALLABLE);
   }
-
+  
   @Test
   public void shouldInheritContextInCreatedThread()
       throws Exception {
@@ -68,14 +81,15 @@ public class TestContextPropagatingCallable {
       }
     }), 1);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullRunnable() {
     ContextPropagatingCallable.decorate(null);
   }
-
+  
   @Test
-  public void shouldDecorateRunnable() throws Exception {
+  public void shouldDecorateRunnable()
+      throws Exception {
     Context.set(context);
     WroTestUtils.runConcurrently(ContextPropagatingCallable.decorate(new Runnable() {
       public void run() {
@@ -84,7 +98,7 @@ public class TestContextPropagatingCallable {
       }
     }), 1);
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();

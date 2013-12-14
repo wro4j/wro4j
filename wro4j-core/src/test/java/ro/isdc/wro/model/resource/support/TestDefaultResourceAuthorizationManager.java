@@ -4,8 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ro.isdc.wro.config.Context;
 
 
 /**
@@ -13,24 +17,34 @@ import org.junit.Test;
  */
 public class TestDefaultResourceAuthorizationManager {
   private DefaultResourceAuthorizationManager victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new DefaultResourceAuthorizationManager();
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAddNullResource() {
     victim.add(null);
   }
-
+  
   @Test
   public void shouldAuthorizeAddedResource() {
     final String resource = "/resource.js";
     victim.add(resource);
     assertTrue(victim.isAuthorized(resource));
   }
-
+  
   @Test
   public void shouldNotAuthorizeAddedResourceAfterClearIsInvoked() {
     final String resource = "/resource.js";
@@ -39,7 +53,7 @@ public class TestDefaultResourceAuthorizationManager {
     victim.clear();
     assertFalse(victim.isAuthorized(resource));
   }
-
+  
   @Test
   public void shouldContainOnlyOneResourceWhenSameIsAddedTwice() {
     final String resource = "/resource.js";
