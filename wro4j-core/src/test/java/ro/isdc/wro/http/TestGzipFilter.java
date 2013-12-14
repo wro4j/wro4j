@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -26,9 +29,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.DelegatingServletInputStream;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.util.io.NullOutputStream;
+
 
 /**
  * @author Alex Objelean
@@ -41,8 +46,17 @@ public class TestGzipFilter {
   private HttpServletResponse mockResponse;
   @Mock
   private FilterChain mockFilterChain;
-
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp()
       throws Exception {
@@ -62,37 +76,43 @@ public class TestGzipFilter {
       }
     }).when(mockFilterChain).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
   }
-
+  
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test
-  public void shouldChainWhenGzipIsNotSupported() throws Exception {
+  public void shouldChainWhenGzipIsNotSupported()
+      throws Exception {
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     verify(mockFilterChain, Mockito.times(1)).doFilter(mockRequest, mockResponse);
   }
-
-
+  
   @Test
-  public void shouldGzipWhenGzipSupported() throws Exception {
+  public void shouldGzipWhenGzipSupported()
+      throws Exception {
     markGzipAsAllowed();
     final String content = "sampleContent";
     final InputStream sourceStream = new ByteArrayInputStream(content.getBytes());
     final ByteArrayOutputStream targetStream = new ByteArrayOutputStream();
-
-
+    
     when(mockRequest.getInputStream()).thenReturn(new DelegatingServletInputStream(sourceStream));
     when(mockResponse.getOutputStream()).thenReturn(new DelegatingServletOutputStream(targetStream));
-
+    
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
-
-    //not the same response is chained
+    
+    // not the same response is chained
     verify(mockFilterChain, Mockito.never()).doFilter(mockRequest, mockResponse);
-    //chain is invoked but with a different response
+    // chain is invoked but with a different response
     verify(mockFilterChain, Mockito.times(1)).doFilter(Mockito.eq(mockRequest), Mockito.any(HttpServletResponse.class));
-
+    
     final InputStream ungzippedStream = new GZIPInputStream(new ByteArrayInputStream(targetStream.toByteArray()));
-
+    
     assertEquals(content, IOUtils.toString(ungzippedStream));
   }
-
+  
   private void markGzipAsAllowed() {
     final String headerName = "Accept-Encoding";
     when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(Arrays.asList(headerName)));

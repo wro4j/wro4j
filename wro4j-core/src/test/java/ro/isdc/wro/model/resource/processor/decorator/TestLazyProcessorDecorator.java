@@ -12,7 +12,10 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,16 +40,31 @@ public class TestLazyProcessorDecorator {
   @Mock
   private Writer mockWriter;
   private ProcessorDecorator mockProcessorDecorator;
-
+  
   private LazyProcessorDecorator victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
     mockProcessorDecorator = Mockito.spy(new ProcessorDecorator(new JSMinProcessor()));
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test(expected = NullPointerException.class)
   public void cannotProcessNullLazyProcessor()
       throws Exception {
@@ -59,7 +77,7 @@ public class TestLazyProcessorDecorator {
     WroTestUtils.createInjector().inject(victim);
     victim.process(null, mockReader, mockWriter);
   }
-
+  
   @Test
   public void shouldInvokeLazyProcessor()
       throws Exception {
@@ -69,6 +87,7 @@ public class TestLazyProcessorDecorator {
       public Class<? extends Annotation> annotationType() {
         return SupportedResourceType.class;
       }
+      
       public ResourceType value() {
         return expectedResourceType;
       }
