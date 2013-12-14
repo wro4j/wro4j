@@ -49,16 +49,7 @@ public class ResourceSerializer implements JsonSerializer<Resource> {
   }
 
   private String getExternalUri(final String uri) {
-    String result = uri;
-    if (!isExternal(uri)) {
-      final StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.append(basePath);
-      stringBuilder.append(ResourceProxyRequestHandler.PATH_RESOURCES);
-      stringBuilder.append("?id=");
-      stringBuilder.append(uri);
-      result = stringBuilder.toString();
-    }
-    return result;
+    return isExternal(uri) ? uri : ResourceProxyRequestHandler.createProxyPath(basePath, uri);
   }
 
   private boolean isExternal(final String uri) {

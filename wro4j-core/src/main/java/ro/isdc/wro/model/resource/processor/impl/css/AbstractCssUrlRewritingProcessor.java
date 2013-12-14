@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.impl.css;
 
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PARAM_RESOURCE_ID;
-import static ro.isdc.wro.http.handler.ResourceProxyRequestHandler.PATH_RESOURCES;
 import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
 
 import java.io.IOException;
@@ -12,7 +10,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Matcher;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -20,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -167,25 +165,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @VisibleForTesting
    */
   protected String getUrlPrefix() {
-    final String requestURI = context.getRequest().getRequestURI();
-    return FilenameUtils.getFullPath(requestURI) + getProxyResourcePath();
-  }
-
-  /**
-   * @return the part of the url used to identify a proxy resource.
-   */
-  private String getProxyResourcePath() {
-    return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
-  }
-
-  /**
-   * @param url
-   *          of the resource to check.
-   * @return true if the provided url is a proxy resource (rewritten by {@link CssUrlRewritingProcessor}.
-   */
-  final boolean isProxyResource(final String url) {
-    Validate.notNull(url);
-    return url.contains(getProxyResourcePath());
+    return ResourceProxyRequestHandler.createProxyPath(context.getRequest().getRequestURI(), "");
   }
 
   /**

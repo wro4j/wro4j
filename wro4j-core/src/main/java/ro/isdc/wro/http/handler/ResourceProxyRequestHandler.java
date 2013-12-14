@@ -7,13 +7,16 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.http.support.HttpHeader;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
@@ -50,7 +53,7 @@ public class ResourceProxyRequestHandler
   @Inject
   private ResourceAuthorizationManager authManager;
   private ResponseHeadersConfigurer headersConfigurer;
-
+  
   /**
    * {@inheritDoc}
    */
@@ -140,5 +143,35 @@ public class ResourceProxyRequestHandler
    */
   protected ResponseHeadersConfigurer newResponseHeadersConfigurer() {
     return ResponseHeadersConfigurer.fromConfig(context.getConfig());
+  }
+
+  /**
+   * @param request
+   *          {@link HttpServletRequest} for a wro request. The assumption is that {@link WroFilter} has a mapping
+   *          ending with a <code>*</code> character.
+   * @return the path for this handler.
+   */
+  public static String createHandlerPath(final String requestUri) {
+    return createProxyPath(requestUri, "");
+  }
+  
+  public static String createProxyPath(final String requestUri, final String resourceId) {
+    Validate.notNull(resourceId);
+    return FilenameUtils.getFullPath(requestUri) + getProxyResourcePath() + resourceId;
+  }
+  
+  /**
+   * Checks if the provided url is a resource proxy request.
+   * @param url
+   *          to check.
+   * @return true if the provided url is a proxy resource.
+   */
+  public static boolean isProxyUrl(final String url) {
+    Validate.notNull(url);
+    return url.contains(getProxyResourcePath());
+  }
+  
+  private static String getProxyResourcePath() {
+    return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
 }

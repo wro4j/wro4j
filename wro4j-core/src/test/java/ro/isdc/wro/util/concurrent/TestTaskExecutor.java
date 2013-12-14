@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -114,6 +115,13 @@ public class TestTaskExecutor {
     tasks.add(createFailingCallable());
     tasks.add(createFailingCallable());
     victim.submit(tasks);
+  }
+  
+  @Test
+  public void test()
+      throws Exception {
+    victim.submit(Arrays.asList(createSlowCallable(1), createSlowCallable(2)));
+    victim.submit(Arrays.asList(createSlowCallable(1), createSlowCallable(2)));
   }
   
   private Callable<Void> createFailingCallable() {
