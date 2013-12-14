@@ -323,9 +323,8 @@ public class WroFilter
 
   /**
    * Perform actual processing. 
-   * @VisibleForTesting
    */
-  void processRequest(final HttpServletRequest request, final HttpServletResponse response)
+  private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
     setResponseHeaders(response);
     // process the uri using manager

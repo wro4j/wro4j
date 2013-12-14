@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.http;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -125,6 +126,6 @@ public class TestWroContextFilter {
     
     victim.init(mockFilterConfig);
     victim.doFilter(mockRequest, mockResponse, chain);
-    Assert.assertEquals(0, Context.countActive());
+    assertEquals(0, Context.countActive());
   }
 }
