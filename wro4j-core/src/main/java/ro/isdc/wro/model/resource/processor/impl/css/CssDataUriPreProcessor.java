@@ -108,7 +108,7 @@ public class CssDataUriPreProcessor
    * @return true if the image url should be replaced with another (servlet context relative).
    */
   private boolean isImageUrlChangeRequired(final String imageUrl) {
-    return !(imageUrl.startsWith("http") || ResourceProxyRequestHandler.isProxyUrl(imageUrl));
+    return !(imageUrl.startsWith("http") || ResourceProxyRequestHandler.isProxyUri(imageUrl));
   }
 
   /**

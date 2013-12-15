@@ -132,7 +132,7 @@ public class TestResourceProxyRequestHandler {
   
   @Test
   public void shouldAcceptCallsTo_wroResources() {
-    when(request.getRequestURI()).thenReturn("/wro/wroResources?id=test.css");
+    when(request.getRequestURI()).thenReturn("/wro/wroAPI/wroResources?id=test.css");
     assertTrue(victim.accept(request));
   }
   
@@ -272,5 +272,21 @@ public class TestResourceProxyRequestHandler {
   private InputStream getInputStream(final String filename)
       throws IOException {
     return this.getClass().getClassLoader().getResourceAsStream(packagePath + "/" + filename);
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void cannotAcceptNullRequestUriToCreateProxyPath() {
+    ResourceProxyRequestHandler.createProxyPath(null, "");
+  }
+  
+  @Test
+  public void shouldCreateProxyPath() {
+    assertEquals("/wro/wroAPI/wroResources?id=id", ResourceProxyRequestHandler.createProxyPath("/wro/all.js", "id"));
+    assertEquals("/wroAPI/wroResources?id=id", ResourceProxyRequestHandler.createProxyPath("", "id"));
+  }
+  
+  @Test
+  public void shouldDetectProxyUri() {
+    assertTrue(ResourceProxyRequestHandler.isProxyUri("/wroAPI/wroResources?id=id"));
   }
 }

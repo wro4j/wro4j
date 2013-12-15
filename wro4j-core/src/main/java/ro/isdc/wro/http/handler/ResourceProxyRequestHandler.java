@@ -1,5 +1,7 @@
 package ro.isdc.wro.http.handler;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,7 +71,7 @@ public class ResourceProxyRequestHandler
    */
   @Override
   public boolean accept(final HttpServletRequest request) {
-    return StringUtils.contains(request.getRequestURI(), PATH_RESOURCES);
+    return isProxyUri(request.getRequestURI());
   }
 
   private void serveProxyResourceUri(final HttpServletRequest request, final HttpServletResponse response)
@@ -146,18 +148,19 @@ public class ResourceProxyRequestHandler
   }
 
   /**
-   * @param request
-   *          {@link HttpServletRequest} for a wro request. The assumption is that {@link WroFilter} has a mapping
-   *          ending with a <code>*</code> character.
+   * Builds the request path for this request handler using the assumption that {@link WroFilter} has a mapping ending
+   * with a <code>*</code> character.
+   * 
+   * @param requestUri
+   *          of wro request used to compute the path to this request handler. This request uri is required, becuase we
+   *          do not know how the wro filter is mapped.
    * @return the path for this handler.
    */
-  public static String createHandlerPath(final String requestUri) {
-    return createProxyPath(requestUri, "");
-  }
-  
   public static String createProxyPath(final String requestUri, final String resourceId) {
-    Validate.notNull(resourceId);
-    return FilenameUtils.getFullPath(requestUri) + getProxyResourcePath() + resourceId;
+    notNull(requestUri);
+    notNull(resourceId);
+    final String basePath = StringUtils.isEmpty(requestUri) ? "/" : FilenameUtils.getFullPath(requestUri);
+    return basePath + getProxyResourcePath() + resourceId;
   }
   
   /**
@@ -166,12 +169,12 @@ public class ResourceProxyRequestHandler
    *          to check.
    * @return true if the provided url is a proxy resource.
    */
-  public static boolean isProxyUrl(final String url) {
+  public static boolean isProxyUri(final String url) {
     Validate.notNull(url);
     return url.contains(getProxyResourcePath());
   }
   
   private static String getProxyResourcePath() {
-    return String.format("%s?%s=", PATH_RESOURCES, PARAM_RESOURCE_ID);
+    return String.format("%s/%s?%s=", PATH_API, PATH_RESOURCES, PARAM_RESOURCE_ID);
   }
 }
