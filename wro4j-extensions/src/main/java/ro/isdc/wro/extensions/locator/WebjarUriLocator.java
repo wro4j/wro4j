@@ -14,6 +14,7 @@ import org.webjars.WebJarAssetLocator;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
+import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 
 /**
  * Locator responsible for locating webjar resources. A webjar resource is a classpath resource respecting a certain
@@ -72,9 +73,11 @@ public class WebjarUriLocator
     }
   }
 
-
+  /**
+   * Replaces the protocol specific prefix and removes the query path if it exist, since it should not be accepted.
+   */
   private String extractPath(final String uri) {
-    return uri.replace(PREFIX, "");
+    return DefaultWildcardStreamLocator.stripQueryPath(uri.replace(PREFIX, ""));
   }
 
   /**
