@@ -3,12 +3,16 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -19,7 +23,7 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
  * Test class for {@link FallbackAwareXmlModelFactory}.
- * 
+ *
  * @author Alex Objelean
  */
 public class TestFallbackAwareWroModelFactory {
@@ -29,12 +33,12 @@ public class TestFallbackAwareWroModelFactory {
    * Used to simulate that a resource stream used to build the model is not available.
    */
   private boolean isModelAvailable;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());

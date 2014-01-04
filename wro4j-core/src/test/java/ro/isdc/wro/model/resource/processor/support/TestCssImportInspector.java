@@ -30,50 +30,50 @@ public class TestCssImportInspector {
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Test
   public void shouldRemoveImportsFromComments()
       throws Exception {
     compareResultsFromFolderUsingProcessor("expectedRemoveImportsFromComments", createImportsRemovalProcessor());
   }
-  
+
   @Test
   public void shouldRemoveImports()
       throws Exception {
     compareResultsFromFolderUsingProcessor("expectedRemoveImports", createRemoveImportsProcessor());
   }
-  
+
   @Test
   public void shouldFindImports()
       throws Exception {
     compareResultsFromFolderUsingProcessor("expectedFindImports", createFindImportsProcessor());
   }
 
-  private void compareResultsFromFolderUsingProcessor(final String expectedFolderName, final ResourcePreProcessor processor) throws Exception {
+  private void compareResultsFromFolderUsingProcessor(final String expectedFolderName, final ResourceProcessor processor) throws Exception {
     final URL url = getClass().getResource("cssimport");
-    
+
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), expectedFolderName);
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-  
+
   @Test
   public void shouldDetectImportStatement() {
     assertHasImport("@import 'style.css'");
     assertHasImport("@import url(style.css)");
   }
-  
+
   @Test
   public void shouldDetectMissingImportStatement() {
     assertFalse(createCssImportInspector("#someId {color: red}").containsImport());
     assertFalse(createCssImportInspector("#import {display: block}").containsImport());
   }
-  
+
   private ResourceProcessor createFindImportsProcessor() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -85,7 +85,7 @@ public class TestCssImportInspector {
       }
     };
   }
-  
+
   private ResourceProcessor createImportsRemovalProcessor() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -94,7 +94,7 @@ public class TestCssImportInspector {
       }
     };
   }
-  
+
   private ResourceProcessor createRemoveImportsProcessor() {
     return new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -103,11 +103,11 @@ public class TestCssImportInspector {
       }
     };
   }
-  
+
   protected CssImportInspector createCssImportInspector(final String cssContent) {
     return new CssImportInspector(cssContent);
   }
-  
+
   protected final void assertHasImport(final String cssContent) {
     assertTrue(createCssImportInspector(cssContent).containsImport());
   }

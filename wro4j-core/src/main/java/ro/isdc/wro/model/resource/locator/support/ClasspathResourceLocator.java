@@ -59,7 +59,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
   /**
    * Same as path but without the prefix.
    */
-  private final String location;
+  private String location;
 
   public ClasspathResourceLocator(final String path) {
     Validate.notNull(path);
@@ -88,7 +88,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
       try {
-        return locateWildcardStream(uri, location);
+        return locateWildcardStream(path, location);
       } catch (final IOException e) {
         if (location.contains("?")) {
           location = DefaultWildcardStreamLocator.stripQueryPath(location);
