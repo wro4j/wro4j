@@ -1,5 +1,6 @@
 package ro.isdc.wro.model.resource.support.change;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -13,8 +14,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -63,9 +67,19 @@ public class TestResourceWatcher {
   private ResourceLocator mockLocator;
   @Mock
   private ResourceLocatorFactory mockLocatorFactory;
-
+  
   private ResourceWatcher victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp()
       throws Exception {
@@ -75,12 +89,28 @@ public class TestResourceWatcher {
     when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
     when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
     when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
+      
+      public boolean accept(final String uri) {
+        return true;
+      }
+    });
 
+    victim = new ResourceWatcher();
     createDefaultInjector().inject(victim);
   }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
+  public Injector createDefaultInjector() {
+    final UriLocatorFactory locatorFactory = new AbstractUriLocatorFactory() {
+      public UriLocator getInstance(final String uri) {
+        return mockLocator;
+      }
+    };
 
-  public Injector createDefaultInjector()
-      throws Exception {
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     model.addGroup(new Group(GROUP_2).addResource(Resource.create(RESOURCE_FIRST)).addResource(
         Resource.create("/path/2.js")));
@@ -90,20 +120,21 @@ public class TestResourceWatcher {
     final Injector injector = InjectorBuilder.create(factory).build();
     return injector;
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotCheckNullCacheEntry() {
     Context.unset();
     victim = new ResourceWatcher();
     victim.check(null);
   }
-
+  
   @Test
-  public void shouldNotDetectChangeAfterFirstRun() throws Exception {
+  public void shouldNotDetectChangeAfterFirstRun()
+      throws Exception {
     victim.check(cacheEntry);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
   }
-
+  
   @Test
   public void shouldDetectResourceChange()
       throws Exception {
@@ -127,7 +158,7 @@ public class TestResourceWatcher {
     assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
     assertTrue(flag.get());
   }
-
+  
   @Test
   public void shouldAssumeResourceNotChangedWhenStreamIsUnavailable()
       throws Exception {
@@ -140,13 +171,13 @@ public class TestResourceWatcher {
     };
     createDefaultInjector().inject(victim);
     final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
-
+    
     Mockito.when(mockLocatorFactory.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
-
+    
     victim.check(cacheEntry);
     verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
   }
-
+  
   @Test
   public void shouldDetectChangeOfImportedResource()
       throws Exception {
@@ -159,7 +190,7 @@ public class TestResourceWatcher {
       void onResourceChanged(final Resource resource) {
         importResourceChanged.set(true);
       }
-
+      
       @Override
       void onGroupChanged(final CacheKey key) {
         groupChanged.set(true);
@@ -182,12 +213,13 @@ public class TestResourceWatcher {
     assertTrue(groupChanged.get());
     assertTrue(importResourceChanged.get());
   }
-
+  
   /**
    * Fix the issue described <a href="https://github.com/alexo/wro4j/issues/72">here</a>.
    */
   @Test
-  public void shouldNotDetectErroneouslyChange() throws Exception {
+  public void shouldNotDetectErroneouslyChange()
+      throws Exception {
     final AtomicBoolean groupChanged = new AtomicBoolean(false);
     final AtomicBoolean resourceChanged = new AtomicBoolean(false);
     victim = new ResourceWatcher() {
@@ -195,38 +227,40 @@ public class TestResourceWatcher {
       void onResourceChanged(final Resource resource) {
         resourceChanged.set(true);
       }
+      
       @Override
       void onGroupChanged(final CacheKey key) {
         groupChanged.set(true);
       }
     };
-
+    
     createDefaultInjector().inject(victim);
-    //first check will always detect changes.
+    // first check will always detect changes.
     victim.check(cacheEntry2);
-
+    
     Mockito.when(mockLocatorFactory.locate(RESOURCE_FIRST)).then(answerWithContent("different"));
-
+    
     victim.check(cacheEntry2);
     assertTrue(groupChanged.get());
     assertTrue(resourceChanged.get());
-
+    
     groupChanged.set(false);
     resourceChanged.set(false);
-
-    //next check should find no change
+    
+    // next check should find no change
     victim.check(cacheEntry2);
     assertFalse(groupChanged.get());
     assertFalse(resourceChanged.get());
   }
-
+  
   private static class CallbackRegistryHolder {
     @Inject
     private LifecycleCallbackRegistry registry;
   }
-
+  
   @Test
-  public void shouldInvokeCallbackWhenChangeIsDetected() throws Exception {
+  public void shouldInvokeCallbackWhenChangeIsDetected()
+      throws Exception {
     final CallbackRegistryHolder callbackRegistryHolder = new CallbackRegistryHolder();
     victim = new ResourceWatcher();
     final AtomicBoolean flag = new AtomicBoolean();
@@ -246,7 +280,7 @@ public class TestResourceWatcher {
     victim.check(cacheEntry);
     assertTrue(flag.get());
   }
-
+  
   private Answer<InputStream> answerWithContent(final String content) {
     return new Answer<InputStream>() {
       public InputStream answer(final InvocationOnMock invocation)

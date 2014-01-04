@@ -1,10 +1,14 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Reader;
 import java.io.Writer;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -15,6 +19,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroTestUtils;
+
 
 /**
  * @author Alex Objelean
@@ -33,6 +38,17 @@ public class TestBenchmarkProcessorDecorator {
   @Mock
   private Runnable mockAfter;
   private BenchmarkProcessorDecorator victim;
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -43,6 +59,7 @@ public class TestBenchmarkProcessorDecorator {
         super.before(stopWatch);
         mockBefore.run();
       }
+      
       @Override
       void after(final StopWatch stopWatch) {
         super.after(stopWatch);
@@ -51,22 +68,24 @@ public class TestBenchmarkProcessorDecorator {
     };
     WroTestUtils.createInjector().inject(victim);
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   @Test
-  public void shouldInvokeBeforeAndAfterInDebugMode() throws Exception {
+  public void shouldInvokeBeforeAndAfterInDebugMode()
+      throws Exception {
     Context.get().getConfig().setDebug(true);
     victim.process(mockResource, mockReader, mockWriter);
     Mockito.verify(mockBefore).run();
     Mockito.verify(mockAfter).run();
   }
-
+  
   @Test
-  public void shouldNotInvokeBeforeAndAfterInProductionMode() throws Exception {
+  public void shouldNotInvokeBeforeAndAfterInProductionMode()
+      throws Exception {
     Context.get().getConfig().setDebug(false);
     victim.process(mockResource, mockReader, mockWriter);
     Mockito.verify(mockBefore, Mockito.never()).run();

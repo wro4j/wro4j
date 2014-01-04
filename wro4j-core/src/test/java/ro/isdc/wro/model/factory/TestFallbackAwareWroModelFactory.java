@@ -29,7 +29,16 @@ public class TestFallbackAwareWroModelFactory {
    * Used to simulate that a resource stream used to build the model is not available.
    */
   private boolean isModelAvailable;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
   @Before
   public void setUp() {
     isModelAvailable = true;

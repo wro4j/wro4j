@@ -3,12 +3,17 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -39,7 +44,17 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestCssDataUriPreProcessor {
   private final String PROXY_RESOURCE_PATH = "classpath:ro/isdc/wro/model/resource/processor/dataUri/proxyImage/";
   private ResourceProcessor processor;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   protected DataUriGenerator createMockDataUriGenerator() {
     try {
       final DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
@@ -50,9 +65,9 @@ public class TestCssDataUriPreProcessor {
       throw new RuntimeException("Cannot create DataUriGenerator mock", e);
     }
   }
-
+  
   @Before
-  public void init()
+  public void setUp()
       throws Exception {
     Context.set(Context.standaloneContext());
     processor = new CssDataUriPreProcessor() {
@@ -63,7 +78,12 @@ public class TestCssDataUriPreProcessor {
     };
     initProcessor(processor);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   final void initProcessor(final ResourceProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setLocatorFactory(createLocatorFactory());
@@ -96,12 +116,12 @@ public class TestCssDataUriPreProcessor {
     };
     return locatorFactory;
   }
-
+  
   @Test
   public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
@@ -112,7 +132,7 @@ public class TestCssDataUriPreProcessor {
       throws Exception {
     processor = new CssDataUriPreProcessor();
     initProcessor(processor);
-
+    
     final URL url = getClass().getResource("dataUri");
     
     final File testFolder = new File(url.getFile(), "test");

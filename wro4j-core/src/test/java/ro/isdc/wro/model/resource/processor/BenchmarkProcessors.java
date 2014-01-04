@@ -27,7 +27,7 @@ import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.provider.ProviderFinder;
 
 /**
- * Used to check how long does it take to process a given amount of resources for eacch processor.
+ * Used to check how long does it take to process a given amount of resources for each processor.
  *
  * @author Alex Objelean
  */

@@ -1,12 +1,18 @@
 package ro.isdc.wro.model.factory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -36,14 +42,23 @@ public class TestDefaultWroModelFactory {
   private ResourceAuthorizationManager authManager;
   @Inject
   private Injector injector;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
     // required to get the authManager and make assertions agains it.
     injector.inject(this);
-    Context.set(Context.standaloneContext());
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test
@@ -63,7 +78,7 @@ public class TestDefaultWroModelFactory {
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        Assert.assertEquals(expectedModel, victim.create());
+        assertEquals(expectedModel, victim.create());
         return null;
       }
     }));
@@ -73,24 +88,24 @@ public class TestDefaultWroModelFactory {
   public void shouldAuthorizeResourcesFromModelWhenInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(true);
-    Context.set(Context.standaloneContext(), config);
+    Context.get().setConfig(config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
 
-    Assert.assertTrue(authManager.isAuthorized(authorizedResourceUri));
-    Assert.assertFalse(authManager.isAuthorized("/notAuthorized.js"));
+    assertTrue(authManager.isAuthorized(authorizedResourceUri));
+    assertFalse(authManager.isAuthorized("/notAuthorized.js"));
   }
 
   @Test
   public void shouldNotAuthorizeResourcesFromModelWhenNotInDebugMode() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(false);
-    Context.set(Context.standaloneContext(), config);
+    Context.get().setConfig(config);
     final String authorizedResourceUri = "/authorized.js";
     createSampleModel(authorizedResourceUri);
 
-    Assert.assertFalse(authManager.isAuthorized(authorizedResourceUri));
-    Assert.assertFalse(authManager.isAuthorized("/notAuthorized.js"));
+    assertFalse(authManager.isAuthorized(authorizedResourceUri));
+    assertFalse(authManager.isAuthorized("/notAuthorized.js"));
   }
 
   /**
@@ -110,4 +125,10 @@ public class TestDefaultWroModelFactory {
     injector.inject(victim);
     victim.create();
   }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
 }

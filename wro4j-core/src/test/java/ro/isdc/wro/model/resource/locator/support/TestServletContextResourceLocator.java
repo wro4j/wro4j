@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.Validate;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -50,6 +50,16 @@ public class TestServletContextResourceLocator {
   @Mock
   private FilterConfig mockFilterConfig;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -63,6 +73,11 @@ public class TestServletContextResourceLocator {
     final WroConfiguration config = new WroConfiguration();
     config.setConnectionTimeout(100);
     Context.set(context, config);
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   private void useLocator(final ServletContextResourceLocator locator) {
@@ -170,7 +185,8 @@ public class TestServletContextResourceLocator {
   }
 
   @Test(expected = IOException.class)
-  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed() throws Exception {
+  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed()
+      throws Exception {
     final AtomicBoolean dispatcherInvokedFlag = new AtomicBoolean();
     useLocator(new ServletContextResourceLocator(mockServletContext, "/test.css") {
       @Override

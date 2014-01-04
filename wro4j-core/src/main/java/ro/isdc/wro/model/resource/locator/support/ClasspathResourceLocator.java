@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
+import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer.NoMoreAttemptsIOException;
@@ -50,6 +51,7 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     notNull(path);
     return PREFIX + path;
   }
+
   /**
    * Classpath location. This value is expected to be prefixed with "classpath:" value.
    */
@@ -85,7 +87,14 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     LOG.debug("Reading uri: {}", path);
 
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      return locateWildcardStream(path, location);
+      try {
+        return locateWildcardStream(uri, location);
+      } catch (final IOException e) {
+        if (location.contains("?")) {
+          location = DefaultWildcardStreamLocator.stripQueryPath(location);
+          LOG.debug("Trying fallback location: {}", location);
+        }
+      }
     }
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
@@ -93,7 +102,6 @@ public class ClasspathResourceLocator extends AbstractResourceLocator {
     }
     return is;
   }
-
 
   /**
    * @return an input stream for an uri containing a wildcard for a given location.

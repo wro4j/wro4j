@@ -3,13 +3,18 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -22,30 +27,43 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssDataUriPreProcessor} class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
 public class TestDuplicateAwareCssDataUriPreProcessor {
   private ResourceProcessor processor;
-
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
-  public void init() {
+  public void setUp() {
     processor = new DuplicatesAwareCssDataUriPreProcessor();
     Context.set(Context.standaloneContext());
     WroTestUtils.initProcessor(processor);
   }
-
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   /**
    * Check if a large dataUri with more than 32KB does not replace original url.
    */
   @Test
   public void processLargeDataUri()
-    throws Exception {
+      throws Exception {
     final URL url = getClass().getResource("duplicateAwareDataUri");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", new ResourceProcessor() {
@@ -55,10 +73,10 @@ public class TestDuplicateAwareCssDataUriPreProcessor {
       }
     });
   }
-
-
+  
   /**
-   * @param resourceUri the resource should return.
+   * @param resourceUri
+   *          the resource should return.
    * @return mocked {@link Resource} object.
    */
   private Resource createMockResource(final String resourceUri) {

@@ -3,12 +3,17 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.impl.SingleLineCommentStripperProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -21,7 +26,15 @@ import ro.isdc.wro.util.WroTestUtils;
  * @created Created on Nov 28, 2008
  */
 public class TestSingleLineCommentStripperProcessor {
-
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
   @Test
   public void testFromFolder() throws IOException {
     final ResourceProcessor processor = new SingleLineCommentStripperProcessor();

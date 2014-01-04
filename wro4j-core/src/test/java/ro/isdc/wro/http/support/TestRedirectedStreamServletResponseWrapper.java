@@ -1,5 +1,7 @@
 package ro.isdc.wro.http.support;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,10 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ClasspathResourceLocator;
 
@@ -24,6 +28,12 @@ public class TestRedirectedStreamServletResponseWrapper {
   @Mock
   private HttpServletResponse mockResponse;
   private ByteArrayOutputStream redirectedStream;
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     redirectedStream = new ByteArrayOutputStream();
@@ -76,6 +86,6 @@ public class TestRedirectedStreamServletResponseWrapper {
       }
     };
     victim.sendRedirect("/does/not/matter");
-    Assert.assertEquals(message, new String(redirectedStream.toByteArray()));
+    assertEquals(message, new String(redirectedStream.toByteArray()));
   }
 }

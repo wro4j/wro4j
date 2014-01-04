@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -14,7 +15,10 @@ import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -32,28 +36,40 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssUrlRewritingProcessor} class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class TestCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestCssUrlRewritingProcessor.class);
   private CssUrlRewritingProcessor processor;
-
+  
   private static final String CSS_INPUT_NAME = "cssUrlRewriting.css";
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new CssUrlRewritingProcessor() {
       @Inject
       private ResourceAuthorizationManager authorizationManager;
+      
       @Override
       protected void onProcessCompleted() {
         if (authorizationManager instanceof DefaultResourceAuthorizationManager) {
           LOG.debug("allowed urls: {}", ((DefaultResourceAuthorizationManager) authorizationManager).list());
         }
       }
+      
       @Override
       protected String getUrlPrefix() {
         return "[WRO-PREFIX]?id=";
@@ -61,39 +77,43 @@ public class TestCssUrlRewritingProcessor {
     };
     WroTestUtils.createInjector().inject(processor);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test
   public void testFromFolder()
       throws Exception {
     final URL url = getClass().getResource("cssUrlRewriting");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-
+  
   /**
    * When background url contains a dataUri, the rewriting should have no effect.
    */
   @Test
   public void processResourceWithDataUriEncodedValue()
-    throws IOException {
+      throws IOException {
     final String resourceUri = "classpath:cssUrlRewriting-dataUri.css";
     WroTestUtils.compareProcessedResourceContents(resourceUri, resourceUri, new ResourceProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
-        throws IOException {
+          throws IOException {
         processor.process(createMockResource(resourceUri), reader, writer);
       }
     });
   }
-
-
+  
   /**
    * Test a classpath css resource.
    */
   @Test
   public void processClasspathResourceType()
-    throws IOException {
+      throws IOException {
     final String resourceUri = "classpath:" + CSS_INPUT_NAME;
     WroTestUtils.compareProcessedResourceContents(resourceUri, "classpath:cssUrlRewriting-classpath-outcome.css",
       new ResourceProcessor() {
@@ -103,10 +123,10 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
-
+  
   /**
-   * @param resourceUri the resource should return.
+   * @param resourceUri
+   *          the resource should return.
    * @return mocked {@link Resource} object.
    */
   private Resource createMockResource(final String resourceUri) {
@@ -114,14 +134,13 @@ public class TestCssUrlRewritingProcessor {
     Mockito.when(resource.getUri()).thenReturn(resourceUri);
     return resource;
   }
-
-
+  
   /**
    * Test a servletContext css resource.
    */
   @Test
   public void processServletContextResourceType()
-    throws IOException {
+      throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-servletContext-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -130,13 +149,13 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
+  
   /**
    * Test a servletContext css resource.
    */
   @Test
   public void processServletContextResourceTypeWithAggregatedFolderSet()
-    throws IOException {
+      throws IOException {
     Context.get().setAggregatedFolderPath("wro/css");
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-servletContext-aggregatedFolderSet-outcome.css", new ResourceProcessor() {
@@ -146,14 +165,13 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
-
+  
   /**
    * Test a resource which is located inside WEB-INF protected folder.
    */
   @Test
   public void processWEBINFServletContextResourceType()
-    throws IOException {
+      throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-WEBINFservletContext-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -162,13 +180,13 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
+  
   /**
    * Test a url css resource.
    */
   @Test
   public void processUrlResourceType()
-    throws IOException {
+      throws IOException {
     WroTestUtils.compareProcessedResourceContents("classpath:" + CSS_INPUT_NAME,
       "classpath:cssUrlRewriting-url-outcome.css", new ResourceProcessor() {
         public void process(final Resource resource, final Reader reader, final Writer writer)
@@ -177,19 +195,20 @@ public class TestCssUrlRewritingProcessor {
         }
       });
   }
-
+  
   @Test
-  public void checkUrlIsAllowed() throws Exception {
+  public void checkUrlIsAllowed()
+      throws Exception {
     processClasspathResourceType();
     assertFalse(processor.isUriAllowed("/WEB-INF/web.xml"));
     assertTrue(processor.isUriAllowed("classpath:folder/img.gif"));
   }
-
+  
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);
   }
-
+  
   /**
    * Tests that the Context injected into processor is thread safe and uses the values of set by the thread which runs
    * the processor.
@@ -201,14 +220,18 @@ public class TestCssUrlRewritingProcessor {
     WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {
-        Context.set(Context.standaloneContext());
-        if (new Random().nextBoolean()) {
-          processServletContextResourceTypeWithAggregatedFolderSet();
-        } else {
-          // ensure that a thread uses null aggregatedFolderPath which is injected into processor.
-          Context.get().setAggregatedFolderPath(null);
+        try {
+          Context.set(Context.standaloneContext());
+          if (new Random().nextBoolean()) {
+            processServletContextResourceTypeWithAggregatedFolderSet();
+          } else {
+            // ensure that a thread uses null aggregatedFolderPath which is injected into processor.
+            Context.get().setAggregatedFolderPath(null);
+          }
+          return null;
+        } finally {
+          Context.unset();
         }
-        return null;
       }
     }, 20);
   }

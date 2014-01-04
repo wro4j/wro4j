@@ -51,6 +51,10 @@ public class DefaultWildcardStreamLocator
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
   /**
+   * Regex used to identify the query path from the provided path.
+   */
+  private static final String REGEX_QUERY_PATH = "\\?.*";
+  /**
    * Ensures File's natural ordering across different platforms.
    */
   private static final Comparator<File> ALPHABETIC_FILE_COMPARATOR = new Comparator<File>() {
@@ -58,6 +62,18 @@ public class DefaultWildcardStreamLocator
       return o1.getPath().compareTo(o2.getPath());
     }
   };
+
+  /**
+   * Removes the query path from the path which potentially could be treated as a path containing wildcard special
+   * characters.
+   *
+   * @param path to strip the query path from.
+   * @return a path with the query path removed.
+   */
+  public static String stripQueryPath(final String path) {
+    return path.replaceFirst(REGEX_QUERY_PATH, "");
+  }
+
   /**
    * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
    */

@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,7 +40,15 @@ public class TestConfigurableLocatorFactory {
   @Mock
   private ProviderFinder<LocatorProvider> mockProviderFinder;
   private ConfigurableLocatorFactory victim;
-
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);

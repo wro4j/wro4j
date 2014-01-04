@@ -3,8 +3,10 @@ package ro.isdc.wro.model.resource.locator.factory;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator;
 import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.LocatorStrategy;
 
@@ -14,7 +16,12 @@ import ro.isdc.wro.model.resource.locator.support.ServletContextResourceLocator.
  */
 public class TestDefaultUriLocatorFactory {
   private DefaultResourceLocatorFactory victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new DefaultResourceLocatorFactory();

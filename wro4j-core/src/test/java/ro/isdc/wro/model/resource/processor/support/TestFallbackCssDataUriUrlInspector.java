@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.resource.processor.support;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -8,8 +10,10 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.support.CssUrlInspector.ItemHandler;
@@ -21,7 +25,12 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestFallbackCssDataUriUrlInspector {
   private FallbackCssDataUriUrlInspector victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new FallbackCssDataUriUrlInspector();

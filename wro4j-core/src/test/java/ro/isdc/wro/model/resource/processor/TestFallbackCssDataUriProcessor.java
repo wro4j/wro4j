@@ -3,10 +3,15 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -19,17 +24,27 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssDataUriPreProcessor} class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
 public class TestFallbackCssDataUriProcessor
     extends TestCssDataUriPreProcessor {
   private ResourceProcessor processor;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Override
   @Before
-  public void init() {
+  public void setUp() {
     Context.set(Context.standaloneContext());
     processor = new FallbackCssDataUriProcessor() {
       @Override
@@ -37,16 +52,21 @@ public class TestFallbackCssDataUriProcessor
         return createMockDataUriGenerator();
       }
     };
-    //find a way to use a custom uriLocator
+    // find a way to use a custom uriLocator
     initProcessor(processor);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Override
   @Test
   public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedFallback");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);

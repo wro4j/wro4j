@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,6 +51,11 @@ public class TestCssImportPreProcessor {
     WroTestUtils.initProcessor(victim);
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test
   public void testFromFolder()
       throws Exception {

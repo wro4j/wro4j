@@ -3,6 +3,7 @@ package ro.isdc.wro.model.resource.support.change;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +31,11 @@ public class TestResourceChangeDetector {
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test(expected = NullPointerException.class)
