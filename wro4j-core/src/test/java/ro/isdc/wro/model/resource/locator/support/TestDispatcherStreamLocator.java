@@ -18,7 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -44,7 +46,12 @@ public class TestDispatcherStreamLocator {
   @Mock
   private UriLocator mockUriLocator;
   private DispatcherStreamLocator victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -53,6 +60,11 @@ public class TestDispatcherStreamLocator {
     Context.set(Context.standaloneContext());
     victim = new DispatcherStreamLocator();
     WroTestUtils.createInjector().inject(victim);
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test(expected = IOException.class)

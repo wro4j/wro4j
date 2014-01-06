@@ -322,7 +322,7 @@ public class WroFilter
   }
 
   /**
-   * Perform actual processing.
+   * Perform actual processing. 
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {

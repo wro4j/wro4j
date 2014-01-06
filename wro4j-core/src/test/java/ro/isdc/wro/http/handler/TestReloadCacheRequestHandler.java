@@ -1,5 +1,6 @@
 package ro.isdc.wro.http.handler;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -14,7 +15,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +37,16 @@ public class TestReloadCacheRequestHandler {
   @Mock
   private HttpServletResponse response;
   
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
@@ -40,6 +54,11 @@ public class TestReloadCacheRequestHandler {
     
     Context.set(Context.webContext(request, response, mock(FilterConfig.class)));
     WroTestUtils.createInjector().inject(victim);
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
   
   @Test

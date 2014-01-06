@@ -1,21 +1,26 @@
 package ro.isdc.wro.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -24,9 +29,19 @@ import ro.isdc.wro.util.StopWatch;
  */
 public class TestTaskExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(TestTaskExecutor.class);
-
+  
   private TaskExecutor<Void> victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new TaskExecutor<Void>() {
@@ -37,14 +52,14 @@ public class TestTaskExecutor {
       }
     };
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotSubmitNullCallables()
       throws Exception {
     final Collection<Callable<Void>> callables = null;
     victim.submit(callables);
   }
-
+  
   private Callable<Void> createSlowCallable(final long millis) {
     return new Callable<Void>() {
       public Void call()
@@ -54,25 +69,25 @@ public class TestTaskExecutor {
       }
     };
   }
-
+  
   @Test
   public void shouldHaveMinimalOverheadWhenRunningASingleTask()
       throws Exception {
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
     final long delay = 100;
     callables.add(createSlowCallable(delay));
-
+    
     final long start = System.currentTimeMillis();
     victim.submit(callables);
     final long end = System.currentTimeMillis();
-
+    
     final long delta = end - start;
     LOG.debug("Execution took: {}", delta);
-    //number of milliseconds added by overhead
+    // number of milliseconds added by overhead
     final long overhead = 40;
     assertTrue(delta < delay + overhead);
   }
-
+  
   @Test
   public void shouldBeFasterWhenRunningMultipleSlowTasks()
       throws Exception {
@@ -82,25 +97,33 @@ public class TestTaskExecutor {
     for (int i = 0; i < times; i++) {
       callables.add(createSlowCallable(delay));
     }
-
+    
     final long start = System.currentTimeMillis();
     victim.submit(callables);
     final long end = System.currentTimeMillis();
-
+    
     final long delta = end - start;
     LOG.debug("Execution took: {}", delta);
     assertTrue(delta < delay * times);
   }
-
+  
   @Test(expected = WroRuntimeException.class)
-  public void shouldPropagateOriginalException() throws Exception {
+  public void shouldPropagateOriginalException()
+      throws Exception {
     final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
-    //add at least two, otherwise no concurrency is applied.
+    // add at least two, otherwise no concurrency is applied.
     tasks.add(createFailingCallable());
     tasks.add(createFailingCallable());
     victim.submit(tasks);
   }
-
+  
+  @Test
+  public void test()
+      throws Exception {
+    victim.submit(Arrays.asList(createSlowCallable(1), createSlowCallable(2)));
+    victim.submit(Arrays.asList(createSlowCallable(1), createSlowCallable(2)));
+  }
+  
   private Callable<Void> createFailingCallable() {
     return new Callable<Void>() {
       public Void call()
@@ -109,11 +132,11 @@ public class TestTaskExecutor {
       }
     };
   }
-
+  
   private static void printDate() {
     LOG.debug(new SimpleDateFormat("HH:ss:S").format(new Date()));
   }
-
+  
   public static void main(final String[] args)
       throws Exception {
     final TaskExecutor<String> executor = new TaskExecutor<String>() {

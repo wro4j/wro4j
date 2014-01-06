@@ -1,10 +1,12 @@
 package ro.isdc.wro.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.lang3.Validate;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,12 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  */
 public class TestProxyFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestProxyFactory.class);
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Test
   public void shouldCreateProxyForAnObjectWithNotAAnInterfaceType() {
     final Object proxy = ProxyFactory.proxy(new ObjectFactory<Object>() {
