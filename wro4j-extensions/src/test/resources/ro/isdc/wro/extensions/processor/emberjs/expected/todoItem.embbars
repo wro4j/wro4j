@@ -12,13 +12,13 @@ function anonymous(Handlebars, depth0, helpers, partials, data) {
     if (stack1 = helpers.done) {
         stack1 = stack1.call(depth0, options);
     } else {
-        stack1 = depth0.done;
-        stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1;
+        stack1 = (depth0 && depth0.done);
+        stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1;
     }
     hashTypes = {};
     hashContexts = {};
     if (!helpers.done) {
-        stack1 = blockHelperMissing.call(depth0, stack1, options);
+        stack1 = blockHelperMissing.call(depth0, "done", options);
     }
     if (stack1 || stack1 === 0) {
         data.buffer.push(stack1);
