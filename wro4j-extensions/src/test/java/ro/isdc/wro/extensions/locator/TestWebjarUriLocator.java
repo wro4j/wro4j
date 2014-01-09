@@ -58,7 +58,7 @@ public class TestWebjarUriLocator {
       throws Exception {
     victim.locate("webjar:invalid.js");
   }
-  
+
   @Test
   public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar() throws IOException {
 	  assertNotEmpty(victim.locate("webjar:webjarFail.js"));
@@ -68,5 +68,11 @@ public class TestWebjarUriLocator {
       throws IOException {
     IOUtils.read(stream, new byte[] {});
     stream.close();
+  }
+
+
+  @Test
+  public void shouldLocateWebjarResourceContainingQuestionMarkInUri() throws Exception {
+    victim.locate("webjar:font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3");
   }
 }

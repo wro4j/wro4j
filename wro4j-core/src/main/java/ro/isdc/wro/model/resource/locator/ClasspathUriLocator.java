@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
+import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.JarWildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -27,7 +28,7 @@ import ro.isdc.wro.util.StringUtils;
 
 /**
  * Implementation of the {@link UriLocator} that is able to read a resource from a classpath.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Nov 6, 2008
  */
@@ -35,7 +36,7 @@ public class ClasspathUriLocator
     extends WildcardUriLocatorSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ClasspathUriLocator.class);
   /**
-   * Alias used to register this locator with {@link LocatorProvider}. 
+   * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "classpath";
   /**
@@ -50,17 +51,17 @@ public class ClasspathUriLocator
     notNull(path);
     return PREFIX + path;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean accept(final String url) {
     return isValid(url);
   }
-  
+
   /**
    * Check if a uri is a classpath resource.
-   * 
+   *
    * @param uri
    *          to check.
    * @return true if the uri is a classpath resource.
@@ -68,7 +69,7 @@ public class ClasspathUriLocator
   public static boolean isValid(final String uri) {
     return uri.trim().startsWith(PREFIX);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -77,10 +78,17 @@ public class ClasspathUriLocator
     Validate.notNull(uri, "URI cannot be NULL!");
     // replace prefix & clean path by removing '..' characters if exists and
     // normalizing the location to use.
-    final String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
-    
+    String location = StringUtils.cleanPath(uri.replaceFirst(PREFIX, "")).trim();
+
     if (getWildcardStreamLocator().hasWildcard(location)) {
-      return locateWildcardStream(uri, location);
+      try {
+        return locateWildcardStream(uri, location);
+      } catch (final IOException e) {
+        if (location.contains("?")) {
+          location = DefaultWildcardStreamLocator.stripQueryPath(location);
+          LOG.debug("Trying fallback location: {}", location);
+        }
+      }
     }
     final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(location);
     if (is == null) {
@@ -88,7 +96,7 @@ public class ClasspathUriLocator
     }
     return is;
   }
-  
+
   /**
    * @return an input stream for an uri containing a wildcard for a given location.
    */
@@ -113,7 +121,7 @@ public class ClasspathUriLocator
       return locateWildcardStream(uri, url);
     }
   }
-  
+
   private InputStream locateWildcardStream(final String uri, final URL url)
       throws IOException {
     if (url == null) {
@@ -122,7 +130,7 @@ public class ClasspathUriLocator
     }
     return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
   }
-  
+
   /**
    * Builds a {@link JarWildcardStreamLocator} in order to get resources from the full classpath.
    */
