@@ -1,22 +1,23 @@
 package ro.isdc.wro.model.resource.support.change;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheKey;
-import ro.isdc.wro.config.support.ContextPropagatingCallable;
+import ro.isdc.wro.cache.CacheStrategy;
+import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -44,8 +45,40 @@ import ro.isdc.wro.util.WroUtil;
  * @created 06 Aug 2012
  * @since 1.4.8
  */
-public class ResourceWatcher implements Destroyable {
+public class ResourceWatcher
+    implements Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
+
+  public static interface Callback {
+    /**
+     * Callback method invoked when a group change is detected.
+     *
+     * @param key
+     *          {@link CacheKey} associated with the group whose change was detected.
+     */
+    void onGroupChanged(final CacheKey key);
+
+    /**
+     * Invoked when the change of the resource is detected.
+     *
+     * @param resource
+     *          the {@link Resource} which changed.
+     */
+    void onResourceChanged(final Resource resource);
+  }
+
+  /**
+   * Default implementation of {@link Callback} which does nothing by default.
+   */
+  public static class CallbackSupport
+      implements Callback {
+    public void onGroupChanged(final CacheKey key) {
+    }
+
+    public void onResourceChanged(final Resource resource) {
+    };
+  }
+
   @Inject
   private WroModelFactory modelFactory;
   @Inject
@@ -56,6 +89,8 @@ public class ResourceWatcher implements Destroyable {
   private LifecycleCallbackRegistry lifecycleCallback;
   @Inject
   private ResourceChangeDetector resourceChangeDetector;
+  @Inject
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   /**
    * Executor responsible for running the check asynchronously.
    */
@@ -64,6 +99,7 @@ public class ResourceWatcher implements Destroyable {
     protected ExecutorService initialize() {
       return Executors.newFixedThreadPool(1, WroUtil.createDaemonThreadFactory(ResourceWatcher.class.getName()));
     }
+
     @Override
     public void destroy() {
       if (isInitialized()) {
@@ -74,20 +110,35 @@ public class ResourceWatcher implements Destroyable {
   };
 
   /**
-   * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
-   *
-   * @param cacheEntry
-   *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
+   * Check for change and removes the changed group if a change is detected.
    */
   public void check(final CacheKey cacheEntry) {
-    Validate.notNull(cacheEntry);
+    check(cacheEntry, new Callback() {
+      public void onGroupChanged(final CacheKey key) {
+        cacheStrategy.put(key, null);
+      }
+
+      public void onResourceChanged(final Resource resource) {
+        lifecycleCallback.onResourceChanged(resource);
+      }
+    });
+  }
+
+  /**
+   * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
+   *
+   * @param cacheKey
+   *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
+   */
+  public void check(final CacheKey cacheKey, final Callback callback) {
+    notNull(cacheKey);
     LOG.debug("ResourceWatcher started...");
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
-      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheEntry.getGroupName());
-      if (isGroupChanged(group.collectResourcesOfType(cacheEntry.getType()))) {
-        onGroupChanged(cacheEntry);
+      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
+      if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
+        callback.onGroupChanged(cacheKey);
       }
       resourceChangeDetector.reset();
     } catch (final Exception e) {
@@ -99,24 +150,6 @@ public class ResourceWatcher implements Destroyable {
   }
 
   /**
-   * Asynchronously check for change for the provided {@link CacheKey}. When the check is complete, the callback will be
-   * invoked.
-   *
-   * @param cacheKey {@link CacheKey} to check for change.
-   * @param callack {@link Callable} to invoke after check is completed.
-   */
-  public void checkAsync(final CacheKey cacheKey, final Runnable callack) {
-    final Callable<Void> callable = ContextPropagatingCallable.decorate(new Runnable() {
-      public void run() {
-        check(cacheKey);
-        callack.run();
-      }
-    });
-    executorServiceRef.get().submit(callable);
-  }
-
-
-  /**
    * Invoked when exception occurs.
    */
   protected void onException(final Exception e) {
@@ -125,14 +158,14 @@ public class ResourceWatcher implements Destroyable {
     LOG.debug("[FAIL] detecting resource change ", e);
   }
 
-  private boolean isGroupChanged(final Group group) {
+  private boolean isGroupChanged(final Group group, final Callback callback) {
     // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
       if (isChanged |= isChanged(resource, group.getName())) {
         try {
-          onResourceChanged(resource);
+          callback.onResourceChanged(resource);
         } catch (final Exception e) {
           LOG.debug("Exception while onResourceChange is invoked", e);
         }
@@ -140,28 +173,6 @@ public class ResourceWatcher implements Destroyable {
     }
     LOG.debug("isGroup {} changed: {}", group.getName(), BooleanUtils.toStringYesNo(isChanged));
     return isChanged;
-  }
-
-  /**
-   * Invoked when the change of the resource is detected.
-   *
-   * @param resource
-   *          the {@link Resource} which changed.
-   * @VisibleForTesting
-   */
-  void onResourceChanged(final Resource resource) {
-    lifecycleCallback.onResourceChanged(resource);
-  }
-
-  /**
-   * Invoked when a resource change detected.
-   *
-   * @param key
-   *          {@link CacheKey} which has to be invalidated because the corresponding group contains stale resources.
-   * @VisibleForTesting
-   */
-  protected void onGroupChanged(final CacheKey key) {
-    LOG.debug("Detected change for : {}", key);
   }
 
   /**
@@ -200,8 +211,7 @@ public class ResourceWatcher implements Destroyable {
    *          the name of the group being processed.
    * @return a processor used to detect changes in imported resources.
    */
-  private ResourcePreProcessor createCssImportProcessor(final AtomicBoolean changeDetected,
-      final String groupName) {
+  private ResourcePreProcessor createCssImportProcessor(final AtomicBoolean changeDetected, final String groupName) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
@@ -210,7 +220,8 @@ public class ResourceWatcher implements Destroyable {
         LOG.debug("\tisImportChanged: {}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
-          // we need to continue in order to store the hash for all imported resources, otherwise the change won't be computed correctly.
+          // we need to continue in order to store the hash for all imported resources, otherwise the change won't be
+          // computed correctly.
         }
       };
 
@@ -240,7 +251,6 @@ public class ResourceWatcher implements Destroyable {
     return processor;
   }
 
-
   /**
    * @VisibleForTesting
    */
@@ -253,4 +263,3 @@ public class ResourceWatcher implements Destroyable {
     executorServiceRef.destroy();
   }
 }
-

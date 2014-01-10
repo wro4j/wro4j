@@ -13,7 +13,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class ResourceProxyRequestHandler
   @Inject
   private ResourceAuthorizationManager authManager;
   private ResponseHeadersConfigurer headersConfigurer;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -150,7 +149,7 @@ public class ResourceProxyRequestHandler
   /**
    * Builds the request path for this request handler using the assumption that {@link WroFilter} has a mapping ending
    * with a <code>*</code> character.
-   * 
+   *
    * @param requestUri
    *          of wro request used to compute the path to this request handler. This request uri is required, becuase we
    *          do not know how the wro filter is mapped.
@@ -162,7 +161,7 @@ public class ResourceProxyRequestHandler
     final String basePath = StringUtils.isEmpty(requestUri) ? "/" : FilenameUtils.getFullPath(requestUri);
     return basePath + getProxyResourcePath() + resourceId;
   }
-  
+
   /**
    * Checks if the provided url is a resource proxy request.
    * @param url
@@ -170,10 +169,10 @@ public class ResourceProxyRequestHandler
    * @return true if the provided url is a proxy resource.
    */
   public static boolean isProxyUri(final String url) {
-    Validate.notNull(url);
+    notNull(url);
     return url.contains(getProxyResourcePath());
   }
-  
+
   private static String getProxyResourcePath() {
     return String.format("%s/%s?%s=", PATH_API, PATH_RESOURCES, PARAM_RESOURCE_ID);
   }

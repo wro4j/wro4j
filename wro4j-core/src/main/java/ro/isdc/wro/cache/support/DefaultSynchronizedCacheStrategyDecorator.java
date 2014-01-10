@@ -46,7 +46,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
   private ReadOnlyContext context;
   @Inject
   private Injector injector;
+  @Inject
   private ResourceWatcher resourceWatcher;
+
   /**
    * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
@@ -132,31 +134,10 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Override
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
-      LOG.debug("ResourceWatcher check key: {}", key);
-      getResourceWatcher().checkAsync(key, new Runnable() {
-        public void run() {
-          checkedKeys.add(key);
-        }
-      });
+      LOG.debug("onBeforeGet={}", key);
+      checkedKeys.add(key);
+      resourceWatcher.check(key);
     }
-  }
-
-  /**
-   * @return the {@link ResourceWatcher} instance handling check for stale resources.
-   * @VisibleForTesting
-   */
-  ResourceWatcher getResourceWatcher() {
-    if (resourceWatcher == null) {
-      resourceWatcher = new ResourceWatcher() {
-        @Override
-        public void onGroupChanged(final CacheKey key) {
-          super.onGroupChanged(key);
-          DefaultSynchronizedCacheStrategyDecorator.this.put(key, null);
-        }
-      };
-      injector.inject(resourceWatcher);
-    }
-    return resourceWatcher;
   }
 
   /**
@@ -164,7 +145,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
    */
   private boolean shouldWatchForChange(final CacheKey key) {
     final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
-    LOG.debug("shouldWatchForChange: {}", result);
+    LOG.debug("shouldWatchForChange={}", result);
     return result;
   }
 
@@ -174,16 +155,6 @@ public class DefaultSynchronizedCacheStrategyDecorator
     // reset authorization manager (clear any stored uri's).
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
-    }
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    try {
-      getResourceWatcher().destroy();
-    } catch (final Exception e) {
-      LOG.warn("Could not destroy resourceWatcher", e);
     }
   }
 }
