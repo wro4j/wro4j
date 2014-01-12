@@ -24,6 +24,7 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
@@ -133,18 +134,17 @@ public class ResourceWatcher
    * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
    */
   private void checkAsync(final CacheKey cacheKey) {
-    executorServiceRef.get().submit(new Callable<Void>() {
-      public Void call()
-          throws Exception {
+    final Callable<Void> callable = ContextPropagatingCallable.decorate(new Runnable() {
+      public void run() {
         try {
           ResourceWatcherRequestHandler.check(cacheKey, Context.get().getRequest(),
               wrapResponse(Context.get().getResponse()));
         } catch (final IOException e) {
           LOG.error("Could not check the following cacheKey: " + cacheKey, e);
         }
-        return null;
       }
     });
+    executorServiceRef.get().submit(callable);
   }
 
   /**
