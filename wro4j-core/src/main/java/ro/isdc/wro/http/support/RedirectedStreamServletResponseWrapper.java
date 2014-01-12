@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 
 /**
  * A specialized {@link HttpServletResponseWrapper} responsible for streaming response to provided {@link OutputStream}.
- * 
+ *
  * @author Alex Objelean
  * @since 1.4.5
  * @created 18 Mar 2012
@@ -38,9 +38,9 @@ public class RedirectedStreamServletResponseWrapper
    */
   private ServletOutputStream servletOutputStream;
   /**
-   * Used to locate external resources. 
+   * Used to locate external resources.
    */
-  private UriLocator externalResourceLocator = newExternalResourceLocator();
+  private final UriLocator externalResourceLocator = newExternalResourceLocator();
 
   /**
    * @return {@link UriLocator} responsible for resolving external resources.
@@ -48,7 +48,7 @@ public class RedirectedStreamServletResponseWrapper
   protected UriLocator newExternalResourceLocator() {
     return new UrlUriLocator().setEnableWildcards(false);
   }
-  
+
   /**
    * @param outputStream
    *          the stream where the response will be written.
@@ -63,30 +63,24 @@ public class RedirectedStreamServletResponseWrapper
     printWriter = new PrintWriter(outputStream);
     servletOutputStream = new DelegatingServletOutputStream(outputStream);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void sendError(final int sc)
       throws IOException {
     onError(sc, "");
     super.sendError(sc);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void sendError(final int sc, final String msg)
       throws IOException {
     onError(sc, msg);
     super.sendError(sc, msg);
   }
-  
+
   /**
    * Use an empty stream to avoid container writing unwanted message when a resource is missing.
-   * 
+   *
    * @param sc
    *          status code.
    * @param msg
@@ -97,7 +91,7 @@ public class RedirectedStreamServletResponseWrapper
     printWriter = new PrintWriter(emptyStream);
     servletOutputStream = new DelegatingServletOutputStream(emptyStream);
   }
-  
+
   /**
    * By default, redirect does not allow writing to output stream its content. In order to support this use-case, we
    * need to open a new connection and read the content manually.
@@ -122,7 +116,7 @@ public class RedirectedStreamServletResponseWrapper
       throws IOException {
     return servletOutputStream;
   }
-    
+
   @Override
   public PrintWriter getWriter()
       throws IOException {

@@ -50,6 +50,16 @@ public class ResourceWatcherRequestHandler
     resourceWatcher.check(retrieveCacheKey(request));
   }
 
+
+  public static void check(final CacheKey cacheKey, final HttpServletRequest request,
+      final HttpServletResponse response) throws IOException {
+    notNull(cacheKey);
+    notNull(request);
+    notNull(response);
+    final String location = getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
+    new DispatcherStreamLocator().getInputStream(request, response, location);
+  }
+
   private CacheKey retrieveCacheKey(final HttpServletRequest request) {
     CacheKey cacheKey = null;
     final String resourceTypeAsString = request.getParameter(PARAM_RESOURCE_TYPE);

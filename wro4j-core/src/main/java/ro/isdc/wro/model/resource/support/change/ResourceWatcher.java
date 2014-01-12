@@ -4,12 +4,17 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
@@ -18,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -35,6 +42,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -110,18 +118,48 @@ public class ResourceWatcher
   };
 
   /**
-   * Check for change and removes the changed group if a change is detected.
+   * Default constructor with a NoOP callback.
    */
-  public void check(final CacheKey cacheEntry) {
-    check(cacheEntry, new Callback() {
-      public void onGroupChanged(final CacheKey key) {
-        cacheStrategy.put(key, null);
-      }
+  public void check(final CacheKey cacheKey) {
+    final boolean async = true;
+    if (async) {
+      checkAsync(cacheKey);
+    } else {
+      check(cacheKey, new CallbackSupport());
+    }
+  }
 
-      public void onResourceChanged(final Resource resource) {
-        lifecycleCallback.onResourceChanged(resource);
+  /**
+   * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
+   */
+  private void checkAsync(final CacheKey cacheKey) {
+    executorServiceRef.get().submit(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        try {
+          ResourceWatcherRequestHandler.check(cacheKey, Context.get().getRequest(),
+              wrapResponse(Context.get().getResponse()));
+        } catch (final IOException e) {
+          LOG.error("Could not check the following cacheKey: " + cacheKey, e);
+        }
+        return null;
       }
     });
+  }
+
+  /**
+   * TODO create a callback to check for error and log it when needed
+   */
+  private HttpServletResponse wrapResponse(final HttpServletResponse response) {
+    return new HttpServletResponseWrapper(response) {
+      private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
+
+      @Override
+      public PrintWriter getWriter()
+          throws IOException {
+        return printWriter;
+      }
+    };
   }
 
   /**
@@ -132,13 +170,14 @@ public class ResourceWatcher
    */
   public void check(final CacheKey cacheKey, final Callback callback) {
     notNull(cacheKey);
-    LOG.debug("ResourceWatcher started...");
+    LOG.debug("started");
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
       final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
       if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
         callback.onGroupChanged(cacheKey);
+        cacheStrategy.put(cacheKey, null);
       }
       resourceChangeDetector.reset();
     } catch (final Exception e) {
@@ -166,12 +205,13 @@ public class ResourceWatcher
       if (isChanged |= isChanged(resource, group.getName())) {
         try {
           callback.onResourceChanged(resource);
+          lifecycleCallback.onResourceChanged(resource);
         } catch (final Exception e) {
           LOG.debug("Exception while onResourceChange is invoked", e);
         }
       }
     }
-    LOG.debug("isGroup {} changed: {}", group.getName(), BooleanUtils.toStringYesNo(isChanged));
+    LOG.debug("group={}, changed={}", group.getName(), isChanged);
     return isChanged;
   }
 
@@ -199,7 +239,7 @@ public class ResourceWatcher
       LOG.debug("[FAIL] Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
     }
-    LOG.debug("\tResource {} isChanged: {}", resource.getUri(), BooleanUtils.toStringYesNo(changed));
+    LOG.debug("\tresource={}, changed={}", resource.getUri(), BooleanUtils.toStringYesNo(changed));
     return changed;
   }
 
@@ -217,7 +257,7 @@ public class ResourceWatcher
       protected void onImportDetected(final String importedUri) {
         LOG.debug("Found @import {}", importedUri);
         final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS), groupName);
-        LOG.debug("\tisImportChanged: {}", isImportChanged);
+        LOG.debug("\tisImportChanged={}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
           // we need to continue in order to store the hash for all imported resources, otherwise the change won't be
