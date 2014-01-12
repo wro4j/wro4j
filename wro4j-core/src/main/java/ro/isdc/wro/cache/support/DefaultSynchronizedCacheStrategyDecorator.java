@@ -136,7 +136,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
     if (shouldWatchForChange(key)) {
       LOG.debug("onBeforeGet={}", key);
       checkedKeys.add(key);
-      resourceWatcher.check(key);
+      resourceWatcher.checkAsync(key);
     }
   }
 

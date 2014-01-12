@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -122,44 +124,53 @@ public class ResourceWatcher
    * Default constructor with a NoOP callback.
    */
   public void check(final CacheKey cacheKey) {
-    final boolean async = true;
-    if (async) {
-      checkAsync(cacheKey);
-    } else {
-      check(cacheKey, new CallbackSupport());
-    }
+    check(cacheKey, new CallbackSupport());
   }
 
   /**
    * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
    */
-  private void checkAsync(final CacheKey cacheKey) {
+  public void checkAsync(final CacheKey cacheKey) {
     final Callable<Void> callable = ContextPropagatingCallable.decorate(new Runnable() {
       public void run() {
         try {
-          ResourceWatcherRequestHandler.check(cacheKey, Context.get().getRequest(),
+          ResourceWatcherRequestHandler.check(cacheKey, wrapRequest(Context.get().getRequest()),
               wrapResponse(Context.get().getResponse()));
         } catch (final IOException e) {
           LOG.error("Could not check the following cacheKey: " + cacheKey, e);
         }
       }
+
+      /**
+       * Wrap original request and override getRequestURL method, because invoking it on original request in async way
+       * cause IllegalStateException.
+       */
+      private HttpServletRequest wrapRequest(final HttpServletRequest request) {
+        final String requestURL = request.getRequestURL().toString();
+        return new HttpServletRequestWrapper(request) {
+          @Override
+          public StringBuffer getRequestURL() {
+            return new StringBuffer(requestURL);
+          }
+        };
+      }
+
+      /**
+       * TODO create a callback to check for error and log it when needed
+       */
+      private HttpServletResponse wrapResponse(final HttpServletResponse response) {
+        return new HttpServletResponseWrapper(response) {
+          private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
+
+          @Override
+          public PrintWriter getWriter()
+              throws IOException {
+            return printWriter;
+          }
+        };
+      }
     });
     executorServiceRef.get().submit(callable);
-  }
-
-  /**
-   * TODO create a callback to check for error and log it when needed
-   */
-  private HttpServletResponse wrapResponse(final HttpServletResponse response) {
-    return new HttpServletResponseWrapper(response) {
-      private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
-
-      @Override
-      public PrintWriter getWriter()
-          throws IOException {
-        return printWriter;
-      }
-    };
   }
 
   /**

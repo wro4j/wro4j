@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,8 @@ public class ResourceWatcherRequestHandler
     notNull(cacheKey);
     notNull(request);
     notNull(response);
-    final String location = getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
+    final String translatedPath = FilenameUtils.getFullPath(request.getRequestURI());
+    final String location = translatedPath + getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
     new DispatcherStreamLocator().getInputStream(request, response, location);
   }
 
@@ -101,7 +103,7 @@ public class ResourceWatcherRequestHandler
 
 
   static String getRequestHandlerPath() {
-    return String.format("%s/%s", PATH_API, PATH_HANDLER);
+    return String.format("/%s/%s", PATH_API, PATH_HANDLER);
   }
 
   static String getRequestHandlerPath(final String groupName, final ResourceType resourceType) {
