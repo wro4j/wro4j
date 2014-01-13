@@ -104,7 +104,12 @@ public class ConfigurableWroFilter
     return new DefaultWroManagerFactory(properties) {
       @Override
       protected WroManagerFactory newManagerFactory() {
-        return new ConfigurableWroManagerFactory().setConfigProperties(properties);
+        return new ConfigurableWroManagerFactory() {
+          @Override
+          protected Properties newConfigProperties() {
+            return properties;
+          }
+        };
       }
     };
   }

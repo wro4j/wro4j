@@ -46,7 +46,9 @@ public class DefaultSynchronizedCacheStrategyDecorator
   private ReadOnlyContext context;
   @Inject
   private Injector injector;
+  @Inject
   private ResourceWatcher resourceWatcher;
+
   /**
    * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
@@ -132,22 +134,10 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Override
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
-      LOG.debug("ResourceWatcher check key: {}", key);
-      getResourceWatcher().check(key);
+      LOG.debug("onBeforeGet={}", key);
       checkedKeys.add(key);
+      resourceWatcher.checkAsync(key);
     }
-  }
-
-  /**
-   * @return the {@link ResourceWatcher} instance handling check for stale resources.
-   * @VisibleForTesting
-   */
-  ResourceWatcher getResourceWatcher() {
-    if (resourceWatcher == null) {
-      resourceWatcher = new ResourceWatcher();
-      injector.inject(resourceWatcher);
-    }
-    return resourceWatcher;
   }
 
   /**
@@ -155,13 +145,10 @@ public class DefaultSynchronizedCacheStrategyDecorator
    */
   private boolean shouldWatchForChange(final CacheKey key) {
     final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
-    LOG.debug("shouldWatchForChange: {}", result);
+    LOG.debug("shouldWatchForChange={}", result);
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void clear() {
     super.clear();

@@ -61,15 +61,17 @@ public class TaskExecutor<T> {
       LOG.debug("Using ForkJoinPool as task executor.");
       return executor;
     } catch (final Exception e) {
-      LOG.debug("ForkJoinPool class is not available, using default executor. ", e);
+      LOG.debug("ForkJoinPool class is not available, using default executor.", e);
       return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
   }
 
   /**
+   * TODO rename to submitAll.
+   * <p/>
    * Submits a chunk of jobs for parallel execution. This is a blocking operation - it will end execution when all
    * submitted tasks are finished.
-   *
+   * 
    * @param callables
    *          a {@link Collection} of {@link Callable} to execute. When the provided collection contains only one item,
    *          the task will be executed synchronously.

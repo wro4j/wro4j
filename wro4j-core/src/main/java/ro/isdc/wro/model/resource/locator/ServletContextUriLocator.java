@@ -31,7 +31,7 @@ import ro.isdc.wro.util.WroUtil;
  * kind of resources will be accepted if their prefix is '/'.
  *
  * @author Alex Objelean, Ivar Conradi Østhus
- * @created Created on Nov 10, 2008, Updated on March 2, 2012
+ * @created Created on Nov 10 2008
  */
 public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
@@ -183,7 +183,7 @@ public class ServletContextUriLocator
       throws IOException {
     try {
       return servletContextBasedStreamLocator(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return locateWithDispatcher(uri);
     }
@@ -193,7 +193,7 @@ public class ServletContextUriLocator
       throws IOException {
     try {
       return locateWithDispatcher(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return servletContextBasedStreamLocator(uri);
     }

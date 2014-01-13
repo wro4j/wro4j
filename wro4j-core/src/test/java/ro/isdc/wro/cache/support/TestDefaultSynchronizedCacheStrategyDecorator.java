@@ -1,19 +1,23 @@
 package ro.isdc.wro.cache.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
@@ -42,22 +46,24 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestDefaultSynchronizedCacheStrategyDecorator {
   private static final String GROUP_NAME = "g1";
   private static final String RESOURCE_URI = "/test.js";
-  
+
   private CacheStrategy<CacheKey, CacheValue> victim;
+  @Mock
   private ResourceWatcher mockResourceWatcher;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp() {
+    MockitoAnnotations.initMocks(this);
     Context.set(Context.standaloneContext());
     victim = new DefaultSynchronizedCacheStrategyDecorator(new MemoryCacheStrategy<CacheKey, CacheValue>()) {
       @Override
@@ -65,27 +71,17 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
         // use milliseconds to make test faster
         return TimeUnit.MILLISECONDS;
       }
-      
-      @Override
-      ResourceWatcher getResourceWatcher() {
-        if (mockResourceWatcher == null) {
-          mockResourceWatcher = Mockito.spy(super.getResourceWatcher());
-        }
-        return mockResourceWatcher;
-      }
     };
     createInjector().inject(victim);
-    // invoke getter explicitly to be sure we have a not null reference
-    ((DefaultSynchronizedCacheStrategyDecorator) victim).getResourceWatcher();
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
     // have to reset it, otherwise a test fails when testing entire project.
     Mockito.reset(mockResourceWatcher);
   }
-  
+
   public Injector createInjector() {
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
@@ -93,24 +89,24 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setUriLocatorFactory(
         locatorFactory);
     factory.setProcessorsFactory(new SimpleProcessorsFactory());
-    final Injector injector = InjectorBuilder.create(factory).build();
+    final Injector injector = InjectorBuilder.create(factory).setResourceWatcher(mockResourceWatcher).build();
     return injector;
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullKey() {
     victim.get(null);
   }
-  
+
   @Test
   public void shouldNotCheckForChangesWhenResourceWatcherPeriodIsNotSet()
       throws Exception {
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     victim.get(key);
     victim.get(key);
-    Mockito.verify(mockResourceWatcher, never()).check(key);
+    verify(mockResourceWatcher, never()).check(key);
   }
-  
+
   /**
    * Proves that even if the get() is invoked more times, the check is performed only after a certain period of time.
    */
@@ -125,9 +121,9 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     do {
       victim.get(key);
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
-    Mockito.verify(mockResourceWatcher, times(1)).check(key);
+    verify(mockResourceWatcher, times(1)).checkAsync(key);
   }
-  
+
   /**
    * This test does not pass consistently. TODO: rewrite it in order to make it always pass.
    */
@@ -147,23 +143,23 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
       victim.get(key1);
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
     victim.get(key2);
-    Mockito.verify(mockResourceWatcher, times(2)).check(key1);
-    Mockito.verify(mockResourceWatcher, times(1)).check(key2);
+    verify(mockResourceWatcher, times(2)).check(key1);
+    verify(mockResourceWatcher, times(1)).check(key2);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullObject() {
     DefaultSynchronizedCacheStrategyDecorator.decorate(null);
   }
-  
+
   @Test
   public void shouldDecorateCacheStrategy() {
     final CacheStrategy<CacheKey, CacheValue> original = new LruMemoryCacheStrategy<CacheKey, CacheValue>();
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
-    Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
-    Assert.assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
+    assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
+    assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
-  
+
   /**
    * Fix Issue 528: Redundant CacheStrategy decoration (which has unclear cause, but it is safe to prevent redundant
    * decoration anyway).
@@ -172,7 +168,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   public void shouldNotRedundantlyDecorateCacheStrategy() {
     final CacheStrategy<CacheKey, CacheValue> original = DefaultSynchronizedCacheStrategyDecorator.decorate(new LruMemoryCacheStrategy<CacheKey, CacheValue>());
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
-    Assert.assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
-    Assert.assertSame(original, victim);
+    assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
+    assertSame(original, victim);
   }
 }

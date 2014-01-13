@@ -28,8 +28,17 @@ public final class CacheKey implements Serializable {
 	 */
 	private final Map<String, String> map = new HashMap<String, String>();
 
+  /**
+   * Uses default minimize flag to build {@link CacheKey} (minimize = true). Useful when this flag is not important
+   * (example resource watcher).
+   *
+   * @see #CacheKey(String, ResourceType, boolean)
+   */
+  public CacheKey(final String groupName, final ResourceType type) {
+	  this(groupName, type, true);
+	}
+
 	/**
-	 *
 	 * @param groupName name of the group.
 	 * @param type resource type (js or css)
 	 * @param minimize true if the result should produce minimized version.

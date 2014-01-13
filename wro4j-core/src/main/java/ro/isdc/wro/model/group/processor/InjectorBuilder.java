@@ -27,6 +27,8 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.change.ResourceChangeDetector;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
@@ -45,7 +47,9 @@ public class InjectorBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorBuilder.class);
   private final GroupsProcessor groupsProcessor = new GroupsProcessor();
   private final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
-  private ResourceBundleProcessor bundleProcessor;
+  private final ResourceChangeDetector resourceChangeDetector = new ResourceChangeDetector();
+  private final ResourceBundleProcessor bundleProcessor = new ResourceBundleProcessor();
+  private ResourceWatcher resourceWatcher = new ResourceWatcher();
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
@@ -96,14 +100,13 @@ public class InjectorBuilder {
     map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
     map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
     map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
+    map.put(ResourceChangeDetector.class, createResourceChangeDetectorProxy());
+    map.put(ResourceWatcher.class, createResourceWatcherProxy());
   }
 
   private Object createResourceBundleProcessorProxy() {
     return new InjectorObjectFactory<ResourceBundleProcessor>() {
       public ResourceBundleProcessor create() {
-        if (bundleProcessor == null) {
-          bundleProcessor = new ResourceBundleProcessor();
-        }
         return bundleProcessor;
       }
     };
@@ -241,6 +244,31 @@ public class InjectorBuilder {
         return managerFactory.create().getCacheKeyFactory();
       }
     };
+  }
+
+  private Object createResourceChangeDetectorProxy() {
+    return new InjectorObjectFactory<ResourceChangeDetector>() {
+      public ResourceChangeDetector create() {
+        return resourceChangeDetector;
+      }
+    };
+  }
+
+  private Object createResourceWatcherProxy() {
+    return new InjectorObjectFactory<ResourceWatcher>() {
+      public ResourceWatcher create() {
+        return resourceWatcher;
+      }
+    };
+  }
+
+
+  /**
+   * @VisibleForTesting
+   */
+  public InjectorBuilder setResourceWatcher(final ResourceWatcher resourceWatcher) {
+    this.resourceWatcher = resourceWatcher;
+    return this;
   }
 
   public Injector build() {
