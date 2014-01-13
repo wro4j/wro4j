@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.TimeUnit;
 
@@ -103,7 +104,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
     victim.get(key);
     victim.get(key);
-    Mockito.verify(mockResourceWatcher, never()).check(key);
+    verify(mockResourceWatcher, never()).check(key);
   }
 
   /**
@@ -120,7 +121,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     do {
       victim.get(key);
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
-    Mockito.verify(mockResourceWatcher, times(1)).check(key);
+    verify(mockResourceWatcher, times(1)).checkAsync(key);
   }
 
   /**
@@ -142,8 +143,8 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
       victim.get(key1);
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
     victim.get(key2);
-    Mockito.verify(mockResourceWatcher, times(2)).check(key1);
-    Mockito.verify(mockResourceWatcher, times(1)).check(key2);
+    verify(mockResourceWatcher, times(2)).check(key1);
+    verify(mockResourceWatcher, times(1)).check(key2);
   }
 
   @Test(expected = NullPointerException.class)

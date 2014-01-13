@@ -48,7 +48,8 @@ public class DispatcherStreamLocator {
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
    *
-   * @param location a path to a request relative resource to locate.
+   * @param location
+   *          a path to a request relative resource to locate.
    * @return a valid stream for required location. This method will never return a null.
    * @throws IOException
    *           if the stream cannot be located at the specified location.
@@ -64,7 +65,6 @@ public class DispatcherStreamLocator {
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
-
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher != null) {
@@ -101,9 +101,18 @@ public class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
+  public void forward(final RequestDispatcher dispatcher, final HttpServletRequest request,
+      final HttpServletResponse response, final String location)
+      throws IOException {
+    try {
+      dispatcher.forward(getWrappedServletRequest(request, location), response);
+    } catch (final Exception e) {
+      throw new IOException("Could not forward to location: " + location, e);
+    }
+  }
+
   private InputStream locateExternal(final HttpServletRequest request, final String location)
       throws IOException {
-    // Returns the part URL from the protocol name up to the query string and contextPath.
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
     final String absolutePath = servletContextPath + location;
     LOG.debug("locateExternalUri: {}", absolutePath);

@@ -13,12 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +23,10 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
+import ro.isdc.wro.http.support.PreserveDetailsRequestWrapper;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -102,6 +101,8 @@ public class ResourceWatcher
   private ResourceChangeDetector resourceChangeDetector;
   @Inject
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+  @Inject
+  private WroConfiguration configuration;
   /**
    * Executor responsible for running the check asynchronously.
    */
@@ -131,10 +132,20 @@ public class ResourceWatcher
    * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
    */
   public void checkAsync(final CacheKey cacheKey) {
-    final Callable<Void> callable = ContextPropagatingCallable.decorate(new Runnable() {
+    if (configuration.isResourceWatcherAsync()) {
+      LOG.debug("Checking resourceWatcher asynchronously...");
+      final Callable<Void> callable = ContextPropagatingCallable.decorate(createAsyncCheckRunnable(cacheKey));
+      executorServiceRef.get().submit(callable);
+    } else {
+      check(cacheKey);
+    }
+  }
+
+  private Runnable createAsyncCheckRunnable(final CacheKey cacheKey) {
+    return new Runnable() {
       public void run() {
         try {
-          ResourceWatcherRequestHandler.check(cacheKey, wrapRequest(Context.get().getRequest()),
+          ResourceWatcherRequestHandler.check(cacheKey, new PreserveDetailsRequestWrapper(Context.get().getRequest()),
               wrapResponse(Context.get().getResponse()));
         } catch (final IOException e) {
           LOG.error("Could not check the following cacheKey: " + cacheKey, e);
@@ -142,21 +153,7 @@ public class ResourceWatcher
       }
 
       /**
-       * Wrap original request and override getRequestURL method, because invoking it on original request in async way
-       * cause IllegalStateException.
-       */
-      private HttpServletRequest wrapRequest(final HttpServletRequest request) {
-        final String requestURL = request.getRequestURL().toString();
-        return new HttpServletRequestWrapper(request) {
-          @Override
-          public StringBuffer getRequestURL() {
-            return new StringBuffer(requestURL);
-          }
-        };
-      }
-
-      /**
-       * TODO create a callback to check for error and log it when needed
+       * TODO create a callback to check for error and log it when needed.
        */
       private HttpServletResponse wrapResponse(final HttpServletResponse response) {
         return new HttpServletResponseWrapper(response) {
@@ -169,8 +166,7 @@ public class ResourceWatcher
           }
         };
       }
-    });
-    executorServiceRef.get().submit(callable);
+    };
   }
 
   /**
@@ -242,7 +238,7 @@ public class ResourceWatcher
       final AtomicBoolean changeDetected = new AtomicBoolean(resourceChangeDetector.checkChangeForGroup(uri, groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
-        LOG.debug("\t\tCheck @import directive from {}", resource);
+        LOG.debug("\tCheck @import directive from {}", resource);
         createCssImportProcessor(changeDetected, groupName).process(resource, reader, new StringWriter());
       }
       changed = changeDetected.get();
@@ -250,7 +246,7 @@ public class ResourceWatcher
       LOG.debug("[FAIL] Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
     }
-    LOG.debug("\tresource={}, changed={}", resource.getUri(), BooleanUtils.toStringYesNo(changed));
+    LOG.debug("resource={}, changed={}", resource.getUri(), changed);
     return changed;
   }
 

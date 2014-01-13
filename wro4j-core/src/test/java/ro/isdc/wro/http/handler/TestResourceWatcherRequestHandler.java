@@ -16,10 +16,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -58,9 +58,16 @@ public class TestResourceWatcherRequestHandler {
   }
 
   @Test
-  public void shouldHandleRequest() {
-    when(request.getAttribute(DispatcherStreamLocator.ATTRIBUTE_INCLUDED_BY_DISPATCHER)).thenReturn(Boolean.TRUE);
-    when(request.getRequestURI()).thenReturn("wroAPI/resourceWatch");
+  public void shouldHandleAuthorizedRequest() {
+    final String authKey = "123";
+    victim = new ResourceWatcherRequestHandler() {
+      @Override
+      String generateRandomKey() {
+        return authKey;
+      }
+    };
+    when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PARAM_AUTH_KEY))).thenReturn(authKey);
+    when(request.getRequestURI()).thenReturn("wroAPI/resourceWatcher");
     assertTrue(victim.accept(request));
   }
 

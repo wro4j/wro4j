@@ -9,7 +9,7 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
  * Hold the name of the properties.
- * 
+ *
  * @author Alex Objelean
  * @created 11 May 2011
  * @since 1.3.7
@@ -37,6 +37,10 @@ public enum ConfigConstants {
    * checking resource changes. When a change is detected, the cache for that particular group is invalidated.
    */
   resourceWatcherUpdatePeriod,
+  /**
+   * Flag which enables an experimental feature: asynchronous check for resource watcher.
+   */
+  resourceWatcherAsync,
   /**
    * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
    * DEPLOYMENT mode changing this flag will have no effect.

@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,8 @@ import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 
 
 /**
- * Triggers resource watcher check.
+ * Triggers resource watcher check. This handler is not meant to be invoked publicly. It has a protection mechanism,
+ * which allows only server-side handling.
  *
  * @author Alex Objelean
  * @created 9 Jan 2014
@@ -31,9 +33,13 @@ import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 public class ResourceWatcherRequestHandler
     extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcherRequestHandler.class);
-  private static final String PARAM_GROUP_NAME = "groupName";
+  private static final String PARAM_GROUP_NAME = "group";
   private static final String PARAM_RESOURCE_TYPE = "resourceType";
-  private static final String PATH_HANDLER = "resourceWatch";
+  /**
+   * @VisibleForTesting
+   */
+  static final String PARAM_AUTH_KEY = "auth";
+  private static final String PATH_HANDLER = "resourceWatcher";
   /**
    * The alias of this {@link RequestHandler} used for configuration.
    */
@@ -44,22 +50,21 @@ public class ResourceWatcherRequestHandler
 
   @Inject
   private ReadOnlyContext context;
+  /**
+   * A random string used to authorize request. This key is updated after each successful handle operation to avoid
+   * hijacking.
+   */
+  private static String authorizationKey;
+
+  public ResourceWatcherRequestHandler() {
+    updateAuthorizationKey();
+  }
 
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     resourceWatcher.check(retrieveCacheKey(request));
-  }
-
-
-  public static void check(final CacheKey cacheKey, final HttpServletRequest request,
-      final HttpServletResponse response) throws IOException {
-    notNull(cacheKey);
-    notNull(request);
-    notNull(response);
-    final String translatedPath = FilenameUtils.getFullPath(request.getRequestURI());
-    final String location = translatedPath + getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
-    new DispatcherStreamLocator().getInputStream(request, response, location);
+    updateAuthorizationKey();
   }
 
   private CacheKey retrieveCacheKey(final HttpServletRequest request) {
@@ -84,14 +89,22 @@ public class ResourceWatcherRequestHandler
   public boolean accept(final HttpServletRequest request) {
     // Authorize only server-side included request (performed by {@link DispatcherStreamLocator}). Any public access to
     // this request handler is forbidden to avoid .
-    final boolean isDispatchedRequest = DispatcherStreamLocator.isIncludedRequest(request);
     final boolean isHandlerRequest = isHandlerUri(request.getRequestURI());
-    return isHandlerRequest && isDispatchedRequest;
+    return isHandlerRequest && isAuthorized(request);
   }
 
+  private boolean isAuthorized(final HttpServletRequest request) {
+    final String actualKey = request.getParameter(PARAM_AUTH_KEY);
+    final boolean isAuthorized = authorizationKey.equals(actualKey);
+    if (!isAuthorized) {
+      LOG.debug("Unauthorized request. actualKey={}, expected={}", actualKey, authorizationKey);
+    }
+    return isAuthorized;
+  }
 
   /**
    * Checks if the provided url is a resource proxy request.
+   *
    * @param url
    *          to check.
    * @return true if the provided url is a proxy resource.
@@ -101,12 +114,41 @@ public class ResourceWatcherRequestHandler
     return url.contains(getRequestHandlerPath());
   }
 
-
-  static String getRequestHandlerPath() {
-    return String.format("/%s/%s", PATH_API, PATH_HANDLER);
+  /**
+   * Updates the authorizationKey with an unique value.
+   */
+  private void updateAuthorizationKey() {
+    authorizationKey = generateRandomKey();
   }
 
-  static String getRequestHandlerPath(final String groupName, final ResourceType resourceType) {
-    return String.format("%s?%s=%s&%s=%s", getRequestHandlerPath(), PARAM_GROUP_NAME, groupName, PARAM_RESOURCE_TYPE, resourceType.name());
+  /**
+   * @VisibleForTesting
+   * @return a random key used for authorization.
+   */
+  String generateRandomKey() {
+    return UUID.randomUUID().toString();
+  }
+
+  /**
+   * Allows this request handler to be invoked using a server-side invocation. Hides the details about creating a valid
+   * url and providing the authorization key required to invoke this handler.
+   */
+  public static void check(final CacheKey cacheKey, final HttpServletRequest request, final HttpServletResponse response)
+      throws IOException {
+    notNull(cacheKey);
+    notNull(request);
+    notNull(response);
+    final String fullPath = FilenameUtils.getFullPath(request.getServletPath());
+    final String location = fullPath + getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
+    new DispatcherStreamLocator().getInputStream(request, response, location);
+  }
+
+  private static String getRequestHandlerPath() {
+    return String.format("%s/%s", PATH_API, PATH_HANDLER);
+  }
+
+  private static String getRequestHandlerPath(final String groupName, final ResourceType resourceType) {
+    return String.format("%s?%s=%s&%s=%s&%s=%s", getRequestHandlerPath(), PARAM_GROUP_NAME, groupName,
+        PARAM_RESOURCE_TYPE, resourceType.name(), PARAM_AUTH_KEY, authorizationKey);
   }
 }
