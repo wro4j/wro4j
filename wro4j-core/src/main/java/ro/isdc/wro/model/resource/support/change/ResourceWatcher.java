@@ -23,7 +23,7 @@ import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.http.support.PreserveDetailsRequestWrapper;
@@ -102,7 +102,7 @@ public class ResourceWatcher
   @Inject
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   @Inject
-  private WroConfiguration configuration;
+  private ReadOnlyContext context;
   /**
    * Executor responsible for running the check asynchronously.
    */
@@ -132,41 +132,22 @@ public class ResourceWatcher
    * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
    */
   public void checkAsync(final CacheKey cacheKey) {
-    if (configuration.isResourceWatcherAsync()) {
+    if (context.getConfig().isResourceWatcherAsync()) {
       LOG.debug("Checking resourceWatcher asynchronously...");
-      final Callable<Void> callable = ContextPropagatingCallable.decorate(createAsyncCheckRunnable(cacheKey));
-      executorServiceRef.get().submit(callable);
+      final Callable<Void> callable = new ContextPropagatingCallable<Void>(createAsyncCheckCallable(cacheKey));
+      submit(callable);
     } else {
       check(cacheKey);
     }
   }
 
-  private Runnable createAsyncCheckRunnable(final CacheKey cacheKey) {
-    return new Runnable() {
-      public void run() {
-        try {
-          ResourceWatcherRequestHandler.check(cacheKey, new PreserveDetailsRequestWrapper(Context.get().getRequest()),
-              wrapResponse(Context.get().getResponse()));
-        } catch (final IOException e) {
-          LOG.error("Could not check the following cacheKey: " + cacheKey, e);
-        }
-      }
-
-      /**
-       * TODO create a callback to check for error and log it when needed.
-       */
-      private HttpServletResponse wrapResponse(final HttpServletResponse response) {
-        return new HttpServletResponseWrapper(response) {
-          private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
-
-          @Override
-          public PrintWriter getWriter()
-              throws IOException {
-            return printWriter;
-          }
-        };
-      }
-    };
+  /**
+   * @VisibleForTesting
+   * @param callable
+   *          {@link Callable} to submit for asynchronous execution.
+   */
+  void submit(final Callable<Void> callable) {
+    executorServiceRef.get().submit(callable);
   }
 
   /**
@@ -296,6 +277,37 @@ public class ResourceWatcher
     };
     injector.inject(processor);
     return processor;
+  }
+
+  private Callable<Void> createAsyncCheckCallable(final CacheKey cacheKey) {
+    return new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        try {
+          ResourceWatcherRequestHandler.check(cacheKey, new PreserveDetailsRequestWrapper(Context.get().getRequest()),
+              wrapResponse(Context.get().getResponse()));
+          return null;
+        } catch (final IOException e) {
+          LOG.error("Could not check the following cacheKey: " + cacheKey, e);
+          throw e;
+        }
+      }
+
+      /**
+       * TODO create a callback to check for error and log it when needed.
+       */
+      private HttpServletResponse wrapResponse(final HttpServletResponse response) {
+        return new HttpServletResponseWrapper(response) {
+          private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
+
+          @Override
+          public PrintWriter getWriter()
+              throws IOException {
+            return printWriter;
+          }
+        };
+      }
+    };
   }
 
   /**
