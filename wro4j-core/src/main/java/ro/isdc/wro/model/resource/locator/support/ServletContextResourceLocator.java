@@ -26,7 +26,7 @@ import ro.isdc.wro.util.StringUtils;
  * interpreting relative paths within the web application root directory.
  *
  * @author Alex Objelean, Ivar Conradi Østhus
- * @created Created on Nov 10, 2008, Updated on March 2, 2012
+ * @created Created on Nov 10 2008
  */
 public class ServletContextResourceLocator
     extends AbstractResourceLocator {
@@ -176,7 +176,7 @@ public class ServletContextResourceLocator
       throws IOException {
     try {
       return servletContextBasedStreamLocator(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return locateWithDispatcher(uri);
     }
@@ -186,7 +186,7 @@ public class ServletContextResourceLocator
       throws IOException {
     try {
       return locateWithDispatcher(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return servletContextBasedStreamLocator(uri);
     }

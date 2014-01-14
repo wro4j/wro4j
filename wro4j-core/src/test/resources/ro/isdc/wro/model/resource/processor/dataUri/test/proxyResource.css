@@ -1,14 +1,14 @@
 input.button {
-	background: url(/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);
-	background-image: url("/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png");
-  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png', sizingMethod='scale');
+	background: url(/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);
+	background-image: url("/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png");
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png', sizingMethod='scale');
 }
 .multilineAndSpaces {
   background: 
-     url( "/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " );
+     url( "/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " );
   background-image : 
-     url( "/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " )     
+     url( "/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png " )     
 }
 @font-face {
-    src: url(/wro/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);
+    src: url(/wroAPI/wroResources?id=classpath:ro/isdc/wro/resources/inner/inner/img/pinguin.png);
 }

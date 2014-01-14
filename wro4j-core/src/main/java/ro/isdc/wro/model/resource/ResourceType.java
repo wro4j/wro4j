@@ -3,8 +3,7 @@
  */
 package ro.isdc.wro.model.resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Make a distinction between resource type. Can be CSS or JS.
@@ -25,7 +24,6 @@ public enum ResourceType {
       return "text/javascript";
     }
   };
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceType.class);
   /**
    * @return the content type of the resource type.
    */
@@ -35,23 +33,7 @@ public enum ResourceType {
    * @return {@link ResourceType} associated to the string representation of the type.
    */
   public static ResourceType get(final String typeAsString) {
+    Validate.isTrue(typeAsString != null, "ResourceType cannot be NULL.");
     return ResourceType.valueOf(typeAsString.toUpperCase());
-  }
-
-  /**
-   * Same as {@link ResourceType#get(String)} but will never return an {@link IllegalArgumentException}. When an invalid
-   * resource type is searched, a default one will be used.
-   *
-   * @param typeAsString
-   * @return
-   */
-  public static ResourceType getSafe(final String typeAsString) {
-    ResourceType type = ResourceType.CSS;
-    try {
-      type = get(typeAsString);
-    } catch(final IllegalArgumentException e) {
-      LOG.debug("Invalid type found: " + typeAsString + ". Falling back to default one: " + type);
-    }
-    return type;
   }
 }

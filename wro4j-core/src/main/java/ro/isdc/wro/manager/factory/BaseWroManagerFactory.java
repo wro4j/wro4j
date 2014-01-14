@@ -33,6 +33,7 @@ import ro.isdc.wro.model.resource.processor.factory.DefaultProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -66,7 +67,7 @@ public class BaseWroManagerFactory
   private ResourceAuthorizationManager authorizationManager;
   private CacheKeyFactory cacheKeyFactory;
   private MetaDataFactory metaDataFactory;
-
+  private ResourceWatcher resourceWatcher;
   /**
    * Handles the lazy synchronized creation of the manager
    */
@@ -141,6 +142,10 @@ public class BaseWroManagerFactory
       if (metaDataFactory != null) {
         managerBuilder.setMetaDataFactory(metaDataFactory);
       }
+      if (resourceWatcher == null) {
+        resourceWatcher = new ResourceWatcher();
+      }
+      managerBuilder.setResourceWatcher(resourceWatcher);
       final WroManager manager = managerBuilder.build();
 
       onAfterInitializeManager(manager);
@@ -387,6 +392,12 @@ public class BaseWroManagerFactory
 
   public BaseWroManagerFactory setMetaDataFactory(final MetaDataFactory metaDataFactory) {
     this.metaDataFactory = metaDataFactory;
+    return this;
+  }
+
+
+  public BaseWroManagerFactory setResourceWatcher(final ResourceWatcher resourceWatcher) {
+    this.resourceWatcher = resourceWatcher;
     return this;
   }
 

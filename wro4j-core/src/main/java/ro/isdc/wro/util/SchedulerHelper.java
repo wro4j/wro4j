@@ -48,7 +48,7 @@ public class SchedulerHelper {
    */
   private final String name;
   /**
-   * The future of the currently running task. Allows reschedule operation by cancelling execution of the running
+   * The future of the currently running task. Allows reschedule operation by canceling execution of the running
    * thread.
    */
   private ScheduledFuture<?> future;

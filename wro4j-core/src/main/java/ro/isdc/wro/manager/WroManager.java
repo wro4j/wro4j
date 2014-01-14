@@ -46,6 +46,7 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
@@ -104,6 +105,8 @@ public class WroManager
   private final CacheKeyFactory cacheKeyFactory;
   @Inject
   private final MetaDataFactory metaDataFactory;
+  @Inject
+  private final ResourceWatcher resourceWatcher;
   /**
    * Schedules the model update.
    */
@@ -137,6 +140,8 @@ public class WroManager
     this.namingStrategy = builder.namingStrategy;
     this.processorsFactory = builder.processorsFactory;
     this.modelFactory = DefaultWroModelFactoryDecorator.decorate(builder.modelFactory, builder.modelTransformers);
+    //TODO initialize
+    this.resourceWatcher = new ResourceWatcher();
   }
 
   /**
@@ -213,6 +218,7 @@ public class WroManager
       modelSchedulerHelper.destroy();
       cacheStrategy.destroy();
       modelFactory.destroy();
+      resourceWatcher.destroy();
       destroyProcessors();
     } catch (final Exception e) {
       LOG.error("Exception occured during manager destroy!", e);
@@ -288,6 +294,10 @@ public class WroManager
     return metaDataFactory;
   }
 
+  public ResourceWatcher getResourceWatcher() {
+    return resourceWatcher;
+  }
+
   /**
    * Registers a callback.
    *
@@ -334,6 +344,7 @@ public class WroManager
     private ResourceAuthorizationManager authorizationManager = new DefaultResourceAuthorizationManager();
     private CacheKeyFactory cacheKeyFactory = new DefaultCacheKeyFactory();
     private MetaDataFactory metaDataFactory = new DefaultMetaDataFactory();
+    private ResourceWatcher resourceWatcher = new ResourceWatcher();
 
     public Builder() {
     }
@@ -428,6 +439,11 @@ public class WroManager
       final List<Transformer<WroModel>> list = new ArrayList<Transformer<WroModel>>();
       list.add(new WildcardExpanderModelTransformer());
       return list;
+    }
+
+    public Builder setResourceWatcher(final ResourceWatcher resourceWatcher) {
+      this.resourceWatcher = resourceWatcher;
+      return this;
     }
 
     public WroManager build() {

@@ -85,7 +85,7 @@ public class TestModelAsJsonRequestHandler {
 
   @Test
   public void shouldBeEnabledByDefault() {
-    Assert.assertTrue(victim.isEnabled());
+    assertTrue(victim.isEnabled());
   }
 
   @Test

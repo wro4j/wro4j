@@ -47,26 +47,19 @@ public class RedirectedStreamServletResponseWrapper
   public RedirectedStreamServletResponseWrapper(final OutputStream outputStream, final HttpServletResponse response) {
     super(response);
     Validate.notNull(outputStream);
-    // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will
-    // write
+    // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will write
     // to the pipe.
     printWriter = new PrintWriter(outputStream);
     servletOutputStream = new DelegatingServletOutputStream(outputStream);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void sendError(final int sc)
       throws IOException {
     onError(sc, "");
     super.sendError(sc);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void sendError(final int sc, final String msg)
       throws IOException {
@@ -97,7 +90,7 @@ public class RedirectedStreamServletResponseWrapper
       throws IOException {
     try {
       LOG.debug("redirecting to: {}", location);
-      final InputStream is = newExternalResourceLocator(location).getInputStream();
+      final InputStream is = externalResourceLocator.locate(location);
       IOUtils.copy(is, servletOutputStream);
       is.close();
       servletOutputStream.close();

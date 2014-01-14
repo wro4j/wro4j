@@ -50,6 +50,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
+import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.http.support.UnauthorizedRequestException;
@@ -390,7 +391,7 @@ public class TestWroFilter {
       throws Exception {
     initVictimWithMockAuthManager();
     final String resourcePath = "/g1.css";
-    final String requestUri = PATH_RESOURCES + resourcePath;
+    final String requestUri = ResourceProxyRequestHandler.createProxyPath("", resourcePath);
     
     when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
@@ -430,7 +431,7 @@ public class TestWroFilter {
     
     when(mockAuthorizationManager.isAuthorized(resourcePath)).thenReturn(true);
     
-    final String requestUri = PATH_RESOURCES + "?id=" + resourcePath;
+    final String requestUri = ResourceProxyRequestHandler.createProxyPath("", resourcePath);
     requestGroupByUri(requestUri, new RequestBuilder(requestUri) {
       @Override
       protected HttpServletRequest newRequest() {
@@ -703,7 +704,7 @@ public class TestWroFilter {
   private void processProxyWithResourceId(final String resourceId)
       throws Exception {
     when(mockRequest.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourceId);
-    when(mockRequest.getRequestURI()).thenReturn(PATH_RESOURCES + "?" + PARAM_RESOURCE_ID + "=" + resourceId);
+    when(mockRequest.getRequestURI()).thenReturn(ResourceProxyRequestHandler.createProxyPath("", resourceId));
     
     final WroConfiguration config = new WroConfiguration();
     // we don't need caching here, otherwise we'll have clashing during unit tests.

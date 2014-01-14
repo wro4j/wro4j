@@ -1,20 +1,32 @@
 package ro.isdc.wro.model.resource.support.change;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.Validate;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.ReadOnlyContext;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
+import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
+import ro.isdc.wro.http.support.PreserveDetailsRequestWrapper;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -28,7 +40,10 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.model.resource.processor.impl.css.AbstractCssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.StopWatch;
+import ro.isdc.wro.util.WroUtil;
+import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -39,10 +54,40 @@ import ro.isdc.wro.util.StopWatch;
  * @created 06 Aug 2012
  * @since 1.4.8
  */
-public class ResourceWatcher {
+public class ResourceWatcher
+    implements Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
-  @Inject
-  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+
+  public static interface Callback {
+    /**
+     * Callback method invoked when a group change is detected.
+     *
+     * @param key
+     *          {@link CacheKey} associated with the group whose change was detected.
+     */
+    void onGroupChanged(final CacheKey key);
+
+    /**
+     * Invoked when the change of the resource is detected.
+     *
+     * @param resource
+     *          the {@link Resource} which changed.
+     */
+    void onResourceChanged(final Resource resource);
+  }
+
+  /**
+   * Default implementation of {@link Callback} which does nothing by default.
+   */
+  public static class CallbackSupport
+      implements Callback {
+    public void onGroupChanged(final CacheKey key) {
+    }
+
+    public void onResourceChanged(final Resource resource) {
+    };
+  }
+
   @Inject
   private WroModelFactory modelFactory;
   @Inject
@@ -51,25 +96,77 @@ public class ResourceWatcher {
   private Injector injector;
   @Inject
   private LifecycleCallbackRegistry lifecycleCallback;
-  private ResourceChangeDetector changeDetector;
+  @Inject
+  private ResourceChangeDetector resourceChangeDetector;
+  @Inject
+  private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
+  @Inject
+  private ReadOnlyContext context;
+  /**
+   * Executor responsible for running the check asynchronously.
+   */
+  private final DestroyableLazyInitializer<ExecutorService> executorServiceRef = new DestroyableLazyInitializer<ExecutorService>() {
+    @Override
+    protected ExecutorService initialize() {
+      return Executors.newFixedThreadPool(1, WroUtil.createDaemonThreadFactory(ResourceWatcher.class.getName()));
+    }
+
+    @Override
+    public void destroy() {
+      if (isInitialized()) {
+        get().shutdownNow();
+      }
+      super.destroy();
+    };
+  };
+
+  /**
+   * Default constructor with a NoOP callback.
+   */
+  public void check(final CacheKey cacheKey) {
+    check(cacheKey, new CallbackSupport());
+  }
+
+  /**
+   * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
+   */
+  public void checkAsync(final CacheKey cacheKey) {
+    if (context.getConfig().isResourceWatcherAsync()) {
+      LOG.debug("Checking resourceWatcher asynchronously...");
+      final Callable<Void> callable = new ContextPropagatingCallable<Void>(createAsyncCheckCallable(cacheKey));
+      submit(callable);
+    } else {
+      check(cacheKey);
+    }
+  }
+
+  /**
+   * @VisibleForTesting
+   * @param callable
+   *          {@link Callable} to submit for asynchronous execution.
+   */
+  void submit(final Callable<Void> callable) {
+    executorServiceRef.get().submit(callable);
+  }
 
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
    *
-   * @param cacheEntry
+   * @param cacheKey
    *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
    */
-  public void check(final CacheKey cacheEntry) {
-    Validate.notNull(cacheEntry);
-    LOG.debug("ResourceWatcher started...");
+  public void check(final CacheKey cacheKey, final Callback callback) {
+    notNull(cacheKey);
+    LOG.debug("started");
     final StopWatch watch = new StopWatch();
     watch.start("detect changes");
     try {
-      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheEntry.getGroupName());
-      if (isGroupChanged(group.collectResourcesOfType(cacheEntry.getType()))) {
-        onGroupChanged(cacheEntry);
+      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
+      if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
+        callback.onGroupChanged(cacheKey);
+        cacheStrategy.put(cacheKey, null);
       }
-      changeDetector.reset();
+      resourceChangeDetector.reset();
     } catch (final Exception e) {
       onException(e);
     } finally {
@@ -87,40 +184,22 @@ public class ResourceWatcher {
     LOG.debug("[FAIL] detecting resource change ", e);
   }
 
-  private boolean isGroupChanged(final Group group) {
+  private boolean isGroupChanged(final Group group, final Callback callback) {
     // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
     boolean isChanged = false;
     for (final Resource resource : resources) {
       if (isChanged |= isChanged(resource, group.getName())) {
-        onResourceChanged(resource);
+        try {
+          callback.onResourceChanged(resource);
+          lifecycleCallback.onResourceChanged(resource);
+        } catch (final Exception e) {
+          LOG.debug("Exception while onResourceChange is invoked", e);
+        }
       }
     }
-    LOG.debug("isGroup {} changed: {}", group.getName(), BooleanUtils.toStringYesNo(isChanged));
+    LOG.debug("group={}, changed={}", group.getName(), isChanged);
     return isChanged;
-  }
-
-  /**
-   * Invoked when the change of the resource is detected.
-   *
-   * @param resource
-   *          the {@link Resource} which changed.
-   * @VisibleForTesting
-   */
-  void onResourceChanged(final Resource resource) {
-    lifecycleCallback.onResourceChanged(resource);
-  }
-
-  /**
-   * Invoked when a resource change detected.
-   *
-   * @param key
-   *          {@link CacheKey} which has to be invalidated because the corresponding group contains stale resources.
-   * @VisibleForTesting
-   */
-  void onGroupChanged(final CacheKey key) {
-    LOG.debug("Detected change for : {}", key);
-    cacheStrategy.put(key, null);
   }
 
   /**
@@ -136,11 +215,10 @@ public class ResourceWatcher {
     try {
       final String uri = resource.getUri();
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
-      final AtomicBoolean changeDetected = new AtomicBoolean(getResourceChangeDetector().checkChangeForGroup(uri,
-          groupName));
+      final AtomicBoolean changeDetected = new AtomicBoolean(resourceChangeDetector.checkChangeForGroup(uri, groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
         final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
-        LOG.debug("\t\tCheck @import directive from {}", resource);
+        LOG.debug("\tCheck @import directive from {}", resource);
         createCssImportProcessor(changeDetected, groupName).process(resource, reader, new StringWriter());
       }
       changed = changeDetected.get();
@@ -148,7 +226,7 @@ public class ResourceWatcher {
       LOG.debug("[FAIL] Cannot check {} resource (Exception message: {}). Assuming it is unchanged...", resource,
           e.getMessage());
     }
-    LOG.debug("\tResource {} isChanged: {}", resource.getUri(), BooleanUtils.toStringYesNo(changed));
+    LOG.debug("resource={}, changed={}", resource.getUri(), changed);
     return changed;
   }
 
@@ -167,10 +245,11 @@ public class ResourceWatcher {
       protected void onImportDetected(final String importedUri) {
         LOG.debug("Found @import {}", importedUri);
         final boolean isImportChanged = isChanged(Resource.create(importedUri, ResourceType.CSS), groupName);
-        LOG.debug("\tisImportChanged: {}", isImportChanged);
+        LOG.debug("\tisImportChanged={}", isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
-          // we need to continue in order to store the hash for all imported resources, otherwise the change won't be computed correctly.
+          // we need to continue in order to store the hash for all imported resources, otherwise the change won't be
+          // computed correctly.
         }
       };
 
@@ -200,15 +279,46 @@ public class ResourceWatcher {
     return processor;
   }
 
+  private Callable<Void> createAsyncCheckCallable(final CacheKey cacheKey) {
+    return new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        try {
+          ResourceWatcherRequestHandler.check(cacheKey, new PreserveDetailsRequestWrapper(Context.get().getRequest()),
+              wrapResponse(Context.get().getResponse()));
+          return null;
+        } catch (final IOException e) {
+          LOG.error("Could not check the following cacheKey: " + cacheKey, e);
+          throw e;
+        }
+      }
+
+      /**
+       * TODO create a callback to check for error and log it when needed.
+       */
+      private HttpServletResponse wrapResponse(final HttpServletResponse response) {
+        return new HttpServletResponseWrapper(response) {
+          private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
+
+          @Override
+          public PrintWriter getWriter()
+              throws IOException {
+            return printWriter;
+          }
+        };
+      }
+    };
+  }
+
   /**
    * @VisibleForTesting
    */
   ResourceChangeDetector getResourceChangeDetector() {
-    if (changeDetector == null) {
-      changeDetector = new ResourceChangeDetector();
-      injector.inject(changeDetector);
-    }
-    return changeDetector;
+    return resourceChangeDetector;
+  }
+
+  public void destroy()
+      throws Exception {
+    executorServiceRef.destroy();
   }
 }
-

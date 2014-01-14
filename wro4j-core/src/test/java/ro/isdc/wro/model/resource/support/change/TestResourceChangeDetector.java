@@ -10,6 +10,7 @@ import org.junit.Test;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.util.WroTestUtils;
@@ -21,18 +22,17 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestResourceChangeDetector {
   private static final String GROUP1_NAME = "g1";
   private static final String GROUP2_NAME = "g2";
-
+  @Inject
   private ResourceChangeDetector victim;
 
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    victim = new ResourceChangeDetector();
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
     final Injector injector = InjectorBuilder.create(managerFactory).build();
-    injector.inject(victim);
+    injector.inject(this);
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();

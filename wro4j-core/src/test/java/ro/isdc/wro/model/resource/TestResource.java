@@ -16,7 +16,7 @@ public class TestResource {
     Resource.create(null, null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void shouldNotAcceptNullUri2() {
     Resource.create(null);
   }

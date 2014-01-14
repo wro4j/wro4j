@@ -65,7 +65,7 @@ public class ResourceChangeDetector {
   public boolean checkChangeForGroup(final String uri, final String groupName) throws IOException {
     notNull(uri);
     notNull(groupName);
-    LOG.debug("checkChange of uri: {}, for group: {}", uri, groupName);
+    LOG.debug("group={}, uri={}", groupName, uri);
     final ResourceChangeInfo resourceInfo = changeInfoMap.get(uri);
     if (resourceInfo.isCheckRequiredForGroup(groupName)) {
       final String currentHash = hashStrategy.getHash(locatorFactory.locate(uri));

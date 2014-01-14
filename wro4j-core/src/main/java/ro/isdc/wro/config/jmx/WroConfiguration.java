@@ -48,6 +48,10 @@ public final class WroConfiguration
    */
   private long resourceWatcherUpdatePeriod;
   /**
+   * Flag for enabling an experimental feature which allows asynchronous resource watcher check.
+   */
+  private boolean resourceWatcherAsync;
+  /**
    * Gzip enable flag.
    */
   private boolean gzipEnabled = true;
@@ -138,7 +142,7 @@ public final class WroConfiguration
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritDoc}Async
    */
   public long getModelUpdatePeriod() {
     return modelUpdatePeriod;
@@ -473,6 +477,17 @@ public final class WroConfiguration
 
   public void setMinimizeEnabled(final boolean minimizeEnabled) {
     this.minimizeEnabled = minimizeEnabled;
+  }
+
+  /**
+   * @return true if the asynchronous resourceWatcher experimental feature is enabled.
+   */
+  public boolean isResourceWatcherAsync() {
+    return resourceWatcherAsync;
+  }
+
+  public void setResourceWatcherAsync(final boolean resourceWatcherAsync) {
+    this.resourceWatcherAsync = resourceWatcherAsync;
   }
 
   /**

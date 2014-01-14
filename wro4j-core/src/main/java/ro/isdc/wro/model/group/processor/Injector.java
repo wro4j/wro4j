@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +50,16 @@ public final class Injector {
    * @return the injected object instance. Useful for fluent interface.
    */
   public <T> T inject(final T object) {
-    Validate.notNull(object);
-    if (!injectedObjects.containsKey(object)) {
+    notNull(object);
+    if (!injectedObjects.containsKey(computeKey(object))) {
+      injectedObjects.put(computeKey(object), true);
       processInjectAnnotation(object);
-      injectedObjects.put(System.identityHashCode(object), true);
     }
     return object;
+  }
+
+  private <T> int computeKey(final T object) {
+    return System.identityHashCode(object);
   }
 
   /**

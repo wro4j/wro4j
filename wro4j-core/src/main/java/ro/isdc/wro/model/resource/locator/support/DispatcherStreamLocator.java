@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,8 @@ public class DispatcherStreamLocator {
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
    *
+   * @param location
+   *          a path to a request relative resource to locate.
    * @return a valid stream for required location. This method will never return a null.
    * @throws IOException
    *           if the stream cannot be located at the specified location.
@@ -62,7 +65,6 @@ public class DispatcherStreamLocator {
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
-
     try {
       final RequestDispatcher dispatcher = request.getRequestDispatcher(location);
       if (dispatcher != null) {
@@ -74,9 +76,8 @@ public class DispatcherStreamLocator {
         // use dispatcher
         dispatcher.include(servletRequest, servletResponse);
         warnOnEmptyStream = true;
-        // force flushing - the content will be written to
-        // BytArrayOutputStream. Otherwise exactly 32K of data will be
-        // written.
+        // force flushing - the content will be written to BytArrayOutputStream.
+        // Otherwise exactly 32K of data will be written.
         servletResponse.getWriter().flush();
         os.close();
       }
@@ -102,9 +103,9 @@ public class DispatcherStreamLocator {
 
   private InputStream locateExternal(final HttpServletRequest request, final String location)
       throws IOException {
-    // Returns the part URL from the protocol name up to the query string and contextPath.
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
     final String absolutePath = servletContextPath + location;
+    LOG.debug("locateExternalUri: {}", absolutePath);
     return createExternalResourceLocator(absolutePath).getInputStream();
   }
 
@@ -152,11 +153,10 @@ public class DispatcherStreamLocator {
   }
 
   /**
-   * @param request
    * @return true if the request is included from within wro request cycle.
    */
   public static boolean isIncludedRequest(final HttpServletRequest request) {
-    Validate.notNull(request);
+    notNull(request);
     return request.getAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER) != null;
   }
 }
