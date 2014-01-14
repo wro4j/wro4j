@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.model.resource;
 
-import org.apache.commons.lang3.Validate;
+import static org.apache.commons.lang3.Validate.isTrue;
 
 /**
  * Make a distinction between resource type. Can be CSS or JS.
@@ -33,7 +33,7 @@ public enum ResourceType {
    * @return {@link ResourceType} associated to the string representation of the type.
    */
   public static ResourceType get(final String typeAsString) {
-    Validate.isTrue(typeAsString != null, "ResourceType cannot be NULL.");
+    isTrue(typeAsString != null, "ResourceType cannot be NULL.");
     return ResourceType.valueOf(typeAsString.toUpperCase());
   }
 }
