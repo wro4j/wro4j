@@ -90,7 +90,7 @@ public class RedirectedStreamServletResponseWrapper
       throws IOException {
     try {
       LOG.debug("redirecting to: {}", location);
-      final InputStream is = externalResourceLocator.locate(location);
+      final InputStream is = newExternalResourceLocator(location).getInputStream();
       IOUtils.copy(is, servletOutputStream);
       is.close();
       servletOutputStream.close();

@@ -86,6 +86,8 @@ public class TestResourceWatcher {
   @Mock
   private FilterConfig filterConfig;
   @Mock
+  private ResourceLocator mockLocator;
+  @Mock
   private ResourceLocatorFactory mockLocatorFactory;
   @Mock
   private Callback resourceWatcherCallback;
@@ -112,7 +114,6 @@ public class TestResourceWatcher {
     victim = new ResourceWatcher();
     when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
     when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
-    when(mockLocator.getInputStream()).thenReturn(WroUtil.EMPTY_STREAM);
 
     victim = new ResourceWatcher();
     createDefaultInjector().inject(victim);
@@ -320,10 +321,4 @@ public class TestResourceWatcher {
       }
     };
   }
-
-  @After
-  public void tearDown() {
-    Context.unset();
-  }
-
 }
