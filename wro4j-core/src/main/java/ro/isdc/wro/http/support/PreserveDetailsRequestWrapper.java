@@ -5,10 +5,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 
 /**
- * A wrapper which preserve details of the wrapped request. This is useful when the wrapper is reused outside of the
- * request cycle and the client code needs details about its original path, uri, etc. As result, even if the request
- * cycle completes and the wrapped request is returned to the container request pool, the wrapper can refer these
- * details without any issue.
+ * A wrapper which preserve details of the wrapped request. In other words, it doesn't delegate the call to getters, but
+ * rather caches the values locally during construction and returns cached values. This is useful when the wrapper is
+ * reused outside of the request cycle and the client code needs details about its original path, uri, etc. As result,
+ * even if the request cycle completes and the wrapped request is returned to the container request pool, the wrapper
+ * can refer these details without any issue.
  * <p/>
  * One important thing to notice, is that the wrapper is not safe to use if you want to access dispatcher, inputStream,
  * parameters, attributes or cookies.
