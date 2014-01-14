@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.group;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -23,7 +25,7 @@ import ro.isdc.wro.model.resource.ResourceType;
  * A group is an entity holding a list of resources.
  * <p/>
  * This class is thread safe.
- * 
+ *
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
@@ -33,21 +35,21 @@ public final class Group {
    * Group name.
    */
   private String name;
-  
+
   /**
    * Resources of the group.
    */
   private final List<Resource> resources = Collections.synchronizedList(new ArrayList<Resource>());
-  
+
   /**
    * To be used by JSON serializer.
    */
   public Group() {
   }
-  
+
   /**
    * Creates a group with a name.
-   * 
+   *
    * @param name
    *          of the group.
    */
@@ -55,10 +57,10 @@ public final class Group {
     Validate.notNull(name, "Group name cannot be null.");
     this.name = name;
   }
-  
+
   /**
    * Check if the group has at least one resource of some type.
-   * 
+   *
    * @param resourceType
    *          type of the searched resource.
    * @return true if at least one resource of some type exists.
@@ -72,7 +74,7 @@ public final class Group {
     }
     return false;
   }
-  
+
   /**
    * @return true if the resourceToCheck is already contained in this group.
    */
@@ -84,7 +86,7 @@ public final class Group {
     }
     return false;
   }
-  
+
   /**
    * @return true if a {@link Resource} with an uri same as resourceUri is contained in this group.
    */
@@ -96,14 +98,14 @@ public final class Group {
     }
     return false;
   }
-  
+
   /**
    * Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
    * when resources containing wildcard are replaced with a list of wildcard-free resources. The order of resources is
    * preserved.
    * <p/>
    * The implementation is synchronized, because it mutates the collection.
-   * 
+   *
    * @param resource
    *          to replace.
    * @param expandedResources
@@ -141,7 +143,7 @@ public final class Group {
       setResources(new ArrayList<Resource>(result));
     }
   }
-  
+
   /**
    * @param type
    *          of resources to collect. This value should not be null.
@@ -152,7 +154,7 @@ public final class Group {
     Validate.notNull(type);
     final List<Resource> allResources = new ArrayList<Resource>();
     allResources.addAll(getResources());
-    
+
     // retain only resources of needed type
     final List<Resource> filteredResources = new ArrayList<Resource>();
     for (final Resource resource : getResources()) {
@@ -164,12 +166,12 @@ public final class Group {
         }
       }
     }
-    
+
     final Group filteredGroup = new Group(getName());
     filteredGroup.setResources(filteredResources);
     return filteredGroup;
   }
-  
+
   /**
    * @return the readonly list of resources.
    */
@@ -177,17 +179,17 @@ public final class Group {
     // use a new list to avoid ConcurrentModificationException when the Group#replace method is called.
     return Collections.unmodifiableList(new ArrayList<Resource>(resources));
   }
-  
+
   /**
    * Add a {@link Resource} to the collection of resources associated with this group.
    * <p/>
    * The implementation is synchronized, because it mutates the collection.
-   * 
-   * @param resource {@link Resource} to add to this group (at the end). 
+   *
+   * @param resource {@link Resource} to add to this group (at the end).
    * @return the reference to Group (fluent interface).
    */
   public Group addResource(final Resource resource) {
-    Validate.notNull(resource);
+    notNull(resource);
     synchronized (this) {
       if (!hasResource(resource)) {
         resources.add(resource);
@@ -197,17 +199,17 @@ public final class Group {
     }
     return this;
   }
-  
+
   /**
    * This method will replace all earlier defined resources with the provided list of resources.
    * <p/>
    * The implementation is synchronized, because it mutates the collection.
-   * 
+   *
    * @param resources
    *          the resources to replace the underlying resources.
    */
   public final void setResources(final List<Resource> resources) {
-    Validate.notNull(resources);
+    notNull(resources);
     synchronized (this) {
       this.resources.clear();
       for (final Resource resource : resources) {
@@ -215,7 +217,7 @@ public final class Group {
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -228,14 +230,14 @@ public final class Group {
     }
     return false;
   }
-  
+
   /**
    * @return the name
    */
   public String getName() {
     return name;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -243,7 +245,7 @@ public final class Group {
   public int hashCode() {
     return getName().hashCode();
   }
-  
+
   /**
    * {@inheritDoc}
    */

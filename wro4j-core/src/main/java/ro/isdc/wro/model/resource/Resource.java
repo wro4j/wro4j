@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -97,7 +99,7 @@ public class Resource {
    * @param type the type to set
    */
   public void setType(final ResourceType type) {
-    Validate.notNull(type, "ResourceType cannot be null!");
+    notNull(type, "ResourceType cannot be null!");
     this.type = type;
   }
 
@@ -106,7 +108,7 @@ public class Resource {
    * @param uri the uri to set
    */
   public void setUri(final String uri) {
-    Validate.notNull(uri, "Uri cannot be null!");
+    notNull(uri, "Uri cannot be null!");
     this.uri = cleanUri(uri);
   }
 

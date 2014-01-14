@@ -33,8 +33,14 @@ import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 public class ResourceWatcherRequestHandler
     extends RequestHandlerSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcherRequestHandler.class);
-  private static final String PARAM_GROUP_NAME = "group";
-  private static final String PARAM_RESOURCE_TYPE = "resourceType";
+  /**
+   * @VisibleForTesting
+   */
+  static final String PARAM_GROUP_NAME = "group";
+  /**
+   * @VisibleForTesting
+   */
+  static final String PARAM_RESOURCE_TYPE = "resourceType";
   /**
    * @VisibleForTesting
    */
