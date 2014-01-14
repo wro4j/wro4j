@@ -101,16 +101,6 @@ public class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
-  public void forward(final RequestDispatcher dispatcher, final HttpServletRequest request,
-      final HttpServletResponse response, final String location)
-      throws IOException {
-    try {
-      dispatcher.forward(getWrappedServletRequest(request, location), response);
-    } catch (final Exception e) {
-      throw new IOException("Could not forward to location: " + location, e);
-    }
-  }
-
   private InputStream locateExternal(final HttpServletRequest request, final String location)
       throws IOException {
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
