@@ -3,6 +3,10 @@
  */
 package ro.isdc.wro.model.resource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,8 +67,19 @@ public class TestResource {
   public void shouldSetMinimizeFlag() {
     final Resource resource = Resource.create("resource.js");
     resource.setMinimize(true);
-    Assert.assertTrue(resource.isMinimize());
+    assertTrue(resource.isMinimize());
     resource.setMinimize(false);
-    Assert.assertFalse(resource.isMinimize());
+    assertFalse(resource.isMinimize());
   }
+
+  @Test
+  public void shouldAllowSettingResourceTypeAndUri() {
+    final Resource resource = new Resource();
+    final String uri = "/someUri";
+    resource.setType(ResourceType.CSS);
+    resource.setUri(uri);
+    assertEquals(ResourceType.CSS, resource.getType());
+    assertEquals(uri, resource.getUri());
+  }
+
 }

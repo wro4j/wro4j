@@ -4,9 +4,11 @@
 package ro.isdc.wro.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -26,51 +28,51 @@ import ro.isdc.wro.model.resource.locator.support.UrlResourceLocator;
 
 /**
  * Test class for WroModel..
- * 
+ *
  * @author Alex Objelean
  * @created Created on Jan 6, 2010
  */
 public class TestWroModel {
   private WroModel victim;
   private WroModelFactory factory;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
     victim = buildValidModel();
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
     factory.destroy();
   }
-  
+
   @Test
   public void testGetExistingGroup() {
     Assert.assertFalse(victim.getGroups().isEmpty());
     final Group group = victim.getGroupByName("g1");
     // create a copy of original list
-    Assert.assertEquals(1, group.getResources().size());
+    assertEquals(1, group.getResources().size());
   }
-  
+
   @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
-    Assert.assertFalse(victim.getGroups().isEmpty());
+    assertFalse(victim.getGroups().isEmpty());
     victim.getGroupByName("INVALID_GROUP");
   }
-  
+
   /**
    * @return a valid {@link WroModel} pre populated with some valid resources.
    */
@@ -85,32 +87,43 @@ public class TestWroModel {
     final WroModel model = factory.create();
     return model;
   }
-  
+
   @Test
   public void shouldNotReturnDuplicatedResources() {
     final WroModel model = new WroModel();
-    
+
     assertEquals(0, new WroModelInspector(model).getAllUniqueResources().size());
-    
+
     model.addGroup(new Group("one").addResource(Resource.create("/one.js"))).addGroup(
         new Group("two").addResource(Resource.create("/one.js")));
     assertEquals(1, new WroModelInspector(model).getAllUniqueResources().size());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotMergeNullModel() {
     victim.merge(null);
   }
-  
+
   @Test
   public void shouldMergeEmptyModel() {
     victim.merge(new WroModel());
     assertEquals(buildValidModel(), victim);
   }
-  
+
   @Test
   public void shouldMergeNotEmptyModel() {
     victim.merge(new WroModel().addGroup(new Group("anEmptyGroup")));
     assertEquals(Arrays.asList("anEmptyGroup", "g1", "g2", "g3"), new WroModelInspector(victim).getGroupNames());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void cannotSetNullGroups() {
+    victim.setGroups(null);
+  }
+
+  @Test
+  public void shouldSetValidGroups() {
+    victim.setGroups(Collections.EMPTY_LIST);
+    assertEquals(0, victim.getGroups().size());
   }
 }
