@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,7 +50,7 @@ public final class WroModel {
    *          the groups to set
    */
   public final WroModel setGroups(final Collection<Group> groups) {
-    Validate.notNull(groups, "groups cannot be null!");
+    notNull(groups, "groups cannot be null!");
     LOG.debug("setGroups: {}", groups);
     identifyDuplicateGroupNames(groups);
     this.groups = new HashSet<Group>(groups);
