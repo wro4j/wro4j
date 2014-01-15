@@ -13,6 +13,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -260,7 +261,7 @@ public class TestResourceWatcher {
   @Test
   public void shouldCheckForChangeAsynchronously()
       throws Exception {
-    final String invalidUrl = "http://invalidEndpoint:9999/";
+    final String invalidUrl = "http://localhost:1/";
     when(request.getRequestURL()).thenReturn(new StringBuffer(invalidUrl));
     when(request.getServletPath()).thenReturn("");
     final AtomicReference<Callable<Void>> asyncInvoker = new AtomicReference<Callable<Void>>();
@@ -299,11 +300,11 @@ public class TestResourceWatcher {
           throws Exception {
         return asyncInvoker.get() != null;
       }
-    }, 500);
+    }, 2000);
     assertNotNull(asyncInvoker.get());
     assertNotNull(exceptionHolder.get());
-    //We expect a request to an invalid host, since a call to configured url will be performed.
-    assertTrue(exceptionHolder.get() instanceof UnknownHostException);
+    //We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
+    assertEquals(ConnectException.class, exceptionHolder.get().getClass());
   }
 
   @Test
