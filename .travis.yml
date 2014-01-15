@@ -1,4 +1,4 @@
 language: java
-script: mvn clean test
+script: mvn clean deploy
 env: MAVEN_OPTS="-XX:MaxPermSize=512m"
-after-success: mvn clean deploy -DskipTests
+
