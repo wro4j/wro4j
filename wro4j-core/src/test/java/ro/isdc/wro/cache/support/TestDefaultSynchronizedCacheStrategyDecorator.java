@@ -37,6 +37,7 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.util.ObjectDecorator;
+import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.WroTestUtils;
 
 
@@ -170,5 +171,17 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     assertSame(original, victim);
+  }
+  
+  @Test
+  public void shouldDestroySchedulerWhenStrategyIsDestroyed() {
+    final SchedulerHelper scheduler = Mockito.mock(SchedulerHelper.class);
+    victim = new DefaultSynchronizedCacheStrategyDecorator(new MemoryCacheStrategy<CacheKey, CacheValue>()) {
+      SchedulerHelper newResourceWatcherScheduler() {
+        return scheduler;
+      };
+    };
+    victim.destroy();
+    verify(scheduler).destroy();
   }
 }
