@@ -14,6 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 
 /**
@@ -32,6 +33,7 @@ public class UrlResourceLocator
    * Path of the resource to be located.
    */
   private final String path;
+  private int timeout = WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
 
   /**
    * Create a new UrlResource.
@@ -80,12 +82,11 @@ public class UrlResourceLocator
     final URLConnection con = url.openConnection();
     // sets the "UseCaches" flag to <code>false</code>, mainly to avoid jar file locking on Windows.
     con.setUseCaches(false);
+    con.setConnectTimeout(timeout);
+    con.setReadTimeout(timeout);
     return new BufferedInputStream(con.getInputStream());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public long lastModified() {
     try {
@@ -97,9 +98,6 @@ public class UrlResourceLocator
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ResourceLocator createRelative(String relativePath)
       throws IOException {
@@ -107,5 +105,9 @@ public class UrlResourceLocator
       relativePath = relativePath.substring(1);
     }
     return new UrlResourceLocator(new URL(new URL(this.path), relativePath));
+  }
+
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
   }
 }

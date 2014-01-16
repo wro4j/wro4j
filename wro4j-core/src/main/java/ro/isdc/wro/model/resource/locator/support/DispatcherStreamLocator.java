@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
 import ro.isdc.wro.model.resource.locator.ResourceLocator;
 import ro.isdc.wro.util.WroUtil;
@@ -116,7 +116,7 @@ public class DispatcherStreamLocator {
    * @VisibleForTesting
    */
   ResourceLocator createExternalResourceLocator(final String location) {
-    final ResourceLocator locator = new UrlResourceLocator(location);
+    final UrlResourceLocator locator = new UrlResourceLocator(location);
     locator.setEnableWildcards(false);
     locator.setTimeout(timeout);
     return locator;
