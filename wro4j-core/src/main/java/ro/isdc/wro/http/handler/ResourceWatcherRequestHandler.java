@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheKey;
-import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
@@ -50,12 +49,8 @@ public class ResourceWatcherRequestHandler
    * The alias of this {@link RequestHandler} used for configuration.
    */
   public static final String ALIAS = "resourceWatcher";
-
   @Inject
   private ResourceWatcher resourceWatcher;
-
-  @Inject
-  private ReadOnlyContext context;
   /**
    * A random string used to authorize request. This key is updated after each successful handle operation to avoid
    * hijacking.
@@ -136,17 +131,13 @@ public class ResourceWatcherRequestHandler
   }
 
   /**
-   * Allows this request handler to be invoked using a server-side invocation. Hides the details about creating a valid
-   * url and providing the authorization key required to invoke this handler.
+   * Computes the servlet context relative url to call this handler using a server-side invocation. Hides the details
+   * about creating a valid url and providing the authorization key required to invoke this handler.
    */
-  public static void check(final CacheKey cacheKey, final HttpServletRequest request, final HttpServletResponse response)
-      throws IOException {
-    notNull(cacheKey);
-    notNull(request);
-    notNull(response);
+  public static String createHandlerRequestPath(final CacheKey cacheKey, final HttpServletRequest request, final HttpServletResponse response) {
     final String fullPath = FilenameUtils.getFullPath(request.getServletPath());
     final String location = fullPath + getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
-    new DispatcherStreamLocator().getInputStream(request, response, location);
+    return location;
   }
 
   private static String getRequestHandlerPath() {

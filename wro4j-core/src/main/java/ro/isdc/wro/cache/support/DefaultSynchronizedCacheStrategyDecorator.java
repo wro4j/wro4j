@@ -17,7 +17,6 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.GroupsProcessor;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
@@ -45,8 +44,6 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Inject
   private ReadOnlyContext context;
   @Inject
-  private Injector injector;
-  @Inject
   private ResourceWatcher resourceWatcher;
 
   /**
@@ -64,13 +61,29 @@ public class DefaultSynchronizedCacheStrategyDecorator
     return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
         : new DefaultSynchronizedCacheStrategyDecorator(decorated);
   }
+  
+  /**
+   * Based on provided {@link CacheKey} a new key is created which has the same value. This is useful to avoid hashCode
+   * variation for minimize flag. This does make sense for resource watcher functionality, when the changes for original
+   * resources are performed.
+   */
+  private static CacheKey createIgnoreMinimizeFlagKey(final CacheKey cacheKey) {
+    return new CacheKey(cacheKey.getGroupName(), cacheKey.getType());
+  }
 
   /**
    * @VisibleForTesting
    */
   DefaultSynchronizedCacheStrategyDecorator(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
     super(cacheStrategy);
-    resourceWatcherScheduler = SchedulerHelper.create(new LazyInitializer<Runnable>() {
+    resourceWatcherScheduler = newResourceWatcherScheduler();
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  SchedulerHelper newResourceWatcherScheduler() {
+    return SchedulerHelper.create(new LazyInitializer<Runnable>() {
       @Override
       protected Runnable initialize() {
         return new Runnable() {
@@ -82,9 +95,6 @@ public class DefaultSynchronizedCacheStrategyDecorator
     }, "resourceWatcherScheduler");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected CacheValue loadValue(final CacheKey key) {
     resourceWatcherScheduler.scheduleWithPeriod(getResourceWatcherUpdatePeriod(), getTimeUnitForResourceWatcher());
@@ -135,7 +145,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
       LOG.debug("onBeforeGet={}", key);
-      checkedKeys.add(key);
+      checkedKeys.add(createIgnoreMinimizeFlagKey(key));
       resourceWatcher.checkAsync(key);
     }
   }
@@ -156,5 +166,11 @@ public class DefaultSynchronizedCacheStrategyDecorator
     if (authorizationManager instanceof MutableResourceAuthorizationManager) {
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
     }
+  }
+  
+  @Override
+  public void destroy() {
+    super.destroy();
+    resourceWatcherScheduler.destroy();
   }
 }
