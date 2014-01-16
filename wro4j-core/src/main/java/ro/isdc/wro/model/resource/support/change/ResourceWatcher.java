@@ -62,9 +62,10 @@ public class ResourceWatcher
     implements Destroyable {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceWatcher.class);
   /**
-   * The thread pool size of the executor which is responsible for performing async check 
+   * The thread pool size of the executor which is responsible for performing async check
    */
   private static final int POOL_SIZE = 2;
+  
   public static interface Callback {
     /**
      * Callback method invoked when a group change is detected.
@@ -293,16 +294,19 @@ public class ResourceWatcher
     return new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
+        final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request, response);
         try {
-          final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request, response);
           dispatcherLocator.getInputStream(request, response, location);
           return null;
         } catch (final IOException e) {
           final StringBuffer message = new StringBuffer("Could not check the following cacheKey: " + cacheKey);
           if (e instanceof SocketTimeoutException) {
-            message.append(". Please consider increasing the connectionTimeout configuration.");
+            message.append(". The invocation of ").append(location).append(
+                " timed out. Consider increasing the connectionTimeout configuration.");
+            LOG.error(message.toString());
+          } else {
+            LOG.error(message.toString(), e);
           }
-          LOG.error(message.toString(), e);
           throw e;
         }
       }

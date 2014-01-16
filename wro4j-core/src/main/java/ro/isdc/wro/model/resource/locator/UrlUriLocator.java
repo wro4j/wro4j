@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    */
   public InputStream locate(final String uri)
     throws IOException {
-    Validate.notNull(uri, "uri cannot be NULL!");
+    notNull(uri, "uri cannot be NULL!");
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
