@@ -140,7 +140,8 @@ public class ResourceWatcher
   
   /**
    * Will try an asynchronous check. If async check is not supported (not configured or not allowed), a synchronous
-   * check will be performed as a fallback mechanism.
+   * check will be performed as a fallback mechanism. The async check assumes that the
+   * {@link ResourceWatcherRequestHandler} is enabled.
    */
   public void tryAsyncCheck(final CacheKey cacheKey) {
     if (isAsyncCheckAllowed()) {

@@ -319,6 +319,14 @@ public class TestResourceWatcher {
     LOG.debug("Exception: {}", exceptionHolder.get().getClass());
     assertTrue(exceptionHolder.get() instanceof IOException);
   }
+  
+  @Test
+  public void shouldInvokeSyncCheckWhenAsyncIsConfiguredButNotAllowed() {
+    Context.get().getConfig().setResourceWatcherAsync(true);
+    ResourceWatcher victimSpy = Mockito.spy(victim);
+    victimSpy.tryAsyncCheck(cacheKey);
+    verify(victimSpy).check(Mockito.eq(cacheKey));
+  }
 
   @Test
   public void shouldRemoveKeyFromCacheStrategyWhenChangeDetected() {
