@@ -8,7 +8,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,7 @@ public class ResourceWatcherRequestHandler
    * @VisibleForTesting
    */
   static final String PARAM_AUTH_KEY = "auth";
-  private static final String PATH_HANDLER = "resourceWatcher";
+  static final String PATH_HANDLER = "resourceWatcher";
   /**
    * The alias of this {@link RequestHandler} used for configuration.
    */

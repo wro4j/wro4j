@@ -148,6 +148,7 @@ public class ResourceWatcher
       final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
       submit(callable);
     } else {
+      LOG.debug("Async check not allowed. Falling back to sync check.");
       check(cacheKey);
     }
   }

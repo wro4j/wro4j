@@ -76,11 +76,14 @@ public class TestResourceWatcherRequestHandler {
     };
     final CacheKey expected = new CacheKey("group", ResourceType.CSS);
     new InjectorBuilder(new BaseWroManagerFactory()).setResourceWatcher(resourceWatcher).build().inject(victim);
-    when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PARAM_GROUP_NAME))).thenReturn(expected.getGroupName());
+    when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PATH_API))).thenReturn(
+        ResourceWatcherRequestHandler.PATH_HANDLER);
+    when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PARAM_GROUP_NAME))).thenReturn(
+        expected.getGroupName());
     when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PARAM_RESOURCE_TYPE))).thenReturn(
         expected.getType().name());
     when(request.getParameter(Mockito.eq(ResourceWatcherRequestHandler.PARAM_AUTH_KEY))).thenReturn(authKey);
-    when(request.getRequestURI()).thenReturn("wroAPI/resourceWatcher");
+    when(request.getRequestURI()).thenReturn("/style.css?wroAPI=resourceWatcher");
     assertTrue(victim.accept(request));
 
     victim.handle(request, response);

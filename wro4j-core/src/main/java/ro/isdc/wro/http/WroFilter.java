@@ -71,7 +71,7 @@ public class WroFilter
    * 
    * @VisibleForTesting
    */
-  static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
+  public static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
       + ".passed_through_filter";
   /**
    * Filter config.
@@ -285,7 +285,7 @@ public class WroFilter
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-        request.setAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER, Boolean.TRUE);
+        addPassThroughFilterAttribute(request);
         if (!handledWithRequestHandler(request, response)) {
           processRequest(request, response);
           onRequestProcessed();
@@ -299,6 +299,10 @@ public class WroFilter
     } else {
       chain.doFilter(request, response);
     }
+  }
+
+  private void addPassThroughFilterAttribute(final HttpServletRequest request) {
+    request.setAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER, Boolean.TRUE);
   }
 
   /**
