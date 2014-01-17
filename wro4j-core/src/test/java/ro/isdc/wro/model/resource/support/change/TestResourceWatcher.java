@@ -303,7 +303,7 @@ public class TestResourceWatcher {
 
     Context.get().getConfig().setResourceWatcherAsync(true);
 
-    victim.checkAsync(cacheKey);
+    victim.tryAsyncCheck(cacheKey);
     WroTestUtils.waitUntil(new Function<Void, Boolean>() {
       public Boolean apply(final Void input)
           throws Exception {

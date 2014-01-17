@@ -27,6 +27,7 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.http.support.PreserveDetailsRequestWrapper;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -138,16 +139,26 @@ public class ResourceWatcher
   }
   
   /**
-   * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
+   * Will try an asynchronous check. If async check is not supported (not configured or not allowed), a synchronous
+   * check will be performed as a fallback mechanism.
    */
-  public void checkAsync(final CacheKey cacheKey) {
-    if (context.getConfig().isResourceWatcherAsync()) {
+  public void tryAsyncCheck(final CacheKey cacheKey) {
+    if (isAsyncCheckAllowed()) {
       LOG.debug("Checking resourceWatcher asynchronously...");
       final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
       submit(callable);
     } else {
       check(cacheKey);
     }
+  }
+  
+  /**
+   * @return true only if the async is enabled by configuration and if the original request was for a wro resource
+   *         (passed through {@link WroFilter}).
+   */
+  private boolean isAsyncCheckAllowed() {
+    return context.getConfig().isResourceWatcherAsync()
+        && WroFilter.isPassedThroughyWroFilter(Context.get().getRequest());
   }
   
   /**
@@ -289,12 +300,15 @@ public class ResourceWatcher
   }
   
   private Callable<Void> createAsyncCheckCallable(final CacheKey cacheKey) {
-    final HttpServletRequest request = new PreserveDetailsRequestWrapper(Context.get().getRequest());
+    HttpServletRequest originalRequest = Context.get().getRequest();
+    LOG.debug("OriginalRequest: url={}, uri={}, servletPath={}", originalRequest.getRequestURL(),
+        originalRequest.getRequestURI(), originalRequest.getServletPath());
+    final HttpServletRequest request = new PreserveDetailsRequestWrapper(originalRequest);
     final HttpServletResponse response = wrapResponse(Context.get().getResponse());
     return new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request, response);
+        final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request);
         try {
           dispatcherLocator.getInputStream(request, response, location);
           return null;
