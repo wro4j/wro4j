@@ -138,15 +138,12 @@ public class DefaultSynchronizedCacheStrategyDecorator
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
       LOG.debug("onBeforeGet={}", key);
       checkedKeys.add(createIgnoreMinimizeFlagKey(key));
-      resourceWatcher.checkAsync(key);
+      resourceWatcher.tryAsyncCheck(key);
     }
   }
 

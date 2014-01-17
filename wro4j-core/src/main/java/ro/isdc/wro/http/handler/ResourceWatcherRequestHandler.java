@@ -1,7 +1,6 @@
 package ro.isdc.wro.http.handler;
 
 import static org.apache.commons.lang3.Validate.isTrue;
-import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,6 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 
 
@@ -44,7 +41,7 @@ public class ResourceWatcherRequestHandler
    * @VisibleForTesting
    */
   static final String PARAM_AUTH_KEY = "auth";
-  private static final String PATH_HANDLER = "resourceWatcher";
+  static final String PATH_HANDLER = "resourceWatcher";
   /**
    * The alias of this {@link RequestHandler} used for configuration.
    */
@@ -89,8 +86,8 @@ public class ResourceWatcherRequestHandler
   @Override
   public boolean accept(final HttpServletRequest request) {
     // Authorize only server-side included request (performed by {@link DispatcherStreamLocator}). Any public access to
-    // this request handler is forbidden to avoid .
-    final boolean isHandlerRequest = isHandlerUri(request.getRequestURI());
+    // this request handler is forbidden.
+    final boolean isHandlerRequest = isHandlerRequest(request);
     return isHandlerRequest && isAuthorized(request);
   }
 
@@ -110,9 +107,9 @@ public class ResourceWatcherRequestHandler
    *          to check.
    * @return true if the provided url is a proxy resource.
    */
-  private boolean isHandlerUri(final String url) {
-    notNull(url);
-    return url.contains(getRequestHandlerPath());
+  private boolean isHandlerRequest(final HttpServletRequest request) {
+    String apiHandlerValue = request.getParameter(PATH_API);
+    return PATH_HANDLER.equals(apiHandlerValue) && retrieveCacheKey(request) != null;
   }
 
   /**
@@ -134,18 +131,18 @@ public class ResourceWatcherRequestHandler
    * Computes the servlet context relative url to call this handler using a server-side invocation. Hides the details
    * about creating a valid url and providing the authorization key required to invoke this handler.
    */
-  public static String createHandlerRequestPath(final CacheKey cacheKey, final HttpServletRequest request, final HttpServletResponse response) {
-    final String fullPath = FilenameUtils.getFullPath(request.getServletPath());
-    final String location = fullPath + getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
+  public static String createHandlerRequestPath(final CacheKey cacheKey, final HttpServletRequest request) {
+    final String handlerQueryPath = getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
+    final String location = request.getServletPath() + handlerQueryPath;
     return location;
   }
 
   private static String getRequestHandlerPath() {
-    return String.format("%s/%s", PATH_API, PATH_HANDLER);
+    return String.format("?%s=%s", PATH_API, PATH_HANDLER);
   }
 
   private static String getRequestHandlerPath(final String groupName, final ResourceType resourceType) {
-    return String.format("%s?%s=%s&%s=%s&%s=%s", getRequestHandlerPath(), PARAM_GROUP_NAME, groupName,
+    return String.format("%s&%s=%s&%s=%s&%s=%s", getRequestHandlerPath(), PARAM_GROUP_NAME, groupName,
         PARAM_RESOURCE_TYPE, resourceType.name(), PARAM_AUTH_KEY, authorizationKey);
   }
 }

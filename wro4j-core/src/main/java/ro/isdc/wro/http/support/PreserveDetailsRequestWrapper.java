@@ -35,7 +35,8 @@ public class PreserveDetailsRequestWrapper
   public PreserveDetailsRequestWrapper(final HttpServletRequest request) {
     super(request);
     requestURI = request.getRequestURI();
-    requestURL = request.getRequestURL();
+    //get the immutable representation of buffer, because StringBuffer is mutable.
+    requestURL = new StringBuffer(request.getRequestURL().toString());
     pathInfo = request.getPathInfo();
     contextPath = request.getContextPath();
     servletPath = request.getServletPath();

@@ -122,7 +122,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     do {
       victim.get(key);
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
-    verify(mockResourceWatcher, times(1)).checkAsync(key);
+    verify(mockResourceWatcher, times(1)).tryAsyncCheck(key);
   }
 
   /**

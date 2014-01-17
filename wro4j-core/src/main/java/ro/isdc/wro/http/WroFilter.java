@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.http;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -62,6 +65,15 @@ public class WroFilter
    */
   private static final String MBEAN_PREFIX = "wro4j-";
   /**
+   * Attribute indicating that the request was passed through {@link WroFilter}. This is required to allow identify
+   * requests for wro resources (example: async resourceWatcher which cannot be executed asynchronously unless a wro
+   * resource was requested).
+   * 
+   * @VisibleForTesting
+   */
+  public static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
+      + ".passed_through_filter";
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -88,6 +100,14 @@ public class WroFilter
   private Injector injector;
   private MBeanServer mbeanServer = null;
 
+  /**
+   * @return true if the provided request contains an attribute indicating that it was handled through {@link WroFilter}
+   */
+  public static boolean isPassedThroughyWroFilter(final HttpServletRequest request) {
+    notNull(request);
+    return request.getAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER) != null;
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -265,7 +285,7 @@ public class WroFilter
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-
+        addPassThroughFilterAttribute(request);
         if (!handledWithRequestHandler(request, response)) {
           processRequest(request, response);
           onRequestProcessed();
@@ -279,6 +299,10 @@ public class WroFilter
     } else {
       chain.doFilter(request, response);
     }
+  }
+
+  private void addPassThroughFilterAttribute(final HttpServletRequest request) {
+    request.setAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER, Boolean.TRUE);
   }
 
   /**
