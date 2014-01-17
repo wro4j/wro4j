@@ -139,15 +139,21 @@ public class ResourceWatcher
   }
   
   /**
-   * Will try an asynchronous check. If async check is not supported (not configured or not allowed), a synchronous
-   * check will be performed as a fallback mechanism. The async check assumes that the
-   * {@link ResourceWatcherRequestHandler} is enabled.
+   * Will try an asynchronous check if the async configuration is enabled. If async check is not configured, a
+   * synchronous check will be performed. The async check assumes that the {@link ResourceWatcherRequestHandler} is
+   * enabled.
+   * <p/>
+   * If the async check is not allowed (the request was not passed through {@link WroFilter}) - no check will be
+   * performed. This is important for use-cases when wro resource is included using a taglib which performs a wro api
+   * call directly, without being invoked through {@link WroFilter}.
    */
   public void tryAsyncCheck(final CacheKey cacheKey) {
-    if (isAsyncCheckAllowed()) {
-      LOG.debug("Checking resourceWatcher asynchronously...");
-      final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
-      submit(callable);
+    if (context.getConfig().isResourceWatcherAsync()) {
+      if (isAsyncCheckAllowed()) {
+        LOG.debug("Checking resourceWatcher asynchronously...");
+        final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
+        submit(callable);
+      }
     } else {
       LOG.debug("Async check not allowed. Falling back to sync check.");
       check(cacheKey);
@@ -159,8 +165,7 @@ public class ResourceWatcher
    *         (passed through {@link WroFilter}).
    */
   private boolean isAsyncCheckAllowed() {
-    return context.getConfig().isResourceWatcherAsync()
-        && WroFilter.isPassedThroughyWroFilter(Context.get().getRequest());
+    return WroFilter.isPassedThroughyWroFilter(Context.get().getRequest());
   }
   
   /**

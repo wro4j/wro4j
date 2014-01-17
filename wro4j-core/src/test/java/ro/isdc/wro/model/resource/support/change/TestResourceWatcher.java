@@ -321,11 +321,11 @@ public class TestResourceWatcher {
   }
   
   @Test
-  public void shouldInvokeSyncCheckWhenAsyncIsConfiguredButNotAllowed() {
+  public void shouldNotCheckAtAllWhenAsyncIsConfiguredButNotAllowed() {
     Context.get().getConfig().setResourceWatcherAsync(true);
     ResourceWatcher victimSpy = Mockito.spy(victim);
     victimSpy.tryAsyncCheck(cacheKey);
-    verify(victimSpy).check(Mockito.eq(cacheKey));
+    verify(victimSpy, Mockito.never()).check(Mockito.eq(cacheKey));
   }
 
   @Test
