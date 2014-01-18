@@ -272,15 +272,13 @@ public class WroFilter
       throws ServletException {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
       throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
 
     if (isFilterActive(request)) {
+      LOG.debug("processing wro request: {}", request.getRequestURI());
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);

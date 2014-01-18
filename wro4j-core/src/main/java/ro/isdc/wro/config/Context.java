@@ -78,6 +78,7 @@ public class Context
    * sets the {@link WroConfiguration} singleton instance.
    */
   public void setConfig(final WroConfiguration config) {
+    notNull(config);
     this.config = config;
   }
 

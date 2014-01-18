@@ -48,9 +48,6 @@ public class ModelAsJsonRequestHandler
   @Inject
   private WroModelFactory modelFactory;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
@@ -82,6 +79,6 @@ public class ModelAsJsonRequestHandler
 
   @Override
   public boolean isEnabled() {
-    return context.getConfig().isDebug();
+    return super.isEnabled() && context.getConfig().isDebug();
   }
 }
