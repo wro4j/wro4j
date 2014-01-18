@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.config;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +16,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -136,8 +137,8 @@ public class Context
    * @param context {@link Context} to set.
    */
   public static void set(final Context context, final WroConfiguration config) {
-    Validate.notNull(context);
-    Validate.notNull(config);
+    notNull(context);
+    notNull(config);
     context.setConfig(config);
 
     final String correlationId = generateCorrelationId();
@@ -178,7 +179,7 @@ public class Context
    * Set the correlationId to the current thread.
    */
   public static void setCorrelationId(final String correlationId) {
-    Validate.notNull(correlationId);
+    notNull(correlationId);
     CORRELATION_ID.set(correlationId);
   }
 
@@ -212,7 +213,7 @@ public class Context
   public static <T> Callable<T> decorate(final Callable<T> callable) {
     return new ContextPropagatingCallable<T>(callable);
   }
-  
+
   /**
    * @return number of {@link Context} objects which were created but not yet destroyed. This is useful to detect leaks
    *         (mostly for unit testing).
@@ -220,7 +221,7 @@ public class Context
   public static int countActive() {
     return CONTEXT_MAP.size();
   }
-  
+
   /**
    * Private constructor. Used to build {@link StandAloneContext}.
    */
@@ -231,6 +232,8 @@ public class Context
    * Constructor.
    */
   private Context(final HttpServletRequest request, final HttpServletResponse response, final FilterConfig filterConfig) {
+    notNull(request);
+    notNull(response);
     this.request = request;
     this.response = response;
     this.servletContext = filterConfig != null ? filterConfig.getServletContext() : null;

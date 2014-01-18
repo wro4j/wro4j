@@ -39,9 +39,6 @@ public class ContextPropagatingCallable<T>
     });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void run() {
     try {
       call();
@@ -50,9 +47,6 @@ public class ContextPropagatingCallable<T>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public T call()
       throws Exception {
     Context.setCorrelationId(correlationId);
