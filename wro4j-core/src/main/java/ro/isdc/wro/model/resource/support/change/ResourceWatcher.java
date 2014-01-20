@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.support.StaleCacheKeyAware;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
@@ -192,7 +193,7 @@ public class ResourceWatcher
       final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
       if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
         callback.onGroupChanged(cacheKey);
-        cacheStrategy.put(cacheKey, null);
+        invalidateCacheKey(cacheKey);
       }
       resourceChangeDetector.reset();
     } catch (final Exception e) {
@@ -200,6 +201,14 @@ public class ResourceWatcher
     } finally {
       watch.stop();
       LOG.debug("resource watcher info: {}", watch.prettyPrint());
+    }
+  }
+
+  private void invalidateCacheKey(final CacheKey cacheKey) {
+    if (cacheStrategy instanceof StaleCacheKeyAware) {
+      ((StaleCacheKeyAware) cacheStrategy).markAsStale(cacheKey);
+    } else {
+      cacheStrategy.put(cacheKey, null);          
     }
   }
 

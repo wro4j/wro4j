@@ -11,37 +11,41 @@ import ro.isdc.wro.util.AbstractDecorator;
  * @since 1.4.6
  */
 public class CacheStrategyDecorator<K, V> extends AbstractDecorator<CacheStrategy<K, V>>
-    implements CacheStrategy<K, V>  {
+    implements CacheStrategy<K, V>, StaleCacheKeyAware<K>  {
 
   public CacheStrategyDecorator(final CacheStrategy<K,V> decorated) {
     super(decorated);
   }
   
-  /**
-   * {@inheritDoc}
-   */
   public void put(K key, V value) {
     getDecoratedObject().put(key, value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public V get(K key) {
     return getDecoratedObject().get(key);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void clear() {
     getDecoratedObject().clear();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void destroy() {
     getDecoratedObject().destroy();
+  }
+  
+  public boolean isStale(K key) {
+    return isStaleCacheKeyAware() && ((StaleCacheKeyAware) getDecoratedObject()).isStale(key);
+  };
+  
+  public void markAsStale(K key) {
+    if (isStaleCacheKeyAware()) {
+      ((StaleCacheKeyAware) getDecoratedObject()).markAsStale(key);
+    } else {
+      getDecoratedObject().put(key, null);
+    }
+  }
+
+  private boolean isStaleCacheKeyAware() {
+    return getDecoratedObject() instanceof StaleCacheKeyAware;
   }
 }

@@ -19,6 +19,7 @@ import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.cache.factory.DefaultCacheKeyFactory;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.support.DefaultSynchronizedCacheStrategyDecorator;
+import ro.isdc.wro.cache.support.StaleCacheKeyAwareCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.DefaultMetaDataFactory;
@@ -132,7 +133,7 @@ public class WroManager
   private WroManager(final Builder builder) {
     this.authorizationManager = builder.authorizationManager;
     this.cacheKeyFactory = builder.cacheKeyFactory;
-    this.cacheStrategy = DefaultSynchronizedCacheStrategyDecorator.decorate(builder.cacheStrategy);
+    this.cacheStrategy = decorate(builder.cacheStrategy);
     this.callbackRegistry = builder.callbackRegistry;
     this.groupExtractor = builder.groupExtractor;
     this.hashStrategy = builder.hashStrategy;
@@ -143,6 +144,14 @@ public class WroManager
     this.modelFactory = DefaultWroModelFactoryDecorator.decorate(builder.modelFactory, builder.modelTransformers);
     //TODO initialize
     this.resourceWatcher = new ResourceWatcher();
+  }
+
+  /**
+   * Decorates the original instance of {@link CacheStrategy}.
+   */
+  private CacheStrategy<CacheKey, CacheValue> decorate(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
+    return DefaultSynchronizedCacheStrategyDecorator.decorate(new StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue>(
+        cacheStrategy));
   }
 
   /**

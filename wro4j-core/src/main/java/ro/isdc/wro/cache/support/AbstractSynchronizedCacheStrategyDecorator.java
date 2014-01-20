@@ -45,12 +45,12 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     } finally {
       lock.readLock().unlock();
     }
-    if (value == null) {
+    if (isUpdateRequired(key, value)) {
       lock.writeLock().lock();
       try {
         // this is necessary to ensure that the load wasn't invoked
         value = getDecoratedObject().get(key);
-        if (value == null) {
+        if (isUpdateRequired(key, value)) {
           LOG.debug("Cache is empty. Loading new value...");
           value = loadValue(key);
           put(key, value);
@@ -60,6 +60,10 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
       }
     }
     return value;
+  }
+
+  private boolean isUpdateRequired(K key, V value) {
+    return value == null || isStale(key);
   }
 
   /**
