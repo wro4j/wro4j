@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -183,5 +184,35 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     };
     victim.destroy();
     verify(scheduler).destroy();
+  }
+  
+  @Test
+  public void shouldReturnStaleValueWhileNewValueIsComputed() {
+    Context.get().getConfig().setResourceWatcherUpdatePeriod(1);
+    final CacheKey key = new CacheKey("g1", ResourceType.JS);
+    CacheStrategy<CacheKey, CacheValue> spy = Mockito.spy(new MemoryCacheStrategy<CacheKey, CacheValue>());
+    final AtomicInteger loadCounter = new AtomicInteger();
+    victim = new DefaultSynchronizedCacheStrategyDecorator(spy) {
+      @Override
+      protected CacheValue loadValue(CacheKey key) {
+        loadCounter.incrementAndGet();
+        //simulate slow operation
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        return CacheValue.valueOf("1", "1");
+      }
+      @Override
+      TimeUnit getTimeUnitForResourceWatcher() {
+        return TimeUnit.MILLISECONDS;
+      }
+    };
+    createInjector().inject(victim);
+    System.out.println("get: " + victim.get(key));
+    System.out.println("get: " + victim.get(key));
+    System.out.println("get: " + victim.get(key));
+    System.out.println("get: " + victim.get(key));
+    System.out.println(loadCounter.get());
   }
 }

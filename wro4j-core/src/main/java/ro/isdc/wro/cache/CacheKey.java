@@ -1,5 +1,7 @@
 package ro.isdc.wro.cache;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +46,8 @@ public final class CacheKey implements Serializable {
 	 * @param minimize true if the result should produce minimized version.
 	 */
 	public CacheKey(final String groupName, final ResourceType type, final boolean minimize) {
-	  Validate.notNull(groupName);
-	  Validate.notNull(type);
+	  notNull(groupName);
+	  notNull(type);
 		this.groupName = groupName;
 		this.type = type;
 		this.minimize = minimize;

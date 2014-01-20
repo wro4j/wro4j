@@ -33,16 +33,16 @@ public class CacheStrategyDecorator<K, V> extends AbstractDecorator<CacheStrateg
     getDecoratedObject().destroy();
   }
   
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public boolean isStale(K key) {
     return isStaleCacheKeyAware() && ((StaleCacheKeyAware) getDecoratedObject()).isStale(key);
-  };
+  }
   
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void markAsStale(K key) {
     if (isStaleCacheKeyAware()) {
       ((StaleCacheKeyAware) getDecoratedObject()).markAsStale(key);
-    } else {
-      getDecoratedObject().put(key, null);
-    }
+    } 
   }
 
   private boolean isStaleCacheKeyAware() {

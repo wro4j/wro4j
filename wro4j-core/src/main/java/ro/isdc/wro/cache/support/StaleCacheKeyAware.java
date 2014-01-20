@@ -18,7 +18,7 @@ public interface StaleCacheKeyAware<K> {
   /**
    * @param key
    *          marks the provided key as stale. This is equivalent to invalidating this key. The only difference is that
-   *          it will still live in cache until a new value overrides it old one.
+   *          it will still live in cache until a new value will override the old one.
    */
   void markAsStale(K key);
   

@@ -3,8 +3,8 @@ package ro.isdc.wro.cache.support;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import ro.isdc.wro.cache.CacheStrategy;
 
@@ -18,8 +18,8 @@ import ro.isdc.wro.cache.CacheStrategy;
  */
 public class StaleCacheKeyAwareCacheStrategyDecorator<K, V>
     extends CacheStrategyDecorator<K, V>
-    implements CacheStrategy<K, V>, StaleCacheKeyAware<K> {
-  private Set<K> staleKeys = Collections.synchronizedSet(new HashSet<K>());
+    implements CacheStrategy<K, V> {
+  private Map<K,V> staleKeys = Collections.synchronizedMap(new HashMap<K,V>());
 
   public StaleCacheKeyAwareCacheStrategyDecorator(final CacheStrategy<K, V> cacheStrategy) {
     super(cacheStrategy);
@@ -27,25 +27,32 @@ public class StaleCacheKeyAwareCacheStrategyDecorator<K, V>
   
   public void markAsStale(final K key) {
     notNull(key);
-    staleKeys.add(key);
+    final V value = super.get(key);
+    staleKeys.put(key, value);
+    super.markAsStale(key);
+    super.put(key, null);
   }
   
   public boolean isStale(final K key) {
     notNull(key);
-    return staleKeys.contains(key);
+    return staleKeys.containsKey(key);
+  }
+  
+  public V get(K key) {
+    //As long as a key is stale, return it instead of original key.
+    return isStale(key) ? staleKeys.get(key) : super.get(key);
   }
   
   public void put(K key, V value) {
-    if (isNotStaleAnymore(key, value)) {
+    if (isStale(key)) {
       staleKeys.remove(key);
     }
     super.put(key, value);
   }
-
-  /**
-   * @return true if the provided key should be removed from the {@link #staleKeys} set.
-   */
-  private boolean isNotStaleAnymore(K key, V value) {
-    return value != null && isStale(key);
-  };
+  
+  @Override
+  public void destroy() {
+    super.destroy();
+    staleKeys.clear();
+  }
 }

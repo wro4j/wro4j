@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
+import ro.isdc.wro.cache.support.StaleCacheKeyAwareCacheStrategyDecorator;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.http.WroFilter;
@@ -90,19 +91,19 @@ public class TestResourceWatcher {
   private Callback resourceWatcherCallback;
   @Mock
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
-
+  
   private ResourceWatcher victim;
-
+  
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-
+  
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-
+  
   @Before
   public void setUp() {
     initMocks(this);
@@ -114,30 +115,30 @@ public class TestResourceWatcher {
           throws IOException {
         return new ByteArrayInputStream(uri.getBytes());
       }
-
+      
       public boolean accept(final String uri) {
         return true;
       }
     });
-
+    
     victim = new ResourceWatcher();
     createDefaultInjector().inject(victim);
   }
-
+  
   @After
   public void tearDown()
       throws Exception {
     victim.destroy();
     Context.unset();
   }
-
+  
   public Injector createDefaultInjector() {
     final UriLocatorFactory locatorFactory = new AbstractUriLocatorFactory() {
       public UriLocator getInstance(final String uri) {
         return mockLocator;
       }
     };
-
+    
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     model.addGroup(new Group(GROUP_2).addResource(Resource.create(RESOURCE_FIRST)).addResource(
         Resource.create("/path/2.js")));
@@ -147,20 +148,20 @@ public class TestResourceWatcher {
     final Injector injector = InjectorBuilder.create(factory).build();
     return injector;
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotCheckNullCacheEntry() {
     Context.unset();
     victim.check(null);
   }
-
+  
   @Test
   public void shouldNotDetectChangeAfterFirstRun()
       throws Exception {
     victim.check(cacheKey);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
   }
-
+  
   @Test
   public void shouldDetectResourceChange()
       throws Exception {
@@ -168,29 +169,29 @@ public class TestResourceWatcher {
     createDefaultInjector().inject(victim);
     victim.check(cacheKey, resourceWatcherCallback);
     assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
-
+    
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenReturn(new ByteArrayInputStream("different".getBytes()));
     final ArgumentCaptor<CacheKey> argumentCaptor = ArgumentCaptor.forClass(CacheKey.class);
-
+    
     victim.check(cacheKey);
     assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
     Mockito.verify(resourceWatcherCallback).onGroupChanged(argumentCaptor.capture());
     assertEquals(GROUP_NAME, argumentCaptor.getValue().getGroupName());
   }
-
+  
   @Test
   public void shouldAssumeResourceNotChangedWhenStreamIsUnavailable()
       throws Exception {
     createDefaultInjector().inject(victim);
     final ResourceChangeDetector mockChangeDetector = Mockito.spy(victim.getResourceChangeDetector());
-
+    
     Mockito.when(mockLocator.locate(Mockito.anyString())).thenThrow(new IOException("Resource is unavailable"));
-
+    
     victim.check(cacheKey, resourceWatcherCallback);
     verify(resourceWatcherCallback, never()).onGroupChanged(Mockito.any(CacheKey.class));
     verify(mockChangeDetector, never()).checkChangeForGroup(Mockito.anyString(), Mockito.anyString());
   }
-
+  
   @Test
   public void shouldDetectChangeOfImportedResource()
       throws Exception {
@@ -201,19 +202,19 @@ public class TestResourceWatcher {
     when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent("initial"));
     when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(
         answerWithContent(String.format("@import url(%s)", importResourceUri)));
-
+    
     victim.check(cacheEntry, resourceWatcherCallback);
-
+    
     when(mockLocator.locate(Mockito.anyString())).thenAnswer(answerWithContent("changed"));
     when(mockLocator.locate("/" + Mockito.eq(RESOURCE_URI))).thenAnswer(
         answerWithContent(String.format("@import url(%s)", importResourceUri)));
-
+    
     victim.check(cacheEntry);
-
+    
     verify(resourceWatcherCallback).onGroupChanged(Mockito.any(CacheKey.class));
     verify(resourceWatcherCallback).onResourceChanged(Mockito.any(Resource.class));
   }
-
+  
   /**
    * Fix the issue described <a href="https://github.com/alexo/wro4j/issues/72">here</a>.
    */
@@ -221,29 +222,29 @@ public class TestResourceWatcher {
   public void shouldNotDetectErroneouslyChange()
       throws Exception {
     createDefaultInjector().inject(victim);
-
+    
     // first check will always detect changes.
     victim.check(cacheEntry2, resourceWatcherCallback);
-
+    
     when(mockLocator.locate(RESOURCE_FIRST)).thenAnswer(answerWithContent("changed"));
-
+    
     victim.check(cacheEntry2, resourceWatcherCallback);
     verify(resourceWatcherCallback, Mockito.atLeastOnce()).onGroupChanged(Mockito.any(CacheKey.class));
     verify(resourceWatcherCallback, Mockito.atLeastOnce()).onResourceChanged(Mockito.any(Resource.class));
-
+    
     Mockito.reset(resourceWatcherCallback);
-
+    
     // next check should find no change
     victim.check(cacheEntry2, resourceWatcherCallback);
     verify(resourceWatcherCallback, Mockito.never()).onGroupChanged(Mockito.any(CacheKey.class));
     verify(resourceWatcherCallback, Mockito.never()).onResourceChanged(Mockito.any(Resource.class));
   }
-
+  
   private static class CallbackRegistryHolder {
     @Inject
     private LifecycleCallbackRegistry registry;
   }
-
+  
   @Test
   public void shouldInvokeCallbackWhenChangeIsDetected()
       throws Exception {
@@ -265,14 +266,14 @@ public class TestResourceWatcher {
     victim.check(cacheKey);
     assertTrue(flag.get());
   }
-
+  
   @Test
   public void shouldCheckForChangeAsynchronously()
       throws Exception {
     final int timeout = 100;
     Context.get().getConfig().setConnectionTimeout(timeout);
     final String invalidUrl = "http://localhost:1/";
-    //Add explicity the filter which makes the request allowed for async check
+    // Add explicity the filter which makes the request allowed for async check
     when(request.getAttribute(Mockito.eq(WroFilter.ATTRIBUTE_PASSED_THROUGH_FILTER))).thenReturn(true);
     when(request.getRequestURL()).thenReturn(new StringBuffer(invalidUrl));
     when(request.getServletPath()).thenReturn("");
@@ -303,9 +304,9 @@ public class TestResourceWatcher {
       }
     };
     createDefaultInjector().inject(victim);
-
+    
     Context.get().getConfig().setResourceWatcherAsync(true);
-
+    
     victim.tryAsyncCheck(cacheKey);
     WroTestUtils.waitUntil(new Function<Void, Boolean>() {
       public Boolean apply(final Void input)
@@ -315,7 +316,7 @@ public class TestResourceWatcher {
     }, timeout * 2);
     assertNotNull(asyncInvoker.get());
     assertNotNull(exceptionHolder.get());
-    //We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
+    // We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
     LOG.debug("Exception: {}", exceptionHolder.get().getClass());
     assertTrue(exceptionHolder.get() instanceof IOException);
   }
@@ -327,14 +328,31 @@ public class TestResourceWatcher {
     victimSpy.tryAsyncCheck(cacheKey);
     verify(victimSpy, Mockito.never()).check(Mockito.eq(cacheKey));
   }
-
+  
   @Test
-  public void shouldRemoveKeyFromCacheStrategyWhenChangeDetected() {
+  public void shouldRemoveStaleValueFromCacheWhenChangeDetected() {
     victim.check(cacheKey);
     final CacheValue cacheValue = null;
     verify(cacheStrategy).put(Mockito.eq(cacheKey), Mockito.eq(cacheValue));
   }
-
+  
+  /**
+   * Create a StaleCacheKeyAware implementation and use it in resourceWatcher to prove that markAsStale is invoked.
+   */
+  @Test
+  public void shouldMarkAsStaleValueWhenChangeDetected() {
+    final StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue> staleKeyDecorator = Mockito.spy(new StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue>(
+        cacheStrategy));
+    cacheStrategy = staleKeyDecorator;
+    victim = new ResourceWatcher();
+    createDefaultInjector().inject(victim);
+    
+    victim.check(cacheKey);
+    final CacheValue cacheValue = null;
+    verify(staleKeyDecorator).markAsStale(Mockito.eq(cacheKey));
+    verify(cacheStrategy).put(Mockito.eq(cacheKey), Mockito.eq(cacheValue));
+  }
+  
   private Answer<InputStream> answerWithContent(final String content) {
     return new Answer<InputStream>() {
       public InputStream answer(final InvocationOnMock invocation)
