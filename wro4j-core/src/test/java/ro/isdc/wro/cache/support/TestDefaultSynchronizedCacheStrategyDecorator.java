@@ -37,6 +37,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
+import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.ObjectDecorator;
 import ro.isdc.wro.util.SchedulerHelper;
 import ro.isdc.wro.util.WroTestUtils;
@@ -48,21 +49,21 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestDefaultSynchronizedCacheStrategyDecorator {
   private static final String GROUP_NAME = "g1";
   private static final String RESOURCE_URI = "/test.js";
-
+  
   private CacheStrategy<CacheKey, CacheValue> victim;
   @Mock
   private ResourceWatcher mockResourceWatcher;
-
+  
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-
+  
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -76,14 +77,14 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     };
     createInjector().inject(victim);
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
     // have to reset it, otherwise a test fails when testing entire project.
     Mockito.reset(mockResourceWatcher);
   }
-
+  
   public Injector createInjector() {
     final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
@@ -94,12 +95,12 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final Injector injector = InjectorBuilder.create(factory).setResourceWatcher(mockResourceWatcher).build();
     return injector;
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullKey() {
     victim.get(null);
   }
-
+  
   @Test
   public void shouldNotCheckForChangesWhenResourceWatcherPeriodIsNotSet()
       throws Exception {
@@ -108,7 +109,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     victim.get(key);
     verify(mockResourceWatcher, never()).check(key);
   }
-
+  
   /**
    * Proves that even if the get() is invoked more times, the check is performed only after a certain period of time.
    */
@@ -125,7 +126,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     } while (System.currentTimeMillis() - start < updatePeriod - delta);
     verify(mockResourceWatcher, times(1)).tryAsyncCheck(key);
   }
-
+  
   /**
    * This test does not pass consistently. TODO: rewrite it in order to make it always pass.
    */
@@ -148,12 +149,12 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     verify(mockResourceWatcher, times(2)).check(key1);
     verify(mockResourceWatcher, times(1)).check(key2);
   }
-
+  
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullObject() {
     DefaultSynchronizedCacheStrategyDecorator.decorate(null);
   }
-
+  
   @Test
   public void shouldDecorateCacheStrategy() {
     final CacheStrategy<CacheKey, CacheValue> original = new LruMemoryCacheStrategy<CacheKey, CacheValue>();
@@ -161,7 +162,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
-
+  
   /**
    * Fix Issue 528: Redundant CacheStrategy decoration (which has unclear cause, but it is safe to prevent redundant
    * decoration anyway).
@@ -192,34 +193,52 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final CacheKey key = new CacheKey("g1", ResourceType.JS);
     final CacheValue value1 = CacheValue.valueOf("1", "1");
     final CacheValue value2 = CacheValue.valueOf("2", "2");
-    CacheStrategy<CacheKey, CacheValue> spy = Mockito.spy(StaleCacheKeyAwareCacheStrategyDecorator.decorate(new MemoryCacheStrategy<CacheKey, CacheValue>()));
+    StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue> spy = Mockito.spy(StaleCacheKeyAwareCacheStrategyDecorator.decorate(new MemoryCacheStrategy<CacheKey, CacheValue>()));
     final AtomicInteger loadCounter = new AtomicInteger();
+    final int timeout = 100;
     victim = new DefaultSynchronizedCacheStrategyDecorator(spy) {
       @Override
       protected CacheValue loadValue(CacheKey key) {
-        CacheValue value = super.loadValue(key);
-        loadCounter.incrementAndGet();
-        if (value != null) {
-          // simulate slow operation
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
+        try {
+          System.out.println("LoadValue");
+          CacheValue newValue = null;
+          if (loadCounter.get() == 0) {
+            newValue = value1;
+          } else {
+            // simulate slow operation
+            try {
+              Thread.sleep(timeout);
+              newValue = value2;
+            } catch (InterruptedException e) {
+            }
           }
+          return newValue;
+        } finally {
+          loadCounter.incrementAndGet();
         }
-        return value;
       }
+      
       @Override
       TimeUnit getTimeUnitForResourceWatcher() {
         return TimeUnit.MILLISECONDS;
       }
     };
     createInjector().inject(victim);
+    assertEquals(value1, victim.get(key));
     System.out.println("get: " + victim.get(key));
     System.out.println("get: " + victim.get(key));
-    victim.put(key, value1);
+    spy.markAsStale(key);
+    //still get old value while new value is loaded asynchronously
+    assertEquals(value1, victim.get(key));
     System.out.println("get: " + victim.get(key));
     System.out.println("get: " + victim.get(key));
     System.out.println("get: " + victim.get(key));
+    WroTestUtils.waitUntil(new Function<Void, Boolean>() {
+      public Boolean apply(Void input)
+          throws Exception {
+        return value2.equals(victim.get(key));
+      }
+    }, timeout * 2);
     System.out.println("get: " + victim.get(key));
     System.out.println(loadCounter.get());
   }
