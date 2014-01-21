@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -94,7 +96,7 @@ public class SchedulerHelper {
    *          what kind of time unit is associated with the period.
    */
   public SchedulerHelper scheduleWithPeriod(final long period, final TimeUnit timeUnit) {
-    Validate.notNull(timeUnit);
+    notNull(timeUnit);
     LOG.debug("period: {} [{}]", period, timeUnit);
     if (this.period != period) {
       this.period = period;
@@ -114,7 +116,7 @@ public class SchedulerHelper {
       // scheduleWithFixedDelay is used instead of scheduleAtFixedRate because the later can cause a problem
       // (thread tries to make up for lost time in some situations)
       final Runnable runnable = lazyRunnable.get();
-      Validate.notNull(runnable);
+      notNull(runnable);
       // avoid reject when this method is accessed concurrently.
       if (!poolInitializer.get().isShutdown()) {
         LOG.debug("[START] Scheduling thread with period of {} {}. ThreadId:  {}", period, timeUnit,

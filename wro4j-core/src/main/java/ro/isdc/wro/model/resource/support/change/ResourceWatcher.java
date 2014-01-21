@@ -27,6 +27,7 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.http.support.PreserveDetailsRequestWrapper;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -53,7 +54,7 @@ import ro.isdc.wro.util.io.NullOutputStream;
 /**
  * A runnable responsible for watching if any resources were changed and invalidate the cache entry for the group
  * containing obsolete resources. This class is thread-safe.
- * 
+ *
  * @author Alex Objelean
  * @created 06 Aug 2012
  * @since 1.4.8
@@ -65,25 +66,25 @@ public class ResourceWatcher
    * The thread pool size of the executor which is responsible for performing async check
    */
   private static final int POOL_SIZE = 2;
-  
+
   public static interface Callback {
     /**
      * Callback method invoked when a group change is detected.
-     * 
+     *
      * @param key
      *          {@link CacheKey} associated with the group whose change was detected.
      */
     void onGroupChanged(final CacheKey key);
-    
+
     /**
      * Invoked when the change of the resource is detected.
-     * 
+     *
      * @param resource
      *          the {@link Resource} which changed.
      */
     void onResourceChanged(final Resource resource);
   }
-  
+
   /**
    * Default implementation of {@link Callback} which does nothing by default.
    */
@@ -91,11 +92,11 @@ public class ResourceWatcher
       implements Callback {
     public void onGroupChanged(final CacheKey key) {
     }
-    
+
     public void onResourceChanged(final Resource resource) {
     };
   }
-  
+
   @Inject
   private WroModelFactory modelFactory;
   @Inject
@@ -120,7 +121,7 @@ public class ResourceWatcher
     protected ExecutorService initialize() {
       return Executors.newFixedThreadPool(POOL_SIZE, WroUtil.createDaemonThreadFactory(ResourceWatcher.class.getName()));
     }
-    
+
     @Override
     public void destroy() {
       if (isInitialized()) {
@@ -129,27 +130,44 @@ public class ResourceWatcher
       super.destroy();
     };
   };
-  
+
   /**
    * Default constructor with a NoOP callback.
    */
   public void check(final CacheKey cacheKey) {
     check(cacheKey, new CallbackSupport());
   }
-  
+
   /**
-   * Invokes asynchronously the check by invoking the handler. This is required, to achieve safe asynchronous behavior.
+   * Will try an asynchronous check if the async configuration is enabled. If async check is not configured, a
+   * synchronous check will be performed. The async check assumes that the {@link ResourceWatcherRequestHandler} is
+   * enabled.
+   * <p/>
+   * If the async check is not allowed (the request was not passed through {@link WroFilter}) - no check will be
+   * performed. This is important for use-cases when wro resource is included using a taglib which performs a wro api
+   * call directly, without being invoked through {@link WroFilter}.
    */
-  public void checkAsync(final CacheKey cacheKey) {
+  public void tryAsyncCheck(final CacheKey cacheKey) {
     if (context.getConfig().isResourceWatcherAsync()) {
-      LOG.debug("Checking resourceWatcher asynchronously...");
-      final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
-      submit(callable);
+      if (isAsyncCheckAllowed()) {
+        LOG.debug("Checking resourceWatcher asynchronously...");
+        final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
+        submit(callable);
+      }
     } else {
+      LOG.debug("Async check not allowed. Falling back to sync check.");
       check(cacheKey);
     }
   }
-  
+
+  /**
+   * @return true only if the async is enabled by configuration and if the original request was for a wro resource
+   *         (passed through {@link WroFilter}).
+   */
+  private boolean isAsyncCheckAllowed() {
+    return WroFilter.isPassedThroughyWroFilter(Context.get().getRequest());
+  }
+
   /**
    * @VisibleForTesting
    * @param callable
@@ -158,10 +176,10 @@ public class ResourceWatcher
   void submit(final Callable<Void> callable) {
     executorServiceRef.get().submit(callable);
   }
-  
+
   /**
    * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
-   * 
+   *
    * @param cacheKey
    *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
    */
@@ -184,7 +202,7 @@ public class ResourceWatcher
       LOG.debug("resource watcher info: {}", watch.prettyPrint());
     }
   }
-  
+
   /**
    * Invoked when exception occurs.
    */
@@ -193,7 +211,7 @@ public class ResourceWatcher
     LOG.info("Could not check for resource changes because: {}", e.getMessage());
     LOG.debug("[FAIL] detecting resource change ", e);
   }
-  
+
   private boolean isGroupChanged(final Group group, final Callback callback) {
     // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
@@ -211,11 +229,11 @@ public class ResourceWatcher
     LOG.debug("group={}, changed={}", group.getName(), isChanged);
     return isChanged;
   }
-  
+
   /**
    * Check if the resource was changed from previous run. The implementation uses resource content digest (hash) to
    * check for change.
-   * 
+   *
    * @param resource
    *          the {@link Resource} to check.
    * @return true if the resource was changed.
@@ -239,7 +257,7 @@ public class ResourceWatcher
     LOG.debug("resource={}, changed={}", resource.getUri(), changed);
     return changed;
   }
-  
+
   /**
    * @param changeDetected
    *          - flag indicating if the change is detected. When this value is true, the processing will be interrupted
@@ -262,14 +280,14 @@ public class ResourceWatcher
           // computed correctly.
         }
       };
-      
+
       @Override
       protected String doTransform(final String cssContent, final List<Resource> foundImports)
           throws IOException {
         // no need to build the content, since we are interested in finding imported resources only
         return "";
       }
-      
+
       @Override
       public String toString() {
         return CssImportPreProcessor.class.getSimpleName();
@@ -288,16 +306,19 @@ public class ResourceWatcher
     injector.inject(processor);
     return processor;
   }
-  
+
   private Callable<Void> createAsyncCheckCallable(final CacheKey cacheKey) {
-    final HttpServletRequest request = new PreserveDetailsRequestWrapper(Context.get().getRequest());
+    final HttpServletRequest originalRequest = Context.get().getRequest();
+    LOG.debug("OriginalRequest: url={}, uri={}, servletPath={}", originalRequest.getRequestURL(),
+        originalRequest.getRequestURI(), originalRequest.getServletPath());
+    final HttpServletRequest request = new PreserveDetailsRequestWrapper(originalRequest);
     final HttpServletResponse response = wrapResponse(Context.get().getResponse());
     return new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
-        final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request, response);
+        final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request);
         try {
-          dispatcherLocator.getInputStream(request, response, location);
+          dispatcherLocator.locateExternal(request, location);
           return null;
         } catch (final IOException e) {
           final StringBuffer message = new StringBuffer("Could not check the following cacheKey: " + cacheKey);
@@ -313,14 +334,14 @@ public class ResourceWatcher
       }
     });
   }
-  
+
   /**
    * TODO create a callback to check for error and log it when needed.
    */
   private HttpServletResponse wrapResponse(final HttpServletResponse response) {
     return new HttpServletResponseWrapper(response) {
       private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
-      
+
       @Override
       public PrintWriter getWriter()
           throws IOException {
@@ -328,14 +349,14 @@ public class ResourceWatcher
       }
     };
   }
-  
+
   /**
    * @VisibleForTesting
    */
   ResourceChangeDetector getResourceChangeDetector() {
     return resourceChangeDetector;
   }
-  
+
   public void destroy()
       throws Exception {
     executorServiceRef.destroy();

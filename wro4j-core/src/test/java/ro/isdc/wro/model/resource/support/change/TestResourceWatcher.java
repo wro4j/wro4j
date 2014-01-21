@@ -13,8 +13,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,6 +39,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
+import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.manager.callback.LifecycleCallback;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.callback.LifecycleCallbackSupport;
@@ -261,7 +260,11 @@ public class TestResourceWatcher {
   @Test
   public void shouldCheckForChangeAsynchronously()
       throws Exception {
+    final int timeout = 100;
+    Context.get().getConfig().setConnectionTimeout(timeout);
     final String invalidUrl = "http://localhost:1/";
+    //Add explicity the filter which makes the request allowed for async check
+    when(request.getAttribute(Mockito.eq(WroFilter.ATTRIBUTE_PASSED_THROUGH_FILTER))).thenReturn(true);
     when(request.getRequestURL()).thenReturn(new StringBuffer(invalidUrl));
     when(request.getServletPath()).thenReturn("");
     final AtomicReference<Callable<Void>> asyncInvoker = new AtomicReference<Callable<Void>>();
@@ -294,17 +297,26 @@ public class TestResourceWatcher {
 
     Context.get().getConfig().setResourceWatcherAsync(true);
 
-    victim.checkAsync(cacheKey);
+    victim.tryAsyncCheck(cacheKey);
     WroTestUtils.waitUntil(new Function<Void, Boolean>() {
       public Boolean apply(final Void input)
           throws Exception {
         return asyncInvoker.get() != null;
       }
-    }, 2000);
+    }, timeout * 2);
     assertNotNull(asyncInvoker.get());
     assertNotNull(exceptionHolder.get());
     //We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
-    assertEquals(ConnectException.class, exceptionHolder.get().getClass());
+    LOG.debug("Exception: {}", exceptionHolder.get().getClass());
+    assertTrue(exceptionHolder.get() instanceof IOException);
+  }
+  
+  @Test
+  public void shouldNotCheckAtAllWhenAsyncIsConfiguredButNotAllowed() {
+    Context.get().getConfig().setResourceWatcherAsync(true);
+    ResourceWatcher victimSpy = Mockito.spy(victim);
+    victimSpy.tryAsyncCheck(cacheKey);
+    verify(victimSpy, Mockito.never()).check(Mockito.eq(cacheKey));
   }
 
   @Test

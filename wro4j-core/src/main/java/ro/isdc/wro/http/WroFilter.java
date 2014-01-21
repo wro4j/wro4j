@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.http;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -62,6 +64,15 @@ public class WroFilter
    */
   private static final String MBEAN_PREFIX = "wro4j-";
   /**
+   * Attribute indicating that the request was passed through {@link WroFilter}. This is required to allow identify
+   * requests for wro resources (example: async resourceWatcher which cannot be executed asynchronously unless a wro
+   * resource was requested).
+   *
+   * @VisibleForTesting
+   */
+  public static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
+      + ".passed_through_filter";
+  /**
    * Filter config.
    */
   private FilterConfig filterConfig;
@@ -87,6 +98,14 @@ public class WroFilter
   private boolean enable = true;
   private Injector injector;
   private MBeanServer mbeanServer = null;
+
+  /**
+   * @return true if the provided request contains an attribute indicating that it was handled through {@link WroFilter}
+   */
+  public static boolean isPassedThroughyWroFilter(final HttpServletRequest request) {
+    notNull(request);
+    return request.getAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER) != null;
+  }
 
   /**
    * {@inheritDoc}
@@ -253,19 +272,17 @@ public class WroFilter
       throws ServletException {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
       throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
 
     if (isFilterActive(request)) {
+      LOG.debug("processing wro request: {}", request.getRequestURI());
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
-
+        addPassThroughFilterAttribute(request);
         if (!handledWithRequestHandler(request, response)) {
           processRequest(request, response);
           onRequestProcessed();
@@ -279,6 +296,10 @@ public class WroFilter
     } else {
       chain.doFilter(request, response);
     }
+  }
+
+  private void addPassThroughFilterAttribute(final HttpServletRequest request) {
+    request.setAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER, Boolean.TRUE);
   }
 
   /**
@@ -297,7 +318,7 @@ public class WroFilter
   private boolean handledWithRequestHandler(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
     final Collection<RequestHandler> handlers = requestHandlerFactory.create();
-    Validate.notNull(handlers, "requestHandlers cannot be null!");
+    notNull(handlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
     final Injector injector = getInjector();
     for (final RequestHandler requestHandler : handlers) {
@@ -322,7 +343,7 @@ public class WroFilter
   }
 
   /**
-   * Perform actual processing. 
+   * Perform actual processing.
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
