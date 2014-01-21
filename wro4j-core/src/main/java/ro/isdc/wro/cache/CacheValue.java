@@ -12,6 +12,8 @@ import java.io.Serializable;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,10 +110,17 @@ public final class CacheValue
   byte[] getGzippedContentInternal() {
     return this.gzippedContent;
   }
-
-  /**
-   * {@inheritDoc}
-   */
+  
+  @Override
+  public boolean equals(Object obj) {
+    return EqualsBuilder.reflectionEquals(this, obj);
+  }
+  
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
+  }
+  
   @Override
   public String toString() {
     return "hash: " + hash;

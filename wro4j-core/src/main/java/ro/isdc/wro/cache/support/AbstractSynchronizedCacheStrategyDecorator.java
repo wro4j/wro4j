@@ -2,13 +2,14 @@ package ro.isdc.wro.cache.support;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
     extends CacheStrategyDecorator<K, V> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSynchronizedCacheStrategyDecorator.class);
   private final ConcurrentMap<K, ReadWriteLock> locks = new ConcurrentHashMap<K, ReadWriteLock>();
+  private Set<K> loadInProgressKeys = Collections.synchronizedSet(new HashSet<K>());
   
   public AbstractSynchronizedCacheStrategyDecorator(final CacheStrategy<K, V> decorated) {
     super(decorated);
@@ -48,50 +50,30 @@ public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>
       lock.readLock().unlock();
     }
     if (isUpdateRequired(key, value)) {
-      value = updateValueForKey(key, lock);
+      value = updateValueForKey(key, value, lock);
     }
     return value;
   }
   
-  private V updateValueForKey(final K key, final ReadWriteLock lock) {
-    V value;
-    // get the original value.
-    value = getDecoratedObject().get(key);
-    if (isUpdateRequired(key, value)) {
-      // put old value to clear stale flag
-      put(key, value);
-      boolean asyncEnabled = false;
-      if (value != null && asyncEnabled) {
-        // do async load only when previous value is not null
-        asyncLoadValue(key, lock.writeLock());
-      } else {
-        // perform sync load only if the old value is not available
-        lock.writeLock().lock();
-        try {
-          LOG.debug("Cache is empty. Loading new value...");
-          value = loadValue(key);
-          put(key, value);
-        } finally {
-          lock.writeLock().unlock();
+  private V updateValueForKey(final K key, final V oldValue, final ReadWriteLock lock) {
+    V newValue = oldValue;
+    if (!loadInProgressKeys.contains(key)) {
+      loadInProgressKeys.add(key);
+      try {
+        if (isUpdateRequired(key, oldValue)) {
+          // put old value to clear stale flag
+          put(key, oldValue);
+          // prevent subsequent loads
+          LOG.debug("Loading new value...");
+          newValue = loadValue(key);
+          // perform sync load only if the old value is not available
+          put(key, newValue);
         }
+      } finally {
+        loadInProgressKeys.remove(key);
       }
     }
-    return value;
-  }
-  
-  /**
-   * Asynchronously loads the latest value. This is an experimental work and it has problems, since loadValue must be
-   * invoked from within the wro4j request cycle (when Context is available).
-   */
-  private void asyncLoadValue(final K key, final Lock lock) {
-    new Thread() {
-      public void run() {
-        V value = loadValue(key);
-        lock.lock();
-        put(key, value);
-        lock.unlock();
-      };
-    }.start();
+    return newValue;
   }
   
   private boolean isUpdateRequired(K key, V value) {

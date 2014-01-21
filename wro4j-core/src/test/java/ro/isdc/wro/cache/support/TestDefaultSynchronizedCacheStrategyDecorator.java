@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,6 +27,7 @@ import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
@@ -188,19 +190,18 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   }
   
   @Test
-  public void shouldReturnStaleValueWhileNewValueIsComputed() {
+  public void shouldReturnStaleValueWhileNewValueIsComputed() throws Exception {
     Context.get().getConfig().setResourceWatcherUpdatePeriod(1);
     final CacheKey key = new CacheKey("g1", ResourceType.JS);
     final CacheValue value1 = CacheValue.valueOf("1", "1");
     final CacheValue value2 = CacheValue.valueOf("2", "2");
     StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue> spy = Mockito.spy(StaleCacheKeyAwareCacheStrategyDecorator.decorate(new MemoryCacheStrategy<CacheKey, CacheValue>()));
     final AtomicInteger loadCounter = new AtomicInteger();
-    final int timeout = 100;
+    final int timeout = 5;
     victim = new DefaultSynchronizedCacheStrategyDecorator(spy) {
       @Override
       protected CacheValue loadValue(CacheKey key) {
         try {
-          System.out.println("LoadValue");
           CacheValue newValue = null;
           if (loadCounter.get() == 0) {
             newValue = value1;
@@ -225,21 +226,28 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     };
     createInjector().inject(victim);
     assertEquals(value1, victim.get(key));
-    System.out.println("get: " + victim.get(key));
-    System.out.println("get: " + victim.get(key));
     spy.markAsStale(key);
+    final AtomicInteger oldValueCounter = new AtomicInteger();
+    final AtomicInteger newValueCounter = new AtomicInteger();
     //still get old value while new value is loaded asynchronously
-    assertEquals(value1, victim.get(key));
-    System.out.println("get: " + victim.get(key));
-    System.out.println("get: " + victim.get(key));
-    System.out.println("get: " + victim.get(key));
-    WroTestUtils.waitUntil(new Function<Void, Boolean>() {
-      public Boolean apply(Void input)
+    WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
+      public Void call()
           throws Exception {
-        return value2.equals(victim.get(key));
+        CacheValue value = victim.get(key);
+        if (value1.equals(value)) {
+          oldValueCounter.incrementAndGet();
+        } else if (value2.equals(value)){
+          newValueCounter.incrementAndGet();
+        } 
+        return null;
       }
-    }, timeout * 2);
-    System.out.println("get: " + victim.get(key));
-    System.out.println(loadCounter.get());
+    }), 200);
+    System.out.println("loaded times: " + loadCounter.get());
+    System.out.println("oldValue: " + oldValueCounter.get());
+    System.out.println("newValue: " + newValueCounter.get());
+    assertTrue(oldValueCounter.get() > 0);
+    assertTrue(newValueCounter.get() > 0);
+    assertEquals(value2, victim.get(key));
+    assertEquals(2, loadCounter.get());
   }
 }
