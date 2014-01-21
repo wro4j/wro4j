@@ -25,6 +25,10 @@ public class StaleCacheKeyAwareCacheStrategyDecorator<K, V>
     super(cacheStrategy);
   }
   
+  public static <K, V> StaleCacheKeyAwareCacheStrategyDecorator<K, V> decorate(CacheStrategy<K, V> decorated) {
+    return new StaleCacheKeyAwareCacheStrategyDecorator<K, V>(decorated);
+  }
+  
   public void markAsStale(final K key) {
     notNull(key);
     final V value = super.get(key);

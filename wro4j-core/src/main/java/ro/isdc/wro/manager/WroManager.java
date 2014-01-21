@@ -150,8 +150,7 @@ public class WroManager
    * Decorates the original instance of {@link CacheStrategy}.
    */
   private CacheStrategy<CacheKey, CacheValue> decorate(final CacheStrategy<CacheKey, CacheValue> cacheStrategy) {
-    return DefaultSynchronizedCacheStrategyDecorator.decorate(new StaleCacheKeyAwareCacheStrategyDecorator<CacheKey, CacheValue>(
-        cacheStrategy));
+    return DefaultSynchronizedCacheStrategyDecorator.decorate(StaleCacheKeyAwareCacheStrategyDecorator.decorate(cacheStrategy));
   }
 
   /**

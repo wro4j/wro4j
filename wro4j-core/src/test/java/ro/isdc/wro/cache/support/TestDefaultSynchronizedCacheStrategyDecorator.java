@@ -190,18 +190,23 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   public void shouldReturnStaleValueWhileNewValueIsComputed() {
     Context.get().getConfig().setResourceWatcherUpdatePeriod(1);
     final CacheKey key = new CacheKey("g1", ResourceType.JS);
-    CacheStrategy<CacheKey, CacheValue> spy = Mockito.spy(new MemoryCacheStrategy<CacheKey, CacheValue>());
+    final CacheValue value1 = CacheValue.valueOf("1", "1");
+    final CacheValue value2 = CacheValue.valueOf("2", "2");
+    CacheStrategy<CacheKey, CacheValue> spy = Mockito.spy(StaleCacheKeyAwareCacheStrategyDecorator.decorate(new MemoryCacheStrategy<CacheKey, CacheValue>()));
     final AtomicInteger loadCounter = new AtomicInteger();
     victim = new DefaultSynchronizedCacheStrategyDecorator(spy) {
       @Override
       protected CacheValue loadValue(CacheKey key) {
+        CacheValue value = super.loadValue(key);
         loadCounter.incrementAndGet();
-        //simulate slow operation
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        if (value != null) {
+          // simulate slow operation
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e) {
+          }
         }
-        return CacheValue.valueOf("1", "1");
+        return value;
       }
       @Override
       TimeUnit getTimeUnitForResourceWatcher() {
@@ -209,6 +214,9 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
       }
     };
     createInjector().inject(victim);
+    System.out.println("get: " + victim.get(key));
+    System.out.println("get: " + victim.get(key));
+    victim.put(key, value1);
     System.out.println("get: " + victim.get(key));
     System.out.println("get: " + victim.get(key));
     System.out.println("get: " + victim.get(key));
