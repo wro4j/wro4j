@@ -30,7 +30,7 @@ import ro.isdc.wro.util.WroUtil;
 /**
  * Responsible to locate a context relative resource. Attempts to locate the resource using {@link RequestDispatcher} .
  * If the dispatcher fails, it will fallback resource retrieval to a http call using {@link UrlUriLocator}.
- * 
+ *
  * @author Alex Objelean
  */
 public class DispatcherStreamLocator {
@@ -38,18 +38,18 @@ public class DispatcherStreamLocator {
   /**
    * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent
    * {@link StackOverflowError}.
-   * 
+   *
    * @VisibleForTesting
    */
   public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName()
       + ".included_with_dispatcher";
   private int timeout = WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
-  
+
   /**
    * /** When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
    * application behind it. So when it intercepts a requests for portal then it start bombing the the application behind
    * the portal with multiple threads (web requests) that are combined with threads for wro4j.
-   * 
+   *
    * @param location
    *          a path to a request relative resource to locate.
    * @return a valid stream for required location. This method will never return a null.
@@ -63,7 +63,7 @@ public class DispatcherStreamLocator {
       throw new IOException("Cannot get stream for location: " + location
           + " because either request, response or location is not available");
     }
-    
+
     // where to write the bytes of the stream
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     boolean warnOnEmptyStream = false;
@@ -102,15 +102,15 @@ public class DispatcherStreamLocator {
     }
     return new ByteArrayInputStream(os.toByteArray());
   }
-  
-  private InputStream locateExternal(final HttpServletRequest request, final String location)
+
+  public InputStream locateExternal(final HttpServletRequest request, final String location)
       throws IOException {
     final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
     final String absolutePath = servletContextPath + location;
     LOG.debug("locateExternalUri: {}", absolutePath);
     return createExternalResourceLocator().locate(absolutePath);
   }
-  
+
   /**
    * @return the {@link UriLocator} responsible for locating resources when dispatcher fails. No wildcard handling is
    *         required.
@@ -122,7 +122,7 @@ public class DispatcherStreamLocator {
     locator.setTimeout(timeout);
     return locator;
   }
-  
+
   /**
    * Build a wrapped servlet request which will be used for dispatching.
    */
@@ -132,12 +132,12 @@ public class DispatcherStreamLocator {
       public String getRequestURI() {
         return getContextPath() + location;
       }
-      
+
       @Override
       public String getPathInfo() {
         return WroUtil.getPathInfoFromLocation(this, location);
       }
-      
+
       @Override
       public String getServletPath() {
         return WroUtil.getServletPathFromLocation(this, location);
@@ -147,7 +147,7 @@ public class DispatcherStreamLocator {
     wrappedRequest.setAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER, Boolean.TRUE);
     return wrappedRequest;
   }
-  
+
   /**
    * @return true if the request is included from within wro request cycle.
    */
@@ -155,15 +155,15 @@ public class DispatcherStreamLocator {
     notNull(request);
     return request.getAttribute(ATTRIBUTE_INCLUDED_BY_DISPATCHER) != null;
   }
-  
+
   /**
    * @param timeout
    *          time (in millis) used when an external url is requested for both: connection & read.
    */
-  public void setTimeout(int timeout) {
+  public void setTimeout(final int timeout) {
     this.timeout = timeout;
   }
-  
+
   /**
    * @return the configured timeout for this instance of locator.
    */

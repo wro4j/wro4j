@@ -3,11 +3,12 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class InjectorBuilder {
   private final ResourceChangeDetector resourceChangeDetector = new ResourceChangeDetector();
   private final ResourceBundleProcessor bundleProcessor = new ResourceBundleProcessor();
   private ResourceWatcher resourceWatcher = new ResourceWatcher();
-  private DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
+  private final DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
@@ -80,7 +81,7 @@ public class InjectorBuilder {
   }
 
   public InjectorBuilder(final WroManagerFactory managerFactory) {
-    Validate.notNull(managerFactory);
+    notNull(managerFactory);
     this.managerFactory = managerFactory;
   }
 
@@ -106,11 +107,11 @@ public class InjectorBuilder {
     map.put(ResourceWatcher.class, createResourceWatcherProxy());
     map.put(DispatcherStreamLocator.class, createDispatcherLocatorProxy());
   }
-  
+
   private Object createDispatcherLocatorProxy() {
     return new InjectorObjectFactory<DispatcherStreamLocator>() {
       public DispatcherStreamLocator create() {
-        //Use the configured timeout. 
+        //Use the configured timeout.
         dispatcherLocator.setTimeout(Context.get().getConfig().getConnectionTimeout());
         return dispatcherLocator;
       }

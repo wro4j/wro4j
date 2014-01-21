@@ -19,7 +19,7 @@ import ro.isdc.wro.util.WroUtil;
  * <p/>
  * This handler is available only in debug mode by default. You can change this behavior by overriding
  * {@link RequestHandler#isEnabled()} method.
- * 
+ *
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
  * @since 1.4.7
@@ -37,10 +37,7 @@ public class ReloadModelRequestHandler
   public static final String ALIAS = "reloadModel";
   @Inject
   private ReadOnlyContext context;
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
@@ -49,20 +46,14 @@ public class ReloadModelRequestHandler
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("WroModel reloaded");
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public boolean accept(final HttpServletRequest request) {
     return WroUtil.matchesUrl(request, ENDPOINT_URI);
   }
-  
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public boolean isEnabled() {
-    return context.getConfig().isDebug();
+    return super.isEnabled() && context.getConfig().isDebug();
   }
 }

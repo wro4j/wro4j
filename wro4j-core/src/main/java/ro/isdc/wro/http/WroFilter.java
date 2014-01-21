@@ -25,7 +25,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class WroFilter
    * Attribute indicating that the request was passed through {@link WroFilter}. This is required to allow identify
    * requests for wro resources (example: async resourceWatcher which cannot be executed asynchronously unless a wro
    * resource was requested).
-   * 
+   *
    * @VisibleForTesting
    */
   public static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
@@ -107,7 +106,7 @@ public class WroFilter
     notNull(request);
     return request.getAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER) != null;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -273,15 +272,13 @@ public class WroFilter
       throws ServletException {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
       throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
 
     if (isFilterActive(request)) {
+      LOG.debug("processing wro request: {}", request.getRequestURI());
       try {
         // add request, response & servletContext to thread local
         Context.set(Context.webContext(request, response, filterConfig), wroConfiguration);
@@ -321,7 +318,7 @@ public class WroFilter
   private boolean handledWithRequestHandler(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
     final Collection<RequestHandler> handlers = requestHandlerFactory.create();
-    Validate.notNull(handlers, "requestHandlers cannot be null!");
+    notNull(handlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
     final Injector injector = getInjector();
     for (final RequestHandler requestHandler : handlers) {
@@ -346,7 +343,7 @@ public class WroFilter
   }
 
   /**
-   * Perform actual processing. 
+   * Perform actual processing.
    */
   private void processRequest(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
