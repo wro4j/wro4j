@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
@@ -66,7 +68,7 @@ public class BuildContextHolder {
       fallbackStorageFile.createNewFile();
     }
     fallbackStorage = new Properties();
-    fallbackStorage.load(new FileInputStream(fallbackStorageFile));
+    fallbackStorage.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
     LOG.debug("loaded fallback storage: {}", fallbackStorage);
   }
 
@@ -116,7 +118,9 @@ public class BuildContextHolder {
       }
       try {
         // immediately persist
-        fallbackStorage.store(new FileOutputStream(getFallbackStorageFile()), "Generated");
+        final OutputStream os = new FileOutputStream(getFallbackStorageFile());
+        fallbackStorage.store(os, "Generated");
+        os.close();
         LOG.debug("fallback storage updated");
       } catch (final IOException e) {
         LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
