@@ -1,9 +1,10 @@
 package ro.isdc.wro.maven.plugin.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.maven.plugin.logging.Log;
 
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
@@ -34,12 +35,12 @@ public class AggregatedFolderPathResolver {
    *         contextFolder.
    */
   public String resolve() {
-    Validate.notNull(buildDirectory, "Build directory cannot be null!");
-    Validate.notNull(log, "Logger cannot be null!");
+    notNull(buildDirectory, "Build directory cannot be null!");
+    notNull(log, "Logger cannot be null!");
     String result = null;
     final File cssTargetFolder = cssDestinationFolder == null ? destinationFolder : cssDestinationFolder;
     File rootFolder = null;
-    Validate.notNull(cssTargetFolder, "cssTargetFolder cannot be null!");
+    notNull(cssTargetFolder, "cssTargetFolder cannot be null!");
 
     if (buildFinalName != null && cssTargetFolder.getPath().startsWith(buildFinalName.getPath())) {
       rootFolder = buildFinalName;
