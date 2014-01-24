@@ -56,11 +56,18 @@ public class WroContextFilter
       throws IOException, ServletException {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) res;
+    //preserve current correlationId to ensure proper clean up during nested requests.
+    final String originalCorrelationId = Context.isContextSet() ? Context.getCorrelationId() : null;
+    Context.set(Context.webContext(request, response, this.filterConfig), getWroConfiguration());
+    final String correlationId = Context.getCorrelationId();
     try {
-      Context.set(Context.webContext(request, response, this.filterConfig), getWroConfiguration());
       chain.doFilter(request, response);
     } finally {
+      Context.setCorrelationId(correlationId);
       Context.unset();
+      if (originalCorrelationId != null) {
+        Context.setCorrelationId(originalCorrelationId);
+      }
     }
   }
 

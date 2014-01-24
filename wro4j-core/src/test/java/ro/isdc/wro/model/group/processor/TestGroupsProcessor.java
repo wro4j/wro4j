@@ -3,19 +3,20 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -30,7 +31,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -44,44 +44,54 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * TestGroupsProcessor.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Jan 5, 2010
  */
 public class TestGroupsProcessor {
   private GroupsProcessor victim;
   final String groupName = "group";
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     victim = new GroupsProcessor();
     initVictim(new WroConfiguration());
   }
-
+  
   @After
   public void tearDown() {
     Context.unset();
   }
-
+  
   private void initVictim(final WroConfiguration config) {
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group(groupName)));
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory);
     initVictim(config, managerFactory);
   }
-
+  
   private void initVictim(final WroConfiguration config, final WroManagerFactory managerFactory) {
-    Context.set(Context.standaloneContext(), config);
+    Context.get().setConfig(config);
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     injector.inject(victim);
   }
-
+  
   @Test
   public void shouldReturnEmptyStringWhenGroupHasNoResources() {
     final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
     Assert.assertEquals(StringUtils.EMPTY, victim.process(key));
   }
-
+  
   /**
    * Same as above, but with ignoreEmptyGroup config updated.
    */
@@ -93,24 +103,15 @@ public class TestGroupsProcessor {
     final CacheKey key = new CacheKey("group", ResourceType.JS, true);
     victim.process(key);
   }
-
+  
   @Test
   public void shouldLeaveContentUnchangedWhenAProcessorFails() {
     final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
     final Group group = new Group(groupName).addResource(Resource.create("1.js")).addResource(Resource.create("2.js"));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(new WroModel().addGroup(group));
     // the locator which returns the name of the resource as its content
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(new UriLocator() {
-      public boolean accept(final String uri) {
-        return true;
-      }
-      
-      public InputStream locate(final String uri)
-          throws IOException {
-        return new ByteArrayInputStream(uri.getBytes());
-      }
-    });
-
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(WroTestUtils.createResourceMockingLocator());
+    
     final ResourcePreProcessor failingPreProcessor = new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -122,40 +123,42 @@ public class TestGroupsProcessor {
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(modelFactory).setUriLocatorFactory(
         locatorFactory);
     managerFactory.setProcessorsFactory(processorsFactory);
-
+    
     final WroConfiguration config = new WroConfiguration();
     config.setIgnoreFailingProcessor(true);
     initVictim(config, managerFactory);
-
+    
     final String actual = victim.process(key);
-    Assert.assertEquals("1.js2.js", actual);
+    WroTestUtils.compare("1.js\n2.js", actual);
   }
-
+  
   @Test
-  public void shouldApplyOnlyEligibleProcessors() throws Exception {
+  public void shouldApplyOnlyEligibleProcessors()
+      throws Exception {
     final CssMinProcessor cssMinProcessor = Mockito.spy(new CssMinProcessor());
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory();
     managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(cssMinProcessor));
     managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("/script.js")))));
     initVictim(new WroConfiguration(), managerFactory);
-
+    
     victim.process(new CacheKey("g1", ResourceType.JS, true));
-    verify(cssMinProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class), Mockito.any(Writer.class));
+    verify(cssMinProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+        Mockito.any(Writer.class));
   }
-
-
+  
   @Test
-  public void shouldApplyEligibleMinimizeAwareProcessors() throws Exception {
+  public void shouldApplyEligibleMinimizeAwareProcessors()
+      throws Exception {
     final JSMinProcessor cssMinProcessor = Mockito.spy(new JSMinProcessor());
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory();
     managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPostProcessor(cssMinProcessor));
     managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(new WroModel().addGroup(new Group("g1").addResource(Resource.create("/script.js")))));
     initVictim(new WroConfiguration(), managerFactory);
-
+    
     victim.process(new CacheKey("g1", ResourceType.JS, true));
     verify(cssMinProcessor).process(Mockito.any(Resource.class), Mockito.any(Reader.class), Mockito.any(Writer.class));
   }
-
+  
   @Test
   public void shouldCleanupProperlyWhenDestroyed() {
     PreProcessorExecutor mockPreProcessorExecutor = mock(PreProcessorExecutor.class);

@@ -1,19 +1,35 @@
 package ro.isdc.wro;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ro.isdc.wro.config.Context;
+
 
 /**
  * @author Alex Objelean
  */
 public class TestWroRuntimeException {
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Test
   public void shouldPreserveOriginalExceptionMessageWhenWrap() {
     final String message = "someMessage";
     Exception e = new IllegalArgumentException(message);
     Exception result = WroRuntimeException.wrap(e);
-    Assert.assertEquals(e.getMessage(), result.getMessage());
+    assertEquals(e.getMessage(), result.getMessage());
   }
   
   @Test
@@ -21,6 +37,6 @@ public class TestWroRuntimeException {
     final String message = "someMessage";
     Exception e = new WroRuntimeException(message);
     Exception result = WroRuntimeException.wrap(e);
-    Assert.assertSame(e, result);
+    assertSame(e, result);
   }
 }

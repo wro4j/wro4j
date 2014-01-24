@@ -13,11 +13,11 @@ import java.net.URLDecoder;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -29,9 +29,12 @@ import ro.isdc.wro.util.WroUtil;
  * UriLocator capable to read the resources relative to servlet context. The resource reader will attempt to locate a
  * physic resource under the servlet context and if the resource does not exist, will try to use requestDispatcher. This
  * kind of resources will be accepted if their prefix is '/'.
- *
+ * <p/>
+ * This locator can be used only within a wro4j request cycle. In other words, the {@link Context} instance should be
+ * available in the {@link ThreadLocal} associated with the thread invoking this locator.
+ * 
  * @author Alex Objelean, Ivar Conradi Østhus
- * @created Created on Nov 10, 2008, Updated on March 2, 2012
+ * @created Created on Nov 10 2008
  */
 public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
@@ -52,10 +55,11 @@ public class ServletContextUriLocator
    */
   public static final String ALIAS_SERVLET_CONTEXT_FIRST = "servletContext.SERVLET_CONTEXT_FIRST";
   /**
-   * Uses SERVLET_CONTEXT_ONLY strategy, meaning that no dispatching will be performed when there is no servletContext resource available.
+   * Uses SERVLET_CONTEXT_ONLY strategy, meaning that no dispatching will be performed when there is no servletContext
+   * resource available.
    */
   public static final String ALIAS_SERVLET_CONTEXT_ONLY = "servletContext.SERVLET_CONTEXT_ONLY";
-
+  
   /**
    * Prefix for url resources.
    */
@@ -68,6 +72,9 @@ public class ServletContextUriLocator
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
+  @Inject
+  private DispatcherStreamLocator dispatcherLocator;
+  
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
    * locate resource via the dispatcher stream locator. This will include dynamic resources produces by servlet's or
@@ -80,7 +87,7 @@ public class ServletContextUriLocator
   public static enum LocatorStrategy {
     DISPATCHER_FIRST, SERVLET_CONTEXT_FIRST, SERVLET_CONTEXT_ONLY
   }
-
+  
   /**
    * Sets the locator strategy to use.
    */
@@ -89,17 +96,17 @@ public class ServletContextUriLocator
     this.locatorStrategy = locatorStrategy;
     return this;
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public boolean accept(final String uri) {
     return isValid(uri);
   }
-
+  
   /**
    * Check if a uri is a servletContext resource.
-   *
+   * 
    * @param uri
    *          to check.
    * @return true if the uri is a servletContext resource.
@@ -107,11 +114,11 @@ public class ServletContextUriLocator
   public static boolean isValid(final String uri) {
     return uri.trim().startsWith(PREFIX);
   }
-
+  
   /**
    * Check If the uri of the resource is protected: it cannot be accessed by accessing the url directly (WEB-INF
    * folder).
-   *
+   * 
    * @param uri
    *          the uri to check.
    * @return true if the uri is a protected resource.
@@ -119,15 +126,15 @@ public class ServletContextUriLocator
   public static boolean isProtectedResource(final String uri) {
     return WroUtil.startsWithIgnoreCase(uri, PROTECTED_PREFIX);
   }
-
+  
   /**
    * {@inheritDoc}
    */
   public InputStream locate(final String uri)
       throws IOException {
-    Validate.notNull(uri, "URI cannot be NULL!");
+    notNull(uri, "URI cannot be NULL!");
     LOG.debug("locate resource: {}", uri);
-
+    
     try {
       if (getWildcardStreamLocator().hasWildcard(uri)) {
         final ServletContext servletContext = Context.get().getServletContext();
@@ -157,7 +164,7 @@ public class ServletContextUriLocator
       LOG.debug("[FAIL] localize the stream containing wildcard. Original error message: '{}'", e.getMessage()
           + "\".\n Trying to locate the stream without the wildcard.");
     }
-
+    
     InputStream inputStream = null;
     try {
       switch (locatorStrategy) {
@@ -178,27 +185,27 @@ public class ServletContextUriLocator
       throw e;
     }
   }
-
+  
   private InputStream servletContextFirstStreamLocator(final String uri)
       throws IOException {
     try {
       return servletContextBasedStreamLocator(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return locateWithDispatcher(uri);
     }
   }
-
+  
   private InputStream dispatcherFirstStreamLocator(final String uri)
       throws IOException {
     try {
       return locateWithDispatcher(uri);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       LOG.debug("retrieving servletContext stream for uri: {}", uri);
       return servletContextBasedStreamLocator(uri);
     }
   }
-
+  
   /**
    * @VisibleForTesting
    */
@@ -207,7 +214,7 @@ public class ServletContextUriLocator
     final Context context = Context.get();
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle
     // jsp resources (if such exist). Switching the order would cause jsp to not be interpreted by the container.
-    return new DispatcherStreamLocator().getInputStream(context.getRequest(), context.getResponse(), uri);
+    return dispatcherLocator.getInputStream(context.getRequest(), context.getResponse(), uri);
   }
 
   private InputStream servletContextBasedStreamLocator(final String uri)
@@ -218,7 +225,7 @@ public class ServletContextUriLocator
       throw new IOException("Could not locate uri: " + uri, e);
     }
   }
-
+  
   private void validateInputStreamIsNotNull(final InputStream inputStream, final String uri)
       throws IOException {
     if (inputStream == null) {
@@ -226,7 +233,7 @@ public class ServletContextUriLocator
       throw new IOException("Exception while reading resource from " + uri);
     }
   }
-
+  
   /**
    * @return the strategy used by this locator.
    * @VisibleForTesting

@@ -48,9 +48,6 @@ public class ModelAsJsonRequestHandler
   @Inject
   private WroModelFactory modelFactory;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
@@ -71,9 +68,6 @@ public class ModelAsJsonRequestHandler
     return new GsonBuilder().registerTypeAdapter(Resource.class, new ResourceSerializer(getWroBasePath(request))).setPrettyPrinting().disableHtmlEscaping().create();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean accept(final HttpServletRequest request) {
     return WroUtil.matchesUrl(request, ENDPOINT_URI);
@@ -83,11 +77,8 @@ public class ModelAsJsonRequestHandler
     return request.getRequestURI().replaceAll("(?i)" + ENDPOINT_URI, "");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isEnabled() {
-    return context.getConfig().isDebug();
+    return super.isEnabled() && context.getConfig().isDebug();
   }
 }

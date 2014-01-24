@@ -1,5 +1,6 @@
 package ro.isdc.wro.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
@@ -10,12 +11,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.StopWatch;
 
 
@@ -26,6 +30,16 @@ public class TestTaskExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(TestTaskExecutor.class);
 
   private TaskExecutor<Void> victim;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {
@@ -68,7 +82,7 @@ public class TestTaskExecutor {
 
     final long delta = end - start;
     LOG.debug("Execution took: {}", delta);
-    //number of milliseconds added by overhead
+    // number of milliseconds added by overhead
     final long overhead = 40;
     assertTrue(delta < delay + overhead);
   }
@@ -93,9 +107,10 @@ public class TestTaskExecutor {
   }
 
   @Test(expected = WroRuntimeException.class)
-  public void shouldPropagateOriginalException() throws Exception {
+  public void shouldPropagateOriginalException()
+      throws Exception {
     final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
-    //add at least two, otherwise no concurrency is applied.
+    // add at least two, otherwise no concurrency is applied.
     tasks.add(createFailingCallable());
     tasks.add(createFailingCallable());
     victim.submit(tasks);

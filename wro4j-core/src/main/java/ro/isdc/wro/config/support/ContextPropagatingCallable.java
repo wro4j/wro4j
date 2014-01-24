@@ -1,5 +1,7 @@
 package ro.isdc.wro.config.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.Validate;
@@ -27,7 +29,7 @@ public class ContextPropagatingCallable<T>
   }
 
   public static ContextPropagatingCallable<Void> decorate(final Runnable runnable) {
-    Validate.notNull(runnable);
+    notNull(runnable);
     return new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
@@ -37,9 +39,6 @@ public class ContextPropagatingCallable<T>
     });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void run() {
     try {
       call();
@@ -48,9 +47,6 @@ public class ContextPropagatingCallable<T>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public T call()
       throws Exception {
     Context.setCorrelationId(correlationId);

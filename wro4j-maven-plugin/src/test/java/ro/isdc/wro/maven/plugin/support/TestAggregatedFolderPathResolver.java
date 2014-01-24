@@ -19,6 +19,7 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class TestAggregatedFolderPathResolver {
+  private static final String PATH_SEPARATOR = File.pathSeparator;
   private AggregatedFolderPathResolver victim;
   @Mock
   private Log log;
@@ -41,7 +42,7 @@ public class TestAggregatedFolderPathResolver {
 
   @Test
   public void shouldResolveToSubfolder() {
-    final String subFolder = "/css";
+    final String subFolder = PATH_SEPARATOR + "css";
     victim.setDestinationFolder(new File(buildDirectory.getPath() + subFolder));
     assertEquals(subFolder, victim.resolve());
   }
@@ -55,8 +56,8 @@ public class TestAggregatedFolderPathResolver {
 
   @Test
   public void shouldUseFirstMatchWhenMultipleContextFoldersProvided() {
-    final String baseSubfolder = "/css";
-    final String firstSubFolder = baseSubfolder + "/first";
+    final String baseSubfolder = PATH_SEPARATOR + "css";
+    final String firstSubFolder = baseSubfolder + PATH_SEPARATOR + "first";
     final String firstCssDestinationPath = buildDirectory.getPath() + firstSubFolder;
     final String secondCssDestinationPath = buildDirectory.getPath() + baseSubfolder;
     victim.setCssDestinationFolder(new File(firstCssDestinationPath));

@@ -414,6 +414,30 @@ public class WroTestUtils {
   }
 
   /**
+   * A blocking operation which waits for the provided function to be true. If the function doesn't return true after a
+   * timeout period (expressed in milliseconds), it will throw a {@link RuntimeException}.
+   *
+   * @param function
+   *          a {@link Function} responsible for expressing the until expression. It must return true if the wait
+   *          blocking operation should stop.
+   * @param timeout
+   *          number of milliseconds to wait until expression is true. If this timeout is exceeded, the exception will
+   *          be thrown.
+   */
+  public static void waitUntil(final Function<Void, Boolean> function, final long timeout) {
+    final long start = System.currentTimeMillis();
+    try {
+      while (!function.apply(null)) {
+        if (System.currentTimeMillis() - start > timeout) {
+          throw new WroRuntimeException("Timeout of " + timeout + "ms exceeded.");
+        }
+      }
+    } catch (final Exception e) {
+      throw WroRuntimeException.wrap(e);
+    }
+  }
+
+  /**
    * @return a default {@link Injector} to be used by test classes.
    */
   public static Injector createInjector() {

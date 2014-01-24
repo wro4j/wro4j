@@ -1,10 +1,14 @@
 package ro.isdc.wro.model.resource.support.change;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ro.isdc.wro.config.Context;
 
 
 /**
@@ -15,7 +19,12 @@ public class TestResourceChangeInfo {
   private static final String GROUP2_NAME = "g2";
   private static final String GROUP3_NAME = "g3";
   private ResourceChangeInfo victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     victim = new ResourceChangeInfo();

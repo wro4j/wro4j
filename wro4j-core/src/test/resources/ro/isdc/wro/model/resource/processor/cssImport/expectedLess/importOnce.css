@@ -3,6 +3,7 @@ div.import2 {
 }
 
 
+
 .test-class {
     .mixin(#fff);
 }

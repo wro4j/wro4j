@@ -3,12 +3,17 @@
  */
 package ro.isdc.wro.model.resource.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -30,14 +35,24 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test for {@link CssDataUriPreProcessor} class.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Mat 09, 2010
  */
 public class TestCssDataUriPreProcessor {
   private final String PROXY_RESOURCE_PATH = "classpath:ro/isdc/wro/model/resource/processor/dataUri/proxyImage/";
   private ResourcePreProcessor processor;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   protected DataUriGenerator createMockDataUriGenerator() {
     try {
       final DataUriGenerator uriGenerator = Mockito.mock(DataUriGenerator.class);
@@ -48,9 +63,9 @@ public class TestCssDataUriPreProcessor {
       throw new RuntimeException("Cannot create DataUriGenerator mock", e);
     }
   }
-
+  
   @Before
-  public void init()
+  public void setUp()
       throws Exception {
     Context.set(Context.standaloneContext());
     processor = new CssDataUriPreProcessor() {
@@ -61,7 +76,12 @@ public class TestCssDataUriPreProcessor {
     };
     initProcessor(processor);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   final void initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setUriLocatorFactory(createLocatorFactory());
@@ -69,24 +89,23 @@ public class TestCssDataUriPreProcessor {
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
   }
-
+  
   /**
    * @return a locator factory which handles absolute url locations and failed servletContext relative url's by serving
    *         proxy resources from classpath. This is useful to make test pass without internet connection.
    */
   private UriLocatorFactory createLocatorFactory() {
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(
-        new ServletContextUriLocator() {
-          @Override
-          public InputStream locate(final String uri)
-              throws IOException {
-            try {
-              return super.locate(uri);
-            } catch (final Exception e) {
-              return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test1.png");
-            }
-          }
-        }).addLocator(new UrlUriLocator() {
+    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(new ServletContextUriLocator() {
+      @Override
+      public InputStream locate(final String uri)
+          throws IOException {
+        try {
+          return super.locate(uri);
+        } catch (final Exception e) {
+          return new ClasspathUriLocator().locate(PROXY_RESOURCE_PATH + "test1.png");
+        }
+      }
+    }).addLocator(new UrlUriLocator() {
       @Override
       public InputStream locate(final String uri)
           throws IOException {
@@ -99,30 +118,30 @@ public class TestCssDataUriPreProcessor {
     });
     return locatorFactory;
   }
-
+  
   @Test
   public void shouldTransformResourcesFromFolder()
       throws Exception {
     final URL url = getClass().getResource("dataUri");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-
+  
   @Test
   public void shouldTransformLargeResources()
       throws Exception {
     processor = new CssDataUriPreProcessor();
     initProcessor(processor);
-
+    
     final URL url = getClass().getResource("dataUri");
-
+    
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedLarge");
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
-
+  
   @Test
   public void shouldSupportOnlyCssResources() {
     WroTestUtils.assertProcessorSupportResourceTypes(processor, ResourceType.CSS);

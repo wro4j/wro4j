@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
@@ -107,7 +108,7 @@ public class CssDataUriPreProcessor
    * @return true if the image url should be replaced with another (servlet context relative).
    */
   private boolean isImageUrlChangeRequired(final String imageUrl) {
-    return !(imageUrl.startsWith("http") || (isProxyResource(imageUrl)));
+    return !(imageUrl.startsWith("http") || ResourceProxyRequestHandler.isProxyUri(imageUrl));
   }
 
   /**

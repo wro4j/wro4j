@@ -21,7 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,6 +53,16 @@ public class TestServletContextUriLocator {
   private ServletContext mockServletContext;
   private ServletContextUriLocator victim;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -67,6 +79,11 @@ public class TestServletContextUriLocator {
     victim = new ServletContextUriLocator();
 
     initLocator(victim);
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   /**
@@ -157,7 +174,8 @@ public class TestServletContextUriLocator {
   }
 
   @Test(expected = IOException.class)
-  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed() throws Exception {
+  public void shouldNotInvokeDispatcherWhenServletContextOnlyStrategyIsUsed()
+      throws Exception {
     final AtomicBoolean dispatcherInvokedFlag = new AtomicBoolean();
     victim = new ServletContextUriLocator() {
       @Override
