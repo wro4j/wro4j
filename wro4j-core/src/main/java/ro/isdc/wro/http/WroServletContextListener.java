@@ -1,10 +1,11 @@
 package ro.isdc.wro.http;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +103,7 @@ public class WroServletContextListener
    *          a not null manager instance.
    */
   public final void setManagerFactory(final WroManagerFactory managerFactory) {
-    Validate.notNull(managerFactory);
+    notNull(managerFactory);
     this.managerFactory = managerFactory;
   }
 
@@ -121,7 +122,7 @@ public class WroServletContextListener
    *          a not null configuration instance.
    */
   public final void setConfiguration(final WroConfiguration configuration) {
-    Validate.notNull(configuration);
+    notNull(configuration);
     this.configuration = configuration;
   }
 

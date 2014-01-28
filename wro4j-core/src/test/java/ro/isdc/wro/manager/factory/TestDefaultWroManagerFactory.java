@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -48,6 +49,11 @@ public class TestDefaultWroManagerFactory {
     Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
     Mockito.when(servletContext.getResourceAsStream(Mockito.anyString())).then(createValidModelStreamAnswer());
     Context.set(Context.webContext(request, response, filterConfig));
+  }
+  
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   private Answer<InputStream> createValidModelStreamAnswer()

@@ -11,44 +11,39 @@ In order to get started with wro4j, you have to follow only 3 simple steps.
 
 
 ## Step 1: Add WroFilter to web.xml
-
-
-
-		<filter>
-		  <filter-name>WebResourceOptimizer</filter-name>
-		  <filter-class>
-			ro.isdc.wro.http.WroFilter
-		  </filter-class>
-		</filter>
+```xml
+<filter>
+	<filter-name>WebResourceOptimizer</filter-name>
+	<filter-class>ro.isdc.wro.http.WroFilter</filter-class>
+</filter>
 		 
-		<filter-mapping>
-		  <filter-name>WebResourceOptimizer</filter-name>
-		  <url-pattern>/wro/*</url-pattern>
-		</filter-mapping>
-		
+<filter-mapping>
+	<filter-name>WebResourceOptimizer</filter-name>
+	<url-pattern>/wro/*</url-pattern>
+</filter-mapping>
+```		
 ## Step 2: Create wro.xml
-		
-
-		<groups xmlns="http://www.isdc.ro/wro">
-		  <group name="all">
-			<css>/asset/*.css</css>
-			<js>/asset/*.js</js>
-		  </group>
-		</groups> 		
-		
+```xml
+<groups xmlns="http://www.isdc.ro/wro">
+	<group name="all">
+		<css>/asset/*.css</css>
+		<js>/asset/*.js</js>
+	</group>
+</groups> 		
+```
 ## Step 3: Use optimized resources
+```html
+<html>
+  <head>
+	<title>Web Page using wro4j</title>
+	<link rel="stylesheet" type="text/css" href="/wro/all.css" />
+	<script type="text/javascript" src="/wro/all.js"/>
+  </head>
+<body>
 
-		<html>
-		  <head>
-			<title>Web Page using wro4j</title>
-			<link rel="stylesheet" type="text/css" href="/wro/all.css" />
-			<script type="text/javascript" src="/wro/all.js"/>
-		  </head>
-		  <body>
-			
-		  </body>
-		</html>		
-
+</body>
+</html>		
+```
 		
 # Documentation
 

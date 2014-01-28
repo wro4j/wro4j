@@ -4,13 +4,17 @@
 package ro.isdc.wro.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -31,6 +35,16 @@ public class TestWroModel {
   private WroModel victim;
   private WroModelFactory factory;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     final Context context = Context.standaloneContext();
@@ -40,6 +54,7 @@ public class TestWroModel {
 
   @After
   public void tearDown() {
+    Context.unset();
     factory.destroy();
   }
 
@@ -48,12 +63,12 @@ public class TestWroModel {
     Assert.assertFalse(victim.getGroups().isEmpty());
     final Group group = victim.getGroupByName("g1");
     // create a copy of original list
-    Assert.assertEquals(1, group.getResources().size());
+    assertEquals(1, group.getResources().size());
   }
 
   @Test(expected = InvalidGroupNameException.class)
   public void testGetInvalidGroup() {
-    Assert.assertFalse(victim.getGroups().isEmpty());
+    assertFalse(victim.getGroups().isEmpty());
     victim.getGroupByName("INVALID_GROUP");
   }
 
@@ -98,5 +113,16 @@ public class TestWroModel {
   public void shouldMergeNotEmptyModel() {
     victim.merge(new WroModel().addGroup(new Group("anEmptyGroup")));
     assertEquals(Arrays.asList("anEmptyGroup", "g1", "g2", "g3"), new WroModelInspector(victim).getGroupNames());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void cannotSetNullGroups() {
+    victim.setGroups(null);
+  }
+
+  @Test
+  public void shouldSetValidGroups() {
+    victim.setGroups(Collections.EMPTY_LIST);
+    assertEquals(0, victim.getGroups().size());
   }
 }

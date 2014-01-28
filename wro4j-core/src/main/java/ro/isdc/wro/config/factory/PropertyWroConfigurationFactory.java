@@ -18,7 +18,7 @@ import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * Loads configurations from a {@link Properties} object.
- * 
+ *
  * @author Alex Objelean
  * @created 10 May 2011
  * @since 1.3.7
@@ -30,16 +30,16 @@ public class PropertyWroConfigurationFactory
    * Holds configuration options. If no properties are set, the default values will be used instead.
    */
   private final Properties properties;
-  
+
   public PropertyWroConfigurationFactory() {
     this(new Properties());
   }
-  
+
   public PropertyWroConfigurationFactory(final Properties props) {
     Validate.notNull(props);
     this.properties = props;
   }
-  
+
 
   /**
    * {@inheritDoc}
@@ -53,6 +53,7 @@ public class PropertyWroConfigurationFactory
     config.setModelUpdatePeriod(valueAsLong(properties.get(ConfigConstants.modelUpdatePeriod.name()), 0));
     config.setResourceWatcherUpdatePeriod(valueAsLong(
         properties.get(ConfigConstants.resourceWatcherUpdatePeriod.name()), 0));
+    config.setResourceWatcherAsync(valueAsBoolean(properties.get(ConfigConstants.resourceWatcherAsync.name()), false));
     config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
     config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     config.setIgnoreEmptyGroup(valueAsBoolean(properties.get(ConfigConstants.ignoreEmptyGroup.name()), true));
@@ -68,7 +69,7 @@ public class PropertyWroConfigurationFactory
     LOG.debug("WroConfiguration created: {}", config);
     return config;
   }
-  
+
   private long valueAsLong(final Object object, final long defaultValue) {
     if (object == null) {
       return defaultValue;
@@ -81,18 +82,18 @@ public class PropertyWroConfigurationFactory
       throw new WroRuntimeException(message);
     }
   }
-  
+
   private boolean valueAsBoolean(final Object object, final boolean defaultValue) {
     return BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(valueAsString(object)), defaultValue);
   }
-  
+
   /**
    * Helps to avoid "null" as string situation.
    */
   private String valueAsString(final Object object) {
     return valueAsString(object, null);
   }
-  
+
   /**
    * @return string representation of an object. If the object is null the defaultValue will be returned.
    */

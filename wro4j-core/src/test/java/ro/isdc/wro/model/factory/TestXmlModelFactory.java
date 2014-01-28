@@ -11,7 +11,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +33,24 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * TestXmlModelFactory.
- *
+ * 
  * @author Alex Objelean
  * @created Created on Nov 3, 2008
  */
 public class TestXmlModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestXmlModelFactory.class);
   private WroModelFactory factory;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     final Context context = Context.standaloneContext();
@@ -45,7 +58,12 @@ public class TestXmlModelFactory {
     context.getConfig().setCacheUpdatePeriod(0);
     context.getConfig().setModelUpdatePeriod(0);
   }
-
+  
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+  
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void recursiveGroupThrowsException() {
     factory = new XmlModelFactory() {
@@ -56,21 +74,21 @@ public class TestXmlModelFactory {
     };
     factory.create();
   }
-
+  
   @Test
   public void testWithUpdatePeriodSet() {
     Context.get().getConfig().setCacheUpdatePeriod(1);
     Context.get().getConfig().setModelUpdatePeriod(1);
     testSuccessfulCreation();
   }
-
+  
   // TODO use two concurrent calls
   @Test
   public void testTwoConcurrentCreationCalls() {
     testSuccessfulCreation();
     factory.create();
   }
-
+  
   @Test
   public void testSuccessfulCreation() {
     factory = new XmlModelFactory() {
@@ -83,7 +101,7 @@ public class TestXmlModelFactory {
     final WroModel model = factory.create();
     LOG.debug("model: " + model);
   }
-
+  
   @Test
   public void testMinimizeAttributePresence() {
     final WroModel model = loadModelFromLocation("wro-minimizeAttribute.xml");
@@ -95,34 +113,34 @@ public class TestXmlModelFactory {
     assertEquals(true, resourceList.get(2).isMinimize());
     LOG.debug("model: " + model);
   }
-
+  
   @Test
   public void testValidImports() {
     final WroModel model = loadModelFromLocation("testimport/validImports.xml");
     assertEquals(2, new WroModelInspector(model).getGroupNames().size());
     LOG.debug("model: " + model);
   }
-
+  
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testRecursiveImports() {
     loadModelFromLocation("testimport/recursive.xml");
   }
-
+  
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testDeepRecursiveImports() {
     loadModelFromLocation("testimport/deepRecursive.xml");
   }
-
+  
   @Test(expected = RecursiveGroupDefinitionException.class)
   public void testCircularImports() {
     loadModelFromLocation("testimport/circular1.xml");
   }
-
+  
   @Test(expected = WroRuntimeException.class)
   public void testInvalidImports() {
     loadModelFromLocation("testimport/invalidImports.xml");
   }
-
+  
   @Test
   public void shouldCreateEmptyModelWhenValidationDisabledAndXmlIsNotValid() {
     factory = new XmlModelFactory() {
@@ -136,7 +154,7 @@ public class TestXmlModelFactory {
     // will create an empty model
     assertEquals(new WroModel(), factory.create());
   }
-
+  
   @Test(expected = SAXParseException.class)
   public void testWildcardImports()
       throws Throwable {
@@ -146,9 +164,10 @@ public class TestXmlModelFactory {
       throw e.getCause();
     }
   }
-
+  
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     factory = new XmlModelFactory() {
       @Override
       protected InputStream getModelResourceAsStream() {
@@ -158,7 +177,7 @@ public class TestXmlModelFactory {
     };
     WroTestUtils.init(factory);
     final WroModel expected = factory.create();
-
+    
     WroTestUtils.runConcurrently(new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()
           throws Exception {
@@ -167,19 +186,19 @@ public class TestXmlModelFactory {
       }
     }), 10);
   }
-
+  
   @Test
   public void shouldCreateEmptyModelWhenAllGroupsAreAbstract() {
     final WroModel model = loadModelFromLocation("shouldCreateEmptyModelWhenAllGroupsAreAbstract.xml");
     assertTrue(model.getGroups().isEmpty());
   }
-
+  
   @Test
   public void shouldCreateNonEmptyModelWhenSomeGroupsAreAbstract() {
     final WroModel model = loadModelFromLocation("shouldCreateNonEmptyModelWhenSomeGroupsAreAbstract.xml");
     assertEquals(2, model.getGroups().size());
   }
-
+  
   @Test
   public void shouldContainOnlyNonAbstractGroups() {
     final WroModel model = loadModelFromLocation("shouldContainOnlyNonAbstractGroups.xml");
@@ -188,31 +207,30 @@ public class TestXmlModelFactory {
     assertEquals("nonAbstract", group.getName());
     assertEquals(5, group.getResources().size());
   }
-
+  
   @Test(expected = WroRuntimeException.class)
   public void shouldDetectInvalidGroupReference() {
     final WroModel model = loadModelFromLocation("shouldDetectInvalidGroupReference.xml");
     assertTrue(model.getGroups().isEmpty());
   }
-
+  
   @Test
   public void shouldDetectGroupReferenceFromImportedModel() {
     final WroModel model = loadModelFromLocation("shouldDetectGroupReferenceFromImportedModel.xml");
     assertEquals(2, model.getGroups().size());
   }
-
+  
   @Test
   public void shouldLoadEmptyModel() {
     final WroModel model = loadModelFromLocation("emptyModel.xml");
     assertEquals(0, model.getGroups().size());
   }
-
+  
   @Test(expected = WroRuntimeException.class)
   public void cannotCreateFromXmlWithInvalidNamespace() {
     loadModelFromLocation("invalidNamespace.xml");
   }
-
-
+  
   private WroModel loadModelFromLocation(final String location) {
     final WroModelFactory factory = new XmlModelFactory() {
       @Override

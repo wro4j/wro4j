@@ -11,14 +11,14 @@ function program1(depth0,data) {
 
   buffer += "<div class=\"row-fluid span5\">\n  <strong>";
   if (stack1 = helpers.remaining) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.remaining; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  else { stack1 = (depth0 && depth0.remaining); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>";
   if (stack1 = helpers.finished) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = depth0.finished; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  else { stack1 = (depth0 && depth0.finished); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "</strong> completed item";
-  stack1 = helpers.unless.call(depth0, depth0.oneFinished, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  stack1 = helpers.unless.call(depth0, (depth0 && depth0.oneFinished), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n  </button>\n</div>";
   return buffer;

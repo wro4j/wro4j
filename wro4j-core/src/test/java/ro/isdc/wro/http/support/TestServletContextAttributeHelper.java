@@ -1,15 +1,19 @@
 package ro.isdc.wro.http.support;
 
+import static org.junit.Assert.assertEquals;
+
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper.Attribute;
@@ -26,7 +30,12 @@ public class TestServletContextAttributeHelper {
   @Mock
   private FilterConfig mockFilterConfig;
   private ServletContextAttributeHelper victim;
-
+  
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+  
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);

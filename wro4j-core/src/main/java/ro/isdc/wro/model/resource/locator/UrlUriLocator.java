@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "uri";
+  private int timeout = WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
   /**
    * {@inheritDoc}
    */
@@ -63,7 +66,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    */
   public InputStream locate(final String uri)
     throws IOException {
-    Validate.notNull(uri, "uri cannot be NULL!");
+    notNull(uri, "uri cannot be NULL!");
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
@@ -74,7 +77,6 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
 
-    final int timeout = getConnectionTimeout();
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
     connection.setConnectTimeout(timeout);
@@ -84,10 +86,10 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
   }
 
   /**
-   * @return connection timeout in milliseconds. By default uses connection timeout from {@link WroConfiguration}.
+   * The read & connect timeout value (in milliseconds) used to limit wait period to a reasonable value. By default
+   * {@value WroConfiguration#DEFAULT_CONNECTION_TIMEOUT} ms is used.
    */
-  private int getConnectionTimeout() {
-    return Context.isContextSet() ? Context.get().getConfig().getConnectionTimeout()
-        : WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
   }
 }

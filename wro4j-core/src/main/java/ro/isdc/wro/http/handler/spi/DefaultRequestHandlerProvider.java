@@ -8,6 +8,7 @@ import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
+import ro.isdc.wro.http.handler.ResourceWatcherRequestHandler;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -19,9 +20,7 @@ import ro.isdc.wro.util.LazyInitializer;
  * @created 23 Sep 2012
  */
 public class DefaultRequestHandlerProvider implements RequestHandlerProvider {
-  /**
-   * {@inheritDoc}
-   */
+
   public Map<String, RequestHandler> provideRequestHandlers() {
     final Map<String, RequestHandler> map = new HashMap<String, RequestHandler>();
     map.put(ReloadCacheRequestHandler.ALIAS, new LazyRequestHandlerDecorator(new LazyInitializer<RequestHandler>() {
@@ -40,6 +39,12 @@ public class DefaultRequestHandlerProvider implements RequestHandlerProvider {
       @Override
       protected RequestHandler initialize() {
         return new ResourceProxyRequestHandler();
+      }
+    }));
+    map.put(ResourceWatcherRequestHandler.ALIAS, new LazyRequestHandlerDecorator(new LazyInitializer<RequestHandler>() {
+      @Override
+      protected RequestHandler initialize() {
+        return new ResourceWatcherRequestHandler();
       }
     }));
     return map;

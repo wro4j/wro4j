@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -61,9 +60,8 @@ public class TestModelAsJsonRequestHandler {
   @Before
   public void setUp()
       throws Exception {
-    Context.set(Context.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
-
     MockitoAnnotations.initMocks(this);
+    Context.set(Context.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
 
     victim = new ModelAsJsonRequestHandler();
 
@@ -85,7 +83,7 @@ public class TestModelAsJsonRequestHandler {
 
   @Test
   public void shouldBeEnabledByDefault() {
-    Assert.assertTrue(victim.isEnabled());
+    assertTrue(victim.isEnabled());
   }
 
   @Test
