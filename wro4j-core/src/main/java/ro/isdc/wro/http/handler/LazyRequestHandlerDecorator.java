@@ -9,6 +9,7 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
+import ro.isdc.wro.util.LazyInitializerDecorator;
 
 
 /**
@@ -21,31 +22,34 @@ import ro.isdc.wro.util.LazyInitializer;
 public class LazyRequestHandlerDecorator
     extends AbstractDecorator<LazyInitializer<RequestHandler>>
     implements RequestHandler {
-  @Inject
-  private Injector injector;
-  private RequestHandler requestHandler;
-  public LazyRequestHandlerDecorator(final LazyInitializer<RequestHandler> initializer) {
-    super(initializer);
+
+  private static LazyInitializerDecorator<RequestHandler> decorate(final LazyInitializer<RequestHandler> initializer) {
+    return new LazyInitializerDecorator<RequestHandler>(initializer) {
+      @Inject
+      private Injector injector;
+      @Override
+      protected RequestHandler initialize() {
+        final RequestHandler handler = super.initialize();
+        injector.inject(handler);
+        return handler;
+      }
+    };
   }
 
-  /**
-   * {@inheritDoc}
-   */
+
+  public LazyRequestHandlerDecorator(final LazyInitializer<RequestHandler> initializer) {
+    super(decorate(initializer));
+  }
+
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     getRequestHandler().handle(request, response);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public boolean accept(final HttpServletRequest request) {
     return getRequestHandler().accept(request);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public boolean isEnabled() {
     return getRequestHandler().isEnabled();
   }
@@ -54,11 +58,7 @@ public class LazyRequestHandlerDecorator
    * This method is used to ensure that lazy initialized object is injected as well.
    */
   private RequestHandler getRequestHandler() {
-    if (requestHandler == null) {
-      requestHandler = getDecoratedObject().get();
-      injector.inject(requestHandler);
-    }
-    return requestHandler;
+    return getDecoratedObject().get();
   }
 
 }

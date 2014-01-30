@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.model.group.Inject;
@@ -41,7 +42,7 @@ public class ReloadCacheRequestHandler
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    context.getConfig().reloadCache();
+    Context.get().getConfig().reloadCache();
     ResponseHeadersConfigurer.noCache().setHeaders(response);
     response.setStatus(HttpServletResponse.SC_OK);
     LOG.debug("Cache is reloaded");

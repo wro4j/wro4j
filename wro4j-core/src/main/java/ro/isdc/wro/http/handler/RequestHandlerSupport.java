@@ -5,11 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ro.isdc.wro.config.Context;
-
 
 /**
  * A handler which implements all the methods. This handler accept all requests and is enabled by default. The handle
@@ -21,7 +16,6 @@ import ro.isdc.wro.config.Context;
  */
 public class RequestHandlerSupport
     implements RequestHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(RequestHandlerSupport.class);
   /**
    * A recommended context path which expose various api calls using {@link RequestHandler} implementations.
    */
@@ -36,13 +30,9 @@ public class RequestHandlerSupport
   }
 
   /**
-   * Enabled by default if the {@link Context} is set.
+   * Enabled by default.
    */
   public boolean isEnabled() {
-    if (!Context.isContextSet()) {
-      LOG.debug("Context NOT set. Thread ID: {}", Thread.currentThread().getName());
-    }
-    return Context.isContextSet();
+    return true;
   }
-
 }
