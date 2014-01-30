@@ -88,7 +88,7 @@ public class WroFilter
   /**
    * Used to create the collection of requestHandlers to apply
    */
-  private RequestHandlerFactory requestHandlerFactory = newRequestHandlerFactory();
+  private RequestHandlerFactory requestHandlerFactory;
 
   private ResponseHeadersConfigurer headersConfigurer;
   /**
@@ -107,16 +107,19 @@ public class WroFilter
     return request.getAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER) != null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void init(final FilterConfig config)
       throws ServletException {
     this.filterConfig = config;
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
+    this.injector = InjectorBuilder.create(wroManagerFactory).build();
     headersConfigurer = newResponseHeadersConfigurer();
+    requestHandlerFactory = DefaultRequestHandlerFactory.decorate(newRequestHandlerFactory(), new ObjectFactory<Injector>() {
+      public Injector create() {
+        return getInjector();
+      }
+    });
     registerChangeListeners();
     registerMBean();
     doInit(config);
@@ -320,9 +323,7 @@ public class WroFilter
     final Collection<RequestHandler> handlers = requestHandlerFactory.create();
     notNull(handlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
-    final Injector injector = getInjector();
     for (final RequestHandler requestHandler : handlers) {
-      injector.inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         return true;
@@ -336,9 +337,6 @@ public class WroFilter
    * @VisibleForTesting
    */
   Injector getInjector() {
-    if (injector == null) {
-      injector = InjectorBuilder.create(wroManagerFactory).build();
-    }
     return injector;
   }
 

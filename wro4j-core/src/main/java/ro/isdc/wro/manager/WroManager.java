@@ -140,7 +140,6 @@ public class WroManager
     this.namingStrategy = builder.namingStrategy;
     this.processorsFactory = builder.processorsFactory;
     this.modelFactory = DefaultWroModelFactoryDecorator.decorate(builder.modelFactory, builder.modelTransformers);
-    //TODO initialize
     this.resourceWatcher = new ResourceWatcher();
   }
 

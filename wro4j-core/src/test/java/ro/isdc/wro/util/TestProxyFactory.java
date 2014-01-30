@@ -16,6 +16,7 @@ import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.resource.support.DefaultResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
+import ro.isdc.wro.util.ProxyFactory.TypedObjectFactory;
 
 
 /**
@@ -23,17 +24,21 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  */
 public class TestProxyFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestProxyFactory.class);
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Test
   public void shouldCreateProxyForAnObjectWithNotAAnInterfaceType() {
-    final Object proxy = ProxyFactory.proxy(new ObjectFactory<Object>() {
+    final Object proxy = ProxyFactory.proxy(new TypedObjectFactory<Object>() {
       public Object create() {
         return new Object();
+      }
+
+      public Class<? extends Object> getObjectClass() {
+        return Object.class;
       }
     }, Object.class);
     Validate.notNull(proxy);
@@ -48,9 +53,13 @@ public class TestProxyFactory {
   @Test
   public void shouldCreateProxyForAValidObject() {
     final ReadOnlyContext object = Context.standaloneContext();
-    final ReadOnlyContext proxy = ProxyFactory.proxy(new ObjectFactory<ReadOnlyContext>() {
+    final ReadOnlyContext proxy = ProxyFactory.proxy(new TypedObjectFactory<ReadOnlyContext>() {
       public ReadOnlyContext create() {
         return object;
+      }
+
+      public Class<? extends ReadOnlyContext> getObjectClass() {
+        return ReadOnlyContext.class;
       }
     }, ReadOnlyContext.class);
     assertNotNull(proxy);
@@ -60,11 +69,16 @@ public class TestProxyFactory {
   @Test
   public void shouldInheritInterfacesOfTheObject() {
     final ResourceAuthorizationManager object = new DefaultResourceAuthorizationManager();
-    final ResourceAuthorizationManager proxy = ProxyFactory.proxy(new ObjectFactory<ResourceAuthorizationManager>() {
-      public ResourceAuthorizationManager create() {
-        return object;
-      }
-    }, ResourceAuthorizationManager.class);
+    final ResourceAuthorizationManager proxy = ProxyFactory.proxy(
+        new TypedObjectFactory<ResourceAuthorizationManager>() {
+          public ResourceAuthorizationManager create() {
+            return object;
+          }
+
+          public Class<? extends ResourceAuthorizationManager> getObjectClass() {
+            return DefaultResourceAuthorizationManager.class;
+          }
+        }, ResourceAuthorizationManager.class);
     assertNotNull(proxy);
     assertNotSame(object, proxy);
     assertTrue(proxy instanceof MutableResourceAuthorizationManager);

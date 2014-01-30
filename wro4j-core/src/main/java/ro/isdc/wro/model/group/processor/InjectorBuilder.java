@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.ProxyFactory;
+import ro.isdc.wro.util.ProxyFactory.TypedObjectFactory;
 
 
 /**
@@ -173,6 +175,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<Injector> createInjectorProxy() {
     return new InjectorObjectFactory<Injector>() {
       public Injector create() {
+        Validate.isTrue(injector != null);
         return injector;
       }
     };
@@ -248,9 +251,13 @@ public class InjectorBuilder {
    *         because the injected field ensure thread-safe behavior.
    */
   private Object createReadOnlyContextProxy() {
-    return ProxyFactory.proxy(new ObjectFactory<ReadOnlyContext>() {
+    return ProxyFactory.proxy(new TypedObjectFactory<ReadOnlyContext>() {
       public ReadOnlyContext create() {
         return Context.get();
+      }
+
+      public Class<? extends ReadOnlyContext> getObjectClass() {
+        return Context.class;
       }
     }, ReadOnlyContext.class);
   }

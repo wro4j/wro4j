@@ -34,6 +34,7 @@
         <connection>scm:git:git://github.com/alexo/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/alexo/wro4j.git</developerConnection>
         <url>http://github.com/alexo/wro4j.git</url>
+      <tag>wro4j-parent-1.7.2</tag>
   </scm>
     <mailingLists>
         <mailingList>
@@ -423,7 +424,7 @@
                 <module>wro4j-osgi</module>
                 -->          
             </modules>
-        </profile>
+        </profile>        
     </profiles>
 
 </project>
