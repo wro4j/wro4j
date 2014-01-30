@@ -18,9 +18,6 @@ import ro.isdc.wro.util.LazyInitializer;
  * @created 23 Sep 2012
  */
 public class DefaultRequestHandlerProvider implements RequestHandlerProvider {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
     final Map<String, RequestHandler> map = new HashMap<String, RequestHandler>();

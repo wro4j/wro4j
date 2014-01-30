@@ -51,6 +51,9 @@ public final class Injector {
    */
   public <T> T inject(final T object) {
     notNull(object);
+    if (!Context.isContextSet()) {
+      throw new WroRuntimeException("No Context Set");
+    }
     if (!injectedObjects.containsKey(computeKey(object))) {
       injectedObjects.put(computeKey(object), true);
       processInjectAnnotation(object);
@@ -124,9 +127,6 @@ public final class Injector {
     boolean accept = false;
     // accept private modifiers
     field.setAccessible(true);
-    if (!Context.isContextSet()) {
-      throw new WroRuntimeException("No Context Set");
-    }
     for (final Map.Entry<Class<?>, Object> entry : map.entrySet()) {
       if (entry.getKey().isAssignableFrom(field.getType())) {
         Object value = entry.getValue();

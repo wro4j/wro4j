@@ -3,18 +3,24 @@ function anonymous(Handlebars, depth0, helpers, partials, data) {
     this.compilerInfo = [4, ">= 1.0.0"];
     helpers = this.merge(helpers, Ember.Handlebars.helpers);
     data = data || {};
-    var buffer = "", stack1, hashTypes, hashContexts, escapeExpression = this.escapeExpression, self = this;
+    var buffer = "", stack1, hashTypes, hashContexts, self = this;
     function program1(depth0, data) {
         data.buffer.push("s");
     }
     data.buffer.push("<div class=\"row-fluid span5\">\n  <strong>");
     hashTypes = {};
     hashContexts = {};
-    data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "remaining", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data})));
+    stack1 = helpers._triageMustache.call(depth0, "remaining", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data});
+    if (stack1 || stack1 === 0) {
+        data.buffer.push(stack1);
+    }
     data.buffer.push("</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>");
     hashTypes = {};
     hashContexts = {};
-    data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "finished", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data})));
+    stack1 = helpers._triageMustache.call(depth0, "finished", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data});
+    if (stack1 || stack1 === 0) {
+        data.buffer.push(stack1);
+    }
     data.buffer.push("</strong> completed item");
     hashTypes = {};
     hashContexts = {};
