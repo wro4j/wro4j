@@ -21,11 +21,11 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.ResourceProcessor;
 import ro.isdc.wro.model.resource.processor.SupportAware;
 
 @SupportedResourceType(ResourceType.JS)
-public class NgMinPreProcessor implements ResourcePreProcessor, SupportAware {
+public class NgMinPreProcessor implements ResourceProcessor, SupportAware {
 
 	public static final String ALIAS = "ngMin";
 	private static final Logger LOG = LoggerFactory.getLogger(NgMinPreProcessor.class);

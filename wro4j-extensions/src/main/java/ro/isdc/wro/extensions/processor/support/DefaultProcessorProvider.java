@@ -65,8 +65,8 @@ public class DefaultProcessorProvider
   public Map<String, ResourceProcessor> providePostProcessors() {
     final Map<String, ResourceProcessor> resultMap = new HashMap<String, ResourceProcessor>();
     /**
-     * Created to overcome the difference between {@link ResourceProcessor} and {@link ResourceProcessor}
-     * interfaces which will be resolved in next major version.
+     * Created to overcome the difference between {@link ResourceProcessor} and {@link ResourceProcessor} interfaces
+     * which will be resolved in next major version.
      */
     final Map<String, ResourceProcessor> preProcessorsMap = createMap();
     for (final Entry<String, ResourceProcessor> entry : preProcessorsMap.entrySet()) {
@@ -276,12 +276,12 @@ public class DefaultProcessorProvider
         return new EmberJsProcessor();
       }
     }));
-    map.put(NgMinPreProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
-        @Override
-        protected ResourcePreProcessor initialize() {
-          return new NgMinPreProcessor();
-        }
-      }));
+    map.put(NgMinPreProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourceProcessor>() {
+      @Override
+      protected ResourceProcessor initialize() {
+        return new NgMinPreProcessor();
+      }
+    }));
     return map;
   }
 }
