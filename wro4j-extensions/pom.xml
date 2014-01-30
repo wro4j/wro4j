@@ -67,10 +67,6 @@
             <artifactId>jruby-stdlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-stdlib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>me.n4u.sass</groupId>
             <artifactId>sass-gems</artifactId>
         </dependency>
