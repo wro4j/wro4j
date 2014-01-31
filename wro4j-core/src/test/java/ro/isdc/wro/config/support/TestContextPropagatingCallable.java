@@ -40,34 +40,34 @@ public class TestContextPropagatingCallable {
       return null;
     }
   };
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp() {
     initMocks(this);
     context = Context.webContext(mockRequest, mockResponse, mockFilterConfig);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotAcceptNullCallable() {
     new ContextPropagatingCallable<Void>(null);
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenNoContextIsAvailable() {
     Context.unset();
     new ContextPropagatingCallable<Void>(NO_OP_CALLABLE);
   }
-  
+
   @Test
   public void shouldInheritContextInCreatedThread()
       throws Exception {
@@ -81,24 +81,33 @@ public class TestContextPropagatingCallable {
       }
     }), 1);
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotDecorateNullRunnable() {
-    ContextPropagatingCallable.decorate(null);
+    final Runnable runnable = null;
+    ContextPropagatingCallable.decorate(runnable);
   }
-  
+
+  @Test(expected = NullPointerException.class)
+  public void cannotDecorateNullCallable() {
+    final Callable<?> callable = null;
+    ContextPropagatingCallable.decorate(callable);
+  }
+
   @Test
   public void shouldDecorateRunnable()
       throws Exception {
     Context.set(context);
-    WroTestUtils.runConcurrently(ContextPropagatingCallable.decorate(new Runnable() {
-      public void run() {
+    WroTestUtils.runConcurrently(ContextPropagatingCallable.decorate(new Callable<Void>() {
+      public Void call()
+          throws Exception {
         assertTrue(Context.isContextSet());
         assertSame(context, Context.get());
+        return null;
       }
     }), 1);
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();

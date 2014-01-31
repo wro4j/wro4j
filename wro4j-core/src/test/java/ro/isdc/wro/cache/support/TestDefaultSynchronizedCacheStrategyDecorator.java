@@ -81,6 +81,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @After
   public void tearDown() {
+    victim.destroy();
     Context.unset();
     // have to reset it, otherwise a test fails when testing entire project.
     Mockito.reset(mockResourceWatcher);
@@ -121,6 +122,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final long delta = 5;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
+    when(mockResourceWatcher.tryAsyncCheck(Mockito.eq(key))).thenReturn(true);
     final long start = System.currentTimeMillis();
     do {
       victim.get(key);

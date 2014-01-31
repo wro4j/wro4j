@@ -7,10 +7,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
@@ -216,28 +218,48 @@ public class ResourceWatcher
   }
 
   private boolean isGroupChanged(final Group group, final Callback callback) {
-    // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
     final AtomicBoolean isChanged = new AtomicBoolean(false);
-    for (final Resource resource : resources) {
-      checkResourceChange(resource, group, callback, isChanged);
+    final List<Future<?>> futures = new ArrayList<Future<?>>();
+    final boolean isAsync = context.getConfig().isResourceWatcherAsync();
+    try {
+      for (final Resource resource : resources) {
+        if (isAsync) {
+          futures.add(executorServiceRef.get().submit(ContextPropagatingCallable.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              checkResourceChange(resource, group, callback, isChanged);
+              return null;
+            }
+          })));
+        } else {
+          checkResourceChange(resource, group, callback, isChanged);
+        }
+      }
+      if (isAsync) {
+        LOG.debug("await async execution");
+        //await for all futures to complete before returning the result
+        for (final Future<?> future : futures) {
+          future.get();
+        }
+      }
+    } catch (final Exception e) {
+      LOG.debug("Exception while onResourceChange is invoked", e);
     }
     LOG.debug("group={}, changed={}", group.getName(), isChanged);
     return isChanged.get();
   }
 
-  private void checkResourceChange(final Resource resource, final Group group, final Callback callback, final AtomicBoolean isChanged) {
-    if (!isChanged.get()) {
-      final boolean changedFlag = isChanged(resource, group.getName());
-      isChanged.compareAndSet(false, changedFlag);
-    }
-    if (isChanged.get()) {
-      try {
-        callback.onResourceChanged(resource);
-        lifecycleCallback.onResourceChanged(resource);
-      } catch (final Exception e) {
-        LOG.debug("Exception while onResourceChange is invoked", e);
-      }
+  /**
+   * Will check if a given resource was changed and will invoke the appropriate callback.
+   */
+  private void checkResourceChange(final Resource resource, final Group group, final Callback callback,
+      final AtomicBoolean isChanged)
+      throws Exception {
+    if (isChanged(resource, group.getName())) {
+      isChanged.compareAndSet(false, true);
+      callback.onResourceChanged(resource);
+      lifecycleCallback.onResourceChanged(resource);
     }
   }
 
@@ -322,7 +344,7 @@ public class ResourceWatcher
     LOG.debug("OriginalRequest: url={}, uri={}, servletPath={}", originalRequest.getRequestURL(),
         originalRequest.getRequestURI(), originalRequest.getServletPath());
     final HttpServletRequest request = new PreserveDetailsRequestWrapper(originalRequest);
-    return new ContextPropagatingCallable<Void>(new Callable<Void>() {
+    return ContextPropagatingCallable.decorate(new Callable<Void>() {
       public Void call()
           throws Exception {
         final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request);

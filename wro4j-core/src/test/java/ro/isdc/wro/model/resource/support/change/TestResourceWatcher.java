@@ -356,21 +356,19 @@ public class TestResourceWatcher {
   }
 
   @Test
-  public void shouldAvoidDuplicateChecksWhenCheckIsPerformedConcurrently()
+  public void shouldCheckForResourceChangeAsynchronously()
       throws Exception {
+    Context.get().getConfig().setResourceWatcherAsync(true);
     final CacheKey cacheKey1 = new CacheKey(MIXED_GROUP_NAME, ResourceType.CSS, true);
     final CacheKey cacheKey2 = new CacheKey(MIXED_GROUP_NAME, ResourceType.JS, true);
     // First check is required to ensure that the subsequent changes do not detect any change
-    when(mockLocator.locate(RESOURCE_JS_URI)).thenAnswer(answerWithContent("initial"));
     victim.check(cacheKey1);
     victim.check(cacheKey2);
 
     when(mockLocator.locate(RESOURCE_JS_URI)).thenAnswer(answerWithContent("changed"));
-    Mockito.reset(resourceWatcherCallback);
-
-    WroTestUtils.runConcurrently(createCheckingCallable(cacheKey1, resourceWatcherCallback),
-        createCheckingCallable(cacheKey1, resourceWatcherCallback));
-
+    victim.check(cacheKey2, resourceWatcherCallback);
+    verify(resourceWatcherCallback).onGroupChanged(Mockito.any(CacheKey.class));
+    verify(resourceWatcherCallback).onResourceChanged(Mockito.any(Resource.class));
   }
 
   private ContextPropagatingCallable<Void> createCheckingCallable(final CacheKey cacheKey, final Callback callback) {

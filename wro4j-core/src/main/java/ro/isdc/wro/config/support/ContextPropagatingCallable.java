@@ -4,8 +4,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.concurrent.Callable;
 
-import org.apache.commons.lang3.Validate;
-
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 
@@ -23,12 +21,22 @@ public class ContextPropagatingCallable<T>
   private final Callable<T> decorated;
 
   public ContextPropagatingCallable(final Callable<T> decorated) {
-    Validate.notNull(decorated);
+    notNull(decorated);
     this.decorated = decorated;
     this.correlationId = Context.getCorrelationId();
   }
 
-  public static ContextPropagatingCallable<Void> decorate(final Runnable runnable) {
+  public static <T> Callable<T> decorate(final Callable<T> callable) {
+    notNull(callable);
+    return new ContextPropagatingCallable<T>(new Callable<T>() {
+      public T call()
+          throws Exception {
+        return callable.call();
+      }
+    });
+  }
+
+  public static Runnable decorate(final Runnable runnable) {
     notNull(runnable);
     return new ContextPropagatingCallable<Void>(new Callable<Void>() {
       public Void call()

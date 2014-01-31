@@ -140,7 +140,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Override
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
-      LOG.debug("onBeforeGet={}", key);
+      LOG.debug("tryAsyncCheck");
       if (resourceWatcher.tryAsyncCheck(key)) {
         checkedKeys.add(createIgnoreMinimizeFlagKey(key));
       }
