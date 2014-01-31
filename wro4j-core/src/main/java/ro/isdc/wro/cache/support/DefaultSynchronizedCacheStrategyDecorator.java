@@ -50,18 +50,17 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * Holds the keys that were checked for change. As long as a key is contained in this set, it won't be checked again.
    */
   private final Set<CacheKey> checkedKeys = Collections.synchronizedSet(new HashSet<CacheKey>());
-  private SchedulerHelper resourceWatcherScheduler;
+  private final SchedulerHelper resourceWatcherScheduler;
 
   /**
    * Decorates the provided {@link CacheStrategy}. The provided {@link CacheStrategy} won't be decorated if the
    * operation is redundant.
    */
-  public static CacheStrategy<CacheKey, CacheValue> decorate(
-      final CacheStrategy<CacheKey, CacheValue> decorated) {
+  public static CacheStrategy<CacheKey, CacheValue> decorate(final CacheStrategy<CacheKey, CacheValue> decorated) {
     return decorated instanceof DefaultSynchronizedCacheStrategyDecorator ? decorated
         : new DefaultSynchronizedCacheStrategyDecorator(decorated);
   }
-  
+
   /**
    * Based on provided {@link CacheKey} a new key is created which has the same value. This is useful to avoid hashCode
    * variation for minimize flag. This does make sense for resource watcher functionality, when the changes for original
@@ -141,9 +140,10 @@ public class DefaultSynchronizedCacheStrategyDecorator
   @Override
   protected void onBeforeGet(final CacheKey key) {
     if (shouldWatchForChange(key)) {
-      LOG.debug("onBeforeGet={}", key);
-      checkedKeys.add(createIgnoreMinimizeFlagKey(key));
-      resourceWatcher.tryAsyncCheck(key);
+      LOG.debug("tryAsyncCheck");
+      if (resourceWatcher.tryAsyncCheck(key)) {
+        checkedKeys.add(createIgnoreMinimizeFlagKey(key));
+      }
     }
   }
 
@@ -151,7 +151,7 @@ public class DefaultSynchronizedCacheStrategyDecorator
    * @return true if the provided key should be checked for change.
    */
   private boolean shouldWatchForChange(final CacheKey key) {
-    final boolean result = getResourceWatcherUpdatePeriod() > 0 && !checkedKeys.contains(key);
+    final boolean result = getResourceWatcherUpdatePeriod() > 0 && !wasCheckedForChange(key);
     LOG.debug("shouldWatchForChange={}", result);
     return result;
   }
@@ -164,10 +164,18 @@ public class DefaultSynchronizedCacheStrategyDecorator
       ((MutableResourceAuthorizationManager) authorizationManager).clear();
     }
   }
-  
+
   @Override
   public void destroy() {
     super.destroy();
     resourceWatcherScheduler.destroy();
+  }
+
+  /**
+   * @return true if the provided key was checked for change since last resourceWatcher update period iteration started.
+   * @VisibleForTesting
+   */
+  boolean wasCheckedForChange(final CacheKey key) {
+    return checkedKeys.contains(key);
   }
 }
