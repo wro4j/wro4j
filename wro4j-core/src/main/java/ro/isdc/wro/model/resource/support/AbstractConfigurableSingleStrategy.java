@@ -25,7 +25,7 @@ public abstract class AbstractConfigurableSingleStrategy<S, P>
   private S configuredStrategy;
 
   /**
-   * The reeturned object will be injected (if injector is available) and will be cached, meaning that only the first
+   * The returned object will be injected (if injector is available) and will be cached, meaning that only the first
    * invocation of this method will instantiate a fresh strategy and any subsequent invocation will return the same
    * object.
    *

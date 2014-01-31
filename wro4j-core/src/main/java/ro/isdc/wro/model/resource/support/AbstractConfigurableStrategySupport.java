@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.resource.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -114,8 +116,8 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
    *          the map where to put entries from source.
    */
   protected final void copyAll(final Map<String, S> source, final Map<String, S> target) {
-    Validate.notNull(source);
-    Validate.notNull(target);
+    notNull(source);
+    notNull(target);
     for (final Map.Entry<String, S> entry : source.entrySet()) {
       target.put(entry.getKey(), entry.getValue());
     }
