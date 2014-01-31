@@ -7,6 +7,7 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
@@ -14,6 +15,7 @@ import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 
 
 /**
@@ -30,16 +32,34 @@ public abstract class AbstractNodeWithFallbackProcessor
   private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeWithFallbackProcessor.class);
   @Inject
   private Injector injector;
+  private final DestroyableLazyInitializer<ResourcePreProcessor> processorInitializer = new DestroyableLazyInitializer<ResourcePreProcessor>() {
+    @Override
+    protected ResourcePreProcessor initialize() {
+      /**
+       * Responsible for node processor initialization. First the nodeCoffeeScript processor will be used as a
+       * primary processor. If it is not supported, the fallback processor will be used.
+       */
+      processor = createNodeProcessor();
+      processor = new ProcessorDecorator(processor).isSupported() ? processor: createFallbackProcessor();
+      injector.inject(processor);
+      return processor;
+    }
+
+    @Override
+    public void destroy() {
+      if (isInitialized()) {
+        try {
+          new ProcessorDecorator(get()).destroy();
+        } catch (final Exception e) {
+          LOG.error("Exception while destroying processor", e);
+          WroRuntimeException.wrap(e);
+        }
+      }
+      super.destroy();
+    };
+  };
   private ResourcePreProcessor processor;
 
-  /**
-   * Responsible for coffeeScriptProcessor initialization. First the nodeCoffeeScript processor will be used as a
-   * primary processor. If it is not supported, the fallback processor will be used.
-   */
-  private ResourcePreProcessor initializeProcessor() {
-    final ProcessorDecorator processor = new ProcessorDecorator(createNodeProcessor());
-    return processor.isSupported() ? processor : createFallbackProcessor();
-  }
 
   /**
    * @return {@link ResourcePreProcessor} used as a primary processor.
@@ -47,27 +67,12 @@ public abstract class AbstractNodeWithFallbackProcessor
    */
   protected abstract ResourcePreProcessor createNodeProcessor();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    getProcessor().process(resource, reader, writer);
+    processorInitializer.get().process(resource, reader, writer);
   }
 
-  private ResourcePreProcessor getProcessor() {
-    if (processor == null) {
-      processor = initializeProcessor();
-      LOG.debug("initialized processor: {}", processor);
-      injector.inject(processor);
-    }
-    return processor;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public final void process(final Reader reader, final Writer writer)
       throws IOException {
@@ -75,22 +80,16 @@ public abstract class AbstractNodeWithFallbackProcessor
   }
 
   /**
-   * Lazily initialize the rhinoProcessor.
+   * Factory method for creating a fallback processor.
    *
    * @return {@link ResourcePreProcessor} used as a fallback processor.
    * @VisibleFortesTesting
    */
   protected abstract ResourcePreProcessor createFallbackProcessor();
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void destroy()
       throws Exception {
-    if (getProcessor() instanceof Destroyable) {
-      ((Destroyable) getProcessor()).destroy();
-    }
+    processorInitializer.destroy();
   }
 }
