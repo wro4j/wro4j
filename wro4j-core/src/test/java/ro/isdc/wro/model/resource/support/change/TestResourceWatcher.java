@@ -70,15 +70,16 @@ public class TestResourceWatcher {
   /**
    * The uri to the first resource in a group.
    */
-  private static final String RESOURCE_FIRST = "/path/1.js";
-  private static final String RESOURCE_URI = "/test.css";
+  private static final String RESOURCE_JS_URI = "/path/1.js";
+  private static final String RESOURCE_CSS_URI = "/test.css";
   private static final String GROUP_NAME = "g1";
+  private static final String MIXED_GROUP_NAME = "mixedGroup";
   /**
    * Group containing two js resources.
    */
   private static final String GROUP_2 = "g2";
   private final CacheKey cacheKey = new CacheKey(GROUP_NAME, ResourceType.CSS, true);
-  private final CacheKey cacheEntry2 = new CacheKey(GROUP_2, ResourceType.JS, true);
+  private final CacheKey cacheKey2 = new CacheKey(GROUP_2, ResourceType.JS, true);
   @Mock
   private HttpServletRequest request;
   @Mock
@@ -114,6 +115,8 @@ public class TestResourceWatcher {
     victim = new ResourceWatcher();
     when(mockLocatorFactory.getLocator(Mockito.anyString())).thenReturn(mockLocator);
     when(mockLocatorFactory.locate(Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+    // Add explicity the filter which makes the request allowed for async check
+    when(request.getAttribute(Mockito.eq(WroFilter.ATTRIBUTE_PASSED_THROUGH_FILTER))).thenReturn(true);
 
     victim = new ResourceWatcher();
     createDefaultInjector().inject(victim);
@@ -127,9 +130,11 @@ public class TestResourceWatcher {
   }
 
   public Injector createDefaultInjector() {
-    final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_URI)));
-    model.addGroup(new Group(GROUP_2).addResource(Resource.create(RESOURCE_FIRST)).addResource(
+    final WroModel model = new WroModel().addGroup(new Group(GROUP_NAME).addResource(Resource.create(RESOURCE_CSS_URI)));
+    model.addGroup(new Group(GROUP_2).addResource(Resource.create(RESOURCE_JS_URI)).addResource(
         Resource.create("/path/2.js")));
+    model.addGroup(new Group(MIXED_GROUP_NAME).addResource(Resource.create(RESOURCE_CSS_URI)).addResource(
+        Resource.create(RESOURCE_JS_URI)));
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
     final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setLocatorFactory(
         mockLocatorFactory);
@@ -147,7 +152,7 @@ public class TestResourceWatcher {
   public void shouldNotDetectChangeAfterFirstRun()
       throws Exception {
     victim.check(cacheKey);
-    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
+    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_CSS_URI, GROUP_NAME));
   }
 
   @Test
@@ -156,13 +161,13 @@ public class TestResourceWatcher {
     // flag used to assert that the expected code was invoked
     createDefaultInjector().inject(victim);
     victim.check(cacheKey, resourceWatcherCallback);
-    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
+    assertFalse(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_CSS_URI, GROUP_NAME));
 
     Mockito.when(mockLocatorFactory.locate(Mockito.anyString())).then(answerWithContent("different"));
     final ArgumentCaptor<CacheKey> argumentCaptor = ArgumentCaptor.forClass(CacheKey.class);
 
     victim.check(cacheKey);
-    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_URI, GROUP_NAME));
+    assertTrue(victim.getResourceChangeDetector().checkChangeForGroup(RESOURCE_CSS_URI, GROUP_NAME));
     Mockito.verify(resourceWatcherCallback).onGroupChanged(argumentCaptor.capture());
     assertEquals(GROUP_NAME, argumentCaptor.getValue().getGroupName());
   }
@@ -192,7 +197,7 @@ public class TestResourceWatcher {
     final ResourceLocator mockImportedResourceLocator = mock(ResourceLocator.class);
     when(mockImportedResourceLocator.getInputStream()).then(answerWithContent("initial"));
 
-    when(mockLocatorFactory.getLocator(Mockito.eq("/" + RESOURCE_URI))).thenReturn(mockLocator);
+    when(mockLocatorFactory.getLocator(Mockito.eq("/" + RESOURCE_JS_URI))).thenReturn(mockLocator);
     when(mockLocatorFactory.getLocator(Mockito.eq("/" + importResourceUri))).thenReturn(mockImportedResourceLocator);
 
     victim.check(cacheEntry);
@@ -214,18 +219,18 @@ public class TestResourceWatcher {
     createDefaultInjector().inject(victim);
 
     // first check will always detect changes.
-    victim.check(cacheEntry2, resourceWatcherCallback);
+    victim.check(cacheKey2, resourceWatcherCallback);
 
-    Mockito.when(mockLocatorFactory.locate(RESOURCE_FIRST)).then(answerWithContent("changed"));
+    Mockito.when(mockLocatorFactory.locate(RESOURCE_JS_URI)).then(answerWithContent("changed"));
 
-    victim.check(cacheEntry2, resourceWatcherCallback);
+    victim.check(cacheKey2, resourceWatcherCallback);
     verify(resourceWatcherCallback, Mockito.atLeastOnce()).onGroupChanged(Mockito.any(CacheKey.class));
     verify(resourceWatcherCallback, Mockito.atLeastOnce()).onResourceChanged(Mockito.any(Resource.class));
 
     Mockito.reset(resourceWatcherCallback);
 
     // next check should find no change
-    victim.check(cacheEntry2, resourceWatcherCallback);
+    victim.check(cacheKey2, resourceWatcherCallback);
     verify(resourceWatcherCallback, Mockito.never()).onGroupChanged(Mockito.any(CacheKey.class));
     verify(resourceWatcherCallback, Mockito.never()).onResourceChanged(Mockito.any(Resource.class));
   }
@@ -263,8 +268,6 @@ public class TestResourceWatcher {
     final int timeout = 100;
     Context.get().getConfig().setConnectionTimeout(timeout);
     final String invalidUrl = "http://localhost:1/";
-    //Add explicity the filter which makes the request allowed for async check
-    when(request.getAttribute(Mockito.eq(WroFilter.ATTRIBUTE_PASSED_THROUGH_FILTER))).thenReturn(true);
     when(request.getRequestURL()).thenReturn(new StringBuffer(invalidUrl));
     when(request.getServletPath()).thenReturn("");
     final AtomicReference<Callable<Void>> asyncInvoker = new AtomicReference<Callable<Void>>();
@@ -306,15 +309,16 @@ public class TestResourceWatcher {
     }, timeout * 2);
     assertNotNull(asyncInvoker.get());
     assertNotNull(exceptionHolder.get());
-    //We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
+    // We expect a request to fail, since a request a localhost using some port from where we expect to get no response.
     LOG.debug("Exception: {}", exceptionHolder.get().getClass());
     assertTrue(exceptionHolder.get() instanceof IOException);
   }
-  
+
   @Test
   public void shouldNotCheckAtAllWhenAsyncIsConfiguredButNotAllowed() {
     Context.get().getConfig().setResourceWatcherAsync(true);
-    ResourceWatcher victimSpy = Mockito.spy(victim);
+    when(request.getAttribute(Mockito.eq(WroFilter.ATTRIBUTE_PASSED_THROUGH_FILTER))).thenReturn(null);
+    final ResourceWatcher victimSpy = Mockito.spy(victim);
     victimSpy.tryAsyncCheck(cacheKey);
     verify(victimSpy, Mockito.never()).check(Mockito.eq(cacheKey));
   }
@@ -327,11 +331,44 @@ public class TestResourceWatcher {
   }
 
   private Answer<InputStream> answerWithContent(final String content) {
+    return answerWithContent(content, 0);
+  }
+
+  private Answer<InputStream> answerWithContent(final String content, final long delay) {
     return new Answer<InputStream>() {
       public InputStream answer(final InvocationOnMock invocation)
           throws Throwable {
+        if (delay > 0) {
+          Thread.sleep(delay);
+        }
         return new ByteArrayInputStream(content.getBytes());
       }
     };
+  }
+
+  @Test
+  public void shouldCheckForResourceChangeAsynchronously()
+      throws Exception {
+    Context.get().getConfig().setResourceWatcherAsync(true);
+    final CacheKey cacheKey1 = new CacheKey(MIXED_GROUP_NAME, ResourceType.CSS, true);
+    final CacheKey cacheKey2 = new CacheKey(MIXED_GROUP_NAME, ResourceType.JS, true);
+    // First check is required to ensure that the subsequent changes do not detect any change
+    victim.check(cacheKey1);
+    victim.check(cacheKey2);
+
+    Mockito.when(mockLocatorFactory.locate(Mockito.eq(RESOURCE_JS_URI))).then(answerWithContent("different"));
+    victim.check(cacheKey2, resourceWatcherCallback);
+    verify(resourceWatcherCallback).onGroupChanged(Mockito.any(CacheKey.class));
+    verify(resourceWatcherCallback).onResourceChanged(Mockito.any(Resource.class));
+  }
+
+  private ContextPropagatingCallable<Void> createCheckingCallable(final CacheKey cacheKey, final Callback callback) {
+    return new ContextPropagatingCallable<Void>(new Callable<Void>() {
+      public Void call()
+          throws Exception {
+        victim.check(cacheKey, callback);
+        return null;
+      }
+    });
   }
 }

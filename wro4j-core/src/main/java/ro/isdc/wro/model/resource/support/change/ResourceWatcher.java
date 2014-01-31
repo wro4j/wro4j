@@ -4,19 +4,18 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.WroUtil;
-import ro.isdc.wro.util.io.NullOutputStream;
 
 
 /**
@@ -65,7 +63,7 @@ public class ResourceWatcher
   /**
    * The thread pool size of the executor which is responsible for performing async check
    */
-  private static final int POOL_SIZE = 2;
+  private static final int POOL_SIZE = Runtime.getRuntime().availableProcessors();
 
   public static interface Callback {
     /**
@@ -146,18 +144,25 @@ public class ResourceWatcher
    * If the async check is not allowed (the request was not passed through {@link WroFilter}) - no check will be
    * performed. This is important for use-cases when wro resource is included using a taglib which performs a wro api
    * call directly, without being invoked through {@link WroFilter}.
+   *
+   * @return true if the actual check invocation was performed. This is important to decide if the resource change
+   *         should be skipped or not.
    */
-  public void tryAsyncCheck(final CacheKey cacheKey) {
+  public boolean tryAsyncCheck(final CacheKey cacheKey) {
+    boolean checkInvoked = false;
     if (context.getConfig().isResourceWatcherAsync()) {
       if (isAsyncCheckAllowed()) {
         LOG.debug("Checking resourceWatcher asynchronously...");
         final Callable<Void> callable = createAsyncCheckCallable(cacheKey);
         submit(callable);
+        checkInvoked = true;
       }
     } else {
       LOG.debug("Async check not allowed. Falling back to sync check.");
       check(cacheKey);
+      checkInvoked = true;
     }
+    return checkInvoked;
   }
 
   /**
@@ -213,21 +218,49 @@ public class ResourceWatcher
   }
 
   private boolean isGroupChanged(final Group group, final Callback callback) {
-    // TODO run the check in parallel?
     final List<Resource> resources = group.getResources();
-    boolean isChanged = false;
-    for (final Resource resource : resources) {
-      if (isChanged |= isChanged(resource, group.getName())) {
-        try {
-          callback.onResourceChanged(resource);
-          lifecycleCallback.onResourceChanged(resource);
-        } catch (final Exception e) {
-          LOG.debug("Exception while onResourceChange is invoked", e);
+    final AtomicBoolean isChanged = new AtomicBoolean(false);
+    final List<Future<?>> futures = new ArrayList<Future<?>>();
+    final boolean isAsync = context.getConfig().isResourceWatcherAsync();
+    try {
+      for (final Resource resource : resources) {
+        if (isAsync) {
+          futures.add(executorServiceRef.get().submit(ContextPropagatingCallable.decorate(new Callable<Void>() {
+            public Void call()
+                throws Exception {
+              checkResourceChange(resource, group, callback, isChanged);
+              return null;
+            }
+          })));
+        } else {
+          checkResourceChange(resource, group, callback, isChanged);
         }
       }
+      if (isAsync) {
+        LOG.debug("await async execution");
+        //await for all futures to complete before returning the result
+        for (final Future<?> future : futures) {
+          future.get();
+        }
+      }
+    } catch (final Exception e) {
+      LOG.debug("Exception while onResourceChange is invoked", e);
     }
     LOG.debug("group={}, changed={}", group.getName(), isChanged);
-    return isChanged;
+    return isChanged.get();
+  }
+
+  /**
+   * Will check if a given resource was changed and will invoke the appropriate callback.
+   */
+  private void checkResourceChange(final Resource resource, final Group group, final Callback callback,
+      final AtomicBoolean isChanged)
+      throws Exception {
+    if (isChanged(resource, group.getName())) {
+      isChanged.compareAndSet(false, true);
+      callback.onResourceChanged(resource);
+      lifecycleCallback.onResourceChanged(resource);
+    }
   }
 
   /**
@@ -312,8 +345,7 @@ public class ResourceWatcher
     LOG.debug("OriginalRequest: url={}, uri={}, servletPath={}", originalRequest.getRequestURL(),
         originalRequest.getRequestURI(), originalRequest.getServletPath());
     final HttpServletRequest request = new PreserveDetailsRequestWrapper(originalRequest);
-    final HttpServletResponse response = wrapResponse(Context.get().getResponse());
-    return new ContextPropagatingCallable<Void>(new Callable<Void>() {
+    return ContextPropagatingCallable.decorate(new Callable<Void>() {
       public Void call()
           throws Exception {
         final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request);
@@ -333,21 +365,6 @@ public class ResourceWatcher
         }
       }
     });
-  }
-
-  /**
-   * TODO create a callback to check for error and log it when needed.
-   */
-  private HttpServletResponse wrapResponse(final HttpServletResponse response) {
-    return new HttpServletResponseWrapper(response) {
-      private final PrintWriter printWriter = new PrintWriter(new NullOutputStream());
-
-      @Override
-      public PrintWriter getWriter()
-          throws IOException {
-        return printWriter;
-      }
-    };
   }
 
   /**

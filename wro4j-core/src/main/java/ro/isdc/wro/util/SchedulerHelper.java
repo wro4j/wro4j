@@ -9,7 +9,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public class SchedulerHelper {
   }
 
   private SchedulerHelper(final LazyInitializer<Runnable> lazyRunnable, final String name) {
-    Validate.notNull(lazyRunnable);
+    notNull(lazyRunnable);
     this.name = name;
     this.lazyRunnable = lazyRunnable;
   }

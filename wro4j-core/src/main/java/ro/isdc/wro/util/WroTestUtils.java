@@ -389,6 +389,17 @@ public class WroTestUtils {
     }
   }
   
+  public static void runConcurrently(final Callable<Void>... tasks) throws Exception {
+    final ExecutorService service = Executors.newFixedThreadPool(5);
+    final List<Future<?>> futures = new ArrayList<Future<?>>();
+    for (final Callable<Void> task : tasks) {
+      futures.add(service.submit(task));
+    }
+    for (final Future<?> future : futures) {
+      future.get();
+    }
+  }
+
   /**
    * Run the task concurrently 50 times.
    */

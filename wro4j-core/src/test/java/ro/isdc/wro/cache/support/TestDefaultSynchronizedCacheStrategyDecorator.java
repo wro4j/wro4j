@@ -1,11 +1,13 @@
 package ro.isdc.wro.cache.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
 
@@ -48,9 +50,10 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   private static final String GROUP_NAME = "g1";
   private static final String RESOURCE_URI = "/test.js";
 
-  private CacheStrategy<CacheKey, CacheValue> victim;
+  private DefaultSynchronizedCacheStrategyDecorator victim;
   @Mock
   private ResourceWatcher mockResourceWatcher;
+  private Injector injector;
 
   @BeforeClass
   public static void onBeforeClass() {
@@ -78,6 +81,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @After
   public void tearDown() {
+    victim.destroy();
     Context.unset();
     // have to reset it, otherwise a test fails when testing entire project.
     Mockito.reset(mockResourceWatcher);
@@ -118,6 +122,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final long delta = 5;
     Context.get().getConfig().setResourceWatcherUpdatePeriod(updatePeriod);
     final CacheKey key = new CacheKey("g1", ResourceType.JS, true);
+    when(mockResourceWatcher.tryAsyncCheck(Mockito.eq(key))).thenReturn(true);
     final long start = System.currentTimeMillis();
     do {
       victim.get(key);
@@ -156,7 +161,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   @Test
   public void shouldDecorateCacheStrategy() {
     final CacheStrategy<CacheKey, CacheValue> original = new LruMemoryCacheStrategy<CacheKey, CacheValue>();
-    victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
+    victim = (DefaultSynchronizedCacheStrategyDecorator) DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     assertSame(original, ((ObjectDecorator<?>) victim).getDecoratedObject());
   }
@@ -168,20 +173,35 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   @Test
   public void shouldNotRedundantlyDecorateCacheStrategy() {
     final CacheStrategy<CacheKey, CacheValue> original = DefaultSynchronizedCacheStrategyDecorator.decorate(new LruMemoryCacheStrategy<CacheKey, CacheValue>());
-    victim = DefaultSynchronizedCacheStrategyDecorator.decorate(original);
+    victim = (DefaultSynchronizedCacheStrategyDecorator) DefaultSynchronizedCacheStrategyDecorator.decorate(original);
     assertTrue(victim instanceof DefaultSynchronizedCacheStrategyDecorator);
     assertSame(original, victim);
   }
-  
+
   @Test
   public void shouldDestroySchedulerWhenStrategyIsDestroyed() {
     final SchedulerHelper scheduler = Mockito.mock(SchedulerHelper.class);
     victim = new DefaultSynchronizedCacheStrategyDecorator(new MemoryCacheStrategy<CacheKey, CacheValue>()) {
+      @Override
       SchedulerHelper newResourceWatcherScheduler() {
         return scheduler;
       };
     };
     victim.destroy();
     verify(scheduler).destroy();
+  }
+
+  @Test
+  public void shouldNotWatchForChangeUnlessCheckCompleted() {
+    Context.get().getConfig().setResourceWatcherUpdatePeriod(1);
+    final CacheKey key = new CacheKey(GROUP_NAME, ResourceType.JS, true);
+
+    when(mockResourceWatcher.tryAsyncCheck(Mockito.eq(key))).thenReturn(false);
+    victim.get(key);
+    assertFalse(victim.wasCheckedForChange(key));
+
+    when(mockResourceWatcher.tryAsyncCheck(Mockito.eq(key))).thenReturn(true);
+    victim.get(key);
+    assertTrue(victim.wasCheckedForChange(key));
   }
 }
