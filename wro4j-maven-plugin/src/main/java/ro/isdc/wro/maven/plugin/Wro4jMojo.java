@@ -86,9 +86,6 @@ public class Wro4jMojo
    */
   private final Properties groupNames = new Properties();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void validate()
       throws MojoExecutionException {
@@ -99,9 +96,6 @@ public class Wro4jMojo
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onBeforeExecute() {
     groupNames.clear();
@@ -115,9 +109,6 @@ public class Wro4jMojo
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void doExecute()
       throws Exception {
@@ -157,9 +148,6 @@ public class Wro4jMojo
     writeGroupNameMap();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean isIncrementalCheckRequired() {
     return super.isIncrementalCheckRequired() && destinationFolder.exists();
