@@ -3,10 +3,10 @@
  */
 package ro.isdc.wro.model.resource.support.naming;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
@@ -36,15 +36,10 @@ public class FolderHashEncoderNamingStrategy
     return hashStrategy;
   }
 
-
-
-  /**
-   * {@inheritDoc}
-   */
   public String rename(final String originalName, final InputStream inputStream)
     throws IOException {
-    Validate.notNull(originalName);
-    Validate.notNull(inputStream);
+    notNull(originalName);
+    notNull(inputStream);
     final String hash = getHashStrategy().getHash(inputStream);
     final StringBuilder sb = new StringBuilder(hash).append("/").append(originalName);
     return sb.toString();

@@ -75,9 +75,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   protected void contributePostProcessors(final Map<String, ResourcePostProcessor> map) {}
 
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
     final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
@@ -127,9 +124,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     return factory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NamingStrategy newNamingStrategy() {
     return new ConfigurableNamingStrategy() {
@@ -142,9 +136,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected HashStrategy newHashStrategy() {
     return new ConfigurableHashStrategy() {
@@ -157,9 +148,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected CacheStrategy<CacheKey, CacheValue> newCacheStrategy() {
     return new ConfigurableCacheStrategy() {
@@ -172,9 +160,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected WroModelFactory newModelFactory() {
     return new ConfigurableModelFactory() {
