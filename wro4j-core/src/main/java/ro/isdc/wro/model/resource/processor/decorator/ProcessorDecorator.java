@@ -3,12 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,20 +28,17 @@ import ro.isdc.wro.model.resource.processor.ResourceProcessor;
  * @since 1.4.1
  */
 public class ProcessorDecorator
-  extends AbstractProcessorDecoratorSupport {
+    extends AbstractProcessorDecoratorSupport {
   private static final Logger LOG = LoggerFactory.getLogger(ProcessorDecorator.class);
 
   /**
    * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
-   * This will be removed in 2.0 when all processors will have an unified interface.
+   * This will be removed in 1.5.0 when all processors will have an unified interface.
    */
   public ProcessorDecorator(final ResourceProcessor processor) {
     super(processor);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     if (isEnabled(resource)) {
@@ -63,7 +61,7 @@ public class ProcessorDecorator
    * @return true if this processor is of searchedType.
    */
   public final boolean isEligible(final boolean minimize, final ResourceType searchedType) {
-    Validate.notNull(searchedType);
+    notNull(searchedType);
 
     final SupportedResourceType supportedType = getSupportedResourceType();
     final boolean isTypeSatisfied = supportedType == null
@@ -82,9 +80,6 @@ public class ProcessorDecorator
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return getDecoratedObject().toString();
