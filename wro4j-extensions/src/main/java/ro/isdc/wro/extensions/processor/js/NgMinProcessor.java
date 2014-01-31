@@ -27,6 +27,12 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
 
 
 /**
+ * Uses ngmin node utility.
+ * <p/>
+ * Ngmin is a "pre-minifier" for AngularJS. It modifies Angular code to prevent errors that may arise from minification.
+ * <p/>
+ * More details can be found here: http://www.thinkster.io/pick/XlWneEZCqY/angularjs-ngmin
+ *
  * @author Janek L.B
  * @since 1.7.4
  * @created 26 Jan 2014
