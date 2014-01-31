@@ -1,10 +1,11 @@
 package ro.isdc.wro.cache;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -44,8 +45,8 @@ public final class CacheKey implements Serializable {
 	 * @param minimize true if the result should produce minimized version.
 	 */
 	public CacheKey(final String groupName, final ResourceType type, final boolean minimize) {
-	  Validate.notNull(groupName);
-	  Validate.notNull(type);
+	  notNull(groupName);
+	  notNull(type);
 		this.groupName = groupName;
 		this.type = type;
 		this.minimize = minimize;
@@ -93,25 +94,16 @@ public final class CacheKey implements Serializable {
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
 	public boolean equals(final Object obj) {
     return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
-  /**
-   * {@inheritDoc}
-   */
 	@Override
 	public int hashCode() {
 	  return HashCodeBuilder.reflectionHashCode(this, false);
   }
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
