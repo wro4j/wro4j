@@ -3,13 +3,18 @@
  */
 package ro.isdc.wro.extensions.script;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
@@ -32,17 +37,18 @@ public final class RhinoScriptBuilder {
   private static final String SCRIPT_ENV = "env.rhino.min.js";
   private static final String SCRIPT_JSON = "json2.min.js";
   private static final String SCRIPT_CYCLE = "cycle.js";
+  final ScriptEngine nashornEngine;
   private final ScriptableObject scope;
 
   private RhinoScriptBuilder() {
     this(null);
   }
 
-
   private RhinoScriptBuilder(final ScriptableObject scope) {
     this.scope = createContext(scope);
+    final ScriptEngineManager manager = new ScriptEngineManager();
+    nashornEngine = manager.getEngineByName("nashorn");
   }
-
 
   private Context getContext() {
     initContext();
@@ -85,15 +91,20 @@ public final class RhinoScriptBuilder {
    * @throws IOException
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
+//    try {
+//      final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
+//      evaluateChain(scriptEnv, SCRIPT_ENV);
+//      return this;
+//    } catch (final IOException e) {
+//      throw new RuntimeException("Couldn't initialize env.rhino script", e);
+//    }
     try {
-      final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
-      evaluateChain(scriptEnv, SCRIPT_ENV);
-      return this;
-    } catch (final IOException e) {
-      throw new RuntimeException("Couldn't initialize env.rhino script", e);
+      nashornEngine.eval("var window = { }; var document = {};");
+    } catch (final ScriptException e) {
+      throw WroRuntimeException.wrap(e);
     }
+    return this;
   }
-
 
   /**
    * This method will load JSON utility and aslo a Douglas Crockford's <a
@@ -116,22 +127,28 @@ public final class RhinoScriptBuilder {
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
    *
-   * @param stream {@link InputStream} of the script to evaluate.
-   * @param sourceName the name of the evaluated script.
+   * @param stream
+   *          {@link InputStream} of the script to evaluate.
+   * @param sourceName
+   *          the name of the evaluated script.
    * @return {@link RhinoScriptBuilder} chain with required script evaluated.
-   * @throws IOException if the script couldn't be retrieved.
+   * @throws IOException
+   *           if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
-    throws IOException {
-    Validate.notNull(stream);
+      throws IOException {
+    notNull(stream);
     try {
-      getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
+      //getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
+      nashornEngine.eval(new InputStreamReader(stream));
       return this;
-    } catch(final RhinoException e) {
+    } catch (final RhinoException e) {
       if (e instanceof RhinoException) {
         LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage(e));
       }
       throw e;
+    } catch(final ScriptException e) {
+      throw WroRuntimeException.wrap(e, "problem while evaluating " + sourceName);
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
       throw e;
@@ -149,33 +166,42 @@ public final class RhinoScriptBuilder {
     }
   }
 
-
   /**
    * Evaluates a script and return {@link RhinoScriptBuilder} for a chained script evaluation.
    *
-   * @param script the string representation of the script to evaluate.
-   * @param sourceName the name of the evaluated script.
+   * @param script
+   *          the string representation of the script to evaluate.
+   * @param sourceName
+   *          the name of the evaluated script.
    * @return evaluated object.
-   * @throws IOException if the script couldn't be retrieved.
+   * @throws IOException
+   *           if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
-    Validate.notNull(script);
-    getContext().evaluateString(scope, script, sourceName, 1, null);
+    notNull(script);
+    // getContext().evaluateString(scope, script, sourceName, 1, null);
+    try {
+      nashornEngine.eval(script);
+    } catch (final ScriptException e) {
+      throw WroRuntimeException.wrap(e);
+    }
     return this;
   }
-
 
   /**
    * Evaluates a script from a reader.
    *
-   * @param reader {@link Reader} of the script to evaluate.
-   * @param sourceName the name of the evaluated script.
+   * @param reader
+   *          {@link Reader} of the script to evaluate.
+   * @param sourceName
+   *          the name of the evaluated script.
    * @return evaluated object.
-   * @throws IOException if the script couldn't be retrieved.
+   * @throws IOException
+   *           if the script couldn't be retrieved.
    */
   public Object evaluate(final Reader reader, final String sourceName)
-    throws IOException {
-    Validate.notNull(reader);
+      throws IOException {
+    notNull(reader);
     try {
       return evaluate(IOUtils.toString(reader), sourceName);
     } finally {
@@ -183,24 +209,29 @@ public final class RhinoScriptBuilder {
     }
   }
 
-
   /**
    * Evaluates a script.
    *
-   * @param script string representation of the script to evaluate.
-   * @param sourceName the name of the evaluated script.
+   * @param script
+   *          string representation of the script to evaluate.
+   * @param sourceName
+   *          the name of the evaluated script.
    * @return evaluated object.
-   * @throws IOException if the script couldn't be retrieved.
+   * @throws IOException
+   *           if the script couldn't be retrieved.
    */
   public Object evaluate(final String script, final String sourceName) {
-    Validate.notNull(script);
+    notNull(script);
     // make sure we have a context associated with current thread
     try {
-      return getContext().evaluateString(scope, script, sourceName, 1, null);
+      return nashornEngine.eval(script);
+      // return getContext().evaluateString(scope, script, sourceName, 1, null);
     } catch (final RhinoException e) {
       final String message = RhinoUtils.createExceptionMessage(e);
       LOG.error("JavaScriptException occured: {}", message);
       throw new WroRuntimeException(message);
+    } catch (final ScriptException e) {
+      throw WroRuntimeException.wrap(e);
     } finally {
       // Rhino throws an exception when trying to exit twice. Make sure we don't get any exception
       if (Context.getCurrentContext() != null) {
@@ -216,16 +247,20 @@ public final class RhinoScriptBuilder {
     return new RhinoScriptBuilder();
   }
 
-
   public static RhinoScriptBuilder newChain(final ScriptableObject scope) {
     return new RhinoScriptBuilder(scope);
   }
-
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.
    */
   public static RhinoScriptBuilder newClientSideAwareChain() {
     return new RhinoScriptBuilder().addClientSideEnvironment();
+  }
+
+  public static void main(final String[] args) {
+    final ScriptEngineManager manager = new ScriptEngineManager();
+    final ScriptEngine engine = manager.getEngineByName("nashorn");
+    System.out.println(engine);
   }
 }
