@@ -6,7 +6,6 @@ package ro.isdc.wro.manager;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
@@ -55,7 +53,6 @@ import ro.isdc.wro.model.resource.support.hash.SHA1HashStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NoOpNamingStrategy;
 import ro.isdc.wro.model.transformer.WildcardExpanderModelTransformer;
-import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.SchedulerHelper;
@@ -141,36 +138,10 @@ public class WroManager
     this.hashStrategy = builder.hashStrategy;
     this.locatorFactory = builder.locatorFactory;
     this.metaDataFactory = builder.metaDataFactory;
-    this.namingStrategy = decorate(builder.namingStrategy);
+    this.namingStrategy = builder.namingStrategy;
     this.processorsFactory = builder.processorsFactory;
     this.modelFactory = DefaultWroModelFactoryDecorator.decorate(builder.modelFactory, builder.modelTransformers);
     this.resourceWatcher = new ResourceWatcher();
-  }
-
-  private NamingStrategy decorate(final NamingStrategy namingStrategy) {
-    return new LazyNamingStrategyDecorator(namingStrategy);
-  }
-
-  private static class LazyNamingStrategyDecorator extends AbstractDecorator<NamingStrategy> implements NamingStrategy {
-    @Inject
-    private Injector injector;
-    private final LazyInitializer<NamingStrategy> initializer = new LazyInitializer<NamingStrategy>() {
-      @Override
-      protected NamingStrategy initialize() {
-        final NamingStrategy namingStrategy = getDecoratedObject();
-        LOG.debug("injecting: {}", namingStrategy);
-        injector.inject(namingStrategy);
-        return namingStrategy;
-      }
-    };
-
-    public LazyNamingStrategyDecorator(final NamingStrategy namingStrategy) {
-      super(namingStrategy);
-    }
-    public String rename(final String originalName, final InputStream inputStream)
-        throws IOException {
-      return initializer.get().rename(originalName, inputStream);
-    }
   }
 
   /**
