@@ -66,10 +66,8 @@ public class ResourceChangeDetector {
     notNull(uri);
     notNull(groupName);
     LOG.debug("group={}, uri={}", groupName, uri);
-    System.out.println(changeInfoMap);
     final ResourceChangeInfo resourceInfo = changeInfoMap.get(uri);
     if (resourceInfo.isCheckRequiredForGroup(groupName)) {
-      System.out.println("checkRequired for group: " + groupName + " and uri: " + uri);
       final String currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
       resourceInfo.updateHashForGroup(currentHash, groupName);
     }
