@@ -384,9 +384,6 @@ public class TestConfigurableWroManagerFactory {
     assertEquals(MemoryCacheStrategy.class, actual.getClass());
   }
 
-  /**
-   * TODO Implement
-   */
   @Test(expected = WroRuntimeException.class)
   public void cannotConfigureInvalidRequestHandler()
       throws Exception {
@@ -456,7 +453,7 @@ public class TestConfigurableWroManagerFactory {
   }
 
   @Test
-  public void test()
+  public void shouldApplyNamingStrategyConcurrently()
       throws Exception {
     final Properties configProperties = new Properties();
     configProperties.setProperty(ConfigurableNamingStrategy.KEY, FolderHashEncoderNamingStrategy.ALIAS);

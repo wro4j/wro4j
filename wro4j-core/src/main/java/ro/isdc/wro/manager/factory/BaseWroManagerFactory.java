@@ -151,17 +151,6 @@ public class BaseWroManagerFactory
       onAfterInitializeManager(manager);
       return manager;
     }
-
-    /**
-     * Avoid unnecessary initialization when destroying the object.
-     */
-    @Override
-    public void destroy() {
-      if (this.object != null) {
-        this.object.destroy();
-      }
-      super.destroy();
-    };
   };
 
   /**

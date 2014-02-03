@@ -34,9 +34,6 @@ public class WroManagerFactoryDecorator
     super(managerFactory);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public WroManager create() {
     return managerInitializer.get();
   }
@@ -47,23 +44,14 @@ public class WroManagerFactoryDecorator
   protected void onBeforeBuild(final Builder builder) {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void onCachePeriodChanged(final long value) {
     managerInitializer.get().onCachePeriodChanged(value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void onModelPeriodChanged(final long value) {
     managerInitializer.get().onModelPeriodChanged(value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void destroy() {
     managerInitializer.destroy();
   }

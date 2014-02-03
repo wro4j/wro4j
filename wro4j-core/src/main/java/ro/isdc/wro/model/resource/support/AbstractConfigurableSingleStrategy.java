@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
 import ro.isdc.wro.util.LazyInitializer;
 
 
@@ -23,7 +24,7 @@ public abstract class AbstractConfigurableSingleStrategy<S, P>
   private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurableSingleStrategy.class);
   @Inject
   private Injector injector;
-  private final LazyInitializer<S> lazyInitializer = new LazyInitializer<S>() {
+  private final LazyInitializer<S> lazyInitializer = new DestroyableLazyInitializer<S>() {
     @Override
     protected S initialize() {
       final String alias = getConfiguredValue();
