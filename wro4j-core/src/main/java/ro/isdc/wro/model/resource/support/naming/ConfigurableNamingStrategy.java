@@ -21,41 +21,27 @@ public class ConfigurableNamingStrategy
    * Property name to specify namingStrategy alias.
    */
   public static final String KEY = "namingStrategy";
-  /**
-   * {@inheritDoc}
-   */
+
   public String rename(final String originalName, final InputStream inputStream)
       throws IOException {
     return getConfiguredStrategy().rename(originalName, inputStream);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NamingStrategy getDefaultStrategy() {
     return new NoOpNamingStrategy();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Map<String, NamingStrategy> getStrategies(final NamingStrategyProvider provider) {
     return provider.provideNamingStrategies();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getStrategyKey() {
     return KEY;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Class<NamingStrategyProvider> getProviderClass() {
     return NamingStrategyProvider.class;

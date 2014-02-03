@@ -223,7 +223,9 @@ public class StopWatch {
       pf.setGroupingUsed(false);
       for (final TaskInfo task : tasks) {
         sb.append(nf.format(task.getTimeMillis()) + "  ");
-        sb.append(pf.format(task.getTimeSeconds() / getTotalTimeSeconds()) + "  ");
+        final double totalTimeSeconds = getTotalTimeSeconds();
+        final double percentage = totalTimeSeconds == 0 ? 0 : task.getTimeSeconds() / totalTimeSeconds;
+        sb.append(pf.format(percentage) + "  ");
         sb.append(task.getTaskName() + "\n");
       }
     }

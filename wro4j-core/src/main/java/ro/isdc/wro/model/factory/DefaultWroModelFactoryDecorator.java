@@ -110,16 +110,10 @@ public final class DefaultWroModelFactoryDecorator
     this.modelTransformers = modelTransformers;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public WroModel create() {
     return modelInitializer.get();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void destroy() {
     LOG.debug("Destroy model");
     modelInitializer.destroy();

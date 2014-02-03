@@ -26,9 +26,6 @@ public abstract class AbstractDigesterHashStrategy
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDigesterHashStrategy.class);
 
 
-  /**
-   * {@inheritDoc}
-   */
   public String getHash(final InputStream input)
     throws IOException {
     if (input == null) {
