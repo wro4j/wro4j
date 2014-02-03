@@ -32,9 +32,12 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestLess4jProcessor {
+  private ResourcePreProcessor victim;
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
+    victim = new Less4jProcessor();
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @After
@@ -45,12 +48,11 @@ public class TestLess4jProcessor {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePreProcessor processor = new Less4jProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedLess4j");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", victim);
   }
 
 

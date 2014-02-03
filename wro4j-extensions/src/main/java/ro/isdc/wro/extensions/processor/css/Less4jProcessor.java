@@ -1,17 +1,22 @@
 package ro.isdc.wro.extensions.processor.css;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -19,6 +24,7 @@ import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
 import com.github.sommeri.less4j.LessCompiler.CompilationResult;
 import com.github.sommeri.less4j.LessCompiler.Problem;
+import com.github.sommeri.less4j.LessSource;
 import com.github.sommeri.less4j.core.DefaultLessCompiler;
 
 
@@ -33,27 +39,69 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
 public class Less4jProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(Less4jProcessor.class);
-
   public static final String ALIAS = "less4j";
+
+  private static class RelativeAwareLessSource
+      extends LessSource.StringSource {
+    private final Resource resource;
+    private final UriLocatorFactory locatorFactory;
+
+    public RelativeAwareLessSource(final Resource resource, final String content, final UriLocatorFactory locatorFactory) {
+      super(content);
+      this.resource = resource;
+      notNull(locatorFactory);
+      this.locatorFactory = locatorFactory;
+    }
+
+    @Override
+    public LessSource relativeSource(final String relativePath)
+        throws StringSourceException {
+      return resource != null ? computeRelative(resource, relativePath) : super.relativeSource(relativePath);
+    }
+
+    private LessSource computeRelative(final Resource resource, final String relativePath) throws StringSourceException {
+      try {
+        final String relativeResourceUri = computeRelativeResourceUri(resource.getUri(), relativePath);
+        final Resource relativeResource = Resource.create(relativeResourceUri, ResourceType.CSS);
+        final String relativeResourceContent = IOUtils.toString(locatorFactory.locate(relativeResourceUri), "UTF-8");
+        System.out.println("relativeResource: " + relativeResource);
+        System.out.println("relativeResourceContent: " + relativeResourceContent);
+        return new RelativeAwareLessSource(relativeResource, relativeResourceContent, locatorFactory);
+      } catch (final IOException e) {
+        throw new StringSourceException();
+      }
+    }
+
+    public String computeRelativeResourceUri(final String originalResourceUri, final String relativePath) {
+      final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
+      return FilenameUtils.normalize(fullPath);
+    }
+//
+//    /**
+//     * Override hashcode to make less4j aware about duplicate imports using the provided resource.
+//     */
+//    @Override
+//    public int hashCode() {
+//      return resource == null ? super.hashCode() : resource.hashCode();
+//    }
+  }
+  @Inject
+  private UriLocatorFactory locatorFactory;
+
   private final LessCompiler compiler = new DefaultLessCompiler();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     try {
-      final CompilationResult result = compiler.compile(IOUtils.toString(reader));
+      final LessSource lessSource = new RelativeAwareLessSource(resource, IOUtils.toString(reader), locatorFactory);
+      final CompilationResult result = compiler.compile(lessSource);
       logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
