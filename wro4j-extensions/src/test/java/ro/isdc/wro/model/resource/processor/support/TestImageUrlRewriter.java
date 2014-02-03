@@ -27,23 +27,21 @@ public class TestImageUrlRewriter {
   @Before
   public void setUp() {
     context = new RewriterContext();
+    context.setContextPath("/1/2/3");
     context.setProxyPrefix(DEFAULT_PREFIX);
     context.setContextPath(DEFAULT_CONTEXT_PATH);
     victim = new ImageUrlRewriter(context);
   }
 
-
   @Test
   public void checkRelativeImageUrlInClasspathCssResource() {
-    context.setContextPath("/1/2/3");
     final String actual = victim.rewrite(ClasspathUriLocator.createUri("bootstrap/2.3.2/css/bootstrap.css"), RELATIVE_IMAGE_URL);
-    final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;
+    final String expected = DEFAULT_PREFIX + "classpath:bootstrap/2.3.2/css/" + RELATIVE_IMAGE_URL;
     assertEquals(expected, actual);
   }
 
   @Test
   public void checkRelativeImageUrlInWebjarCssResource() {
-    context.setContextPath("/1/2/3");
     //classpath:bootstrap/2.3.2/css/bootstrap.css
     final String actual = victim.rewrite(WebjarUriLocator.createUri(DEFAULT_CSS_URI), RELATIVE_IMAGE_URL);
     final String expected = DEFAULT_PREFIX + "classpath:/path/to/" + RELATIVE_IMAGE_URL;

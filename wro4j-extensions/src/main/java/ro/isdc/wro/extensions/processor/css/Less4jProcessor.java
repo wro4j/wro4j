@@ -37,18 +37,12 @@ public class Less4jProcessor
   public static final String ALIAS = "less4j";
   private final LessCompiler compiler = new DefaultLessCompiler();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {

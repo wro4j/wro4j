@@ -109,9 +109,6 @@ public class CssUrlRewritingProcessor
   @Inject
   private ReadOnlyContext context;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onUrlReplaced(final String replacedUrl) {
     final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
@@ -151,9 +148,6 @@ public class CssUrlRewritingProcessor
     return authorizationManager.isAuthorized(uri);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onProcessCompleted() {
   }

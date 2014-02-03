@@ -58,9 +58,7 @@ public class WebjarUriLocator
     notNull(path);
     return PREFIX + path;
   }
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public InputStream locate(final String uri)
       throws IOException {
@@ -80,9 +78,6 @@ public class WebjarUriLocator
     return DefaultWildcardStreamLocator.stripQueryPath(uri.replace(PREFIX, ""));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean accept(final String uri) {
     return uri.trim().startsWith(PREFIX);
