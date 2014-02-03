@@ -7,7 +7,6 @@ import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
@@ -44,19 +43,6 @@ public abstract class AbstractNodeWithFallbackProcessor
       injector.inject(processor);
       return processor;
     }
-
-    @Override
-    public void destroy() {
-      if (isInitialized()) {
-        try {
-          new ProcessorDecorator(get()).destroy();
-        } catch (final Exception e) {
-          LOG.error("Exception while destroying processor", e);
-          WroRuntimeException.wrap(e);
-        }
-      }
-      super.destroy();
-    };
   };
   private ResourcePreProcessor processor;
 

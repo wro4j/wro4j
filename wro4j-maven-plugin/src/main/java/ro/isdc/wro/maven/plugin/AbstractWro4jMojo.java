@@ -140,9 +140,6 @@ public abstract class AbstractWro4jMojo
   private TaskExecutor<Void> taskExecutor;
   private ResourceChangeHandler resourceChangeHandler;
 
-  /**
-   * {@inheritDoc}
-   */
   public final void execute()
       throws MojoExecutionException {
     if (skip) {
