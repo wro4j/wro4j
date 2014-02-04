@@ -1,9 +1,10 @@
 package ro.isdc.wro.extensions.processor.support.sass;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,31 +26,31 @@ public class TestRubySassEngine {
 
   @Test
   public void shouldReturnEmptyStringWhenNullContentIsProcessed() {
-    Assert.assertEquals(StringUtils.EMPTY, engine.process(null));
+    assertEquals(StringUtils.EMPTY, engine.process(null));
   }
 
 
   @Test
   public void shouldReturnEmptyStringWhenEmptyContentIsProcessed() {
-    Assert.assertEquals(StringUtils.EMPTY, engine.process(""));
+    assertEquals(StringUtils.EMPTY, engine.process(""));
   }
 
 
   @Test(expected = WroRuntimeException.class)
   public void cannotProcessInvalidCss() {
-    Assert.assertEquals(StringUtils.EMPTY, engine.process("invalidCss"));
+    assertEquals(StringUtils.EMPTY, engine.process("invalidCss"));
   }
 
 
   @Test
   public void shouldProcessValidCss()
     throws IOException {
-    Assert.assertEquals("#element {\n  color: red; }\n", engine.process("#element {color: red;}"));
+    assertEquals("#element {\n  color: red; }\n", engine.process("#element {color: red;}"));
   }
 
   @Test
   public void shouldProcessValidSass()
     throws IOException {
-    Assert.assertEquals("#element #child {\n  color: red; }\n", engine.process("#element { #child {color: red;}}"));
+    assertEquals("#element #child {\n  color: red; }\n", engine.process("#element { #child {color: red;}}"));
   }
 }
