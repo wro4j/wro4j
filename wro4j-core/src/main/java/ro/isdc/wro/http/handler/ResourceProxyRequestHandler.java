@@ -9,10 +9,8 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +53,6 @@ public class ResourceProxyRequestHandler
   private ResourceAuthorizationManager authManager;
   private ResponseHeadersConfigurer headersConfigurer;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
@@ -65,12 +60,9 @@ public class ResourceProxyRequestHandler
     serveProxyResourceUri(request, response);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean accept(final HttpServletRequest request) {
-    return isProxyUri(request.getRequestURI());
+    return isProxyRequest(request);
   }
 
   private void serveProxyResourceUri(final HttpServletRequest request, final HttpServletResponse response)
@@ -151,15 +143,16 @@ public class ResourceProxyRequestHandler
    * with a <code>*</code> character.
    *
    * @param requestUri
-   *          of wro request used to compute the path to this request handler. This request uri is required, becuase we
+   *          of wro request used to compute the path to this request handler. This request uri is required, because we
    *          do not know how the wro filter is mapped.
    * @return the path for this handler.
    */
   public static String createProxyPath(final String requestUri, final String resourceId) {
     notNull(requestUri);
     notNull(resourceId);
-    final String basePath = StringUtils.isEmpty(requestUri) ? "/" : FilenameUtils.getFullPath(requestUri);
-    return basePath + getProxyResourcePath() + resourceId;
+    //final String basePath = StringUtils.isEmpty(requestUri) ? "/" : FilenameUtils.getFullPath(requestUri);
+    //return basePath + getProxyResourcePath() + resourceId;
+    return requestUri + getRequestHandlerPath(resourceId);
   }
 
   /**
@@ -170,10 +163,20 @@ public class ResourceProxyRequestHandler
    */
   public static boolean isProxyUri(final String url) {
     notNull(url);
-    return url.contains(getProxyResourcePath());
+    return url.contains(getRequestHandlerPath());
   }
 
-  private static String getProxyResourcePath() {
-    return String.format("%s/%s?%s=", PATH_API, PATH_RESOURCES, PARAM_RESOURCE_ID);
+  private boolean isProxyRequest(final HttpServletRequest request) {
+    final String apiHandlerValue = request.getParameter(PATH_API);
+    final String resourceId = request.getParameter(PARAM_RESOURCE_ID);
+    return PATH_RESOURCES.equals(apiHandlerValue) && resourceId != null;
+  }
+
+  private static String getRequestHandlerPath() {
+    return String.format("?%s=%s", PATH_API, PATH_RESOURCES);
+  }
+
+  private static String getRequestHandlerPath(final String resourceId) {
+    return String.format("%s&%s=%s", getRequestHandlerPath(), PARAM_RESOURCE_ID, resourceId);
   }
 }
