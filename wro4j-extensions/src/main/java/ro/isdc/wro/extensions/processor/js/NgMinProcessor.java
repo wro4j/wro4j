@@ -56,7 +56,7 @@ public class NgMinProcessor
     final InputStream in = new ReaderInputStream(reader);
 
     try {
-      process(in, out);
+      doProcess(in, out);
     } catch (final IOException ex) {
       final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
       LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
@@ -65,7 +65,10 @@ public class NgMinProcessor
     }
   }
 
-  private void process(final InputStream in, final OutputStream out)
+  /**
+   * @VisibleForTesting
+   */
+  void doProcess(final InputStream in, final OutputStream out)
       throws ExecuteException, IOException {
     final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
     final Executor executor = new DefaultExecutor();
@@ -79,13 +82,15 @@ public class NgMinProcessor
 
   @Override
   public boolean isSupported() {
+    boolean supported = true;
     try {
       final InputStream input = new ByteArrayInputStream("".getBytes("UTF-8"));
-      process(input, null);
+      doProcess(input, null);
     } catch (final Exception e) {
       LOG.debug("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
+      supported = false;
     }
-    return false;
+    return supported;
   }
 
 }
