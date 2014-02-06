@@ -1,20 +1,24 @@
-package ro.isdc.wro.extensions.processor;
+package ro.isdc.wro.extensions.processor.js;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 
+import org.apache.commons.exec.ExecuteException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.processor.js.NgMinProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -44,18 +48,30 @@ public class TestNgMinProcessor {
   }
 
   @Test
-  public void shouldLeaveInvalidJsUnchanged()
+  public void shouldProcessInvalidJsUnchanged()
       throws Exception {
-    final String invalidJs = "al /ert- -- 1";
+    final String invalidJs = "qwertwi42o";
     final StringWriter writer = new StringWriter();
     victim.process(new StringReader(invalidJs), writer);
-    assertEquals(invalidJs, writer.toString());
+    assertEquals(invalidJs + ";", writer.toString());
+  }
+
+  @Test
+  public void shouldSupportProcessorNgMinInstalled() {
+    victim = new NgMinProcessor() {
+      @Override
+      void doProcess(final InputStream in, final OutputStream out)
+          throws ExecuteException, IOException {
+        super.doProcess(in, out);
+      }
+    };
+    assertTrue(((NgMinProcessor) victim).isSupported());
   }
 
   @Test
   public void testFromFolder()
       throws Exception {
-    final URL url = getClass().getResource("ngmin");
+    final URL url = getClass().getResource("../ngmin");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
