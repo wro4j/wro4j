@@ -259,6 +259,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>0.3.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${spring.version}</version>
@@ -292,6 +298,10 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -381,6 +391,25 @@
                 <version>1.3.1</version>
                 <inherited>true</inherited>
             </plugin>
+	<plugin>
+	    <groupId>org.codehaus.mojo</groupId>
+	    <artifactId>build-helper-maven-plugin</artifactId>
+	    <version>1.3</version>
+	    <executions>
+	      <execution>
+		<id>add-perf-source</id>
+		<phase>pre-integration-test</phase>
+		<goals>
+		  <goal>add-source</goal>
+		</goals>
+		<configuration>
+		  <sources>
+		    <source>${basedir}/src/perf/java</source>
+		  </sources>
+		</configuration>
+	      </execution>
+	    </executions>
+	  </plugin>	        
         </plugins>
         <extensions>
             <extension>
