@@ -67,10 +67,6 @@
             <artifactId>jruby-stdlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-stdlib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>me.n4u.sass</groupId>
             <artifactId>sass-gems</artifactId>
         </dependency>
@@ -104,17 +100,17 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>emberjs</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.1-1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>handlebars</artifactId>
-            <version>1.1.2</version>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>coffee-script</artifactId>
-            <version>1.6.3</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
