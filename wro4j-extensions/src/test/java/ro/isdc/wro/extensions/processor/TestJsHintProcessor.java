@@ -35,9 +35,6 @@ public class TestJsHintProcessor
     victim = new JsHintProcessor();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ResourcePreProcessor newLinterProcessor() {
     return new JsHintProcessor();
