@@ -32,8 +32,10 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestLess4jProcessor {
+  private ResourcePreProcessor victim;
   @Before
   public void setUp() {
+    victim = new Less4jProcessor();
     Context.set(Context.standaloneContext());
   }
 
