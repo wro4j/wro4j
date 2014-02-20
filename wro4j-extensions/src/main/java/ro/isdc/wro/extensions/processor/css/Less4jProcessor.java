@@ -41,6 +41,9 @@ public class Less4jProcessor
   private static final Logger LOG = LoggerFactory.getLogger(Less4jProcessor.class);
   public static final String ALIAS = "less4j";
 
+  /**
+   * Required to use the less4j import mechanism.
+   */
   private static class RelativeAwareLessSource
       extends LessSource.StringSource {
     private final Resource resource;
@@ -64,8 +67,6 @@ public class Less4jProcessor
         final String relativeResourceUri = computeRelativeResourceUri(resource.getUri(), relativePath);
         final Resource relativeResource = Resource.create(relativeResourceUri, ResourceType.CSS);
         final String relativeResourceContent = IOUtils.toString(locatorFactory.locate(relativeResourceUri), "UTF-8");
-        System.out.println("relativeResource: " + relativeResource);
-        System.out.println("relativeResourceContent: " + relativeResourceContent);
         return new RelativeAwareLessSource(relativeResource, relativeResourceContent, locatorFactory);
       } catch (final IOException e) {
         throw new StringSourceException();
@@ -76,14 +77,6 @@ public class Less4jProcessor
       final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
       return FilenameUtils.normalize(fullPath);
     }
-//
-//    /**
-//     * Override hashcode to make less4j aware about duplicate imports using the provided resource.
-//     */
-//    @Override
-//    public int hashCode() {
-//      return resource == null ? super.hashCode() : resource.hashCode();
-//    }
   }
   @Inject
   private UriLocatorFactory locatorFactory;
