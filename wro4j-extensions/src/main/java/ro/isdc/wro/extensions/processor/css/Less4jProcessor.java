@@ -105,7 +105,7 @@ public class Less4jProcessor
       logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
-      LOG.error("Failed to compile less resource: {}.", resource.getUri());
+      LOG.error("Failed to compile less resource: {}.", resource);
       for (final Problem problem : e.getErrors()) {
         LOG.error(problemAsString(problem));
       }
