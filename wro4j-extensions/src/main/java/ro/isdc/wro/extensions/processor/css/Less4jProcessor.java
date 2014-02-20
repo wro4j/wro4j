@@ -32,12 +32,11 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
 public class Less4jProcessor
     implements ResourceProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(Less4jProcessor.class);
+
   public static final String ALIAS = "less4j";
   private final LessCompiler compiler = new DefaultLessCompiler();
 
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
@@ -46,7 +45,7 @@ public class Less4jProcessor
       logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
-      LOG.error("Failed to compile less resource: {}.", resource.getUri());
+      LOG.error("Failed to compile less resource: {}.", resource);
       for (final Problem problem : e.getErrors()) {
         LOG.error(problemAsString(problem));
       }
