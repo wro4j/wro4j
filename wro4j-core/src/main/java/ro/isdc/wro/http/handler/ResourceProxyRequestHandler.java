@@ -26,7 +26,17 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
 /**
- * Provides access to wro resources via a resource proxy.
+ * Provides access to wro resources via a resource proxy. This request handler accepts the following uri:
+ *
+ * <pre>
+ * ?wroAPI=wroResources?id=/path/to/resourceId.js
+ * </pre>
+ *
+ * Notice that this uri has the following mandatory parameters:
+ * <ul>
+ * <li>wroAPI - having the 'wroResources' value</li>
+ * <li>id - the id of the proxy resource</li>
+ * </ul>
  *
  * @author Ivar Conradi Østhus
  * @created 19 May 2012
@@ -150,8 +160,6 @@ public class ResourceProxyRequestHandler
   public static String createProxyPath(final String requestUri, final String resourceId) {
     notNull(requestUri);
     notNull(resourceId);
-    //final String basePath = StringUtils.isEmpty(requestUri) ? "/" : FilenameUtils.getFullPath(requestUri);
-    //return basePath + getProxyResourcePath() + resourceId;
     return requestUri + getRequestHandlerPath(resourceId);
   }
 

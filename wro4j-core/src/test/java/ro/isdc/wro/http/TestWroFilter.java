@@ -400,6 +400,7 @@ public class TestWroFilter {
       protected HttpServletRequest newRequest() {
         final HttpServletRequest request = super.newRequest();
         when(request.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourcePath);
+        when(request.getParameter(ResourceProxyRequestHandler.PATH_API)).thenReturn(ResourceProxyRequestHandler.PATH_RESOURCES);
         return request;
       }
     }, mockFilterChain);
@@ -439,6 +440,7 @@ public class TestWroFilter {
       protected HttpServletRequest newRequest() {
         final HttpServletRequest request = super.newRequest();
         when(request.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourcePath);
+        when(request.getParameter(ResourceProxyRequestHandler.PATH_API)).thenReturn(ResourceProxyRequestHandler.PATH_RESOURCES);
         return request;
       }
     });
@@ -713,6 +715,7 @@ public class TestWroFilter {
   private void processProxyWithResourceId(final String resourceId)
       throws Exception {
     when(mockRequest.getParameter(PARAM_RESOURCE_ID)).thenReturn(resourceId);
+    when(mockRequest.getParameter(ResourceProxyRequestHandler.PATH_API)).thenReturn(ResourceProxyRequestHandler.PATH_RESOURCES);
     when(mockRequest.getRequestURI()).thenReturn(ResourceProxyRequestHandler.createProxyPath("", resourceId));
 
     final WroConfiguration config = new WroConfiguration();
