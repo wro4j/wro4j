@@ -1,0 +1,4 @@
+@LOGO_TEST_DATA:    url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAABE//CAYAAADX/TrJAAAAGXRFWHRTb2Z0d2F');
+#test {
+  background: @LOGO_TEST_DATA
+}
