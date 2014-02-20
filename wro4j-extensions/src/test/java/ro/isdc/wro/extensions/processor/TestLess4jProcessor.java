@@ -20,8 +20,6 @@ import ro.isdc.wro.extensions.processor.css.Less4jProcessor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourceProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ChainedProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -37,6 +35,8 @@ public class TestLess4jProcessor {
   public void setUp() {
     victim = new Less4jProcessor();
     Context.set(Context.standaloneContext());
+    victim = new Less4jProcessor();
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @After
@@ -100,7 +100,7 @@ public class TestLess4jProcessor {
   @Test
   public void shouldDetectProperlyCssImportStatements()
       throws Exception {
-    final ResourceProcessor processor = ChainedProcessor.create(new LessCssImportPreProcessor(), new Less4jProcessor());
+    final ResourcePreProcessor processor = victim;
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
