@@ -1,0 +1,5 @@
+<groups xmlns="http://www.isdc.ro/wro">
+  <group name="all">
+    <css>/example.css</css>
+  </group>
+</groups>

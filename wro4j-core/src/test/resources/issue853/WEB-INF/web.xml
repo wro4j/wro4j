@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+  <filter>
+    <filter-name>WebResourceOptimizer</filter-name>
+    <filter-class>
+      ro.isdc.wro.http.WroFilter
+    </filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>WebResourceOptimizer</filter-name>
+      <url-pattern>/wro/*</url-pattern>
+    </filter-mapping>
+ </web-app>
