@@ -25,9 +25,6 @@ public class Issue853Test {
 
   @BeforeClass
   public static void initTest() throws Exception {
-    BasicConfigurator.configure();
-    Logger.getRootLogger().setLevel(Level.DEBUG);
-
     ServerSocket s = null;
     try {
       s = new ServerSocket(0);
