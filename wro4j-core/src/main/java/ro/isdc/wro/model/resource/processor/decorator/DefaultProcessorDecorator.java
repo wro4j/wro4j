@@ -32,9 +32,6 @@ public class DefaultProcessorDecorator
     this.criteria = criteria;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
@@ -53,9 +50,6 @@ public class DefaultProcessorDecorator
             processor, criteria.getProcessingType())))));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean isEnabled(final Resource resource) {
     final boolean isApplicable = resource != null ? isEligible(criteria.isMinimize(), resource.getType()) : true;

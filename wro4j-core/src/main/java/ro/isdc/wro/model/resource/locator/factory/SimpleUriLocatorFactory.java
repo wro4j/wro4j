@@ -8,11 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager;
-import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
@@ -56,29 +51,6 @@ public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
    * @param locators {@link Collection} of locators to add.
    */
   public final SimpleUriLocatorFactory addLocators(final Collection<UriLocator> locators) {
-    try {
-      Context context = Context.get();
-      String managerClassName = context.getConfig().getWroManagerClassName();
-
-      Class clz = Class.forName(managerClassName);
-      if (WroManagerFactory.class.isAssignableFrom(clz)) {
-        WroManagerFactory manager = (WroManagerFactory) clz.newInstance();
-
-        InjectorBuilder builder = InjectorBuilder.create(manager);
-        Injector injector = builder.build();
-
-        for (UriLocator locator : locators) {
-          injector.inject(locator);
-        }
-      }
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-
     uriLocators.addAll(locators);
     return this;
   }

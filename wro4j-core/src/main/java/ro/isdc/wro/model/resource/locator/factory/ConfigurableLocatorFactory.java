@@ -37,33 +37,21 @@ public class ConfigurableLocatorFactory
 
   private final UriLocatorFactory locatorFactory = newLocatorFactory();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getStrategyKey() {
     return PARAM_URI_LOCATORS;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Map<String, UriLocator> getStrategies(final LocatorProvider provider) {
     return provider.provideLocators();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public InputStream locate(final String uri)
       throws IOException {
     return new AutoCloseInputStream(locatorFactory.locate(uri));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   private UriLocatorFactory newLocatorFactory() {
     final SimpleUriLocatorFactory factory = new SimpleUriLocatorFactory();
     final List<UriLocator> locators = getConfiguredStrategies();
@@ -78,16 +66,10 @@ public class ConfigurableLocatorFactory
     return factory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public UriLocator getInstance(final String uri) {
     return locatorFactory.getInstance(uri);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Class<LocatorProvider> getProviderClass() {
     return LocatorProvider.class;

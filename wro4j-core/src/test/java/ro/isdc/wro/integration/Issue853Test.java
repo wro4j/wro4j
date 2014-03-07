@@ -1,5 +1,13 @@
 package ro.isdc.wro.integration;
 
+import static org.junit.Assert.assertFalse;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.URL;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -8,15 +16,6 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.net.URL;
-
-import static org.junit.Assert.*;
 
 public class Issue853Test {
 
@@ -32,14 +31,16 @@ public class Issue853Test {
     } finally {
       s.close();
     }
+    BasicConfigurator.configure();
+    Logger.getRootLogger().setLevel(Level.WARN);
 
     server = new Server(port);
-    WebAppContext context = new WebAppContext();
+    final WebAppContext context = new WebAppContext();
     context.setDescriptor("src/test/resources/issue853/WEB-INF/web.xml");
     context.setResourceBase("src/test/resources/issue853/");
     context.setContextPath("/");
-    context.setParentLoaderPriority(true);
-
+    context.setParentLoaderPriority(false);
+    //context.setClassLoader(Thread.currentThread().getContextClassLoader());
     server.setHandler(context);
     server.start();
 
@@ -48,7 +49,7 @@ public class Issue853Test {
 
   @Test
   public void testNormalJSP() throws IOException {
-    String contents = getURL(getBaseURL() + "example.jsp");
+    final String contents = getURL(getBaseURL() + "example.jsp");
 
     assertFalse(contents.trim().isEmpty());
     assertFalse("The JSP should not have this token, as it should be processed by JSP", contents.contains("out.println"));
@@ -56,17 +57,17 @@ public class Issue853Test {
 
   @Test
   public void testCSS() throws IOException {
-    String contents = getURL(getBaseURL() + "wro/all.css");
+    final String contents = getURL(getBaseURL() + "wro/all.css");
 
     assertFalse(contents.trim().isEmpty());
     assertFalse("The CSS file should not have this token, as the include should be processed by JSP", contents.contains("out.println"));
   }
 
-  private String getURL(String location) throws IOException {
-    URL url = new URL(location);
+  private String getURL(final String location) throws IOException {
+    final URL url = new URL(location);
 
     BufferedReader in = null;
-    StringBuilder result = new StringBuilder();
+    final StringBuilder result = new StringBuilder();
     try {
       in = new BufferedReader(new InputStreamReader(url.openStream()));
 

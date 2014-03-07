@@ -3,13 +3,13 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +172,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<Injector> createInjectorProxy() {
     return new InjectorObjectFactory<Injector>() {
       public Injector create() {
-        Validate.isTrue(injector != null);
+        isTrue(injector != null);
         return injector;
       }
     };
@@ -282,7 +282,6 @@ public class InjectorBuilder {
       }
     };
   }
-
 
   /**
    * @VisibleForTesting

@@ -189,9 +189,6 @@ public class WroManager
     return String.format("%s/%s", hash, resourcePath);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void onCachePeriodChanged(final long period) {
     LOG.info("onCachePeriodChanged with value {} has been triggered!", period);
     cacheSchedulerHelper.scheduleWithPeriod(period);
@@ -199,9 +196,6 @@ public class WroManager
     cacheStrategy.clear();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void onModelPeriodChanged(final long period) {
     LOG.info("onModelPeriodChanged with value {} has been triggered!", period);
     // trigger model destroy
