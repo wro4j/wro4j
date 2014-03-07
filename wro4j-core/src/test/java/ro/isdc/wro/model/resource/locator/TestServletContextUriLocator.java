@@ -32,9 +32,14 @@ import org.mockito.MockitoAnnotations;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
+import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrategy;
+import ro.isdc.wro.model.resource.locator.factory.SimpleUriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
+import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -198,6 +203,30 @@ public class TestServletContextUriLocator {
   public void cannotSetNullLocatorStrategy() {
     victim.setLocatorStrategy(null);
   }
+
+  @Test
+  public void shouldInjectEachLocatorWhenLocatorFactoryIsUsed()
+      throws Exception {
+    final SimpleUriLocatorFactory locatorFactory = new SimpleUriLocatorFactory();
+    final ServletContextUriLocator locator = new ServletContextUriLocator();
+    locatorFactory.addLocator(locator);
+    final DispatcherStreamLocator dispatcherLocator = Mockito.mock(DispatcherStreamLocator.class);
+    when(
+        dispatcherLocator.getInputStream(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class),
+            Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory)).setDispatcherLocator(
+        dispatcherLocator).build();
+    final LocatorFactoryHolder locatorFactoryHolder = new LocatorFactoryHolder();
+    injector.inject(locatorFactoryHolder);
+    final String uri = "/style.css";
+    locatorFactoryHolder.locatorFactory.locate(uri);
+  }
+
+  private static final class LocatorFactoryHolder {
+    @Inject
+    private UriLocatorFactory locatorFactory;
+  }
+
 
   @After
   public void resetContext() {

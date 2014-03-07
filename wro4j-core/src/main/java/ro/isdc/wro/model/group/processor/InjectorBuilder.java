@@ -26,6 +26,7 @@ import ro.isdc.wro.manager.factory.SimpleWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
+import ro.isdc.wro.model.resource.locator.factory.InjectableUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -54,7 +55,7 @@ public class InjectorBuilder {
   private final ResourceChangeDetector resourceChangeDetector = new ResourceChangeDetector();
   private final ResourceBundleProcessor bundleProcessor = new ResourceBundleProcessor();
   private ResourceWatcher resourceWatcher = new ResourceWatcher();
-  private final DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
+  private DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
@@ -197,7 +198,7 @@ public class InjectorBuilder {
   private Object createLocatorFactoryProxy() {
     return new InjectorObjectFactory<UriLocatorFactory>() {
       public UriLocatorFactory create() {
-        return managerFactory.create().getUriLocatorFactory();
+        return new InjectableUriLocatorFactoryDecorator(managerFactory.create().getUriLocatorFactory());
       }
     };
   }
@@ -288,7 +289,17 @@ public class InjectorBuilder {
    * @VisibleForTesting
    */
   public InjectorBuilder setResourceWatcher(final ResourceWatcher resourceWatcher) {
+    notNull(resourceWatcher);
     this.resourceWatcher = resourceWatcher;
+    return this;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  public InjectorBuilder setDispatcherLocator(final DispatcherStreamLocator dispatcherLocator) {
+    notNull(dispatcherLocator);
+    this.dispatcherLocator = dispatcherLocator;
     return this;
   }
 
