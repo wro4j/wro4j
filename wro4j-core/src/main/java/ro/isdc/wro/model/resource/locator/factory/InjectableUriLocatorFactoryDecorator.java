@@ -39,7 +39,9 @@ public class InjectableUriLocatorFactoryDecorator extends AbstractDecorator<UriL
 
   public UriLocator getInstance(final String uri) {
     final UriLocator instance = getDecoratedObject().getInstance(uri);
-    injector.inject(instance);
+    if (instance != null) {
+      injector.inject(instance);
+    }
     return instance;
   }
 }
