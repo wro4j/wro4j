@@ -26,15 +26,17 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestCssUrlInspector {
   private CssUrlInspector victim;
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
+
   @Before
   public void setUp() {
     victim = new CssUrlInspector();
