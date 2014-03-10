@@ -37,7 +37,7 @@ public abstract class AbstractLinterMojo<T>
   /**
    * When true, all the plugin won't stop its execution and will log all found errors.
    *
-   * @parameter default-value="false" expression="${failNever}"
+   * @parameter default-value="false" property="${failNever}"
    * @optional
    */
   private boolean failNever;
@@ -45,14 +45,14 @@ public abstract class AbstractLinterMojo<T>
    * Allows build to fail when the first error is encountered without searching for next errors. This flag is true by
    * default. When interested in all errors, set this flag to false.
    *
-   * @parameter default-value="true" expression="${failFast}"
+   * @parameter default-value="true" property="${failFast}"
    * @optional
    */
   private boolean failFast = true;
   /**
    * Counts maximum acceptable number of jshint errors, useful for progressive code quality enhancement strategy.
    *
-   * @parameter expression="${failThreshold}"
+   * @parameter property="${failThreshold}"
    * @optional
    */
   private int failThreshold = 0;
