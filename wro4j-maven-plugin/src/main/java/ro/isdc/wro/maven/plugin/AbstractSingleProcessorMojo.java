@@ -36,14 +36,14 @@ public abstract class AbstractSingleProcessorMojo
   /**
    * Comma separated options. This field is optional. If no value is provided, no options will be used..
    *
-   * @parameter expression="${options}"
+   * @parameter property="${options}"
    * @optional
    */
   private String options;
   /**
    * When true, all the plugin won't stop its execution and will log all found errors.
    *
-   * @parameter default-value="false" expression="${failNever}"
+   * @parameter default-value="false" property="${failNever}"
    * @optional
    */
   private boolean failNever;
