@@ -192,7 +192,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
 
   @Test
   public void shouldNotWatchForChangeUnlessCheckCompleted() {
-    Context.get().getConfig().setResourceWatcherUpdatePeriod(1);
+    Context.get().getConfig().setResourceWatcherUpdatePeriod(100);
     final CacheKey key = new CacheKey(GROUP_NAME, ResourceType.JS, true);
 
     when(mockResourceWatcher.tryAsyncCheck(Mockito.eq(key))).thenReturn(false);
