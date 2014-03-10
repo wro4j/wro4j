@@ -53,7 +53,6 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
   private DefaultSynchronizedCacheStrategyDecorator victim;
   @Mock
   private ResourceWatcher mockResourceWatcher;
-  private Injector injector;
 
   @BeforeClass
   public static void onBeforeClass() {
