@@ -55,7 +55,7 @@ public class TestCssImportPreProcessor {
   public void tearDown() {
     Context.unset();
   }
-  
+
   @Test
   public void testFromFolder()
       throws Exception {
