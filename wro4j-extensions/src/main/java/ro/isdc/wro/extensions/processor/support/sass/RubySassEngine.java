@@ -96,7 +96,8 @@ public class RubySassEngine {
         // Non-ASCII String may cause invalid multibyte char (US-ASCII) error with Ruby 1.9
         // because Ruby 1.9 expects you to use ASCII characters in your source code.
         // Instead we use Unicode code point representation which is usable with
-        // Ruby 1.9 and later.
+        // Ruby 1.9 and later. Inspired from
+        // http://www.stefanwille.com/2010/08/ruby-on-rails-fix-for-invalid-multibyte-char-us-ascii/
         cb.append(String.format("\\u%04x", code));
       }
     }
