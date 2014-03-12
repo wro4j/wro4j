@@ -33,6 +33,7 @@ public class RubySassEngine {
   private final Set<String> requires;
 
   public RubySassEngine() {
+    System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);
@@ -75,13 +76,33 @@ public class RubySassEngine {
     final StringWriter raw = new StringWriter();
     final PrintWriter script = new PrintWriter(raw);
     final StringBuilder sb = new StringBuilder();
+    final StringBuilder cb = new StringBuilder();
     sb.append(":syntax => :scss");
 
     for (final String require : requires) {
       script.println("  require '" + require + "'                                   ");
     }
-    final String scriptAsString = String.format("result = Sass::Engine.new('%s', {%s}).render",
-        content.replace("'", "\""),
+    final int BACKSLASH = 0x5c;
+    for (int i = 0; i < content.length(); i++) {
+      final int code = content.codePointAt(i);
+      if (code < 0x80) {
+        // We leave only ASCII unchanged.
+        if (code == BACKSLASH) {
+          // escape backslash
+          cb.append("\\");
+        }
+        cb.append(content.charAt(i));
+      } else {
+        // Non-ASCII String may cause invalid multibyte char (US-ASCII) error with Ruby 1.9
+        // because Ruby 1.9 expects you to use ASCII characters in your source code.
+        // Instead we use Unicode code point representation which is usable with
+        // Ruby 1.9 and later. Inspired from
+        // http://www.stefanwille.com/2010/08/ruby-on-rails-fix-for-invalid-multibyte-char-us-ascii/
+        cb.append(String.format("\\u%04x", code));
+      }
+    }
+    final String scriptAsString = String.format("result = Sass::Engine.new(\"%s\", {%s}).render",
+        cb.toString().replace("\"", "\\\"").replace("#", "\\#"), // escape ", #
         sb.toString());
     LOG.debug("scriptAsString: {}", scriptAsString);
     script.println(scriptAsString);
