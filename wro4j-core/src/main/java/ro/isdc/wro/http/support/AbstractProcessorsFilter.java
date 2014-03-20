@@ -26,6 +26,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
@@ -71,10 +72,12 @@ public abstract class AbstractProcessorsFilter
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
 
       final StringWriter writer = new StringWriter();
-      doProcess(reader, writer);
+      final String requestUri = request.getRequestURI();
+      doProcess(requestUri, reader, writer);
       // it is important to update the contentLength to new value, otherwise the transfer can be closed without all
       // bytes being read. Some browsers (chrome) complains with the following message: ERR_CONNECTION_CLOSED
       response.setContentLength(writer.getBuffer().length());
+      LOG.debug("processed output: {}", writer.toString());
       IOUtils.write(writer.toString(), response.getOutputStream());
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
@@ -86,13 +89,14 @@ public abstract class AbstractProcessorsFilter
   /**
    * Applies configured processor on the intercepted stream.
    */
-  private void doProcess(final Reader reader, final Writer writer)
+  private void doProcess(final String requestUri, final Reader reader, final Writer writer)
       throws IOException {
     Reader input = reader;
     Writer output = null;
+    LOG.debug("processing resource: {}", requestUri);
     try {
       final StopWatch stopWatch = new StopWatch();
-      Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
+      final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
       final List<ResourcePreProcessor> processors = getProcessorsList();
       if (processors == null || processors.isEmpty()) {
         IOUtils.copy(reader, writer);
@@ -104,7 +108,7 @@ public abstract class AbstractProcessorsFilter
 
           output = new StringWriter();
           LOG.debug("Using {} processor", processor);
-          processor.process(null, input, output);
+          processor.process(createResource(requestUri), input, output);
 
           input = new StringReader(output.toString());
           stopWatch.stop();
@@ -116,6 +120,15 @@ public abstract class AbstractProcessorsFilter
       reader.close();
       writer.close();
     }
+  }
+
+  /**
+   * @param requestUri
+   *          the uri of the requested resource.
+   * @return the {@link Resource} to pass as argument to the processor.
+   */
+  protected Resource createResource(final String requestUri) {
+    return Resource.create(requestUri);
   }
 
   /**
