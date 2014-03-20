@@ -109,8 +109,7 @@ public class ResourceWatcher
   private CacheStrategy<CacheKey, CacheValue> cacheStrategy;
   @Inject
   private ReadOnlyContext context;
-  @Inject
-  private DispatcherStreamLocator dispatcherLocator;
+  private final DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
   /**
    * Executor responsible for running the check asynchronously.
    */

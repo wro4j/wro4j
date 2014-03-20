@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.File;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -73,8 +71,7 @@ public class ServletContextUriLocator
    * Determines the order of dispatcher resource locator and servlet context based resource locator.
    */
   private LocatorStrategy locatorStrategy = LocatorStrategy.DISPATCHER_FIRST;
-  @Inject
-  private DispatcherStreamLocator dispatcherLocator;
+  private final DispatcherStreamLocator dispatcherLocator = newDispatcherStreamLocator() ;
 
   /**
    * Available LocatorStrategies. DISPATCHER_FIRST is default option. This means this UriLocator will first try to
@@ -98,11 +95,12 @@ public class ServletContextUriLocator
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public boolean accept(final String uri) {
     return isValid(uri);
+  }
+
+  protected DispatcherStreamLocator newDispatcherStreamLocator() {
+    return new DispatcherStreamLocator();
   }
 
   /**
@@ -211,7 +209,7 @@ public class ServletContextUriLocator
       throws IOException {
     final Context context = Context.get();
     if (dispatcherLocator == null) {
-      LOG.error("DispatcherLocator was not injected properly. This is a BUG.");
+      LOG.error("DispatcherLocator was not configured properly. This is a BUG.");
       throw new IllegalStateException("DispatcherLocator not injected properly");
     }
     // The order of stream retrieval is important. We are trying to get the dispatcherStreamLocator in order to handle

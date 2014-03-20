@@ -28,7 +28,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.resource.locator.factory.InjectableUriLocatorFactoryDecorator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.change.ResourceChangeDetector;
@@ -55,7 +54,6 @@ public class InjectorBuilder {
   private final ResourceChangeDetector resourceChangeDetector = new ResourceChangeDetector();
   private final ResourceBundleProcessor bundleProcessor = new ResourceBundleProcessor();
   private ResourceWatcher resourceWatcher = new ResourceWatcher();
-  private DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
   private Injector injector;
   /**
    * Mapping of classes to be annotated and the corresponding injected object. TODO: probably replace this map with
@@ -108,17 +106,6 @@ public class InjectorBuilder {
     map.put(CacheKeyFactory.class, createCacheKeyFactoryProxy());
     map.put(ResourceChangeDetector.class, createResourceChangeDetectorProxy());
     map.put(ResourceWatcher.class, createResourceWatcherProxy());
-    map.put(DispatcherStreamLocator.class, createDispatcherLocatorProxy());
-  }
-
-  private Object createDispatcherLocatorProxy() {
-    return new InjectorObjectFactory<DispatcherStreamLocator>() {
-      public DispatcherStreamLocator create() {
-        //Use the configured timeout.
-        dispatcherLocator.setTimeout(Context.get().getConfig().getConnectionTimeout());
-        return dispatcherLocator;
-      }
-    };
   }
 
   private Object createResourceBundleProcessorProxy() {
@@ -291,15 +278,6 @@ public class InjectorBuilder {
   public InjectorBuilder setResourceWatcher(final ResourceWatcher resourceWatcher) {
     notNull(resourceWatcher);
     this.resourceWatcher = resourceWatcher;
-    return this;
-  }
-
-  /**
-   * @VisibleForTesting
-   */
-  public InjectorBuilder setDispatcherLocator(final DispatcherStreamLocator dispatcherLocator) {
-    notNull(dispatcherLocator);
-    this.dispatcherLocator = dispatcherLocator;
     return this;
   }
 

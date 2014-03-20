@@ -31,7 +31,6 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
@@ -42,7 +41,6 @@ import ro.isdc.wro.model.group.GroupExtractor;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.DefaultUriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
-import ro.isdc.wro.model.resource.locator.support.DispatcherStreamLocator;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
@@ -112,7 +110,6 @@ public class TestInjectorBuilder {
     assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.bundleProcessor);
     assertNotNull(sample.resourceWatcher);
-    assertNotNull(sample.dispatcherLocator);
   }
 
   @Test
@@ -132,7 +129,6 @@ public class TestInjectorBuilder {
     assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
-    assertNotNull(sample.dispatcherLocator);
   }
 
   @Test
@@ -179,7 +175,6 @@ public class TestInjectorBuilder {
     assertNotNull(sample.metaDataFactory);
     assertNotNull(sample.cacheKeyFactory);
     assertNotNull(sample.bundleProcessor);
-    assertNotNull(sample.dispatcherLocator);
   }
 
   @Test(expected = IOException.class)
@@ -193,22 +188,6 @@ public class TestInjectorBuilder {
     injector.inject(sample);
     // this will throw NullPointerException if the uriLocator is not injected.
     sample.uriLocatorFactory.locate("/path/to/servletContext/resource.js");
-  }
-  
-  @Test
-  public void shouldOverrideTheDispatcherLocatorTimeoutWithConfiguredTimeout() {
-    final Sample sample = new Sample();
-    DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
-    sample.dispatcherLocator = dispatcherLocator;
-    
-    assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, sample.dispatcherLocator.getTimeout());
-
-    int timeout = 5000;
-    Context.get().getConfig().setConnectionTimeout(timeout);
-    Injector injector = createDefaultInjector();
-    injector.inject(sample);
-        
-    assertEquals(timeout, sample.dispatcherLocator.getTimeout());
   }
 
   private Injector createDefaultInjector() {
@@ -253,7 +232,5 @@ public class TestInjectorBuilder {
     ResourceBundleProcessor bundleProcessor;
     @Inject
     ResourceWatcher resourceWatcher;
-    @Inject
-    DispatcherStreamLocator dispatcherLocator;
   }
 }

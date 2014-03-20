@@ -119,6 +119,11 @@ public class RedirectedStreamServletResponseWrapper
   }
 
   @Override
+  public void setStatus(final int sc) {
+    super.setStatus(sc);
+  }
+
+  @Override
   public PrintWriter getWriter()
       throws IOException {
     return printWriter;

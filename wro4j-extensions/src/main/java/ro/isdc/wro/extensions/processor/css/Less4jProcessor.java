@@ -69,6 +69,7 @@ public class Less4jProcessor
         final String relativeResourceContent = IOUtils.toString(locatorFactory.locate(relativeResourceUri), "UTF-8");
         return new RelativeAwareLessSource(relativeResource, relativeResourceContent, locatorFactory);
       } catch (final IOException e) {
+        LOG.error("Failed to compute relative resource: " + resource, e);
         throw new StringSourceException();
       }
     }

@@ -30,6 +30,7 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
 
+
 /**
  * Allows configuration of a list of processors to be applied on the
  *
@@ -41,11 +42,12 @@ public abstract class AbstractProcessorsFilter
     implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorsFilter.class);
   private FilterConfig filterConfig;
+
   /**
    * {@inheritDoc}
    */
   public final void init(final FilterConfig config)
-    throws ServletException {
+      throws ServletException {
     this.filterConfig = config;
     doInit(config);
   }
@@ -72,13 +74,16 @@ public abstract class AbstractProcessorsFilter
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
 
       final StringWriter writer = new StringWriter();
-      final String requestUri = request.getRequestURI();
+      final String requestUri = request.getRequestURI().replaceFirst(request.getContextPath(), "");
       doProcess(requestUri, reader, writer);
       // it is important to update the contentLength to new value, otherwise the transfer can be closed without all
       // bytes being read. Some browsers (chrome) complains with the following message: ERR_CONNECTION_CLOSED
-      response.setContentLength(writer.getBuffer().length());
-      LOG.debug("processed output: {}", writer.toString());
-      IOUtils.write(writer.toString(), response.getOutputStream());
+      final int contentLength = writer.getBuffer().length();
+      response.setContentLength(contentLength);
+      // Content length can be 0 when the 30x (not modified) status code is returned.
+      if (contentLength > 0) {
+        IOUtils.write(writer.toString(), response.getOutputStream());
+      }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
@@ -135,10 +140,11 @@ public abstract class AbstractProcessorsFilter
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
    *
-   * @param e {@link RuntimeException} thrown during request processing.
+   * @param e
+   *          {@link RuntimeException} thrown during request processing.
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-    final FilterChain chain) {
+      final FilterChain chain) {
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");

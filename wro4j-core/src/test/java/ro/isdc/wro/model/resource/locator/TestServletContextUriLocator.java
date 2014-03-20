@@ -208,14 +208,18 @@ public class TestServletContextUriLocator {
   public void shouldInjectEachLocatorWhenLocatorFactoryIsUsed()
       throws Exception {
     final SimpleUriLocatorFactory locatorFactory = new SimpleUriLocatorFactory();
-    final ServletContextUriLocator locator = new ServletContextUriLocator();
-    locatorFactory.addLocator(locator);
     final DispatcherStreamLocator dispatcherLocator = Mockito.mock(DispatcherStreamLocator.class);
+    final ServletContextUriLocator locator = new ServletContextUriLocator() {
+      @Override
+      protected DispatcherStreamLocator newDispatcherStreamLocator() {
+        return dispatcherLocator;
+      }
+    };
+    locatorFactory.addLocator(locator);
     when(
         dispatcherLocator.getInputStream(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class),
             Mockito.anyString())).thenReturn(WroUtil.EMPTY_STREAM);
-    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory)).setDispatcherLocator(
-        dispatcherLocator).build();
+    final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory().setUriLocatorFactory(locatorFactory)).build();
     final LocatorFactoryHolder locatorFactoryHolder = new LocatorFactoryHolder();
     injector.inject(locatorFactoryHolder);
     final String uri = "/style.css";
