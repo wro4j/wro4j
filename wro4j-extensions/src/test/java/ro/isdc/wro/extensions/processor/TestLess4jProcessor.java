@@ -20,8 +20,6 @@ import ro.isdc.wro.extensions.processor.css.Less4jProcessor;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.impl.css.LessCssImportPreProcessor;
-import ro.isdc.wro.model.resource.processor.support.ChainedProcessor;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.WroTestUtils;
 
@@ -32,9 +30,13 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestLess4jProcessor {
+  private ResourcePreProcessor victim;
   @Before
   public void setUp() {
+    victim = new Less4jProcessor();
     Context.set(Context.standaloneContext());
+    victim = new Less4jProcessor();
+    WroTestUtils.createInjector().inject(victim);
   }
 
   @After
@@ -45,23 +47,21 @@ public class TestLess4jProcessor {
   @Test
   public void testFromFolder()
       throws Exception {
-    final ResourcePreProcessor processor = new Less4jProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expectedLess4j");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", victim);
   }
 
 
   @Test
   public void shouldBeThreadSafe() throws Exception {
-    final ResourcePreProcessor processor = new Less4jProcessor();
     final Callable<Void> task = new Callable<Void>() {
       @Override
       public Void call() {
         try {
-          processor.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
+          victim.process(null, new StringReader("#id {.class {color: red;}}"), new StringWriter());
         } catch (final Exception e) {
           throw new RuntimeException(e);
         }
@@ -77,7 +77,6 @@ public class TestLess4jProcessor {
   @Test
   public void shouldFailWhenInvalidLessCssIsProcessed()
       throws Exception {
-    final ResourcePreProcessor processor = new Less4jProcessor();
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "invalid");
@@ -86,7 +85,7 @@ public class TestLess4jProcessor {
       public Void apply(final File input)
           throws Exception {
         try {
-          processor.process(Resource.create(input.getPath(), ResourceType.CSS), new FileReader(input),
+          victim.process(Resource.create(input.getPath(), ResourceType.CSS), new FileReader(input),
               new StringWriter());
           Assert.fail("Expected to fail, but didn't");
         } catch (final Exception e) {
@@ -101,7 +100,7 @@ public class TestLess4jProcessor {
   @Test
   public void shouldDetectProperlyCssImportStatements()
       throws Exception {
-    final ResourcePreProcessor processor = ChainedProcessor.create(new LessCssImportPreProcessor(), new Less4jProcessor());
+    final ResourcePreProcessor processor = victim;
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");

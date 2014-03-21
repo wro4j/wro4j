@@ -194,20 +194,20 @@ public class TestInjectorBuilder {
     // this will throw NullPointerException if the uriLocator is not injected.
     sample.uriLocatorFactory.locate("/path/to/servletContext/resource.js");
   }
-  
+
   @Test
   public void shouldOverrideTheDispatcherLocatorTimeoutWithConfiguredTimeout() {
     final Sample sample = new Sample();
-    DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
+    final DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
     sample.dispatcherLocator = dispatcherLocator;
-    
+
     assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, sample.dispatcherLocator.getTimeout());
 
-    int timeout = 5000;
+    final int timeout = 5000;
     Context.get().getConfig().setConnectionTimeout(timeout);
-    Injector injector = createDefaultInjector();
+    final Injector injector = createDefaultInjector();
     injector.inject(sample);
-        
+
     assertEquals(timeout, sample.dispatcherLocator.getTimeout());
   }
 

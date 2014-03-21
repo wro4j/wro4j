@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -40,7 +42,7 @@ public class ProcessorDecorator
   }
 
   private static ResourcePreProcessor transform(final Object processor) {
-    Validate.notNull(processor);
+    notNull(processor);
     if (processor instanceof ResourcePreProcessor) {
       return (ResourcePreProcessor) processor;
     } else if (processor instanceof ResourcePostProcessor) {

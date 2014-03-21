@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
+import ro.isdc.wro.util.DestroyableLazyInitializer;
+import ro.isdc.wro.util.LazyInitializer;
 
 
 /**
@@ -22,21 +24,11 @@ public abstract class AbstractConfigurableSingleStrategy<S, P>
   private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigurableSingleStrategy.class);
   @Inject
   private Injector injector;
-  private S configuredStrategy;
-
-  /**
-   * The reeturned object will be injected (if injector is available) and will be cached, meaning that only the first
-   * invocation of this method will instantiate a fresh strategy and any subsequent invocation will return the same
-   * object.
-   *
-   * @return the strategy S whose alias is found configured in the properties. This method will never return null. If no
-   *         alias is defined the default strategy will be returned. If an invalid alias is provided - a runtime
-   *         exception will be thrown.
-   */
-  public final S getConfiguredStrategy() {
-    if (configuredStrategy == null) {
+  private final LazyInitializer<S> lazyInitializer = new DestroyableLazyInitializer<S>() {
+    @Override
+    protected S initialize() {
       final String alias = getConfiguredValue();
-      configuredStrategy = getDefaultStrategy();
+      S configuredStrategy = getDefaultStrategy();
       if (!StringUtils.isEmpty(alias)) {
         LOG.debug("configured alias: {}", alias);
         configuredStrategy = getStrategyForAlias(alias);
@@ -50,8 +42,21 @@ public abstract class AbstractConfigurableSingleStrategy<S, P>
         injector.inject(configuredStrategy);
       }
       LOG.debug("using strategy: {}", configuredStrategy);
+      return configuredStrategy;
     }
-    return configuredStrategy;
+  };
+
+  /**
+   * The returned object will be injected (if injector is available) and will be cached, meaning that only the first
+   * invocation of this method will instantiate a fresh strategy and any subsequent invocation will return the same
+   * object.
+   *
+   * @return the strategy S whose alias is found configured in the properties. This method will never return null. If no
+   *         alias is defined the default strategy will be returned. If an invalid alias is provided - a runtime
+   *         exception will be thrown.
+   */
+  public final S getConfiguredStrategy() {
+    return lazyInitializer.get();
   }
 
   /**

@@ -1,5 +1,7 @@
 package ro.isdc.wro.http.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class RedirectedStreamServletResponseWrapper
    */
   public RedirectedStreamServletResponseWrapper(final OutputStream outputStream, final HttpServletResponse response) {
     super(response);
-    Validate.notNull(outputStream);
+    notNull(outputStream);
     // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will write
     // to the pipe.
     printWriter = new PrintWriter(outputStream);
@@ -115,6 +116,11 @@ public class RedirectedStreamServletResponseWrapper
   public ServletOutputStream getOutputStream()
       throws IOException {
     return servletOutputStream;
+  }
+
+  @Override
+  public void setStatus(final int sc) {
+    super.setStatus(sc);
   }
 
   @Override

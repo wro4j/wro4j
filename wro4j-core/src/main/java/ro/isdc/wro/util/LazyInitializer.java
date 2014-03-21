@@ -14,7 +14,7 @@ package ro.isdc.wro.util;
  */
 public abstract class LazyInitializer<T> {
   /** Stores the managed object. */
-  protected volatile T object;
+  volatile T object;
 
   /**
    * Returns the object wrapped by this instance. On first access the object is created. After that it is cached and can

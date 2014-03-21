@@ -17,13 +17,16 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.ObjectFactory;
 
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.ClosureCodingConvention;
@@ -47,7 +50,7 @@ import com.google.javascript.jscomp.SourceFile;
 @Minimize
 @SupportedResourceType(ResourceType.JS)
 public class GoogleClosureCompressorProcessor
-    implements ResourcePostProcessor, ResourcePreProcessor {
+    implements ResourcePostProcessor, ResourcePreProcessor, Destroyable {
   public static final String ALIAS_SIMPLE = "googleClosureSimple";
   public static final String ALIAS_ADVANCED = "googleClosureAdvanced";
   public static final String ALIAS_WHITESPACE_ONLY = "googleClosureWhitespace";
@@ -55,7 +58,10 @@ public class GoogleClosureCompressorProcessor
    * {@link CompilationLevel} to use for compression.
    */
   private CompilationLevel compilationLevel;
-  private CompilerOptions compilerOptions;
+  /**
+   * Reuse options(which are not thread safe).
+   */
+  private ObjectPoolHelper<CompilerOptions> optionsPool;
   @Inject
   private ReadOnlyContext context;
   private String encoding;
@@ -75,6 +81,16 @@ public class GoogleClosureCompressorProcessor
    */
   public GoogleClosureCompressorProcessor(final CompilationLevel compilationLevel) {
     Validate.notNull(compilationLevel);
+    /**
+     * Using pool to fix the threadSafety issue. See <a
+     * href="http://code.google.com/p/closure-compiler/issues/detail?id=781">issue</a>.
+     */
+    optionsPool = new ObjectPoolHelper<CompilerOptions>(new ObjectFactory<CompilerOptions>() {
+      @Override
+      public CompilerOptions create() {
+        return newCompilerOptions();
+      }
+    });
     this.compilationLevel = compilationLevel;
   }
 
@@ -85,16 +101,12 @@ public class GoogleClosureCompressorProcessor
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     final String content = IOUtils.toString(reader);
+    final CompilerOptions compilerOptions = optionsPool.getObject();
+    final Compiler compiler = newCompiler(compilerOptions);
     try {
-      Compiler.setLoggingLevel(Level.SEVERE);
-      final Compiler compiler = new Compiler();
-      if (compilerOptions == null) {
-        compilerOptions = newCompilerOptions();
-      }
-
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final SourceFile[] input = new SourceFile[] {
-          SourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
+        SourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
       };
       SourceFile[] externs = getExterns(resource);
       if (externs == null) {
@@ -102,28 +114,18 @@ public class GoogleClosureCompressorProcessor
         externs = new SourceFile[] {};
       }
       Result result = null;
-      /**
-       * fix the threadSafety issue.<br/>
-       * TODO remove synchronization after the <a
-       * href="http://code.google.com/p/closure-compiler/issues/detail?id=781">issue</a> is fixed
-       */
-      synchronized (this) {
-        compilationLevel.setOptionsForCompilationLevel(compilerOptions);
-        // make it play nice with GAE
-        compiler.disableThreads();
-        compiler.initOptions(compilerOptions);
-        result = compiler.compile(Arrays.asList(externs), Arrays.asList(input), compilerOptions);
-      }
+      result = compiler.compile(Arrays.asList(externs), Arrays.asList(input), compilerOptions);
       if (result.success) {
         writer.write(compiler.toSource());
       } else {
         throw new WroRuntimeException("Compilation has errors: " + Arrays.asList(result.errors));
       }
-    } catch(final Exception e) {
+    } catch (final Exception e) {
       onException(e);
     } finally {
       reader.close();
       writer.close();
+      optionsPool.returnObject(compilerOptions);
     }
   }
 
@@ -146,6 +148,16 @@ public class GoogleClosureCompressorProcessor
     return encoding;
   }
 
+  private Compiler newCompiler(final CompilerOptions compilerOptions) {
+    Compiler.setLoggingLevel(Level.SEVERE);
+    final Compiler compiler = new Compiler();
+    compilationLevel.setOptionsForCompilationLevel(compilerOptions);
+    // make it play nice with GAE
+    compiler.disableThreads();
+    compiler.initOptions(compilerOptions);
+    return compiler;
+  }
+
   /**
    * @param encoding
    *          the encoding to set
@@ -163,15 +175,6 @@ public class GoogleClosureCompressorProcessor
    */
   protected SourceFile[] getExterns(final Resource resource) {
     return new SourceFile[] {};
-  }
-
-  /**
-   * @param compilerOptions
-   *          the compilerOptions to set
-   */
-  public GoogleClosureCompressorProcessor setCompilerOptions(final CompilerOptions compilerOptions) {
-    this.compilerOptions = compilerOptions;
-    return this;
   }
 
   /**
@@ -207,5 +210,11 @@ public class GoogleClosureCompressorProcessor
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);
+  }
+
+  @Override
+  public void destroy()
+      throws Exception {
+    optionsPool.destroy();
   }
 }

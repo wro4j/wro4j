@@ -36,14 +36,14 @@ public class JsHintMojo
   /**
    * File where the report will be written.
    *
-   * @parameter default-value="${project.build.directory}/wro4j-reports/jshint.xml" expression="${reportFile}"
+   * @parameter default-value="${project.build.directory}/wro4j-reports/jshint.xml" property="${reportFile}"
    * @optional
    */
   private File reportFile;
   /**
    * The preferred format of the report.
    *
-   * @parameter expression="${reportFormat}"
+   * @parameter property="${reportFormat}"
    * @optional
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();

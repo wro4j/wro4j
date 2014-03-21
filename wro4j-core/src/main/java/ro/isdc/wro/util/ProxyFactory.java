@@ -26,7 +26,15 @@ public class ProxyFactory<T> {
   private static final Logger LOG = LoggerFactory.getLogger(ProxyFactory.class);
   private final Class<T> genericType;
 
-  private final ObjectFactory<T> objectFactory;
+  private final TypedObjectFactory<T> objectFactory;
+
+  /**
+   * A specialized version of {@link ObjectFactory} which provides more information about type class. This is required
+   * to avoid premature creation because the class cannot be extracted from generic type.
+   */
+  public static interface TypedObjectFactory <T> extends ObjectFactory<T> {
+    Class<? extends T> getObjectClass();
+  }
 
   /**
    * Creates a proxy for the provided object.
@@ -37,14 +45,14 @@ public class ProxyFactory<T> {
    *          the Class of the generic object, required to create the proxy. This argument is required because of type
    *          erasure and generics info aren't available at runtime.
    */
-  private ProxyFactory(final ObjectFactory<T> objectFactory, final Class<T> genericType) {
+  private ProxyFactory(final TypedObjectFactory<T> objectFactory, final Class<T> genericType) {
     notNull(objectFactory);
     notNull(genericType);
     this.objectFactory = objectFactory;
     this.genericType = genericType;
   }
 
-  public static <T> T proxy(final ObjectFactory<T> objectFactory, final Class<T> genericType) {
+  public static <T> T proxy(final TypedObjectFactory<T> objectFactory, final Class<T> genericType) {
     try {
       return new ProxyFactory<T>(objectFactory, genericType).create();
     } catch (final RuntimeException e) {
@@ -53,9 +61,6 @@ public class ProxyFactory<T> {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   private T create() {
     final InvocationHandler handler = new InvocationHandler() {
@@ -82,7 +87,7 @@ public class ProxyFactory<T> {
     if (genericType.isInterface()) {
       set.add(genericType);
     }
-    final Class[] classes = objectFactory.create().getClass().getInterfaces();
+    final Class<?>[] classes = objectFactory.getObjectClass().getInterfaces();
     for (final Class<?> clazz : classes) {
       set.add(clazz);
     }

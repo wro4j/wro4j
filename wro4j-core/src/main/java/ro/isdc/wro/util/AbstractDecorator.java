@@ -1,6 +1,6 @@
 package ro.isdc.wro.util;
 
-import org.apache.commons.lang3.Validate;
+import static org.apache.commons.lang3.Validate.notNull;
 
 
 /**
@@ -15,7 +15,7 @@ public abstract class AbstractDecorator<T>
   private final T decorated;
 
   public AbstractDecorator(final T decorated) {
-    Validate.notNull(decorated);
+    notNull(decorated);
     this.decorated = decorated;
   }
 
@@ -41,9 +41,6 @@ public abstract class AbstractDecorator<T>
     return (object instanceof ObjectDecorator) ? ((ObjectDecorator<T>) object).getOriginalDecoratedObject() : object;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return getDecoratedObject().toString();
