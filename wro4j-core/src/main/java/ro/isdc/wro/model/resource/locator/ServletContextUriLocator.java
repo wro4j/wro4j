@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.File;
@@ -96,6 +95,10 @@ public class ServletContextUriLocator
     notNull(locatorStrategy);
     this.locatorStrategy = locatorStrategy;
     return this;
+  }
+
+  private DispatcherStreamLocator newDispatcherStreamLocator() {
+    return new DispatcherStreamLocator();
   }
 
   /**

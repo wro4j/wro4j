@@ -1,6 +1,7 @@
 package ro.isdc.wro.http.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,18 +22,18 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
  * Test the behavior of {@link AbstractProcessorsFilter}
- * 
+ *
  * @author Alex Objelean
  */
 public class TestAbstractProcessorsFilter {
@@ -44,44 +45,46 @@ public class TestAbstractProcessorsFilter {
   private FilterChain chain;
   private ByteArrayOutputStream outputStream;
   private AbstractProcessorsFilter victim;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp()
       throws Exception {
     outputStream = new ByteArrayOutputStream();
     MockitoAnnotations.initMocks(this);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(outputStream));
+    when(request.getRequestURI()).thenReturn("");
+    when(request.getContextPath()).thenReturn("");
+    when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(outputStream));
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
   }
-  
+
   @Test
   public void shouldDoNothingWhenNoProcessorProvided()
       throws Exception {
     doFilterWithProcessors(Collections.<ResourcePreProcessor> emptyList());
     Assert.assertEquals(0, outputStream.size());
   }
-  
+
   @Test
   public void shouldDoNothingWhenNullProcessorsProvided()
       throws Exception {
     doFilterWithProcessors(null);
     Assert.assertEquals(0, outputStream.size());
   }
-  
+
   @Test
   public void shouldApplyProcessor()
       throws Exception {
@@ -94,9 +97,9 @@ public class TestAbstractProcessorsFilter {
       }
     });
     doFilterWithProcessors(processors);
-    Assert.assertEquals(processedMessage, new String(outputStream.toByteArray()));
+    assertEquals(processedMessage, new String(outputStream.toByteArray()));
   }
-  
+
   @Test(expected = WroRuntimeException.class)
   public void shouldThrowExceptionWhenProcessorFails()
       throws Exception {
@@ -109,7 +112,7 @@ public class TestAbstractProcessorsFilter {
     });
     doFilterWithProcessors(processors);
   }
-  
+
   private void doFilterWithProcessors(final List<ResourcePreProcessor> processors)
       throws Exception {
     victim = new AbstractProcessorsFilter() {
@@ -117,11 +120,16 @@ public class TestAbstractProcessorsFilter {
       protected List<ResourcePreProcessor> getProcessorsList() {
         return processors;
       }
-      
+
       @Override
       protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
           final FilterChain chain) {
         throw e;
+      }
+
+      @Override
+      protected Resource createResource(final String requestUri) {
+        return Resource.create(requestUri, ResourceType.CSS);
       }
     };
     victim.doFilter(request, response, chain);

@@ -26,8 +26,10 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
+import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.StopWatch;
+
 
 /**
  * Allows configuration of a list of processors to be applied on the
@@ -40,11 +42,12 @@ public abstract class AbstractProcessorsFilter
     implements Filter {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractProcessorsFilter.class);
   private FilterConfig filterConfig;
+
   /**
    * {@inheritDoc}
    */
   public final void init(final FilterConfig config)
-    throws ServletException {
+      throws ServletException {
     this.filterConfig = config;
     doInit(config);
   }
@@ -71,11 +74,16 @@ public abstract class AbstractProcessorsFilter
       final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
 
       final StringWriter writer = new StringWriter();
-      doProcess(reader, writer);
+      final String requestUri = request.getRequestURI().replaceFirst(request.getContextPath(), "");
+      doProcess(requestUri, reader, writer);
       // it is important to update the contentLength to new value, otherwise the transfer can be closed without all
       // bytes being read. Some browsers (chrome) complains with the following message: ERR_CONNECTION_CLOSED
-      response.setContentLength(writer.getBuffer().length());
-      IOUtils.write(writer.toString(), response.getOutputStream());
+      final int contentLength = writer.getBuffer().length();
+      response.setContentLength(contentLength);
+      // Content length can be 0 when the 30x (not modified) status code is returned.
+      if (contentLength > 0) {
+        IOUtils.write(writer.toString(), response.getOutputStream());
+      }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
     } finally {
@@ -86,13 +94,14 @@ public abstract class AbstractProcessorsFilter
   /**
    * Applies configured processor on the intercepted stream.
    */
-  private void doProcess(final Reader reader, final Writer writer)
+  private void doProcess(final String requestUri, final Reader reader, final Writer writer)
       throws IOException {
     Reader input = reader;
     Writer output = null;
+    LOG.debug("processing resource: {}", requestUri);
     try {
       final StopWatch stopWatch = new StopWatch();
-      Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
+      final Injector injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
       final List<ResourcePreProcessor> processors = getProcessorsList();
       if (processors == null || processors.isEmpty()) {
         IOUtils.copy(reader, writer);
@@ -104,7 +113,7 @@ public abstract class AbstractProcessorsFilter
 
           output = new StringWriter();
           LOG.debug("Using {} processor", processor);
-          processor.process(null, input, output);
+          processor.process(createResource(requestUri), input, output);
 
           input = new StringReader(output.toString());
           stopWatch.stop();
@@ -119,13 +128,23 @@ public abstract class AbstractProcessorsFilter
   }
 
   /**
+   * @param requestUri
+   *          the uri of the requested resource.
+   * @return the {@link Resource} to pass as argument to the processor.
+   */
+  protected Resource createResource(final String requestUri) {
+    return Resource.create(requestUri);
+  }
+
+  /**
    * Invoked when a {@link RuntimeException} is thrown. Allows custom exception handling. The default implementation
    * redirects to 404 for a specific {@link WroRuntimeException} exception when in DEPLOYMENT mode.
    *
-   * @param e {@link RuntimeException} thrown during request processing.
+   * @param e
+   *          {@link RuntimeException} thrown during request processing.
    */
   protected void onRuntimeException(final RuntimeException e, final HttpServletResponse response,
-    final FilterChain chain) {
+      final FilterChain chain) {
     LOG.debug("RuntimeException occured", e);
     try {
       LOG.debug("Cannot process. Proceeding with chain execution.");
