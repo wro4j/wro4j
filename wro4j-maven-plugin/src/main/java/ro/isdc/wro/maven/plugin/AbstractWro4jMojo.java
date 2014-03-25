@@ -47,7 +47,7 @@ public abstract class AbstractWro4jMojo
   /**
    * File containing the groups definitions.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml" property="${wroFile}"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml" property="wroFile"
    * @optional
    */
   private File wroFile;
@@ -64,17 +64,17 @@ public abstract class AbstractWro4jMojo
    * servletContext locator will try to search in next contextFolder when a resource could not be located. By default, a
    * single context folder is configured.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/" property="${contextFolder}"
+   * @parameter default-value="${basedir}/src/main/webapp/" property="contextFolder"
    * @optional
    */
   private String contextFolder;
   /**
-   * @parameter default-value="true" property="${minimize}"
+   * @parameter default-value="true" property="minimize"
    * @optional
    */
   private boolean minimize;
   /**
-   * @parameter property="${ignoreMissingResources}"
+   * @parameter property="ignoreMissingResources"
    * @optional
    */
   private String ignoreMissingResources;
@@ -82,7 +82,7 @@ public abstract class AbstractWro4jMojo
    * Comma separated group names. This field is optional. If no value is provided, a file for each group will be
    * created.
    *
-   * @parameter property="${targetGroups}"
+   * @parameter property="targetGroups"
    * @optional
    */
   private String targetGroups;
@@ -91,7 +91,7 @@ public abstract class AbstractWro4jMojo
    */
   private MavenProject mavenProject;
   /**
-   * @parameter property="${wroManagerFactory}"
+   * @parameter property="wroManagerFactory"
    * @optional
    */
   private String wroManagerFactory;
@@ -102,7 +102,7 @@ public abstract class AbstractWro4jMojo
   /**
    * The path to configuration file.
    *
-   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" property="${extraConfigFile}"
+   * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties" property="extraConfigFile"
    * @optional
    */
   private File extraConfigFile;
@@ -125,7 +125,7 @@ public abstract class AbstractWro4jMojo
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
    *
-   * @parameter default-value="false" property="${parallelProcessing}"
+   * @parameter default-value="false" property="parallelProcessing"
    * @optional
    */
   private boolean parallelProcessing;
@@ -133,7 +133,7 @@ public abstract class AbstractWro4jMojo
    * Flag which allows to enable incremental build (experimental feature). It is false by default, but probably can be
    * changed to true if no unexpected problems are detected..
    *
-   * @parameter default-value="false" property="${incrementalBuildEnabled}"
+   * @parameter default-value="false" property="incrementalBuildEnabled"
    * @optional
    */
   private boolean incrementalBuildEnabled;

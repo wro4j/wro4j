@@ -48,17 +48,17 @@ public class Wro4jMojo
   /**
    * The path to the destination directory where the files are stored at the end of the process.
    *
-   * @parameter default-value="${project.build.directory}" property="${destinationFolder}"
+   * @parameter default-value="${project.build.directory}" property="destinationFolder"
    * @optional
    */
   private File destinationFolder;
   /**
-   * @parameter property="${cssDestinationFolder}"
+   * @parameter property="cssDestinationFolder"
    * @optional
    */
   private File cssDestinationFolder;
   /**
-   * @parameter property="${jsDestinationFolder}"
+   * @parameter property="jsDestinationFolder"
    * @optional
    */
   private File jsDestinationFolder;
@@ -77,7 +77,7 @@ public class Wro4jMojo
    */
   private File buildFinalName;
   /**
-   * @parameter property="${groupNameMappingFile}"
+   * @parameter property="groupNameMappingFile"
    * @optional
    */
   private File groupNameMappingFile;
