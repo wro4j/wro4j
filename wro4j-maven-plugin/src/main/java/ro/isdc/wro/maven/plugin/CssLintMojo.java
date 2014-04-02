@@ -37,14 +37,14 @@ public class CssLintMojo
   /**
    * File where the report will be written.
    *
-   * @parameter default-value="${project.build.directory}/wro4j-reports/csslint.xml" property="${reportFile}"
+   * @parameter default-value="${project.build.directory}/wro4j-reports/csslint.xml" property="reportFile"
    * @optional
    */
   private File reportFile;
   /**
    * The preferred format of the report.
    *
-   * @parameter property="${reportFormat}"
+   * @parameter property="reportFormat"
    * @optional
    */
   private String reportFormat = FormatterType.LINT.getFormat();
