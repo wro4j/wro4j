@@ -4,8 +4,11 @@ package ro.isdc.wro.model.resource.support.change;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.io.IOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +71,13 @@ public class ResourceChangeDetector {
     LOG.debug("group={}, uri={}", groupName, uri);
     final ResourceChangeInfo resourceInfo = changeInfoMap.get(uri);
     if (resourceInfo.isCheckRequiredForGroup(groupName)) {
-      final String currentHash = hashStrategy.getHash(locatorFactory.locate(uri));
-      resourceInfo.updateHashForGroup(currentHash, groupName);
+      final InputStream inputStream = locatorFactory.locate(uri);
+      try{
+        final String currentHash = hashStrategy.getHash(inputStream);
+        resourceInfo.updateHashForGroup(currentHash, groupName);
+      }finally{
+        IOUtils.closeQuietly(inputStream);
+      }
     }
     return resourceInfo.isChanged(groupName);
   }

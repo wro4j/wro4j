@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+
 import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
 
 
@@ -27,7 +29,11 @@ public class ConfigurableHashStrategy
    */
   public String getHash(final InputStream inputStream)
       throws IOException {
-    return getConfiguredStrategy().getHash(inputStream);
+    try{
+      return getConfiguredStrategy().getHash(inputStream);
+	}finally{
+      IOUtils.closeQuietly(inputStream);
+	}
   }
 
   /**

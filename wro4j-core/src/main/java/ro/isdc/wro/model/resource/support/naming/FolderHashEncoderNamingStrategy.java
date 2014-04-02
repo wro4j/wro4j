@@ -8,6 +8,8 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
+
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 
@@ -40,8 +42,12 @@ public class FolderHashEncoderNamingStrategy
     throws IOException {
     notNull(originalName);
     notNull(inputStream);
-    final String hash = getHashStrategy().getHash(inputStream);
-    final StringBuilder sb = new StringBuilder(hash).append("/").append(originalName);
-    return sb.toString();
+    try{
+      final String hash = getHashStrategy().getHash(inputStream);
+      final StringBuilder sb = new StringBuilder(hash).append("/").append(originalName);
+      return sb.toString();
+    }finally{
+      IOUtils.closeQuietly(inputStream);
+    }
   }
 }

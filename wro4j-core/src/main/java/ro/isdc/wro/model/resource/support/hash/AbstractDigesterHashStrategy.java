@@ -10,6 +10,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.io.IOUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,8 @@ public abstract class AbstractDigesterHashStrategy
       return hash;
     } catch (final NoSuchAlgorithmException e) {
       throw new WroRuntimeException("Exception occured while computing SHA1 hash", e);
+    }finally{
+      IOUtils.closeQuietly(input);
     }
   }
 
