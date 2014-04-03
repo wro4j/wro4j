@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -33,6 +34,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
@@ -370,7 +372,9 @@ public final class WroUtil {
 
   /**
    * Creates a temp file which has a certain extension.
-   * @param extension of the created temp file.
+   *
+   * @param extension
+   *          of the created temp file.
    */
   public static File createTempFile(final String extension) {
     try {
@@ -400,5 +404,21 @@ public final class WroUtil {
    */
   public static final File getWorkingDirectory() {
     return new File(System.getProperty("user.dir"));
+  }
+
+  /**
+   * Similar to {@link FilenameUtils#getFullPath(String)}, but fixes the problem with Windows platform for situations
+   * when the path starts with "/" (servlet context relative resources) which are resolved to "\" on windows.
+   *
+   * @param path
+   *          to compute filePath from.
+   * @return full path from the provided path.
+   */
+  public static final String getFullPath(final String path) {
+    String fullPath = FilenameUtils.getFullPath(path);
+    if (ServletContextUriLocator.isValid(path)) {
+      fullPath = fullPath.replace("\\", ServletContextUriLocator.PREFIX);
+    }
+    return fullPath;
   }
 }

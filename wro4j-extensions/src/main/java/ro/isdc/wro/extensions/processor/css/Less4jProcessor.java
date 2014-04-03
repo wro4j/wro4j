@@ -19,6 +19,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
@@ -75,7 +76,7 @@ public class Less4jProcessor
     }
 
     public String computeRelativeResourceUri(final String originalResourceUri, final String relativePath) {
-      final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
+      final String fullPath = WroUtil.getFullPath(originalResourceUri) + relativePath;
       return FilenameUtils.normalize(fullPath);
     }
   }
