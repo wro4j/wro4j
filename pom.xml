@@ -243,7 +243,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>webjars-locator</artifactId>
-                <version>0.12</version>
+                <version>0.13</version>
             </dependency>
             <!-- Unit tests -->
             <dependency>
