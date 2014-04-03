@@ -288,6 +288,9 @@ public class TestWro4jMojo {
   @Test
   public void shouldBeFasterWhenRunningProcessingInParallel()
       throws Exception {
+    //warmup
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    //start actual test
     final long begin = System.currentTimeMillis();
     victim.setParallelProcessing(false);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
@@ -300,7 +303,7 @@ public class TestWro4jMojo {
     final long parallel = endParallel - endSerial;
     LOG.info("serial took: {}ms", serial);
     LOG.info("parallel took: {}ms", parallel);
-    assertTrue(serial > parallel);
+    assertTrue(String.format("Serial (%s) > Parallel (%s)", serial, parallel), serial > parallel);
   }
 
   @Test
