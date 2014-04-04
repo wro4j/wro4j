@@ -189,4 +189,9 @@ public class TestWroUtil {
   public void shouldComputeFullPathForServletContextResource() {
     assertEquals("/a/b/", WroUtil.getFullPath("/a/b/c"));
   }
+
+  @Test
+  public void shouldNormalizeForServletContextResource() {
+    assertEquals("/a/b/d/e", WroUtil.normalize("/a/b/c/../d/e"));
+  }
 }
