@@ -76,8 +76,8 @@ public class Less4jProcessor
     }
 
     public String computeRelativeResourceUri(final String originalResourceUri, final String relativePath) {
-      final String fullPath = WroUtil.getFullPath(originalResourceUri) + relativePath;
-      return FilenameUtils.normalize(fullPath);
+      final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
+      return WroUtil.normalize(fullPath);
     }
   }
   @Inject

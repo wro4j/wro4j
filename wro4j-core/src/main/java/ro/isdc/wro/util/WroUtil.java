@@ -415,10 +415,27 @@ public final class WroUtil {
    * @return full path from the provided path.
    */
   public static final String getFullPath(final String path) {
-    String fullPath = FilenameUtils.getFullPath(path);
+    final String fullPath = FilenameUtils.getFullPath(path);
+    return replaceWithServletContextSeparatorIfNedded(path, fullPath);
+  }
+
+  /**
+   * Similar to {@link FilenameUtils#normalize(String)}, but fixes the problem with Windows platform for situations
+   * when the path starts with "/" (servlet context relative resources) which are resolved to "\" on windows.
+   *
+   * @param path
+   *          to compute filePath from.
+   * @return full path from the provided path.
+   */
+  public static final String normalize(final String path) {
+    final String normalized = FilenameUtils.normalize(path);
+    return replaceWithServletContextSeparatorIfNedded(path, normalized);
+  }
+
+  private static String replaceWithServletContextSeparatorIfNedded(final String path, String normalized) {
     if (ServletContextUriLocator.isValid(path)) {
-      fullPath = fullPath.replace("\\", ServletContextUriLocator.PREFIX);
+      normalized = normalized.replace("\\", ServletContextUriLocator.PREFIX);
     }
-    return fullPath;
+    return normalized;
   }
 }
