@@ -1,0 +1,7 @@
+body {
+  background-image: -webkit-linear-gradient(top, #DCDCDC 0px, #F5F5F5 26px);
+  background-image: linear-gradient(to bottom, #DCDCDC 0px, #F5F5F5 26px);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdcdcdc', endColorstr='#fff5f5f5', GradientType=0);
+  background-color: #F5F5F5;
+}

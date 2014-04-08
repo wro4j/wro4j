@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,7 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.util.LazyInitializer;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -64,8 +64,8 @@ public class SmartWroModelFactory
    */
   public static SmartWroModelFactory createFromStandaloneContext(final StandaloneContext context) {
     Validate.notNull(context);
-    final boolean autoDetectWroFile = FilenameUtils.normalize(context.getWroFile().getPath()).contains(
-        FilenameUtils.normalize(DEFAULT_WRO_FILE));
+    final boolean autoDetectWroFile = WroUtil.normalize(context.getWroFile().getPath()).contains(
+        WroUtil.normalize(DEFAULT_WRO_FILE));
     if (!autoDetectWroFile) {
       LOG.debug("autoDetect is " + autoDetectWroFile + " because wroFile: " + context.getWroFile()
           + " is not the same as the default one: " + DEFAULT_WRO_FILE);

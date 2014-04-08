@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -33,6 +32,7 @@ import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.support.CssImportInspector;
 import ro.isdc.wro.util.StringUtils;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -203,7 +203,7 @@ public abstract class AbstractCssImportPreProcessor
    * @return absolute url of the resource to import.
    */
   private String computeAbsoluteUrl(final String relativeResourceUri, final String importUrl) {
-    final String folder = FilenameUtils.getFullPath(relativeResourceUri);
+    final String folder = WroUtil.getFullPath(relativeResourceUri);
     // remove '../' & normalize the path.
     final String absoluteImportUrl = StringUtils.cleanPath(folder + importUrl);
     return absoluteImportUrl;

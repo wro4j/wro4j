@@ -22,6 +22,7 @@ import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -82,7 +83,7 @@ public class CssDataUriPreProcessor
      * This should not be allowed.
      */
     if (isImageUrlChangeRequired(cleanImageUrl)) {
-      fullPath = FilenameUtils.getFullPath(cssUri) + cleanImageUrl;
+      fullPath = WroUtil.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
     InputStream is = null;

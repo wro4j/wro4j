@@ -37,14 +37,14 @@ public class JsLintMojo
   /**
    * File where the report will be written.
    *
-   * @parameter default-value="${project.build.directory}/wro4j-reports/jslint.xml" property="${reportFile}"
+   * @parameter default-value="${project.build.directory}/wro4j-reports/jslint.xml" property="reportFile"
    * @optional
    */
   private File reportFile;
   /**
    * The preferred format of the report.
    *
-   * @parameter property="${reportFormat}"
+   * @parameter property="reportFormat"
    * @optional
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();

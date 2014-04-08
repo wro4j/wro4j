@@ -3,37 +3,31 @@ function anonymous(Handlebars, depth0, helpers, partials, data) {
     this.compilerInfo = [4, ">= 1.0.0"];
     helpers = this.merge(helpers, Ember.Handlebars.helpers);
     data = data || {};
-    var buffer = "", stack1, options, hashTypes, hashContexts, self = this, functionType = "function", blockHelperMissing = helpers.blockHelperMissing;
+    var buffer = "", stack1, helper, options, self = this, functionType = "function", blockHelperMissing = helpers.blockHelperMissing;
     function program1(depth0, data) {
         data.buffer.push("checked=\"checked\"");
     }
     data.buffer.push("<div class=\"display row-fluid span5\">Fluid\n  <input type=\"checkbox\" class=\"check\" ");
-    options = {hash: {}, inverse: self.noop, fn: self.program(1, program1, data), contexts: [], types: [], hashContexts: hashContexts, hashTypes: hashTypes, data: data};
-    if (stack1 = helpers.done) {
-        stack1 = stack1.call(depth0, options);
+    options = {hash: {}, hashTypes: {}, hashContexts: {}, inverse: self.noop, fn: self.program(1, program1, data), contexts: [], types: [], data: data};
+    if (helper = helpers.done) {
+        stack1 = helper.call(depth0, options);
     } else {
-        stack1 = (depth0 && depth0.done);
-        stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1;
+        helper = (depth0 && depth0.done);
+        stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper;
     }
-    hashTypes = {};
-    hashContexts = {};
     if (!helpers.done) {
-        stack1 = blockHelperMissing.call(depth0, "done", options);
+        stack1 = blockHelperMissing.call(depth0, "done", {hash: {}, hashTypes: {}, hashContexts: {}, inverse: self.noop, fn: self.program(1, program1, data), contexts: [], types: [], data: data});
     }
     if (stack1 || stack1 === 0) {
         data.buffer.push(stack1);
     }
     data.buffer.push(" />\n  <label class=\"todo-content span3\">");
-    hashTypes = {};
-    hashContexts = {};
-    stack1 = helpers._triageMustache.call(depth0, "content", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data});
+    stack1 = helpers._triageMustache.call(depth0, "content", {hash: {}, hashTypes: {}, hashContexts: {}, contexts: [depth0], types: ["ID"], data: data});
     if (stack1 || stack1 === 0) {
         data.buffer.push(stack1);
     }
     data.buffer.push("</label>\n  <i class=\"icon-remove-sign remove\" title=\"Remove\"></i>\n</div>\n<div class=\"edit row-fluid\">\n  <input type=\"text\" class=\"todo-edit span4\" value=\"");
-    hashTypes = {};
-    hashContexts = {};
-    stack1 = helpers._triageMustache.call(depth0, "content", {hash: {}, contexts: [depth0], types: ["ID"], hashContexts: hashContexts, hashTypes: hashTypes, data: data});
+    stack1 = helpers._triageMustache.call(depth0, "content", {hash: {}, hashTypes: {}, hashContexts: {}, contexts: [depth0], types: ["ID"], data: data});
     if (stack1 || stack1 === 0) {
         data.buffer.push(stack1);
     }

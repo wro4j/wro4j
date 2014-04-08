@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -63,7 +63,7 @@ public final class StandaloneServletContextUriLocator
   private InputStream locateStreamWithContextFolder(final String uri, final String contextFolder)
       throws IOException, FileNotFoundException {
     if (getWildcardStreamLocator().hasWildcard(uri)) {
-      final String fullPath = FilenameUtils.getFullPath(uri);
+      final String fullPath = WroUtil.getFullPath(uri);
       final String realPath = contextFolder + fullPath;
       return getWildcardStreamLocator().locateStream(uri, new File(realPath));
     }

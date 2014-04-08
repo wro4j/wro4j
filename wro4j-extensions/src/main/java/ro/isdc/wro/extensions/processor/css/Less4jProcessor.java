@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.util.WroUtil;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
@@ -75,8 +75,8 @@ public class Less4jProcessor
     }
 
     public String computeRelativeResourceUri(final String originalResourceUri, final String relativePath) {
-      final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
-      return FilenameUtils.normalize(fullPath);
+      final String fullPath = WroUtil.getFullPath(originalResourceUri) + relativePath;
+      return WroUtil.normalize(fullPath);
     }
   }
   @Inject
