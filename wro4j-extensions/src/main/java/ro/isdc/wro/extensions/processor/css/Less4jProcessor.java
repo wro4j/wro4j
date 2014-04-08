@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,7 @@ public class Less4jProcessor
     }
 
     public String computeRelativeResourceUri(final String originalResourceUri, final String relativePath) {
-      final String fullPath = FilenameUtils.getFullPath(originalResourceUri) + relativePath;
+      final String fullPath = WroUtil.getFullPath(originalResourceUri) + relativePath;
       return WroUtil.normalize(fullPath);
     }
   }
