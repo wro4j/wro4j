@@ -42,6 +42,11 @@ public enum ConfigConstants {
    */
   resourceWatcherAsync,
   /**
+   * Flag indicating if the minimization is enabled. When this flag is false, the minimization will be
+   *         suppressed for all resources.
+   */
+  minimizeEnabled,
+  /**
    * Disable cache configuration option. When true, the processed content won't be cached in DEVELOPMENT mode. In
    * DEPLOYMENT mode changing this flag will have no effect.
    */

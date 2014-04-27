@@ -54,6 +54,7 @@ public class PropertyWroConfigurationFactory
     config.setResourceWatcherUpdatePeriod(valueAsLong(
         properties.get(ConfigConstants.resourceWatcherUpdatePeriod.name()), 0));
     config.setResourceWatcherAsync(valueAsBoolean(properties.get(ConfigConstants.resourceWatcherAsync.name()), false));
+    config.setMinimizeEnabled(valueAsBoolean(properties.get(ConfigConstants.minimizeEnabled.name()), true));
     config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
     config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     config.setIgnoreEmptyGroup(valueAsBoolean(properties.get(ConfigConstants.ignoreEmptyGroup.name()), true));
