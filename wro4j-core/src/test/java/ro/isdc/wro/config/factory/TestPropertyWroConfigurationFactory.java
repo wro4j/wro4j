@@ -61,6 +61,7 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(true, config.isJmxEnabled());
     assertEquals(false, config.isCacheGzippedContent());
     assertEquals(false, config.isParallelPreprocessing());
+    assertEquals(true, config.isMinimizeEnabled());
     assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
     assertEquals(WroConfiguration.DEFAULT_ENCODING, config.getEncoding());
     assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
@@ -90,6 +91,7 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
     props.setProperty(ConfigConstants.ignoreFailingProcessor.name(), "true");
     props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
+    props.setProperty(ConfigConstants.minimizeEnabled.name(), "false");
 
     factory = new PropertyWroConfigurationFactory(props);
 
@@ -105,6 +107,7 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(false, config.isIgnoreEmptyGroup());
     assertEquals(true, config.isIgnoreFailingProcessor());
     assertEquals(5000, config.getConnectionTimeout());
+    assertEquals(false, config.isMinimizeEnabled());
   }
 
   @Test(expected = WroRuntimeException.class)
