@@ -40,10 +40,6 @@ public class PropertyWroConfigurationFactory
     this.properties = props;
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   public WroConfiguration create() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(valueAsBoolean(properties.get(ConfigConstants.debug.name()), true));
