@@ -16,6 +16,7 @@ import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -120,7 +121,7 @@ public class ImageUrlRewriter {
     String computedPrefix = StringUtils.EMPTY;
     if (aggregatedFolderPath != null) {
       final StringBuffer result = new StringBuffer("");
-      final String[] depthFolders = aggregatedFolderPath.split(ROOT_CONTEXT_PATH);
+      final String[] depthFolders = WroUtil.normalize(aggregatedFolderPath).split(ROOT_CONTEXT_PATH);
       LOG.debug("subfolders {}", Arrays.toString(depthFolders));
 
       for (final String folder : depthFolders) {
