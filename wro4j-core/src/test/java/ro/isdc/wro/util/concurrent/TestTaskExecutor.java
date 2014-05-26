@@ -131,15 +131,7 @@ public class TestTaskExecutor {
 
   public static void main(final String[] args)
       throws Exception {
-    final TaskExecutor<String> executor = new TaskExecutor<String>() {
-      @Override
-      protected void onResultAvailable(final String result)
-          throws Exception {
-        LOG.debug("<<< [OK] result available: " + result);
-        LOG.debug("\n===============\n");
-        printDate();
-      }
-    };
+    final TaskExecutor<String> executor = new TaskExecutor<String>();
     final List<Callable<String>> tasks = new ArrayList<Callable<String>>();
     tasks.add(new Callable<String>() {
       public String call()
