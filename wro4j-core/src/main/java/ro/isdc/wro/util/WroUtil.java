@@ -401,6 +401,13 @@ public final class WroUtil {
   }
 
   /**
+   * Removes the query string from the provided path (everything followed by '?' including the question mark).
+   */
+  public static final String removeQueryString(final String path) {
+    return path.replaceFirst("\\?.*", "");
+  }
+
+  /**
    * @return current working directory
    */
   public static final File getWorkingDirectory() {

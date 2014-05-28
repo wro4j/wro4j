@@ -191,4 +191,10 @@ public class TestWroUtil {
   public void shouldNormalizeForServletContextResource() {
     assertEquals("/a/b/d/e", WroUtil.normalize("/a/b/c/../d/e"));
   }
+
+  @Test
+  public void shouldRemoveQueryString() {
+    assertEquals("/a/b", WroUtil.removeQueryString("/a/b?p1=v1"));
+    assertEquals("http://www.site.com/b/c", WroUtil.removeQueryString("http://www.site.com/b/c?a=b"));
+  }
 }
