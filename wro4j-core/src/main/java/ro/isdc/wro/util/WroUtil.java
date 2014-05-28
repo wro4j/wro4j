@@ -46,6 +46,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
+  private static final String SEPARATOR_WINDOWS = "\\";
   /**
    * Empty line pattern.
    */
@@ -240,7 +241,7 @@ public final class WroUtil {
       for (int i = 0; i < lines.length; i++) {
         final String line = lines[i];
         result.append("\"");
-        result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
+        result.append(line.replace(SEPARATOR_WINDOWS, "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
         // this is used to force a single line to have at least one new line (otherwise cssLint fails).
         if (lines.length == 1) {
           result.append("\\n");
@@ -433,8 +434,8 @@ public final class WroUtil {
   }
 
   private static String replaceWithServletContextSeparatorIfNedded(final String path, String normalized) {
-    if (ServletContextUriLocator.isValid(path)) {
-      normalized = normalized.replace("\\", ServletContextUriLocator.PREFIX);
+    if (path.startsWith(SEPARATOR_WINDOWS)) {
+      normalized = normalized.replace(SEPARATOR_WINDOWS, ServletContextUriLocator.PREFIX);
     }
     return normalized;
   }
