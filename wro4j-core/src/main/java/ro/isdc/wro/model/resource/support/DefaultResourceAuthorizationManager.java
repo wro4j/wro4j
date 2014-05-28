@@ -1,15 +1,17 @@
 package ro.isdc.wro.model.resource.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -23,20 +25,15 @@ public class DefaultResourceAuthorizationManager implements MutableResourceAutho
 
   private final Set<String> authorizedResources = Collections.synchronizedSet(new HashSet<String>());
 
-  /**
-   * {@inheritDoc}
-   */
   public boolean isAuthorized(final String uri) {
-    return authorizedResources.contains(uri);
+    return authorizedResources.contains(WroUtil.removeQueryString(uri));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void add(final String uri) {
-    Validate.notNull(uri);
+    notNull(uri);
     LOG.debug("authorize: {}", uri);
-    authorizedResources.add(uri);
+    //ignore query string added to authorized resources list.
+    authorizedResources.add(WroUtil.removeQueryString(uri));
   }
 
   /**
@@ -46,9 +43,6 @@ public class DefaultResourceAuthorizationManager implements MutableResourceAutho
     return Collections.unmodifiableCollection(authorizedResources);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void clear() {
     LOG.debug("clear.");
     authorizedResources.clear();
