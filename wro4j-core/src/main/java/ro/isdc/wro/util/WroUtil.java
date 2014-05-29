@@ -424,7 +424,7 @@ public final class WroUtil {
    */
   public static final String getFullPath(final String path) {
     final String fullPath = FilenameUtils.getFullPath(path);
-    return replaceWithServletContextSeparatorIfNedded(path, fullPath);
+    return replaceWithServletContextSeparatorIfNedded(fullPath);
   }
 
   /**
@@ -437,11 +437,11 @@ public final class WroUtil {
    */
   public static final String normalize(final String path) {
     final String normalized = FilenameUtils.normalize(path);
-    return replaceWithServletContextSeparatorIfNedded(path, normalized);
+    return replaceWithServletContextSeparatorIfNedded(normalized);
   }
 
-  private static String replaceWithServletContextSeparatorIfNedded(final String path, String normalized) {
-    if (path.startsWith(SEPARATOR_WINDOWS)) {
+  private static String replaceWithServletContextSeparatorIfNedded(String normalized) {
+    if (normalized.startsWith(SEPARATOR_WINDOWS)) {
       normalized = normalized.replace(SEPARATOR_WINDOWS, ServletContextUriLocator.PREFIX);
     }
     return normalized;
