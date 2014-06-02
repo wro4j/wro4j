@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.http;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
@@ -51,13 +53,12 @@ public class TestConfigurableWroFilter {
   public void shouldBeConfiguredBySpring() throws Exception {
     filter.init(mockFilterConfig);
     final WroConfiguration config = filter.getConfiguration();
-    Assert.assertEquals(10, config.getCacheUpdatePeriod());
-    Assert.assertEquals(20, config.getModelUpdatePeriod());
-    Assert.assertEquals(false, config.isGzipEnabled());
-    Assert.assertEquals(true, config.isDebug());
-    Assert.assertEquals(false, config.isIgnoreMissingResources());
-    Assert.assertEquals(true, config.isDisableCache());
-    Assert.assertEquals(false, config.isJmxEnabled());
+    assertEquals(10, config.getCacheUpdatePeriod());
+    assertEquals(20, config.getModelUpdatePeriod());
+    assertEquals(false, config.isGzipEnabled());
+    assertEquals(true, config.isDebug());
+    assertEquals(false, config.isIgnoreMissingResources());
+    assertEquals(false, config.isJmxEnabled());
   }
 
   @Test
