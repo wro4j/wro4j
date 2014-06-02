@@ -63,11 +63,6 @@ public final class WroConfiguration
    * If true, missing resources are ignored. By default this value is true.
    */
   private boolean ignoreMissingResources = true;
-  /**
-   * Flag which will force no caching of the processed content only in DEVELOPMENT mode. In DEPLOYMENT mode changing
-   * this flag will have no effect. By default this value is false.
-   */
-  private boolean disableCache = false;
 
   /**
    * When this flag is enabled, the raw processed content will be gzipped only the first time and all subsequent
@@ -280,25 +275,6 @@ public final class WroConfiguration
    */
   public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
-  }
-
-  /**
-   * @return the disableCache
-   */
-  public boolean isDisableCache() {
-    // disable cache only if you are in DEVELOPMENT mode (aka debug)
-    return this.disableCache && debug;
-  }
-
-  /**
-   * @param disableCache
-   *          the disableCache to set
-   */
-  public void setDisableCache(final boolean disableCache) {
-    if (!debug && disableCache) {
-      LOG.warn("You cannot disable cache in DEPLOYMENT mode");
-    }
-    this.disableCache = disableCache;
   }
 
   /**

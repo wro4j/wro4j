@@ -322,7 +322,6 @@ public class TestWroFilter {
     when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
     victim.init(mockFilterConfig);
     assertEquals(false, victim.getConfiguration().isDebug());
-    assertEquals(false, victim.getConfiguration().isDisableCache());
   }
 
   @Test
@@ -331,7 +330,6 @@ public class TestWroFilter {
     when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
     victim.init(mockFilterConfig);
     assertEquals(true, victim.getConfiguration().isDebug());
-    assertEquals(true, victim.getConfiguration().isDisableCache());
   }
 
   /**
@@ -720,7 +718,6 @@ public class TestWroFilter {
 
     final WroConfiguration config = new WroConfiguration();
     // we don't need caching here, otherwise we'll have clashing during unit tests.
-    config.setDisableCache(true);
     Context.unset();
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), newConfigWithUpdatePeriodValue(0));
     victim.init(mockFilterConfig);
@@ -734,24 +731,7 @@ public class TestWroFilter {
     final WroConfiguration config = new WroConfiguration();
     config.setCacheUpdatePeriod(periodValue);
     config.setModelUpdatePeriod(periodValue);
-    config.setDisableCache(true);
     return config;
-  }
-
-  @Test
-  public void shouldDestroyWroModelWhenCacheIsDisabled()
-      throws Exception {
-    final WroConfiguration config = new WroConfiguration();
-    config.setDisableCache(true);
-
-    prepareValidRequest(config);
-
-    final WroModelFactory mockModelFactory = Mockito.spy(createValidModelFactory());
-    victim.setWroManagerFactory(new BaseWroManagerFactory().setModelFactory(mockModelFactory));
-
-    victim.doFilter(mockRequest, mockResponse, mockFilterChain);
-
-    verify(mockModelFactory).destroy();
   }
 
   private void prepareValidRequest(final WroConfiguration config)
@@ -768,7 +748,6 @@ public class TestWroFilter {
   public void shouldNotDestroyWroModelWhenCacheIsNotDisabled()
       throws Exception {
     final WroConfiguration config = new WroConfiguration();
-    config.setDisableCache(false);
 
     prepareValidRequest(config);
 

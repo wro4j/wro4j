@@ -53,7 +53,6 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(0, config.getResourceWatcherUpdatePeriod());
     assertEquals(false, config.isResourceWatcherAsync());
     assertEquals(true, config.isDebug());
-    assertEquals(false, config.isDisableCache());
     assertEquals(true, config.isGzipEnabled());
     assertEquals(true, config.isIgnoreMissingResources());
     assertEquals(true, config.isIgnoreEmptyGroup());
@@ -100,7 +99,6 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(10, config.getCacheUpdatePeriod());
     assertEquals(20, config.getModelUpdatePeriod());
     assertEquals(30, config.getResourceWatcherUpdatePeriod());
-    assertEquals(true, config.isDisableCache());
     assertEquals(false, config.isGzipEnabled());
     assertEquals(true, config.isCacheGzippedContent());
     assertEquals(true, config.isParallelPreprocessing());
