@@ -76,6 +76,9 @@ public class ImageUrlRewriter {
   public String rewrite(final String cssUri, final String imageUrl) {
     notNull(cssUri);
     notNull(imageUrl);
+    if (StringUtils.isEmpty(imageUrl)) {
+       return imageUrl;
+    }
     if (ServletContextUriLocator.isValid(cssUri)) {
       if (ServletContextUriLocator.isValid(imageUrl)) {
         return imageUrl;
@@ -93,12 +96,9 @@ public class ImageUrlRewriter {
       return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
     }
     if (UrlUriLocator.isValid(cssUri)) {
-      if (ServletContextUriLocator.isValid(imageUrl)) {
-        // when imageUrl starts with /, assume the cssUri is the external server host
-        final String externalServerCssUri = computeCssUriForExternalServer(cssUri);
-        return computeNewImageLocation(externalServerCssUri, imageUrl);
-      }
-      return computeNewImageLocation(cssUri, imageUrl);
+      final String computedCssUri = ServletContextUriLocator.isValid(imageUrl) ? computeCssUriForExternalServer(cssUri)
+          : cssUri;
+      return computeNewImageLocation(computedCssUri, imageUrl);
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);

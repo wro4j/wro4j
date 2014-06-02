@@ -96,6 +96,14 @@ public class TestImageUrlRewriter {
     assertEquals(expected, actual);
   }
 
+
+  @Test
+  public void checkEmptyImageUrlInContextRelativeCssResource() {
+    final String actual = victim.rewrite(DEFAULT_CSS_URI, "");
+    final String expected = "";
+    assertEquals(expected, actual);
+  }
+
   @Test
   public void checkRelativeImageUrlInProtectedContextRelativeCssResource() {
     final String actual = victim.rewrite(PROTECTED_CSS_URI, RELATIVE_IMAGE_URL);
