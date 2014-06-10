@@ -14,6 +14,7 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssDataUriPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
+import ro.isdc.wro.model.resource.processor.impl.css.CssUrlAuthorizationProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.DuplicatesAwareCssDataUriPreProcessor;
@@ -81,5 +82,6 @@ public class DefaultProcessorProvider
     map.put(SingleLineCommentStripperProcessor.ALIAS, new SingleLineCommentStripperProcessor());
     map.put(MultiLineCommentStripperProcessor.ALIAS, new MultiLineCommentStripperProcessor());
     map.put(ConsoleStripperProcessor.ALIAS, new ConsoleStripperProcessor());
+    map.put(CssUrlAuthorizationProcessor.ALIAS, new CssUrlAuthorizationProcessor());
   }
 }
