@@ -60,7 +60,7 @@ public abstract class AbstractCssUrlRewritingProcessor
       throws IOException {
     LOG.debug("Applying {} processor", getClass().getSimpleName());
     try {
-      final String cssUri = resource.getUri();
+      final String cssUri = resource != null ? resource.getUri() : "";
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));

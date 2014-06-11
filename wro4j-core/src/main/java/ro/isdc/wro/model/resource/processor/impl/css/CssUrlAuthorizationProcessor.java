@@ -6,25 +6,14 @@ package ro.isdc.wro.model.resource.processor.impl.css;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.support.CssImportInspector;
 import ro.isdc.wro.model.resource.support.MutableResourceAuthorizationManager;
 import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
-import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -50,89 +39,46 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class CssUrlAuthorizationProcessor
-    implements ResourcePreProcessor, ResourcePostProcessor {
+    extends CssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(CssUrlAuthorizationProcessor.class);
   public static final String ALIAS = "cssClasspathUrlAuthorization";
-  /**
-   * Compiled pattern.
-   */
-  private static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("cssUrlRewrite"));
+
   @Inject
   private ResourceAuthorizationManager authorizationManager;
-  @Inject
-  private ReadOnlyContext context;
 
   /**
    * {@inheritDoc}
    */
-  public void process(Reader reader, Writer writer) throws IOException {
-     LOG.debug("Applying {} processor", getClass().getSimpleName());
-    try {
-      final String css = IOUtils.toString(reader);
-      parseCss(css);
-      writer.write(css);
-    } finally {
-      reader.close();
-      writer.close();
-    }
+  public void process(final Reader reader, final Writer writer)
+      throws IOException {
+    process(null, reader, writer);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void process(Resource resource, Reader reader, Writer writer) throws IOException {
-    process(reader, writer);
+  @Override
+  protected String replaceImageUrl(final String cssUri, final String imageUrl) {
+    // Don't really replace, we are just hijacking the functionality of CssUrlRewritingProcessor
+    return imageUrl;
   }
 
   /**
-   * Parse the css content and find previously processed URLs
-   * 
-   * @param cssContent
-   *          to parse.
+   * {@inheritDoc}
    */
-  private void parseCss(final String cssContent) {
-    final Matcher matcher = PATTERN.matcher(cssContent);
-    final StringBuffer sb = new StringBuffer();
-    while (matcher.find()) {
-      // Do not process @import statements
-      final String cssStatement = matcher.group();
-      if (!new CssImportInspector(cssStatement).containsImport()) {
-        final String originalUrl = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
-        Validate.notNull(originalUrl);
+  @Override
+  protected void onUrlReplaced(final String replacedUrl) {
+    final String allowedUrl = StringUtils.removeStart(replacedUrl, getUrlPrefix());
 
-        final String allowedUrl = StringUtils.removeStart(originalUrl, getUrlPrefix());
-        if (!authorizationManager.isAuthorized(allowedUrl) && allowedUrl.contains("classpath")) {
-          LOG.debug("Authorizing classpath url: '{}'", allowedUrl);
-
-          if (authorizationManager instanceof MutableResourceAuthorizationManager) {
-            ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);
-  
-          } else {
-            throw new WroRuntimeException("This processor (" + getClass().getSimpleName()
-                    + ") requires an instance of MutableResourceAuthorizationManager!");
-          }
-        }
+    if (authorizationManager instanceof MutableResourceAuthorizationManager) {
+      if (!authorizationManager.isAuthorized(allowedUrl)) {
+        LOG.debug("Authorizing url: '{}'", allowedUrl);
+        ((MutableResourceAuthorizationManager) authorizationManager).add(allowedUrl);
       }
+
+    } else {
+      throw new WroRuntimeException("This processor (" + getClass().getSimpleName()
+              + ") requires an instance of MutableResourceAuthorizationManager!");
     }
-  }
-
-  /**
-   * This method has protected modifier in order to be accessed by unit test class.
-   * 
-   * @return urlPrefix value.
-   * @VisibleForTesting
-   */
-  protected String getUrlPrefix() {
-    return ResourceProxyRequestHandler.createProxyPath(context.getRequest().getRequestURI(), "");
-  }
-
-  /**
-   * @param uri
-   *          to check if is allowed.
-   * @return true if passed argument is contained in allowed list.
-   * @VisibleFortesting
-   */
-  public final boolean isUriAllowed(final String uri) {
-    return authorizationManager.isAuthorized(uri);
   }
 }
