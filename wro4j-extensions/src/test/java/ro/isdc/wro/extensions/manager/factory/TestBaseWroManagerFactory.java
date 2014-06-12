@@ -6,7 +6,9 @@ package ro.isdc.wro.extensions.manager.factory;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -20,6 +22,16 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  */
 public class TestBaseWroManagerFactory {
   private BaseWroManagerFactory victim;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {

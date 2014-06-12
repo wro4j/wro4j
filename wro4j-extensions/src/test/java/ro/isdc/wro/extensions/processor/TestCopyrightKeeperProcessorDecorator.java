@@ -3,10 +3,15 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -23,12 +28,28 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestCopyrightKeeperProcessorDecorator {
   private ResourcePreProcessor processor;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     final ResourcePreProcessor decoratedProcessor = new JSMinProcessor();
     processor = CopyrightKeeperProcessorDecorator.decorate(decoratedProcessor);
     Context.set(Context.standaloneContext());
     WroTestUtils.createInjector().inject(decoratedProcessor);
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test

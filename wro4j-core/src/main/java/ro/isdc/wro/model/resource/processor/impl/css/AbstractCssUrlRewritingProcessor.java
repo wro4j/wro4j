@@ -45,17 +45,11 @@ public abstract class AbstractCssUrlRewritingProcessor
   @Inject
   private ReadOnlyContext context;
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     LOG.debug("Applying {} processor", getClass().getSimpleName());
