@@ -14,6 +14,7 @@ import java.net.URL;
 
 import org.apache.commons.exec.ExecuteException;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +27,17 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestNgMinProcessor {
   private ResourcePostProcessor victim;
   private static boolean isSupported = false;
+
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @BeforeClass
   public static void beforeClass() {

@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
@@ -11,7 +13,6 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class TestNodeTypeScriptProcessor {
    */
   @Before
   public void beforeMethod() {
-    Assume.assumeTrue(isSupported);
+    assumeTrue(isSupported);
   }
 
   @Test

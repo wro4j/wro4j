@@ -1,5 +1,6 @@
 package ro.isdc.wro.http;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
@@ -13,12 +14,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.http.handler.ModelAsJsonRequestHandler;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -27,7 +31,7 @@ import ro.isdc.wro.util.WroTestUtils;
 
 /**
  * Test behavior of {@link WroFilter} when the extensions module is available.
- * 
+ *
  * @author Alex Objelean
  */
 public class TestWroFilter {
@@ -42,7 +46,17 @@ public class TestWroFilter {
   @Mock
   private FilterChain mockFilterChain;
   private WroFilter victim;
-  
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp()
       throws Exception {
@@ -53,7 +67,7 @@ public class TestWroFilter {
     victim.setWroManagerFactory(new BaseWroManagerFactory().setModelFactory(WroTestUtils.simpleModelFactory(new WroModel())));
     victim.init(mockFilterConfig);
   }
-  
+
   @Test
   public void shouldInvokeModelAsJsonRequestHandler()
       throws Exception {

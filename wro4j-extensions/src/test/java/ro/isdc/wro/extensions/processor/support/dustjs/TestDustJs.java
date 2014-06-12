@@ -7,10 +7,13 @@ import java.io.FileOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -19,6 +22,16 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestDustJs {
   private DustJs victim;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {

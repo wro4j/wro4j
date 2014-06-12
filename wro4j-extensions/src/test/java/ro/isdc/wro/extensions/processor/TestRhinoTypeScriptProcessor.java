@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
@@ -11,8 +13,10 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -33,6 +37,17 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestRhinoTypeScriptProcessor {
   private ResourcePreProcessor victim;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -54,9 +69,9 @@ public class TestRhinoTypeScriptProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", victim);
   }
 
-
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     final ResourcePreProcessor processor = new RhinoTypeScriptProcessor() {
       @Override
       protected void onException(final Exception e, final String content) {
@@ -92,7 +107,8 @@ public class TestRhinoTypeScriptProcessor {
       public Void apply(final File input)
           throws Exception {
         try {
-          decorated.process(Resource.create(input.getPath(), ResourceType.JS), new FileReader(input), new StringWriter());
+          decorated.process(Resource.create(input.getPath(), ResourceType.JS), new FileReader(input),
+              new StringWriter());
           Assert.fail("Expected to fail, but didn't");
         } catch (final WroRuntimeException e) {
           // expected to throw exception, continue
