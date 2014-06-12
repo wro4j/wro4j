@@ -331,7 +331,7 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void testComputedAggregatedFolder()
+  public void shouldComputedAggregatedFolderWhenContextPathIsSet()
       throws Exception {
     setWroWithValidResources();
     victim.setWroManagerFactory(CssUrlRewriterWroManagerFactory.class.getName());
@@ -340,6 +340,19 @@ public class TestWro4jMojo {
     cssDestinationFolder.mkdir();
     victim.setCssDestinationFolder(cssDestinationFolder);
     victim.execute();
+    assertEquals("/subfolder", Context.get().getAggregatedFolderPath());
+
+    victim.setContextPath("app");
+    victim.execute();
+    assertEquals("/app/subfolder", Context.get().getAggregatedFolderPath());
+
+    victim.setContextPath("/app/");
+    victim.execute();
+    assertEquals("/app/subfolder", Context.get().getAggregatedFolderPath());
+
+    victim.setContextPath("/");
+    victim.execute();
+    assertEquals("/subfolder", Context.get().getAggregatedFolderPath());
   }
 
   @Test(expected = MojoExecutionException.class)

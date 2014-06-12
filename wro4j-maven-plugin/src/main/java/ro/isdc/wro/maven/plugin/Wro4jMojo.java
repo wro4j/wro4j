@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
@@ -29,6 +30,7 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
 import ro.isdc.wro.maven.plugin.support.AggregatedFolderPathResolver;
 import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.util.StopWatch;
 import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
 
@@ -82,6 +84,15 @@ public class Wro4jMojo
    */
   private File groupNameMappingFile;
   /**
+   * Useful when the application is deployed under a contextPath which is different than ROOT (example: "myapp"). This
+   * will be used by CssUrlRewritingProcessor to compute properly the url's. By default, the ROOT is assumed, meaning
+   * that the rewritten url's will start with "/".
+   *
+   * @parameter property="contextPath"
+   * @optional
+   */
+  private String contextPath;
+  /**
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
@@ -112,10 +123,19 @@ public class Wro4jMojo
   @Override
   protected void doExecute()
       throws Exception {
+    if (contextPath != null) {
+      getLog().info("contextPath: " + contextPath);
+    }
     getLog().info("destinationFolder: " + destinationFolder);
-    getLog().info("jsDestinationFolder: " + jsDestinationFolder);
-    getLog().info("cssDestinationFolder: " + cssDestinationFolder);
-    getLog().info("groupNameMappingFile: " + groupNameMappingFile);
+    if (jsDestinationFolder != null) {
+      getLog().info("jsDestinationFolder: " + jsDestinationFolder);
+    }
+    if (cssDestinationFolder != null) {
+      getLog().info("cssDestinationFolder: " + cssDestinationFolder);
+    }
+    if (groupNameMappingFile != null) {
+      getLog().info("groupNameMappingFile: " + groupNameMappingFile);
+    }
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     final StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
@@ -159,7 +179,7 @@ public class Wro4jMojo
       FileOutputStream outputStream = null;
       try {
         final File mappingFileParent = new File(groupNameMappingFile.getParent());
-        //create missing folders if needed
+        // create missing folders if needed
         mappingFileParent.mkdirs();
         outputStream = new FileOutputStream(groupNameMappingFile);
         groupNames.store(outputStream, "Mapping of defined group name to renamed group name");
@@ -249,7 +269,7 @@ public class Wro4jMojo
       config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
-      Context.get().setAggregatedFolderPath(getAggregatedPathResolver().resolve());
+      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file
@@ -287,10 +307,26 @@ public class Wro4jMojo
     }
   }
 
+  private String computeAggregatedFolderPath() {
+    final StringBuffer aggregatedFolderPath = new StringBuffer();
+    final String separator = ServletContextUriLocator.PREFIX;
+    String normalizedContextPath = contextPath;
+    if (StringUtils.startsWith(contextPath, separator)) {
+      normalizedContextPath = StringUtils.removeStart(normalizedContextPath, separator);
+      normalizedContextPath = StringUtils.removeEnd(normalizedContextPath, separator);
+    }
+    if (!StringUtils.isEmpty(normalizedContextPath)) {
+      aggregatedFolderPath.append(separator);
+      aggregatedFolderPath.append(normalizedContextPath);
+    }
+    aggregatedFolderPath.append(getAggregatedPathResolver().resolve());
+    return aggregatedFolderPath.toString();
+  }
+
   private AggregatedFolderPathResolver getAggregatedPathResolver() {
-    return new AggregatedFolderPathResolver().setBuildDirectory(buildDirectory).setBuildFinalName(
-        buildFinalName).setContextFoldersAsCSV(getContextFoldersAsCSV()).setCssDestinationFolder(cssDestinationFolder).setDestinationFolder(
-        destinationFolder).setLog(getLog());
+    return new AggregatedFolderPathResolver().setBuildDirectory(buildDirectory).setBuildFinalName(buildFinalName).setContextFoldersAsCSV(
+        getContextFoldersAsCSV()).setCssDestinationFolder(cssDestinationFolder).setDestinationFolder(destinationFolder).setLog(
+        getLog());
   }
 
   /**
@@ -346,5 +382,12 @@ public class Wro4jMojo
    */
   void setGroupNameMappingFile(final File groupNameMappingFile) {
     this.groupNameMappingFile = groupNameMappingFile;
+  }
+
+  /**
+   * @VisibleForTesting
+   */
+  void setContextPath(final String contextPath) {
+    this.contextPath = contextPath;
   }
 }
