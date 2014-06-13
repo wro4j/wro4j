@@ -81,7 +81,7 @@ public class ImageUrlRewriter {
     }
     if (ServletContextUriLocator.isValid(cssUri)) {
       if (ServletContextUriLocator.isValid(imageUrl)) {
-        return imageUrl;
+        return prependContextPath(imageUrl);
       }
       // Treat WEB-INF special case
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
@@ -93,7 +93,12 @@ public class ImageUrlRewriter {
       // on the depth of the aggregatedFolderPath.
       final String aggregatedPathPrefix = computeAggregationPathPrefix(context.aggregatedFolderPath);
       LOG.debug("computed aggregatedPathPrefix {}", aggregatedPathPrefix);
-      return computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
+      String newImageLocation = computeNewImageLocation(aggregatedPathPrefix + cssUri, imageUrl);
+      if (newImageLocation.startsWith(ServletContextUriLocator.PREFIX)) {
+        newImageLocation = prependContextPath(newImageLocation);
+      }
+      LOG.debug("newImageLocation: {}", newImageLocation);
+      return newImageLocation;
     }
     if (UrlUriLocator.isValid(cssUri)) {
       final String computedCssUri = ServletContextUriLocator.isValid(imageUrl) ? computeCssUriForExternalServer(cssUri)
@@ -102,14 +107,19 @@ public class ImageUrlRewriter {
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
-      //avoid double slash
-      final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
-          : context.contextPath + imageUrl;
+      final String contextRelativeUrl = prependContextPath(imageUrl);
       //final String contextRelativeUrl = context.contextPath + imageUrl;
       // leave imageUrl unchanged if it is a servlet context relative resource
       return (ServletContextUriLocator.isValid(imageUrl) ? contextRelativeUrl : proxyUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
+  }
+
+  private String prependContextPath(final String imageUrl) {
+    //avoid double slash
+    final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
+        : context.contextPath + imageUrl;
+    return contextRelativeUrl;
   }
 
   /**
@@ -184,10 +194,6 @@ public class ImageUrlRewriter {
     // remove '/' from imageUrl if it starts with one.
     final String processedImageUrl = cleanImageUrl.startsWith(ServletContextUriLocator.PREFIX) ? cleanImageUrl.substring(1)
         : cleanImageUrl;
-    // remove redundant part of the path, but skip protected resources (ex: located inside /WEB-INF/ folder). -> Not
-    // sure if this is a problem yet.
-    // final String computedImageLocation = ServletContextUriLocator.isProtectedResource(cssUriFolder) ? cssUriFolder
-    // + processedImageUrl : cleanPath(cssUriFolder + processedImageUrl);
     final String computedImageLocation = cleanPath(cssUriFolder + processedImageUrl);
     LOG.debug("computedImageLocation: {}", computedImageLocation);
     return computedImageLocation;
