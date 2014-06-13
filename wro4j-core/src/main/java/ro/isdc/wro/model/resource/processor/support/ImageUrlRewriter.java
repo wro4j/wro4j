@@ -81,7 +81,7 @@ public class ImageUrlRewriter {
     }
     if (ServletContextUriLocator.isValid(cssUri)) {
       if (ServletContextUriLocator.isValid(imageUrl)) {
-        return imageUrl;
+        return prependContextPath(imageUrl);
       }
       // Treat WEB-INF special case
       if (ServletContextUriLocator.isProtectedResource(cssUri)) {
@@ -102,14 +102,19 @@ public class ImageUrlRewriter {
     }
     if (ClasspathUriLocator.isValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
-      //avoid double slash
-      final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
-          : context.contextPath + imageUrl;
+      final String contextRelativeUrl = prependContextPath(imageUrl);
       //final String contextRelativeUrl = context.contextPath + imageUrl;
       // leave imageUrl unchanged if it is a servlet context relative resource
       return (ServletContextUriLocator.isValid(imageUrl) ? contextRelativeUrl : proxyUrl);
     }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
+  }
+
+  private String prependContextPath(final String imageUrl) {
+    //avoid double slash
+    final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
+        : context.contextPath + imageUrl;
+    return contextRelativeUrl;
   }
 
   /**

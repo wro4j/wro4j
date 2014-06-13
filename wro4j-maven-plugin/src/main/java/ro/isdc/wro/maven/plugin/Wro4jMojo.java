@@ -257,6 +257,7 @@ public class Wro4jMojo
 
       // mock request
       final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+      Mockito.when(request.getContextPath()).thenReturn(normalizeContextPath(contextPath));
       Mockito.when(request.getRequestURI()).thenReturn(group);
       // mock response
       final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -269,7 +270,7 @@ public class Wro4jMojo
       config.setIgnoreEmptyGroup(true);
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
-      Context.get().setAggregatedFolderPath(computeAggregatedFolderPath());
+      Context.get().setAggregatedFolderPath(getAggregatedPathResolver().resolve());
       // perform processing
       getManagerFactory().create().process();
       // encode version & write result to file
@@ -307,20 +308,20 @@ public class Wro4jMojo
     }
   }
 
-  private String computeAggregatedFolderPath() {
-    final StringBuffer aggregatedFolderPath = new StringBuffer();
+  /**
+   * @return normalized representation of the context path. Example: "/myapp". Will add or strip "/" separator depending
+   *         on provided input.
+   */
+  private String normalizeContextPath(final String contextPath) {
     final String separator = ServletContextUriLocator.PREFIX;
-    String normalizedContextPath = contextPath;
-    if (StringUtils.startsWith(contextPath, separator)) {
+    final StringBuffer sb = new StringBuffer(separator);
+    if (contextPath != null) {
+      String normalizedContextPath = contextPath;
       normalizedContextPath = StringUtils.removeStart(normalizedContextPath, separator);
       normalizedContextPath = StringUtils.removeEnd(normalizedContextPath, separator);
+      sb.append(normalizedContextPath);
     }
-    if (!StringUtils.isEmpty(normalizedContextPath)) {
-      aggregatedFolderPath.append(separator);
-      aggregatedFolderPath.append(normalizedContextPath);
-    }
-    aggregatedFolderPath.append(getAggregatedPathResolver().resolve());
-    return aggregatedFolderPath.toString();
+    return sb.toString();
   }
 
   private AggregatedFolderPathResolver getAggregatedPathResolver() {
