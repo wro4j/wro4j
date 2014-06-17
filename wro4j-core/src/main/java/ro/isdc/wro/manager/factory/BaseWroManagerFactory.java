@@ -145,7 +145,6 @@ public class BaseWroManagerFactory
       if (resourceWatcher == null) {
         resourceWatcher = new ResourceWatcher();
       }
-      managerBuilder.setResourceWatcher(resourceWatcher);
       final WroManager manager = managerBuilder.build();
 
       onAfterInitializeManager(manager);

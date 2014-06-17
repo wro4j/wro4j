@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,6 +37,7 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 import ro.isdc.wro.util.LazyInitializer;
 import ro.isdc.wro.util.WroTestUtils;
 
+
 /**
  * @author Alex Objelean
  */
@@ -50,11 +54,21 @@ public class TestLessCssProcessor {
   private ResourcePreProcessor mockRhinoProcessor;
   private ResourcePreProcessor victim;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     MockitoAnnotations.initMocks(this);
-    //use lazy initialization to defer constructor invocation
+    // use lazy initialization to defer constructor invocation
     victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
@@ -74,8 +88,14 @@ public class TestLessCssProcessor {
     WroTestUtils.createInjector().inject(victim);
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
-  public void shouldUseNodeProcessorWhenSupported() throws Exception {
+  public void shouldUseNodeProcessorWhenSupported()
+      throws Exception {
     when(mockNodeProcessor.isSupported()).thenReturn(true);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
@@ -83,19 +103,20 @@ public class TestLessCssProcessor {
   }
 
   @Test
-  public void shouldUseFallbackProcessorWhenNodeNotSupported() throws Exception {
+  public void shouldUseFallbackProcessorWhenNodeNotSupported()
+      throws Exception {
     when(mockNodeProcessor.isSupported()).thenReturn(false);
     victim.process(mockResource, mockReader, mockWriter);
     verify(mockNodeProcessor, Mockito.never()).process(mockResource, mockReader, mockWriter);
     verify(mockRhinoProcessor, Mockito.times(1)).process(mockResource, mockReader, mockWriter);
   }
 
-
   @Test
-  public void shouldWorkAsAPreProcessorWithCssImportPreProcessor() throws Exception {
+  public void shouldWorkAsAPreProcessorWithCssImportPreProcessor()
+      throws Exception {
     final BaseWroManagerFactory managerFactory = new BaseWroManagerFactory();
-    managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(
-        new CssImportPreProcessor()).addPreProcessor(new LessCssProcessor()));
+    managerFactory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(new CssImportPreProcessor()).addPreProcessor(
+        new LessCssProcessor()));
     final Injector injector = InjectorBuilder.create(managerFactory).build();
     final PreProcessorExecutor preProcessorExecutor = new PreProcessorExecutor();
     injector.inject(preProcessorExecutor);
@@ -103,7 +124,8 @@ public class TestLessCssProcessor {
     final List<Resource> resources = new ArrayList<Resource>();
     final String baseFolder = "ro/isdc/wro/extensions/processor/lesscss";
     resources.add(Resource.create(String.format("classpath:%s/test/import.css", baseFolder)));
-    final String noImports = preProcessorExecutor.processAndMerge(resources, ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, true));
+    final String noImports = preProcessorExecutor.processAndMerge(resources,
+        ProcessingCriteria.create(ProcessingType.IMPORT_ONLY, true));
     final StringWriter actual = new StringWriter();
 
     victim = new LessCssProcessor();

@@ -1,0 +1,93 @@
+.imageWithSrcAttribute {
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/myapp/static/images/tabs/tabContent.png', sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/myapp/images/tabs/tabContent.png',   sizingMethod='scale' )
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '/myapp/images/tabs/tabContent.png',   sizingMethod='scale' );
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '/myapp/images/tabs/tabContent.png',  
+       sizingMethod='scale' );
+    filter : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '/myapp/images/tabs/tabContent.png',  sizingMethod='scale' );
+    filter : 
+        progid:DXImageTransform.Microsoft.AlphaImageLoader(src=  '/myapp/images/tabs/tabContent.png',   sizingMethod='scale' );
+    color:red;
+    background: url(/myapp/static/img/img.gif)
+}
+#outer {
+  filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+      src='/myapp/static/img/images/transparent-border.png',
+      sizingMethod='scale');
+}
+@font-face {
+    src: url(/myapp/static/img/btn_icons.png);
+}
+.relativeImageBackgrounds {
+    background: #B3B3B3 url(/myapp/static/img/img.gif);color:red;
+    background: url(/myapp/static/img/img.gif);
+    background: url(/myapp/static/img/folder/img.gif);
+    background: url('/myapp/static/img/folder/img.gif');
+    background: url("/myapp/static/img/folder/img.gif");
+    background: url(/myapp/static/img/folder/folder/img.gif) top left;
+    background: url(/myapp/static/img.gif) repeat-x;
+    background: url(/myapp/img.gif) no-repeat right;
+    BACKGROUND-IMAGE: url(/myapp/static/img1.gif);
+    background-image: url(/myapp/static/img.gif);
+    background-image: 
+     #555 url(/myapp/static/img.gif);
+    background-image: 
+     url(/myapp/static/img.gif);
+    background:
+        url(/myapp/static/themes/andreas08/scripts/syntaxhighlighter-2/styles/wrapping.png)
+        0 1.1em no-repeat !important;color:red;
+}
+.inline {background:#ffffff url('/myapp/static/img/img_tree.png') no-repeat right top;}
+.inlineMinimized {background:#ffffff url('/myapp/static/img/img_tree.png') no-repeat right top;color:red;font-size:large;}.anotherClass{color:blue;background:#ffffff url('/myapp/static/img/img_tree.png') no-repeat right top;}
+.noQuotes {
+    background-IMAGE: URL(/myapp/img.gif);
+    background: url(/myapp/img.gif) red;
+    background: url(/myapp/folder/img.gif) no-repeat right;
+    background: url(http://www.google.com/);
+}
+
+.differentTypeOfQuotes {
+    background: #B3B3B3 url("/myapp/images/buttons/button_gry_bg.png") repeat-x 
+        scroll 0 -1px;
+    background: #B3B3B3 url('/myapp/images/buttons/button_gry_bg.png') repeat-x
+        scroll 0 -1px;
+    background: #B3B3B3 url(/myapp/images/buttons/button_gry_bg.png) repeat-x
+        scroll 0 -1px
+}
+
+.contextPathWithWhitespaces {
+    background-image: url( "/myapp/absolute/path/to/image1.png" );
+    background-image: url( '/myapp/absolute/path/to/image2.png' );
+    background-image: url( /myapp/absolute/path/to/image3.png );
+    background-image: url( "/myapp/absolute/path/to/image4.png");
+    background-image: url( '/myapp/absolute/path/to/image5.png');
+    background-image: url( /myapp/absolute/path/to/image6.png);
+    background-image: url( "/myapp/static/img/absolute/path/to/image7.png" );
+    background-image: url( '/myapp/static/img/absolute/path/to/image8.png' );
+    background-image: url( /myapp/static/img/absolute/path/to/image9.png );
+    background-image: url("/myapp/static/img/absolute/path/to/image10.png");
+    background-image: url('/myapp/static/img/absolute/path/to/image11.png');
+    background-image: url("/myapp/static/img/absolute/path/to/image11a.png" );
+    background-image: url('/myapp/static/img/absolute/path/to/image11b.png' );
+    background-image: url(/myapp/static/img/absolute/path/to/image12.png);
+}
+
+.relativePathWithWhitespaces {
+    background-image: url( "/myapp/static/img/path/to/image.png" );
+    background-image: url( '/myapp/static/img/path/to/image.png' );
+    background-image: url( /myapp/static/img/path/to/image.png );
+}
+
+.specialCharacters {
+    background-image: url( /myapp/static/img/path/with/$pecial/character.png);
+}
+@font-face {
+    font-family: 'Trade Gothic Condensed Bold';
+    src: url('/myapp/static/img/fonts/tradegothic-boldcondtwenty-webfont.eot');
+    src: url('/myapp/static/img/fonts/tradegothic-boldcondtwenty-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/myapp/static/img/fonts/tradegothic-boldcondtwenty-webfont.woff') format('woff'),
+    url('/myapp/static/img/fonts/tradegothic-boldcondtwenty-webfont.ttf') format('truetype'),
+    url('/myapp/static/img/fonts/tradegothic-boldcondtwenty-webfont.svg#tradegothic-boldcondtwenty-webfont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

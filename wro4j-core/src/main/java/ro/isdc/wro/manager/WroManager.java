@@ -189,9 +189,6 @@ public class WroManager
     return String.format("%s/%s", hash, resourcePath);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void onCachePeriodChanged(final long period) {
     LOG.info("onCachePeriodChanged with value {} has been triggered!", period);
     cacheSchedulerHelper.scheduleWithPeriod(period);
@@ -199,9 +196,6 @@ public class WroManager
     cacheStrategy.clear();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void onModelPeriodChanged(final long period) {
     LOG.info("onModelPeriodChanged with value {} has been triggered!", period);
     // trigger model destroy
@@ -344,7 +338,6 @@ public class WroManager
     private ResourceAuthorizationManager authorizationManager = new DefaultResourceAuthorizationManager();
     private CacheKeyFactory cacheKeyFactory = new DefaultCacheKeyFactory();
     private MetaDataFactory metaDataFactory = new DefaultMetaDataFactory();
-    private ResourceWatcher resourceWatcher = new ResourceWatcher();
 
     public Builder() {
     }
@@ -439,11 +432,6 @@ public class WroManager
       final List<Transformer<WroModel>> list = new ArrayList<Transformer<WroModel>>();
       list.add(new WildcardExpanderModelTransformer());
       return list;
-    }
-
-    public Builder setResourceWatcher(final ResourceWatcher resourceWatcher) {
-      this.resourceWatcher = resourceWatcher;
-      return this;
     }
 
     public WroManager build() {

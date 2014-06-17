@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +13,10 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,16 @@ import ro.isdc.wro.util.WroTestUtils;
 public class TestJsonModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestJsonModelFactory.class);
   private JsonModelFactory factory;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {

@@ -3,13 +3,19 @@
  */
 package ro.isdc.wro.extensions.processor.support.csslint;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.FileInputStream;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ro.isdc.wro.config.Context;
 
 
 /**
@@ -17,6 +23,16 @@ import org.junit.Test;
  */
 public class TestCssLint {
   private CssLint cssLint;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {
@@ -94,8 +110,7 @@ public class TestCssLint {
   @Test
   public void processSampleContentWithManyOptions()
       throws Exception {
-    cssLint
-        .setOptions("ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units");
+    cssLint.setOptions("ids,adjoining-classes,box-model,box-sizing,compatible-vendor-prefixes,display-property-grouping,duplicate-background-images,duplicate-properties,empty-rules,errors,fallback-colors,floats,font-faces,font-sizes,gradients,import,important,known-properties,outline-none,overqualified-elements,qualified-headings,regex-selectors,rules-count,shorthand,text-indent,unique-headings,universal-selector,unqualified-attributes,vendor-prefix,zero-units");
     try {
       final URL url = getClass().getResource("sample/content.css");
       cssLint.validate(IOUtils.toString(new FileInputStream(url.getFile())));

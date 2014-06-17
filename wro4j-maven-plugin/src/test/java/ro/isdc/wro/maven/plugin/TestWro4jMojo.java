@@ -33,6 +33,7 @@ import org.apache.maven.project.MavenProject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -285,6 +286,10 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
+  /**
+   * Ignoring this test, since it is not reliable.
+   */
+  @Ignore
   @Test
   public void shouldBeFasterWhenRunningProcessingInParallel()
       throws Exception {
@@ -331,7 +336,7 @@ public class TestWro4jMojo {
   }
 
   @Test
-  public void testComputedAggregatedFolder()
+  public void shouldComputedAggregatedFolderWhenContextPathIsSet()
       throws Exception {
     setWroWithValidResources();
     victim.setWroManagerFactory(CssUrlRewriterWroManagerFactory.class.getName());
@@ -340,6 +345,19 @@ public class TestWro4jMojo {
     cssDestinationFolder.mkdir();
     victim.setCssDestinationFolder(cssDestinationFolder);
     victim.execute();
+    assertEquals("/subfolder", Context.get().getAggregatedFolderPath());
+
+    victim.setContextPath("app");
+    victim.execute();
+    assertEquals("/app", Context.get().getRequest().getContextPath());
+
+    victim.setContextPath("/app/");
+    victim.execute();
+    assertEquals("/app", Context.get().getRequest().getContextPath());
+
+    victim.setContextPath("/");
+    victim.execute();
+    assertEquals("/", Context.get().getRequest().getContextPath());
   }
 
   @Test(expected = MojoExecutionException.class)

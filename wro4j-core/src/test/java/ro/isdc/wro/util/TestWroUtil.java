@@ -128,11 +128,6 @@ public class TestWroUtil {
     assertTrue(WroUtil.isGzipSupported(request));
   }
 
-  /**
-   * @param request
-   * @param headerName
-   * @param headerValue
-   */
   private HttpServletRequest mockRequestHeader(final String headerName, final String headerValue) {
     final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     final Enumeration<String> enumeration = Collections.enumeration(Arrays.asList(headerName));
@@ -182,16 +177,24 @@ public class TestWroUtil {
     assertEquals("Thu, 07 Feb 2013 23:07:39 GMT", WroUtil.toDateAsString(milliseconds));
   }
 
-  /**
-   * This test should pass on windows platform as well (as a prove that the bug is fixed.
-   */
   @Test
   public void shouldComputeFullPathForServletContextResource() {
     assertEquals("/a/b/", WroUtil.getFullPath("/a/b/c"));
   }
 
   @Test
+  public void shouldComputeFullPathForServletContextResourceWithWindowsSeparator() {
+    assertEquals("/a/b/", WroUtil.getFullPath("\\a\\b\\c"));
+  }
+
+  @Test
   public void shouldNormalizeForServletContextResource() {
     assertEquals("/a/b/d/e", WroUtil.normalize("/a/b/c/../d/e"));
+  }
+
+  @Test
+  public void shouldRemoveQueryString() {
+    assertEquals("/a/b", WroUtil.removeQueryString("/a/b?p1=v1"));
+    assertEquals("http://www.site.com/b/c", WroUtil.removeQueryString("http://www.site.com/b/c?a=b"));
   }
 }

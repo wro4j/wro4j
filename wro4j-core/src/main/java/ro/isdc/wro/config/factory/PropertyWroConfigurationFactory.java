@@ -40,10 +40,6 @@ public class PropertyWroConfigurationFactory
     this.properties = props;
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   public WroConfiguration create() {
     final WroConfiguration config = new WroConfiguration();
     config.setDebug(valueAsBoolean(properties.get(ConfigConstants.debug.name()), true));
@@ -54,7 +50,7 @@ public class PropertyWroConfigurationFactory
     config.setResourceWatcherUpdatePeriod(valueAsLong(
         properties.get(ConfigConstants.resourceWatcherUpdatePeriod.name()), 0));
     config.setResourceWatcherAsync(valueAsBoolean(properties.get(ConfigConstants.resourceWatcherAsync.name()), false));
-    config.setDisableCache(valueAsBoolean(properties.get(ConfigConstants.disableCache.name()), false));
+    config.setMinimizeEnabled(valueAsBoolean(properties.get(ConfigConstants.minimizeEnabled.name()), true));
     config.setIgnoreMissingResources(valueAsBoolean(properties.get(ConfigConstants.ignoreMissingResources.name()), true));
     config.setIgnoreEmptyGroup(valueAsBoolean(properties.get(ConfigConstants.ignoreEmptyGroup.name()), true));
     config.setIgnoreFailingProcessor(valueAsBoolean(properties.get(ConfigConstants.ignoreFailingProcessor.name()), false));

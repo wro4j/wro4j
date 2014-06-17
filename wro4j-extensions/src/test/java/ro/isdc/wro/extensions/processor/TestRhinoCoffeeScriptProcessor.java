@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,8 +14,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -22,6 +26,7 @@ import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator;
 import ro.isdc.wro.util.WroTestUtils;
+
 
 /**
  * Test CoffeeScript processor.
@@ -32,6 +37,16 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestRhinoCoffeeScriptProcessor {
   private ResourcePreProcessor processor;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {
@@ -49,7 +64,7 @@ public class TestRhinoCoffeeScriptProcessor {
    */
   @Test
   public void testExceptions()
-    throws IOException {
+      throws IOException {
     final URL url = getClass().getResource("coffeeScript/exceptions");
     final AtomicInteger counter = new AtomicInteger();
     processor = new ExceptionHandlingProcessorDecorator(new RhinoCoffeeScriptProcessor() {
@@ -67,13 +82,13 @@ public class TestRhinoCoffeeScriptProcessor {
 
     final File testFolder = new File(url.getFile(), "test");
     final File expectedFolder = new File(url.getFile(), "expected");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-      processor);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
     Assert.assertEquals(2, counter.get());
   }
 
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     final RhinoCoffeeScriptProcessor processor = new RhinoCoffeeScriptProcessor();
     final Callable<Void> task = new Callable<Void>() {
       @Override
@@ -91,7 +106,7 @@ public class TestRhinoCoffeeScriptProcessor {
 
   @Test
   public void testSimple()
-    throws IOException {
+      throws IOException {
     final URL url = getClass().getResource("coffeeScript/simple");
 
     final File testFolder = new File(url.getFile(), "test");
@@ -99,10 +114,9 @@ public class TestRhinoCoffeeScriptProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", processor);
   }
 
-
   @Test
   public void testAdvanced()
-    throws IOException {
+      throws IOException {
     final URL url = getClass().getResource("coffeeScript/advanced");
 
     final File testFolder = new File(url.getFile(), "test");

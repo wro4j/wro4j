@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +52,11 @@ public class TestGroovyModelFactory {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test(expected = WroRuntimeException.class)
