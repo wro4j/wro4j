@@ -38,7 +38,6 @@ import ro.isdc.wro.http.handler.factory.DefaultRequestHandlerFactory;
 import ro.isdc.wro.http.handler.factory.RequestHandlerFactory;
 import ro.isdc.wro.http.support.ResponseHeadersConfigurer;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
-import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -290,7 +289,6 @@ public class WroFilter
           processRequest(request, response);
           onRequestProcessed();
         }
-        onProcessComplete();
       } catch (final Exception e) {
         onException(e, response, chain);
       } finally {
@@ -303,19 +301,6 @@ public class WroFilter
 
   private void addPassThroughFilterAttribute(final HttpServletRequest request) {
     request.setAttribute(ATTRIBUTE_PASSED_THROUGH_FILTER, Boolean.TRUE);
-  }
-
-  /**
-   * clear the cache if the {@link WroConfiguration#isDisableCache()} flag is set to true.
-   */
-  private void onProcessComplete() {
-    // Destroy the cached model after the processing is done if cache flag is disabled
-    if (wroConfiguration.isDisableCache()) {
-      LOG.debug("Disable Cache is true. Destroying model...");
-      final WroManager manager = wroManagerFactory.create();
-      manager.getModelFactory().destroy();
-      manager.getCacheStrategy().clear();
-    }
   }
 
   private boolean handledWithRequestHandler(final HttpServletRequest request, final HttpServletResponse response)

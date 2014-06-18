@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
 
@@ -19,6 +22,16 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  */
 public class TestWebjarUriLocator {
   private UriLocator victim;
+
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
 
   @Before
   public void setUp() {
@@ -60,8 +73,9 @@ public class TestWebjarUriLocator {
   }
 
   @Test
-  public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar() throws IOException {
-	  assertNotEmpty(victim.locate("webjar:webjarFail.js"));
+  public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar()
+      throws IOException {
+    assertNotEmpty(victim.locate("webjar:webjarFail.js"));
   }
 
   private void assertNotEmpty(final InputStream stream)
@@ -70,9 +84,9 @@ public class TestWebjarUriLocator {
     stream.close();
   }
 
-
   @Test
-  public void shouldLocateWebjarResourceContainingQuestionMarkInUri() throws Exception {
+  public void shouldLocateWebjarResourceContainingQuestionMarkInUri()
+      throws Exception {
     victim.locate("webjar:font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3");
   }
 }

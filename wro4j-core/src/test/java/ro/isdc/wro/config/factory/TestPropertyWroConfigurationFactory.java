@@ -53,7 +53,6 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(0, config.getResourceWatcherUpdatePeriod());
     assertEquals(false, config.isResourceWatcherAsync());
     assertEquals(true, config.isDebug());
-    assertEquals(false, config.isDisableCache());
     assertEquals(true, config.isGzipEnabled());
     assertEquals(true, config.isIgnoreMissingResources());
     assertEquals(true, config.isIgnoreEmptyGroup());
@@ -61,6 +60,7 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(true, config.isJmxEnabled());
     assertEquals(false, config.isCacheGzippedContent());
     assertEquals(false, config.isParallelPreprocessing());
+    assertEquals(true, config.isMinimizeEnabled());
     assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
     assertEquals(WroConfiguration.DEFAULT_ENCODING, config.getEncoding());
     assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
@@ -90,6 +90,7 @@ public class TestPropertyWroConfigurationFactory {
     props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
     props.setProperty(ConfigConstants.ignoreFailingProcessor.name(), "true");
     props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
+    props.setProperty(ConfigConstants.minimizeEnabled.name(), "false");
 
     factory = new PropertyWroConfigurationFactory(props);
 
@@ -98,13 +99,13 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(10, config.getCacheUpdatePeriod());
     assertEquals(20, config.getModelUpdatePeriod());
     assertEquals(30, config.getResourceWatcherUpdatePeriod());
-    assertEquals(true, config.isDisableCache());
     assertEquals(false, config.isGzipEnabled());
     assertEquals(true, config.isCacheGzippedContent());
     assertEquals(true, config.isParallelPreprocessing());
     assertEquals(false, config.isIgnoreEmptyGroup());
     assertEquals(true, config.isIgnoreFailingProcessor());
     assertEquals(5000, config.getConnectionTimeout());
+    assertEquals(false, config.isMinimizeEnabled());
   }
 
   @Test(expected = WroRuntimeException.class)

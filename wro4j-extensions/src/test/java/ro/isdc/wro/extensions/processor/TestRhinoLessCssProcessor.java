@@ -12,6 +12,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,11 @@ public class TestRhinoLessCssProcessor {
     Context.set(Context.standaloneContext());
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void testFromFolder()
       throws Exception {
@@ -55,7 +61,6 @@ public class TestRhinoLessCssProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "css", processor);
   }
 
-
   @Test
   public void executeMultipleTimesDoesntThrowOutOfMemoryException() {
     final LessCss lessCss = new LessCss();
@@ -65,7 +70,8 @@ public class TestRhinoLessCssProcessor {
   }
 
   @Test
-  public void shouldBeThreadSafe() throws Exception {
+  public void shouldBeThreadSafe()
+      throws Exception {
     final RhinoLessCssProcessor processor = new RhinoLessCssProcessor() {
       @Override
       protected void onException(final WroRuntimeException e) {
@@ -110,7 +116,7 @@ public class TestRhinoLessCssProcessor {
           processor.process(null, new FileReader(input), new StringWriter());
           Assert.fail("Expected to fail, but didn't");
         } catch (final WroRuntimeException e) {
-          //expected to throw exception, continue
+          // expected to throw exception, continue
         }
         return null;
       }
@@ -121,7 +127,8 @@ public class TestRhinoLessCssProcessor {
   public void shouldBePossibleToExtendLessCssWithDifferentScriptStream() {
     new LessCss() {
       @Override
-      protected InputStream getScriptAsStream() throws IOException {
+      protected InputStream getScriptAsStream()
+          throws IOException {
         return TestRhinoCoffeeScriptProcessor.class.getResourceAsStream("less.js");
       }
     }.less("#id {}");
@@ -130,7 +137,8 @@ public class TestRhinoLessCssProcessor {
   @Test
   public void shouldWorkProperlyWithCssImportPreProcessor()
       throws Exception {
-    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new RhinoLessCssProcessor());
+    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(),
+        new RhinoLessCssProcessor());
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");

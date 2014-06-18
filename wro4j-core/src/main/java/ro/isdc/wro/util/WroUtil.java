@@ -46,6 +46,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
+  private static final String SEPARATOR_WINDOWS = "\\";
   /**
    * Empty line pattern.
    */
@@ -240,7 +241,7 @@ public final class WroUtil {
       for (int i = 0; i < lines.length; i++) {
         final String line = lines[i];
         result.append("\"");
-        result.append(line.replace("\\", "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
+        result.append(line.replace(SEPARATOR_WINDOWS, "\\\\").replace("\"", "\\\"").replaceAll("\\r|\\n", ""));
         // this is used to force a single line to have at least one new line (otherwise cssLint fails).
         if (lines.length == 1) {
           result.append("\\n");
@@ -400,6 +401,13 @@ public final class WroUtil {
   }
 
   /**
+   * Removes the query string from the provided path (everything followed by '?' including the question mark).
+   */
+  public static final String removeQueryString(final String path) {
+    return path.replaceFirst("\\?.*", "");
+  }
+
+  /**
    * @return current working directory
    */
   public static final File getWorkingDirectory() {
@@ -416,7 +424,7 @@ public final class WroUtil {
    */
   public static final String getFullPath(final String path) {
     final String fullPath = FilenameUtils.getFullPath(path);
-    return replaceWithServletContextSeparatorIfNedded(path, fullPath);
+    return replaceWithServletContextSeparatorIfNedded(fullPath);
   }
 
   /**
@@ -429,12 +437,12 @@ public final class WroUtil {
    */
   public static final String normalize(final String path) {
     final String normalized = FilenameUtils.normalize(path);
-    return replaceWithServletContextSeparatorIfNedded(path, normalized);
+    return replaceWithServletContextSeparatorIfNedded(normalized);
   }
 
-  private static String replaceWithServletContextSeparatorIfNedded(final String path, String normalized) {
-    if (ServletContextUriLocator.isValid(path)) {
-      normalized = normalized.replace("\\", ServletContextUriLocator.PREFIX);
+  private static String replaceWithServletContextSeparatorIfNedded(String normalized) {
+    if (normalized.startsWith(SEPARATOR_WINDOWS)) {
+      normalized = normalized.replace(SEPARATOR_WINDOWS, ServletContextUriLocator.PREFIX);
     }
     return normalized;
   }

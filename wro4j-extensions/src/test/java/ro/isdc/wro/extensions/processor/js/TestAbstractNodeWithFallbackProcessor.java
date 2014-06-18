@@ -1,11 +1,15 @@
 package ro.isdc.wro.extensions.processor.js;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.StringReader;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.output.NullWriter;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +30,16 @@ public class TestAbstractNodeWithFallbackProcessor {
   private ResourcePreProcessor fallbackProcessor;
   private AbstractNodeWithFallbackProcessor victim;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -44,6 +58,11 @@ public class TestAbstractNodeWithFallbackProcessor {
     WroTestUtils.createInjector().inject(victim);
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void shouldNotFailWhenProcessorIsCreatedConcurrently()
       throws Exception {
@@ -56,10 +75,4 @@ public class TestAbstractNodeWithFallbackProcessor {
       }
     }));
   }
-
-  @After
-  public void tearDown() {
-    Context.unset();
-  }
-
 }

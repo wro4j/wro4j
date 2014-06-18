@@ -47,7 +47,7 @@ public class TestNodeLessCssProcessor {
    * Checks if the test can be run by inspecting {@link NodeLessCssProcessor#isSupported()}
    */
   @Before
-  public void beforeMethod() {
+  public void setUp() {
     Context.set(Context.standaloneContext());
     assumeTrue(isSupported);
   }

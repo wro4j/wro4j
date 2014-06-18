@@ -3,11 +3,14 @@
  */
 package ro.isdc.wro.extensions.http;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,11 +22,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;
 import ro.isdc.wro.http.ConfigurableWroFilter;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.resource.processor.factory.ConfigurableProcessorsFactory;
+
 
 /**
  * This test normally should live in wro4j-core module, but since we need spring dependency to test it, the test will
@@ -44,20 +49,25 @@ public class TestConfigurableWroFilter {
     MockitoAnnotations.initMocks(this);
     Mockito.when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     final ApplicationContext ctx = new ClassPathXmlApplicationContext("configurableWroFilter-context.xml");
-    filter = (ConfigurableWroFilter)ctx.getBean("filter");
+    filter = (ConfigurableWroFilter) ctx.getBean("filter");
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test
-  public void shouldBeConfiguredBySpring() throws Exception {
+  public void shouldBeConfiguredBySpring()
+      throws Exception {
     filter.init(mockFilterConfig);
     final WroConfiguration config = filter.getConfiguration();
-    Assert.assertEquals(10, config.getCacheUpdatePeriod());
-    Assert.assertEquals(20, config.getModelUpdatePeriod());
-    Assert.assertEquals(false, config.isGzipEnabled());
-    Assert.assertEquals(true, config.isDebug());
-    Assert.assertEquals(false, config.isIgnoreMissingResources());
-    Assert.assertEquals(true, config.isDisableCache());
-    Assert.assertEquals(false, config.isJmxEnabled());
+    assertEquals(10, config.getCacheUpdatePeriod());
+    assertEquals(20, config.getModelUpdatePeriod());
+    assertEquals(false, config.isGzipEnabled());
+    assertEquals(true, config.isDebug());
+    assertEquals(false, config.isIgnoreMissingResources());
+    assertEquals(false, config.isJmxEnabled());
   }
 
   @Test
@@ -65,7 +75,6 @@ public class TestConfigurableWroFilter {
       throws Exception {
     genericProcessorNameConfigurationTest(RhinoLessCssProcessor.ALIAS);
   }
-
 
   /**
    * To be reused by test from extensions module.

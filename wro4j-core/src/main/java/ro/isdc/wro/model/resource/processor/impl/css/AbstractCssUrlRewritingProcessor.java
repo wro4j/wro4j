@@ -45,22 +45,16 @@ public abstract class AbstractCssUrlRewritingProcessor
   @Inject
   private ReadOnlyContext context;
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     LOG.debug("Applying {} processor", getClass().getSimpleName());
     try {
-      final String cssUri = resource.getUri();
+      final String cssUri = resource != null ? resource.getUri() : "";
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));

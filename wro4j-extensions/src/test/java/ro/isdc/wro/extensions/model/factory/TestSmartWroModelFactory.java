@@ -1,18 +1,10 @@
 /*
-* Copyright 2011 wro4j
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2011 wro4j Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package ro.isdc.wro.extensions.model.factory;
 
 import java.io.File;
@@ -22,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +30,7 @@ import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
+
 /**
  * @author Alex Objelean
  * @created 6 Aug 2011
@@ -44,14 +38,21 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 public class TestSmartWroModelFactory {
   private SmartWroModelFactory factory;
   private Injector injector;
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
     injector = InjectorBuilder.create(new BaseWroManagerFactory()).build();
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test(expected = WroRuntimeException.class)
-  public void noFactoryProvided() throws Exception {
+  public void noFactoryProvided()
+      throws Exception {
     final List<WroModelFactory> list = Collections.emptyList();
     factory = new SmartWroModelFactory().setFactoryList(list);
     injector.inject(factory);
@@ -59,7 +60,8 @@ public class TestSmartWroModelFactory {
   }
 
   @Test
-  public void onMockFactoryProvided() throws Exception {
+  public void onMockFactoryProvided()
+      throws Exception {
     final WroModelFactory mockFactory = Mockito.mock(WroModelFactory.class);
     final List<WroModelFactory> list = Arrays.asList(mockFactory);
     factory = new SmartWroModelFactory().setFactoryList(list);
@@ -68,7 +70,8 @@ public class TestSmartWroModelFactory {
   }
 
   @Test
-  public void onMockFactoryProvided2() throws Exception {
+  public void onMockFactoryProvided2()
+      throws Exception {
     final WroModelFactory mockFactory = Mockito.mock(WroModelFactory.class);
     Mockito.when(mockFactory.create()).thenReturn(new WroModel());
     final List<WroModelFactory> list = Arrays.asList(mockFactory);
@@ -86,7 +89,8 @@ public class TestSmartWroModelFactory {
   }
 
   @Test
-  public void shouldCreateValidModelWhenWroFileIsSet() throws Exception {
+  public void shouldCreateValidModelWhenWroFileIsSet()
+      throws Exception {
     factory = new SmartWroModelFactory();
     final File wroFile = new File(getClass().getResource("wro.xml").toURI());
     factory.setWroFile(wroFile);
@@ -95,7 +99,8 @@ public class TestSmartWroModelFactory {
   }
 
   @Test
-  public void shouldCreateValidModelWhenAutoDetectIsTrue() throws Exception {
+  public void shouldCreateValidModelWhenAutoDetectIsTrue()
+      throws Exception {
     factory = new SmartWroModelFactory();
     final File wroFile = new File(getClass().getResource("subfolder/wro.json").toURI());
     factory.setWroFile(wroFile).setAutoDetectWroFile(true);
@@ -104,7 +109,8 @@ public class TestSmartWroModelFactory {
   }
 
   @Test(expected = WroRuntimeException.class)
-  public void testWithInvalidWroFileSet() throws Exception {
+  public void testWithInvalidWroFileSet()
+      throws Exception {
     final File wroFile = new File("/path/to/invalid/wro.xml");
     factory = new SmartWroModelFactory().setWroFile(wroFile);
     injector.inject(factory);
@@ -125,18 +131,19 @@ public class TestSmartWroModelFactory {
   }
 
   @Test
-  public void shouldCreateModelEvenWhenFirstAttemptFails() throws Exception {
+  public void shouldCreateModelEvenWhenFirstAttemptFails()
+      throws Exception {
     factory = createTestSmartModelFactory();
     Assert.assertNotNull(factory.create());
   }
 
-  @Test(expected=WroRuntimeException.class)
-  public void shouldFailCreatingModelEvenWhenFirstAttemptFailsAndAutoDetectIsDisabled() throws Exception {
+  @Test(expected = WroRuntimeException.class)
+  public void shouldFailCreatingModelEvenWhenFirstAttemptFailsAndAutoDetectIsDisabled()
+      throws Exception {
     factory = createTestSmartModelFactory();
     factory.setAutoDetectWroFile(false);
     factory.create();
   }
-
 
   /**
    * Creates a {@link SmartWroModelFactory} which is provided with a list of two {@link WroModelFactory}'s. The first
@@ -150,7 +157,8 @@ public class TestSmartWroModelFactory {
       }
 
       @Override
-      public void destroy() {}
+      public void destroy() {
+      }
     };
     final WroModelFactory workingModelFactory = new WroModelFactory() {
       @Override
@@ -159,7 +167,8 @@ public class TestSmartWroModelFactory {
       }
 
       @Override
-      public void destroy() {}
+      public void destroy() {
+      }
     };
     final SmartWroModelFactory factory = new SmartWroModelFactory() {
       @Override
@@ -197,13 +206,16 @@ public class TestSmartWroModelFactory {
     Assert.assertNotNull(factory.create());
   }
 
-  private static class CustomWroModel implements WroModelFactory {
+  private static class CustomWroModel
+      implements WroModelFactory {
     @Inject
     UriLocatorFactory uriLocatorFactory;
+
     @Override
     public WroModel create() {
       return null;
     }
+
     @Override
     public void destroy() {
     }

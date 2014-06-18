@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -81,6 +82,11 @@ public class TestModelAsJsonRequestHandler {
     when(mockRequest.getRequestURI()).thenReturn("/wro/wroApi/model");
   }
 
+  @After
+  public void tearDown() {
+    Context.unset();
+  }
+
   @Test
   public void shouldBeEnabledByDefault() {
     assertTrue(victim.isEnabled());
@@ -122,7 +128,8 @@ public class TestModelAsJsonRequestHandler {
   }
 
   @Test
-  public void shouldNotProvideProxyUriForExternalResources() throws IOException {
+  public void shouldNotProvideProxyUriForExternalResources()
+      throws IOException {
     when(mockModelFactory.create()).thenReturn(createWroModelExternalModelStub());
     final WroManagerFactory managerFactory = new BaseWroManagerFactory().setModelFactory(mockModelFactory);
     victim = new ModelAsJsonRequestHandler();

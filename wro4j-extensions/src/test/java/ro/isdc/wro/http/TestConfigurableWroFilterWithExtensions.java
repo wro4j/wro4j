@@ -12,7 +12,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -45,6 +48,16 @@ public class TestConfigurableWroFilterWithExtensions {
   @Mock
   private ServletOutputStream mockServletOutputStream;
 
+  @BeforeClass
+  public static void onBeforeClass() {
+    assertEquals(0, Context.countActive());
+  }
+
+  @AfterClass
+  public static void onAfterClass() {
+    assertEquals(0, Context.countActive());
+  }
+
   @Before
   public void setUp()
       throws Exception {
@@ -53,6 +66,11 @@ public class TestConfigurableWroFilterWithExtensions {
     when(mockResponse.getOutputStream()).thenReturn(mockServletOutputStream);
     when(mockFilterConfig.getServletContext()).thenReturn(mockServletContext);
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig));
+  }
+
+  @After
+  public void tearDown() {
+    Context.unset();
   }
 
   @Test
