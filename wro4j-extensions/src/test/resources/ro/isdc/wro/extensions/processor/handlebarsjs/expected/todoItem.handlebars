@@ -1,13 +1,28 @@
-(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoItem'] = template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  var stack1, helper, options, functionType="function", blockHelperMissing=helpers.blockHelperMissing, escapeExpression=this.escapeExpression, buffer = "<div class=\"display row-fluid span5\">Fluid\n  <input type=\"checkbox\" class=\"check\" ";
-  stack1 = ((helper = helpers.done || (depth0 && depth0.done)),(options={"name":"done","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
-  if (!helpers.done) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  return buffer + " />\n  <label class=\"todo-content span3\">"
-    + escapeExpression(((helper = helpers.content || (depth0 && depth0.content)),(typeof helper === functionType ? helper.call(depth0, {"name":"content","hash":{},"data":data}) : helper)))
-    + "</label>\n  <i class=\"icon-remove-sign remove\" title=\"Remove\"></i>\n</div>\n<div class=\"edit row-fluid\">\n  <input type=\"text\" class=\"todo-edit span4\" value=\""
-    + escapeExpression(((helper = helpers.content || (depth0 && depth0.content)),(typeof helper === functionType ? helper.call(depth0, {"name":"content","hash":{},"data":data}) : helper)))
-    + "\" />\n</div>";
-},"1":function(depth0,helpers,partials,data) {
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoItem'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, functionType="function", blockHelperMissing=helpers.blockHelperMissing, escapeExpression=this.escapeExpression;
+
+function program1(depth0,data) {
+  
+  
   return "checked=\"checked\"";
-  },"useData":true} ); })();
+  }
+
+  buffer += "<div class=\"display row-fluid span5\">Fluid\n  <input type=\"checkbox\" class=\"check\" ";
+  options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}
+  if (helper = helpers.done) { stack1 = helper.call(depth0, options); }
+  else { helper = (depth0 && depth0.done); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
+  if (!helpers.done) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data}); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += " />\n  <label class=\"todo-content span3\">";
+  if (helper = helpers.content) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.content); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</label>\n  <i class=\"icon-remove-sign remove\" title=\"Remove\"></i>\n</div>\n<div class=\"edit row-fluid\">\n  <input type=\"text\" class=\"todo-edit span4\" value=\"";
+  if (helper = helpers.content) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.content); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" />\n</div>";
+  return buffer;
+  } ); })();
