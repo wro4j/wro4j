@@ -28,7 +28,6 @@ import ro.isdc.wro.util.WroTestUtils;
 
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.JSSourceFile;
 import com.google.javascript.jscomp.SourceFile;
 
 
@@ -71,8 +70,7 @@ public class TestGoogleClosureCompressorProcessor {
     final URL url = getClass().getResource("google");
 
     final File expectedFolder = new File(url.getFile(), "expectedWhitespaceOnly");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-        (ResourcePreProcessor) victim);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", (ResourcePreProcessor) victim);
   }
 
   @Test
@@ -82,8 +80,7 @@ public class TestGoogleClosureCompressorProcessor {
     final URL url = getClass().getResource("google");
 
     final File expectedFolder = new File(url.getFile(), "expectedSimple");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-        (ResourcePreProcessor) victim);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", (ResourcePreProcessor) victim);
   }
 
   @Test
@@ -93,8 +90,7 @@ public class TestGoogleClosureCompressorProcessor {
     final URL url = getClass().getResource("google");
 
     final File expectedFolder = new File(url.getFile(), "expectedAdvanced");
-    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
-        (ResourcePreProcessor) victim);
+    WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js", (ResourcePreProcessor) victim);
   }
 
   @Test
@@ -102,7 +98,7 @@ public class TestGoogleClosureCompressorProcessor {
       throws IOException {
     victim = new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS) {
       @Override
-      protected JSSourceFile[] getExterns(final Resource resource) {
+      protected SourceFile[] getExterns(final Resource resource) {
         return null;
       }
     };
@@ -113,7 +109,7 @@ public class TestGoogleClosureCompressorProcessor {
     assertEquals("", sw.toString());
   }
 
-  @Test(expected=WroRuntimeException.class)
+  @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenInvalidExternProvided()
       throws IOException {
     victim = new GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS) {
@@ -151,7 +147,8 @@ public class TestGoogleClosureCompressorProcessor {
   }
 
   @Test
-  public void shouldMinimizeWhenUsedAsLazyProcessor() throws Exception {
+  public void shouldMinimizeWhenUsedAsLazyProcessor()
+      throws Exception {
     final ResourcePreProcessor victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
