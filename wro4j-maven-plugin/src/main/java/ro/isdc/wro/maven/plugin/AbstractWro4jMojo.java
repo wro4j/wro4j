@@ -372,6 +372,11 @@ public abstract class AbstractWro4jMojo
     final List<String> classpathElements = new ArrayList<String>();
     try {
       classpathElements.addAll(mavenProject.getRuntimeClasspathElements());
+      classpathElements.addAll(mavenProject.getCompileClasspathElements());
+      classpathElements.addAll(mavenProject.getCompileSourceRoots());
+
+      getLog().info("compile elements: " + mavenProject.getCompileClasspathElements());
+      getLog().info("compile source roots: " + mavenProject.getCompileSourceRoots());
     } catch (final DependencyResolutionRequiredException e) {
       throw new MojoExecutionException("Could not get compile classpath elements", e);
     }
