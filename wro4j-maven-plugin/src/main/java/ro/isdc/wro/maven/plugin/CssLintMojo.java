@@ -19,6 +19,7 @@ import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.extensions.support.lint.ResourceLintReport;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
@@ -84,6 +85,10 @@ public class CssLintMojo
     return processor;
   }
 
+  @Override
+  protected boolean wantProcessGroup(final String groupName, final ResourceType resourceType) {
+    return resourceType == ResourceType.CSS;
+  }
 
   /**
    * {@inheritDoc}
