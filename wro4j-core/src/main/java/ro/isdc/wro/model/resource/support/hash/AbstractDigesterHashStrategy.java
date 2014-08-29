@@ -35,17 +35,13 @@ public abstract class AbstractDigesterHashStrategy
     }
     try {
       final MessageDigest messageDigest = newMessageDigest();
-      final InputStream digestIs = new DigestInputStream(input, messageDigest);
-      // read till the end
-      while (digestIs.read() != -1) {
-      }
-      final byte[] digest = messageDigest.digest();
-      final String hash = new BigInteger(1, digest).toString(16);
+      final byte[] digestArray = messageDigest.digest(IOUtils.toByteArray(input));
+      final String hash = new BigInteger(1, digestArray).toString(16);
 
       LOG.debug("{} hash: {}", getClass().getSimpleName(), hash);
       return hash;
     } catch (final NoSuchAlgorithmException e) {
-      throw new WroRuntimeException("Exception occured while computing SHA1 hash", e);
+      throw new WroRuntimeException("Exception occured while computing hash", e);
     }finally{
       IOUtils.closeQuietly(input);
     }
