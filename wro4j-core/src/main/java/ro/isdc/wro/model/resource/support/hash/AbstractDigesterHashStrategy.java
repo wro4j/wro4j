@@ -6,12 +6,10 @@ package ro.isdc.wro.model.resource.support.hash;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.io.IOUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
