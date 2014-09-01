@@ -262,4 +262,11 @@ public class ResourceChangeHandler {
       getBuildContextHolder().setValue(resource.getUri(), null);
     }
   }
+  
+  /**
+   * Persist the values stored in BuildContext(Holder)
+   */
+  public void persist() {
+    getBuildContextHolder().persist();
+  }
 }
