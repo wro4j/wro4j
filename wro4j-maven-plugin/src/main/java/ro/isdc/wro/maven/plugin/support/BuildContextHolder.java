@@ -33,7 +33,7 @@ public class BuildContextHolder {
    */
   private final BuildContext buildContext;
   private final File buildDirectory;
-  private Properties fallbackStorageProperties;
+  private Properties fallbackStorage;
   private File fallbackStorageFile;
   private boolean incrementalBuildEnabled;
 
@@ -64,7 +64,7 @@ public class BuildContextHolder {
   }
 
   private void initFallbackStorage() throws IOException {
-	fallbackStorageProperties = new Properties();
+	fallbackStorage = new Properties();
 	  
 	File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
     fallbackStorageFile = new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
@@ -73,8 +73,8 @@ public class BuildContextHolder {
       fallbackStorageFile.createNewFile();
       LOG.debug("created fallback storage: {}", fallbackStorageFile);
     } else {
-      fallbackStorageProperties.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
-      LOG.debug("loaded fallback storage: {}", fallbackStorageProperties);
+      fallbackStorage.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
+      LOG.debug("loaded fallback storage: {}", fallbackStorage);
     }
   }
 
@@ -97,7 +97,7 @@ public class BuildContextHolder {
         value = (String) buildContext.getValue(key);
       }
       if (value == null) {
-        value = fallbackStorageProperties.getProperty(key);
+        value = fallbackStorage.getProperty(key);
       }
     }
     return value;
@@ -117,9 +117,9 @@ public class BuildContextHolder {
       }
       // always use fallback
       if (value != null) {
-        fallbackStorageProperties.setProperty(key, value);
+        fallbackStorage.setProperty(key, value);
       } else {
-        fallbackStorageProperties.remove(key);
+        fallbackStorage.remove(key);
       }
     } else {
       LOG.debug("Cannot store null key");
@@ -142,19 +142,19 @@ public class BuildContextHolder {
    * Destroy the persisted storage and all stored data.
    */
   public void destroy() {
-    fallbackStorageProperties.clear();
+    fallbackStorage.clear();
     FileUtils.deleteQuietly(fallbackStorageFile);
   }
   
   /**
-   * Persist the fallbackStorageProperties to the fallbackStorageFile.
+   * Persist the fallbackStorage to the fallbackStorageFile.
    */
   public void persist() {
     OutputStream os = null;
     try {
       // immediately persist
       os = new FileOutputStream(fallbackStorageFile);
-      fallbackStorageProperties.store(os, "Generated");
+      fallbackStorage.store(os, "Generated");
       os.close();
       LOG.debug("fallback storage written to {}", fallbackStorageFile);
     } catch (final IOException e) {
