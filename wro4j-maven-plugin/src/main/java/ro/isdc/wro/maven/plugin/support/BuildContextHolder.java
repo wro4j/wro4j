@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,8 @@ public class BuildContextHolder {
    */
   private final BuildContext buildContext;
   private final File buildDirectory;
-  private Properties fallbackStorage;
+  private Properties fallbackStorageProperties;
+  private File fallbackStorageFile;
   private boolean incrementalBuildEnabled;
 
   /**
@@ -55,29 +57,32 @@ public class BuildContextHolder {
 
     try {
       initFallbackStorage();
+      System.out.println(fallbackStorageFile);
     } catch (final IOException e) {
-      LOG.warn("Cannot use fallback storage. No build context storage will be used.", e);
+      LOG.warn("Cannot use fallback storage: {}.", fallbackStorageFile, e);
     }
   }
 
-  private void initFallbackStorage()
-      throws IOException {
-    final File fallbackStorageFile = getFallbackStorageFile();
+  private void initFallbackStorage() throws IOException {
+	fallbackStorageProperties = new Properties();
+	  
+	File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
+    fallbackStorageFile = new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
     if (!fallbackStorageFile.exists()) {
       fallbackStorageFile.getParentFile().mkdirs();
       fallbackStorageFile.createNewFile();
+      LOG.debug("created fallback storage: {}", fallbackStorageFile);
+    } else {
+      fallbackStorageProperties.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
+      LOG.debug("loaded fallback storage: {}", fallbackStorageProperties);
     }
-    fallbackStorage = new Properties();
-    fallbackStorage.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
-    LOG.debug("loaded fallback storage: {}", fallbackStorage);
   }
 
   /**
    * @return the File where the fallback storage is persisted.
    */
   protected File getFallbackStorageFile() {
-    final File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
-    return new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
+    return fallbackStorageFile;
   }
 
   /**
@@ -92,7 +97,7 @@ public class BuildContextHolder {
         value = (String) buildContext.getValue(key);
       }
       if (value == null) {
-        value = fallbackStorage.getProperty(key);
+        value = fallbackStorageProperties.getProperty(key);
       }
     }
     return value;
@@ -112,18 +117,9 @@ public class BuildContextHolder {
       }
       // always use fallback
       if (value != null) {
-        fallbackStorage.setProperty(key, value);
+        fallbackStorageProperties.setProperty(key, value);
       } else {
-        fallbackStorage.remove(key);
-      }
-      try {
-        // immediately persist
-        final OutputStream os = new FileOutputStream(getFallbackStorageFile());
-        fallbackStorage.store(os, "Generated");
-        os.close();
-        LOG.debug("fallback storage updated");
-      } catch (final IOException e) {
-        LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
+        fallbackStorageProperties.remove(key);
       }
     } else {
       LOG.debug("Cannot store null key");
@@ -146,7 +142,25 @@ public class BuildContextHolder {
    * Destroy the persisted storage and all stored data.
    */
   public void destroy() {
-    fallbackStorage.clear();
-    FileUtils.deleteQuietly(getFallbackStorageFile());
+    fallbackStorageProperties.clear();
+    FileUtils.deleteQuietly(fallbackStorageFile);
+  }
+  
+  /**
+   * Persist the fallbackStorageProperties to the fallbackStorageFile.
+   */
+  public void persist() {
+    OutputStream os = null;
+    try {
+      // immediately persist
+      os = new FileOutputStream(fallbackStorageFile);
+      fallbackStorageProperties.store(os, "Generated");
+      os.close();
+      LOG.debug("fallback storage written to {}", fallbackStorageFile);
+    } catch (final IOException e) {
+      LOG.warn("Cannot persist fallback storage: {}.", fallbackStorageFile, e);
+    } finally {
+      IOUtils.closeQuietly(os);
+    }
   }
 }
