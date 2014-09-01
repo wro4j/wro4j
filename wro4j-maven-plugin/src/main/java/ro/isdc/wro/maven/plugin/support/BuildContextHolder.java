@@ -57,16 +57,16 @@ public class BuildContextHolder {
 
     try {
       initFallbackStorage();
-      System.out.println(fallbackStorageFile);
     } catch (final IOException e) {
       LOG.warn("Cannot use fallback storage: {}.", fallbackStorageFile, e);
     }
   }
 
-  private void initFallbackStorage() throws IOException {
+  private void initFallbackStorage()
+      throws IOException {
     fallbackStorage = new Properties();
-    File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
-    fallbackStorageFile = new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
+    final File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
+    fallbackStorageFile = newFallbackStorageFile(rootFolder);
     if (!fallbackStorageFile.exists()) {
       fallbackStorageFile.getParentFile().mkdirs();
       fallbackStorageFile.createNewFile();
@@ -78,9 +78,17 @@ public class BuildContextHolder {
   }
 
   /**
+   * @VisibleForTesting
+   */
+  File newFallbackStorageFile(final File rootFolder) {
+    return new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
+  }
+
+  /**
+   * @VisibleForTesting
    * @return the File where the fallback storage is persisted.
    */
-  protected File getFallbackStorageFile() {
+  File getFallbackStorageFile() {
     return fallbackStorageFile;
   }
 
@@ -144,9 +152,10 @@ public class BuildContextHolder {
     fallbackStorage.clear();
     FileUtils.deleteQuietly(fallbackStorageFile);
   }
-  
+
   /**
-   * Persist the fallbackStorage to the fallbackStorageFile.
+   * Persist the fallbackStorage to the fallbackStorageFile. This method should be invoked only once during build, since
+   * it is relatively expensive. Not invoking it, would break the incremental build feature.
    */
   public void persist() {
     OutputStream os = null;
