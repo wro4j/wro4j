@@ -6,12 +6,10 @@ package ro.isdc.wro.model.resource.support.hash;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.io.IOUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,17 +33,13 @@ public abstract class AbstractDigesterHashStrategy
     }
     try {
       final MessageDigest messageDigest = newMessageDigest();
-      final InputStream digestIs = new DigestInputStream(input, messageDigest);
-      // read till the end
-      while (digestIs.read() != -1) {
-      }
-      final byte[] digest = messageDigest.digest();
+      final byte[] digest = messageDigest.digest(IOUtils.toByteArray(input));
       final String hash = new BigInteger(1, digest).toString(16);
 
       LOG.debug("{} hash: {}", getClass().getSimpleName(), hash);
       return hash;
     } catch (final NoSuchAlgorithmException e) {
-      throw new WroRuntimeException("Exception occured while computing SHA1 hash", e);
+      throw new WroRuntimeException("Exception occured while computing hash", e);
     }finally{
       IOUtils.closeQuietly(input);
     }
