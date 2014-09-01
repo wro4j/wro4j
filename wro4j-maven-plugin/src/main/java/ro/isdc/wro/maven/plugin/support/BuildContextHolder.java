@@ -64,9 +64,8 @@ public class BuildContextHolder {
   }
 
   private void initFallbackStorage() throws IOException {
-	fallbackStorage = new Properties();
-	  
-	File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
+    fallbackStorage = new Properties();
+    File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
     fallbackStorageFile = new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
     if (!fallbackStorageFile.exists()) {
       fallbackStorageFile.getParentFile().mkdirs();

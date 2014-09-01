@@ -267,6 +267,6 @@ public class ResourceChangeHandler {
    * Persist the values stored in BuildContext(Holder)
    */
   public void persist() {
-	  getBuildContextHolder().persist();
+    getBuildContextHolder().persist();
   }
 }
