@@ -152,7 +152,6 @@ public class BuildContextHolder {
   public void persist() {
     OutputStream os = null;
     try {
-      // immediately persist
       os = new FileOutputStream(fallbackStorageFile);
       fallbackStorage.store(os, "Generated");
       os.close();
