@@ -154,7 +154,6 @@ public class BuildContextHolder {
     try {
       os = new FileOutputStream(fallbackStorageFile);
       fallbackStorage.store(os, "Generated");
-      os.close();
       LOG.debug("fallback storage written to {}", fallbackStorageFile);
     } catch (final IOException e) {
       LOG.warn("Cannot persist fallback storage: {}.", fallbackStorageFile, e);
