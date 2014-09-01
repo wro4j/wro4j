@@ -27,11 +27,6 @@ import ro.isdc.wro.model.resource.Resource;
  * @created 25 Jan 2013
  * @since 1.6.3
  */
-/**
- * @author alex
- *
- * @param <T>
- */
 public abstract class AbstractLinterMojo<T>
     extends AbstractSingleProcessorMojo {
   /**
