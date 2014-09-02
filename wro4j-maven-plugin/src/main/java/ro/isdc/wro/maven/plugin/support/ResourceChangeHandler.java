@@ -119,8 +119,10 @@ public class ResourceChangeHandler {
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
     
-    if (!getBuildContextHolder().isAddesInThisRun(resource.getUri())) {
+    if (getBuildContextHolder().isAddesInThisRun(resource.getUri())) {
       // only calculate fingerprints and check imports if not already done
+      getLog().debug("Resource with uri '" + resource.getUri() + "' has already been updated in this run.");
+    } else {
       try {
         final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
         getBuildContextHolder().setValue(resource.getUri(), fingerprint);

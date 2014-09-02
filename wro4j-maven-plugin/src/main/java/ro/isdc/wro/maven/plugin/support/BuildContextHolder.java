@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
 
@@ -176,6 +175,6 @@ public class BuildContextHolder {
   }
 
   public boolean isAddesInThisRun(String key) {
-	return isAddesInThisRun .contains(key);
+	return isAddesInThisRun.contains(key);
   }
 }
