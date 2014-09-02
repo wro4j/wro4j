@@ -118,18 +118,22 @@ public class ResourceChangeHandler {
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
-      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
-      if (resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
-        getLog().debug("Check @import directive from " + resource);
-        // persist fingerprints in imported resources.
-        persistFingerprintsForCssImports(resource, reader);
+    
+    if (getBuildContextHolder().getValue(resource.getUri()) == null) {
+      // only calculate fingerprints and check imports if not already done
+      try {
+        final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+        getBuildContextHolder().setValue(resource.getUri(), fingerprint);
+        getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+        if (resource.getType() == ResourceType.CSS) {
+          final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+          getLog().debug("Check @import directive from " + resource);
+          // persist fingerprints in imported resources.
+          persistFingerprintsForCssImports(resource, reader);
+        }
+      } catch (final IOException e) {
+        getLog().debug("could not check fingerprint of resource: " + resource);
       }
-    } catch (final IOException e) {
-      getLog().debug("could not check fingerprint of resource: " + resource);
     }
   }
 
