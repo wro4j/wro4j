@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.maven.plugin.logging.Log;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -38,6 +37,10 @@ import com.google.common.annotations.VisibleForTesting;
  * @since 1.7.2
  */
 public class ResourceChangeHandler {
+  enum ChangeStatus {
+    CHANGED, NOT_CHANGED 
+  }
+	
   private WroManagerFactory managerFactory;
   private Log log;
   /**
@@ -92,17 +95,15 @@ public class ResourceChangeHandler {
   private void detectChangeForCssImports(final Resource resource, final Reader reader,
       final AtomicBoolean changeDetected)
       throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
+    forEachCssImportApply(new Function<String, ChangeStatus>() {
+      public ChangeStatus apply(final String importedUri) throws Exception {
         final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
         getLog().debug("\tisImportChanged: " + isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
+          return ChangeStatus.CHANGED;
         }
-        return null;
+        return ChangeStatus.NOT_CHANGED;
       }
     }, resource, reader);
   }
@@ -135,11 +136,10 @@ public class ResourceChangeHandler {
 
   private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
       throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
+    forEachCssImportApply(new Function<String, ChangeStatus>() {
+      public ChangeStatus apply(final String importedUri) throws Exception {
         remember(Resource.create(importedUri, ResourceType.CSS));
-        return null;
+        return ChangeStatus.NOT_CHANGED;
       }
     }, resource, reader);
   }
@@ -151,21 +151,24 @@ public class ResourceChangeHandler {
    *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
    *          css.
    */
-  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
+  private void forEachCssImportApply(final Function<String, ChangeStatus> func, final Resource resource, final Reader reader)
       throws IOException {
     final ResourcePreProcessor processor = createCssImportProcessor(func);
     InjectorBuilder.create(getManagerFactory()).build().inject(processor);
     processor.process(resource, reader, new StringWriter());
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Function<String, Void> func) {
+  private ResourcePreProcessor createCssImportProcessor(final Function<String, ChangeStatus> func) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
         try {
-          func.apply(importedUri);
-          remember(Resource.create(importedUri, ResourceType.CSS));
+          ChangeStatus status = func.apply(importedUri);
+          getLog().debug("ChangeStatus for " + importedUri + ": " + status);
+          if (ChangeStatus.NOT_CHANGED.equals(status)) {
+        	  remember(Resource.create(importedUri, ResourceType.CSS));
+          }
         } catch (final Exception e) {
           getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
         }
