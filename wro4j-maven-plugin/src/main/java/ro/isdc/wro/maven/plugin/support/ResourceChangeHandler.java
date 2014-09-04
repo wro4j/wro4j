@@ -37,7 +37,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @since 1.7.2
  */
 public class ResourceChangeHandler {
-  enum ChangeStatus {
+  private enum ChangeStatus {
     CHANGED, NOT_CHANGED 
   }
 	
