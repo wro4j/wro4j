@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.processor;
 
+import static ro.isdc.wro.util.WroTestUtils.initProcessor;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -137,8 +139,8 @@ public class TestRhinoLessCssProcessor {
   @Test
   public void shouldWorkProperlyWithCssImportPreProcessor()
       throws Exception {
-    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(),
-        new RhinoLessCssProcessor());
+    final ResourcePreProcessor processor = ChainedProcessor.create(initProcessor(new CssImportPreProcessor()),
+        initProcessor((ResourcePreProcessor) new RhinoLessCssProcessor()));
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
