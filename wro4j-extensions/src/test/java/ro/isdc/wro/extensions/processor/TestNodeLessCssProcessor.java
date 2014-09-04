@@ -4,6 +4,7 @@
 package ro.isdc.wro.extensions.processor;
 
 import static org.junit.Assume.assumeTrue;
+import static ro.isdc.wro.util.WroTestUtils.initProcessor;
 
 import java.io.File;
 import java.io.FileReader;
@@ -71,7 +72,8 @@ public class TestNodeLessCssProcessor {
   @Test
   public void shouldWorkProperlyWithCssImportPreProcessor()
       throws Exception {
-    final ResourcePreProcessor processor = ChainedProcessor.create(new CssImportPreProcessor(), new NodeLessCssProcessor());
+    final ResourcePreProcessor processor = ChainedProcessor.create(initProcessor(new CssImportPreProcessor()),
+        initProcessor((ResourcePreProcessor) new NodeLessCssProcessor()));
     final URL url = getClass().getResource("lesscss");
 
     final File testFolder = new File(url.getFile(), "test");
