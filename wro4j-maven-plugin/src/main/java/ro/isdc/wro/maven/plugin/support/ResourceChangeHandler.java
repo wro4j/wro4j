@@ -119,18 +119,24 @@ public class ResourceChangeHandler {
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
-      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
-      if (resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
-        getLog().debug("Check @import directive from " + resource);
-        // persist fingerprints in imported resources.
-        persistFingerprintsForCssImports(resource, reader);
+    
+    if (getBuildContextHolder().isAddesInThisRun(resource.getUri())) {
+      // only calculate fingerprints and check imports if not already done
+      getLog().debug("Resource with uri '" + resource.getUri() + "' has already been updated in this run.");
+    } else {
+      try {
+        final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+        getBuildContextHolder().setValue(resource.getUri(), fingerprint);
+        getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+        if (resource.getType() == ResourceType.CSS) {
+          final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+          getLog().debug("Check @import directive from " + resource);
+          // persist fingerprints in imported resources.
+          persistFingerprintsForCssImports(resource, reader);
+        }
+      } catch (final IOException e) {
+        getLog().debug("could not check fingerprint of resource: " + resource);
       }
-    } catch (final IOException e) {
-      getLog().debug("could not check fingerprint of resource: " + resource);
     }
   }
 
