@@ -12,6 +12,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,6 +39,11 @@ public class TestCssLintMojo {
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
     mojo.setMavenProject(Mockito.mock(MavenProject.class));
+  }
+
+  @After
+  public void tearDown() {
+    mojo.clean();
   }
 
   private void setWroFile(final String classpathResourceName)

@@ -62,12 +62,12 @@
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.1</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
-        <closure.version>v20140508</closure.version>
+        <closure.version>v20140814</closure.version>
         <slf4j.version>1.7.7</slf4j.version>
         <maven.version>3.0.4</maven.version>
         <mockito.version>1.9.5</mockito.version>
         <junit.version>4.11</junit.version>
-	<jruby.version>1.7.11</jruby.version>
+	<jruby.version>1.7.14</jruby.version>
         <spring.version>3.1.1.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.6.1</version>
+                <version>1.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>

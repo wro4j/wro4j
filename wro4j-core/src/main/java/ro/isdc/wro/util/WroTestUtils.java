@@ -112,13 +112,14 @@ public class WroTestUtils {
   }
 
   /**
-   * @return the injector
+   * @return the injected processor.
    */
-  public static void initProcessor(final ResourcePreProcessor processor) {
+  public static ResourcePreProcessor initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(processor);
+    return processor;
   }
 
   /**

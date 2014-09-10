@@ -90,12 +90,14 @@ public class TestBuildContextHolder {
       final Properties props = new Properties();
       props.setProperty(KEY, VALUE);
       props.store(new FileOutputStream(tempFile), null);
+
       victim = new BuildContextHolder() {
         @Override
-        protected File getFallbackStorageFile() {
+        File newFallbackStorageFile(final File rootFolder) {
           return tempFile;
         }
       };
+
       assertEquals(VALUE, victim.getValue(KEY));
     } finally {
       FileUtils.deleteQuietly(tempFile);
@@ -103,8 +105,10 @@ public class TestBuildContextHolder {
   }
 
   @Test
-  public void shouldPersisteSavedValue() throws Exception {
+  public void shouldPersisteSavedValue()
+      throws Exception {
     victim.setValue(KEY, VALUE);
+    victim.persist();
     final File storage = victim.getFallbackStorageFile();
 
     final Properties props = new Properties();
@@ -134,5 +138,46 @@ public class TestBuildContextHolder {
   public void shouldNotStoreValueAssociatedWithNullKey() {
     victim.setValue(null, VALUE);
     assertNull(victim.getValue(null));
+  }
+
+  @Test
+  public void shouldRememberStoredValueAfterPersist() throws Exception {
+    final File tempFile = WroUtil.createTempFile();
+    try {
+      victim = new BuildContextHolder();
+      victim.setValue(KEY, VALUE);
+      victim.persist();
+
+      final BuildContextHolder secondVictim = new BuildContextHolder() {
+        @Override
+        File newFallbackStorageFile(final File rootFolder) {
+          return victim.getFallbackStorageFile();
+        };
+      };
+
+      assertEquals(VALUE, secondVictim.getValue(KEY));
+    } finally {
+      FileUtils.deleteQuietly(tempFile);
+    }
+  }
+
+  @Test
+  public void shouldForgetStoredValueIfPersistNotInvoked() {
+    final File tempFile = WroUtil.createTempFile();
+    try {
+      victim = new BuildContextHolder();
+      victim.setValue(KEY, VALUE);
+
+      final BuildContextHolder secondVictim = new BuildContextHolder() {
+        @Override
+        File newFallbackStorageFile(final File rootFolder) {
+          return victim.getFallbackStorageFile();
+        };
+      };
+
+      assertEquals(null, secondVictim.getValue(KEY));
+    } finally {
+      FileUtils.deleteQuietly(tempFile);
+    }
   }
 }

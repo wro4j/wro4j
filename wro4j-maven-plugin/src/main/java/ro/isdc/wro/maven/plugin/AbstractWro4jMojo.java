@@ -431,6 +431,7 @@ public abstract class AbstractWro4jMojo
    * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
    */
   protected void onAfterExecute() {
+    resourceChangeHandler.persist();
   }
 
   /**
