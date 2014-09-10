@@ -30,7 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 
 /**
- * Encapsulates the details about resource change detection and persist of change information in build context.
+ * Encapsulates the details about resource change detection and persist the change information in build context.
  *
  * @author Alex Objelean
  * @created 2 Oct 2013
@@ -38,9 +38,9 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class ResourceChangeHandler {
   private enum ChangeStatus {
-    CHANGED, NOT_CHANGED 
+    CHANGED, NOT_CHANGED
   }
-	
+
   private WroManagerFactory managerFactory;
   private Log log;
   /**
@@ -119,7 +119,7 @@ public class ResourceChangeHandler {
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    
+
     if (getBuildContextHolder().isAddesInThisRun(resource.getUri())) {
       // only calculate fingerprints and check imports if not already done
       getLog().debug("Resource with uri '" + resource.getUri() + "' has already been updated in this run.");
@@ -170,7 +170,7 @@ public class ResourceChangeHandler {
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
         try {
-          ChangeStatus status = func.apply(importedUri);
+          final ChangeStatus status = func.apply(importedUri);
           getLog().debug("ChangeStatus for " + importedUri + ": " + status);
           if (ChangeStatus.NOT_CHANGED.equals(status)) {
         	  remember(Resource.create(importedUri, ResourceType.CSS));
@@ -271,7 +271,7 @@ public class ResourceChangeHandler {
       getBuildContextHolder().setValue(resource.getUri(), null);
     }
   }
-  
+
   /**
    * Persist the values stored in BuildContext(Holder)
    */
