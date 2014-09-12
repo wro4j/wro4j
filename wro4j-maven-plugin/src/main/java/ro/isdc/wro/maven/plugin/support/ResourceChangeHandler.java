@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.plugin.logging.Log;
@@ -50,6 +52,10 @@ public class ResourceChangeHandler {
   private BuildContext buildContext;
   private File buildDirectory;
   private boolean incrementalBuildEnabled;
+  /**
+   * Contains the set of already remembered resources. Used to avoid duplicate hash computation.
+   */
+  private final Set<String> rememberedSet = new HashSet<String>();
 
   /**
    * Factory method which requires all mandatory fields.
@@ -120,13 +126,14 @@ public class ResourceChangeHandler {
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
 
-    if (getBuildContextHolder().isAddesInThisRun(resource.getUri())) {
+    if (rememberedSet.contains(resource.getUri())) {
       // only calculate fingerprints and check imports if not already done
       getLog().debug("Resource with uri '" + resource.getUri() + "' has already been updated in this run.");
     } else {
       try {
         final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
         getBuildContextHolder().setValue(resource.getUri(), fingerprint);
+        rememberedSet.add(resource.getUri());
         getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
         if (resource.getType() == ResourceType.CSS) {
           final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
@@ -257,6 +264,7 @@ public class ResourceChangeHandler {
    */
   public void destroy() {
     getBuildContextHolder().destroy();
+    rememberedSet.clear();
   }
 
   /**
@@ -269,6 +277,7 @@ public class ResourceChangeHandler {
   public void forget(final Resource resource) {
     if (resource != null) {
       getBuildContextHolder().setValue(resource.getUri(), null);
+      rememberedSet.remove(resource.getUri());
     }
   }
 

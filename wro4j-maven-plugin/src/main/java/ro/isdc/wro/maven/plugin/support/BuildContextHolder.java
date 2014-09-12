@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,7 +36,6 @@ public class BuildContextHolder {
   private Properties fallbackStorage;
   private File fallbackStorageFile;
   private boolean incrementalBuildEnabled;
-  private Set<String> isAddesInThisRun = new HashSet<String>();
 
   /**
    * @return an instance of {@link BuildContextHolder} which uses temp folder as root location of persisted data.
@@ -122,7 +119,6 @@ public class BuildContextHolder {
   public void setValue(final String key, final String value) {
     LOG.debug("storing key: '{}' and value: '{}'", key, value);
     if (key != null) {
-      isAddesInThisRun.add(key);
       if (buildContext != null) {
         buildContext.setValue(key, value);
       }
@@ -172,9 +168,5 @@ public class BuildContextHolder {
     } finally {
       IOUtils.closeQuietly(os);
     }
-  }
-
-  public boolean isAddesInThisRun(String key) {
-	return isAddesInThisRun.contains(key);
   }
 }
