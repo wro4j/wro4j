@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.mockito.Mockito;
@@ -45,7 +47,14 @@ public class Wro4jRunMojoIT
     destinationFolder = new File("target/wroTemp-" + new Date().getTime());
     mojo.setDestinationFolder(destinationFolder);
 
-    mojo.setMavenProject(Mockito.mock(MavenProject.class));
+    MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+    Model mockMavenModel = Mockito.mock(Model.class);
+    Build mockBuild = Mockito.mock(Build.class);
+    Mockito.when(mockMavenProject.getModel()).thenReturn(mockMavenModel);
+    Mockito.when(mockMavenModel.getBuild()).thenReturn(mockBuild);
+    Mockito.when(mockBuild.getDirectory()).thenReturn(FileUtils.getTempDirectoryPath());
+    
+    mojo.setMavenProject(mockMavenProject);
 
     final URL url = getClass().getClassLoader().getResource("unit/1/src/main/webapp/WEB-INF/wro.xml");
     final File wroFile = new File(url.toURI());
