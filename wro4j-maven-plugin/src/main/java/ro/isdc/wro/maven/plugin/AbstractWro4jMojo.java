@@ -121,7 +121,6 @@ public abstract class AbstractWro4jMojo
    * @optional
    */
   private File buildDirectory;
-  
   /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
