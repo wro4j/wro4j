@@ -115,6 +115,12 @@ public abstract class AbstractWro4jMojo
    */
   private BuildContext buildContext;
   
+  /**
+   * This parameter is not meant to be used. The only purpose is to hold project build directory
+   *
+   * @parameter default-value="${project.build.directory}"
+   * @optional
+   */
   private File buildDirectory;
   
   /**
@@ -142,7 +148,9 @@ public abstract class AbstractWro4jMojo
       getLog().info("Skipping execution.");
     } else {
       validate();
-      buildDirectory = new File(mavenProject.getModel().getBuild().getDirectory());
+      if (buildDirectory == null) {
+        buildDirectory = new File(mavenProject.getModel().getBuild().getDirectory());
+      }
       
       getLog().info(contextFolder);
       getLog().info("Executing the mojo: ");
