@@ -114,7 +114,6 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
-  
   /**
    * This parameter is not meant to be used. The only purpose is to hold project build directory
    *
