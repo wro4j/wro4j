@@ -114,13 +114,9 @@ public abstract class AbstractWro4jMojo
    * @component
    */
   private BuildContext buildContext;
-  /**
-   * This parameter is not meant to be used. The only purpose is to hold project build directory
-   *
-   * @parameter default-value="${project.build.directory}"
-   * @optional
-   */
+  
   private File buildDirectory;
+  
   /**
    * When this flag is enabled and there are more than one group to be processed, these will be processed in parallel,
    * resulting in faster overall plugin execution time.
@@ -146,6 +142,8 @@ public abstract class AbstractWro4jMojo
       getLog().info("Skipping execution.");
     } else {
       validate();
+      buildDirectory = new File(mavenProject.getModel().getBuild().getDirectory());
+      
       getLog().info(contextFolder);
       getLog().info("Executing the mojo: ");
       getLog().info("Wro4j Model path: " + wroFile.getPath());
@@ -153,6 +151,7 @@ public abstract class AbstractWro4jMojo
       getLog().info("minimize: " + isMinimize());
       getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
       getLog().info("parallelProcessing: " + isParallelProcessing());
+      getLog().info("buildDirectory: " + buildDirectory);
       getLog().debug("wroManagerFactory: " + wroManagerFactory);
       getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
       getLog().debug("extraConfig: " + extraConfigFile);
