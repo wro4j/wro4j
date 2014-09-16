@@ -93,7 +93,7 @@ public class ResourceChangeHandler {
       }
       return changeDetected.get();
     } catch (final IOException e) {
-      getLog().debug("failed to check for delta resource: " + resource);
+      getLog().error("failed to check for delta resource: " + resource, e);
     }
     return false;
   }
