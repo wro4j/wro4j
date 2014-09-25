@@ -119,9 +119,12 @@ public class GroupsProcessor {
   }
 
   /**
+   * This method is synchronized to ensure that processor is injected before it is being used by other thread.
+   *
    * @return a decorated processor.
    */
-  private ProcessorDecorator decorateProcessor(final ResourcePostProcessor processor, final boolean minimize) {
+  private synchronized ProcessorDecorator decorateProcessor(final ResourcePostProcessor processor,
+      final boolean minimize) {
     final ProcessorDecorator decorated = new DefaultProcessorDecorator(processor, minimize) {
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
