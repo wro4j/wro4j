@@ -1,7 +1,5 @@
 package ro.isdc.wro.model.resource.processor.support;
 
-import static ro.isdc.wro.util.WroTestUtils.initProcessor;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -16,7 +14,8 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * A processor which uses a list of processors to compute the result.
+ * A processor which uses a list of processors to compute the result. The chained processors are supposed to be
+ * injected.
  *
  * @author Alex Objelean
  * @since 1.7.0
@@ -47,7 +46,6 @@ public class ChainedProcessor
     Writer tempWriter = new StringWriter();
     for (final ResourcePreProcessor processor : processors) {
       tempWriter = new StringWriter();
-      initProcessor(processor);
       processor.process(resource, tempReader, tempWriter);
       tempReader = new StringReader(tempWriter.toString());
     }

@@ -10,8 +10,11 @@ import java.io.FileInputStream;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -37,7 +40,18 @@ public class TestCssLintMojo {
     mojo.setIgnoreMissingResources(Boolean.FALSE.toString());
     setWroWithValidResources();
     mojo.setTargetGroups("g1");
-    mojo.setMavenProject(Mockito.mock(MavenProject.class));
+    MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+    Model mockMavenModel = Mockito.mock(Model.class);
+    Build mockBuild = Mockito.mock(Build.class);
+    Mockito.when(mockMavenProject.getModel()).thenReturn(mockMavenModel);
+    Mockito.when(mockMavenModel.getBuild()).thenReturn(mockBuild);
+    Mockito.when(mockBuild.getDirectory()).thenReturn(FileUtils.getTempDirectoryPath());
+    mojo.setMavenProject(mockMavenProject);
+  }
+
+  @After
+  public void tearDown() {
+    mojo.clean();
   }
 
   private void setWroFile(final String classpathResourceName)

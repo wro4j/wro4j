@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class BuildContextHolder {
   private final BuildContext buildContext;
   private final File buildDirectory;
   private Properties fallbackStorage;
+  private File fallbackStorageFile;
   private boolean incrementalBuildEnabled;
 
   /**
@@ -56,28 +58,38 @@ public class BuildContextHolder {
     try {
       initFallbackStorage();
     } catch (final IOException e) {
-      LOG.warn("Cannot use fallback storage. No build context storage will be used.", e);
+      LOG.warn("Cannot use fallback storage: {}.", fallbackStorageFile, e);
     }
   }
 
   private void initFallbackStorage()
       throws IOException {
-    final File fallbackStorageFile = getFallbackStorageFile();
+    fallbackStorage = new Properties();
+    final File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
+    fallbackStorageFile = newFallbackStorageFile(rootFolder);
     if (!fallbackStorageFile.exists()) {
       fallbackStorageFile.getParentFile().mkdirs();
       fallbackStorageFile.createNewFile();
+      LOG.debug("created fallback storage: {}", fallbackStorageFile);
+    } else {
+      fallbackStorage.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
+      LOG.debug("loaded fallback storage: {}", fallbackStorage);
     }
-    fallbackStorage = new Properties();
-    fallbackStorage.load(new AutoCloseInputStream(new FileInputStream(fallbackStorageFile)));
-    LOG.debug("loaded fallback storage: {}", fallbackStorage);
   }
 
   /**
+   * @VisibleForTesting
+   */
+  File newFallbackStorageFile(final File rootFolder) {
+    return new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
+  }
+
+  /**
+   * @VisibleForTesting
    * @return the File where the fallback storage is persisted.
    */
-  protected File getFallbackStorageFile() {
-    final File rootFolder = new File(buildDirectory, ROOT_FOLDER_NAME);
-    return new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
+  File getFallbackStorageFile() {
+    return fallbackStorageFile;
   }
 
   /**
@@ -116,15 +128,6 @@ public class BuildContextHolder {
       } else {
         fallbackStorage.remove(key);
       }
-      try {
-        // immediately persist
-        final OutputStream os = new FileOutputStream(getFallbackStorageFile());
-        fallbackStorage.store(os, "Generated");
-        os.close();
-        LOG.debug("fallback storage updated");
-      } catch (final IOException e) {
-        LOG.warn("Cannot store value: {}, because {}.", value, e.getMessage());
-      }
     } else {
       LOG.debug("Cannot store null key");
     }
@@ -147,6 +150,23 @@ public class BuildContextHolder {
    */
   public void destroy() {
     fallbackStorage.clear();
-    FileUtils.deleteQuietly(getFallbackStorageFile());
+    FileUtils.deleteQuietly(fallbackStorageFile);
+  }
+
+  /**
+   * Persist the fallbackStorage to the fallbackStorageFile. This method should be invoked only once during build, since
+   * it is relatively expensive. Not invoking it, would break the incremental build feature.
+   */
+  public void persist() {
+    OutputStream os = null;
+    try {
+      os = new FileOutputStream(fallbackStorageFile);
+      fallbackStorage.store(os, "Generated");
+      LOG.debug("fallback storage written to {}", fallbackStorageFile);
+    } catch (final IOException e) {
+      LOG.warn("Cannot persist fallback storage: {}.", fallbackStorageFile, e);
+    } finally {
+      IOUtils.closeQuietly(os);
+    }
   }
 }

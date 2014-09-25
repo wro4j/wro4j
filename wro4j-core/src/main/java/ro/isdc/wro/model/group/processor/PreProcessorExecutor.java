@@ -200,7 +200,7 @@ public class PreProcessorExecutor {
       Writer writer = null;
       for (final ResourcePreProcessor processor : processors) {
         final ResourcePreProcessor decoratedProcessor = decoratePreProcessor(processor, criteria);
-        
+
         writer = new StringWriter();
         final Reader reader = new StringReader(resourceContent);
         // decorate and process
@@ -215,8 +215,9 @@ public class PreProcessorExecutor {
 
   /**
    * Decorates preProcessor with mandatory decorators.
+   * This method is synchronized to ensure that processor is injected before it is being used by other thread.
    */
-  private ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
+  private synchronized ResourcePreProcessor decoratePreProcessor(final ResourcePreProcessor processor,
       final ProcessingCriteria criteria) {
     final ResourcePreProcessor decorated = new DefaultProcessorDecorator(processor, criteria) {
       @Override

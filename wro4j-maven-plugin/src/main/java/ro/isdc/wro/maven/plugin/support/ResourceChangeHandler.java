@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.plugin.logging.Log;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -31,13 +32,17 @@ import com.google.common.annotations.VisibleForTesting;
 
 
 /**
- * Encapsulates the details about resource change detection and persist of change information in build context.
+ * Encapsulates the details about resource change detection and persist the change information in build context.
  *
  * @author Alex Objelean
  * @created 2 Oct 2013
  * @since 1.7.2
  */
 public class ResourceChangeHandler {
+  private enum ChangeStatus {
+    CHANGED, NOT_CHANGED
+  }
+
   private WroManagerFactory managerFactory;
   private Log log;
   /**
@@ -47,6 +52,10 @@ public class ResourceChangeHandler {
   private BuildContext buildContext;
   private File buildDirectory;
   private boolean incrementalBuildEnabled;
+  /**
+   * Contains the set of already remembered resources. Used to avoid duplicate hash computation.
+   */
+  private final Set<String> rememberedSet = new HashSet<String>();
 
   /**
    * Factory method which requires all mandatory fields.
@@ -84,7 +93,7 @@ public class ResourceChangeHandler {
       }
       return changeDetected.get();
     } catch (final IOException e) {
-      getLog().debug("failed to check for delta resource: " + resource);
+      getLog().error("failed to check for delta resource: " + resource, e);
     }
     return false;
   }
@@ -92,17 +101,15 @@ public class ResourceChangeHandler {
   private void detectChangeForCssImports(final Resource resource, final Reader reader,
       final AtomicBoolean changeDetected)
       throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
+    forEachCssImportApply(new Function<String, ChangeStatus>() {
+      public ChangeStatus apply(final String importedUri) throws Exception {
         final boolean isImportChanged = isResourceChanged(Resource.create(importedUri, ResourceType.CSS));
         getLog().debug("\tisImportChanged: " + isImportChanged);
         if (isImportChanged) {
           changeDetected.set(true);
-          // no need to continue
-          throw new WroRuntimeException("Change detected. No need to continue processing");
+          return ChangeStatus.CHANGED;
         }
-        return null;
+        return ChangeStatus.NOT_CHANGED;
       }
     }, resource, reader);
   }
@@ -118,28 +125,34 @@ public class ResourceChangeHandler {
     final WroManager manager = getManagerFactory().create();
     final HashStrategy hashStrategy = manager.getHashStrategy();
     final UriLocatorFactory locatorFactory = manager.getUriLocatorFactory();
-    try {
-      final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
-      getBuildContextHolder().setValue(resource.getUri(), fingerprint);
-      getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
-      if (resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
-        getLog().debug("Check @import directive from " + resource);
-        // persist fingerprints in imported resources.
-        persistFingerprintsForCssImports(resource, reader);
+
+    if (rememberedSet.contains(resource.getUri())) {
+      // only calculate fingerprints and check imports if not already done
+      getLog().debug("Resource with uri '" + resource.getUri() + "' has already been updated in this run.");
+    } else {
+      try {
+        final String fingerprint = hashStrategy.getHash(locatorFactory.locate(resource.getUri()));
+        getBuildContextHolder().setValue(resource.getUri(), fingerprint);
+        rememberedSet.add(resource.getUri());
+        getLog().debug("Persist fingerprint for resource '" + resource.getUri() + "' : " + fingerprint);
+        if (resource.getType() == ResourceType.CSS) {
+          final Reader reader = new InputStreamReader(locatorFactory.locate(resource.getUri()));
+          getLog().debug("Check @import directive from " + resource);
+          // persist fingerprints in imported resources.
+          persistFingerprintsForCssImports(resource, reader);
+        }
+      } catch (final IOException e) {
+        getLog().debug("could not check fingerprint of resource: " + resource);
       }
-    } catch (final IOException e) {
-      getLog().debug("could not check fingerprint of resource: " + resource);
     }
   }
 
   private void persistFingerprintsForCssImports(final Resource resource, final Reader reader)
       throws IOException {
-    forEachCssImportApply(new Function<String, Void>() {
-      public Void apply(final String importedUri)
-          throws Exception {
+    forEachCssImportApply(new Function<String, ChangeStatus>() {
+      public ChangeStatus apply(final String importedUri) throws Exception {
         remember(Resource.create(importedUri, ResourceType.CSS));
-        return null;
+        return ChangeStatus.NOT_CHANGED;
       }
     }, resource, reader);
   }
@@ -151,21 +164,24 @@ public class ResourceChangeHandler {
    *          a function (closure) invoked for each found import. It will be provided as argument the uri of imported
    *          css.
    */
-  private void forEachCssImportApply(final Function<String, Void> func, final Resource resource, final Reader reader)
+  private void forEachCssImportApply(final Function<String, ChangeStatus> func, final Resource resource, final Reader reader)
       throws IOException {
     final ResourcePreProcessor processor = createCssImportProcessor(func);
     InjectorBuilder.create(getManagerFactory()).build().inject(processor);
     processor.process(resource, reader, new StringWriter());
   }
 
-  private ResourcePreProcessor createCssImportProcessor(final Function<String, Void> func) {
+  private ResourcePreProcessor createCssImportProcessor(final Function<String, ChangeStatus> func) {
     final ResourcePreProcessor cssImportProcessor = new AbstractCssImportPreProcessor() {
       @Override
       protected void onImportDetected(final String importedUri) {
         getLog().debug("Found @import " + importedUri);
         try {
-          func.apply(importedUri);
-          remember(Resource.create(importedUri, ResourceType.CSS));
+          final ChangeStatus status = func.apply(importedUri);
+          getLog().debug("ChangeStatus for " + importedUri + ": " + status);
+          if (ChangeStatus.NOT_CHANGED.equals(status)) {
+        	  remember(Resource.create(importedUri, ResourceType.CSS));
+          }
         } catch (final Exception e) {
           getLog().error("Cannot apply a function on @import resource: " + importedUri + ". Ignoring it.", e);
         }
@@ -248,6 +264,7 @@ public class ResourceChangeHandler {
    */
   public void destroy() {
     getBuildContextHolder().destroy();
+    rememberedSet.clear();
   }
 
   /**
@@ -260,6 +277,14 @@ public class ResourceChangeHandler {
   public void forget(final Resource resource) {
     if (resource != null) {
       getBuildContextHolder().setValue(resource.getUri(), null);
+      rememberedSet.remove(resource.getUri());
     }
+  }
+
+  /**
+   * Persist the values stored in BuildContext(Holder)
+   */
+  public void persist() {
+    getBuildContextHolder().persist();
   }
 }

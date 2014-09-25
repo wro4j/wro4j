@@ -146,6 +146,10 @@ public abstract class AbstractWro4jMojo
       getLog().info("Skipping execution.");
     } else {
       validate();
+      if (buildDirectory == null) {
+        buildDirectory = new File(mavenProject.getModel().getBuild().getDirectory());
+      }
+      
       getLog().info(contextFolder);
       getLog().info("Executing the mojo: ");
       getLog().info("Wro4j Model path: " + wroFile.getPath());
@@ -153,6 +157,7 @@ public abstract class AbstractWro4jMojo
       getLog().info("minimize: " + isMinimize());
       getLog().info("ignoreMissingResources: " + isIgnoreMissingResources());
       getLog().info("parallelProcessing: " + isParallelProcessing());
+      getLog().info("buildDirectory: " + buildDirectory);
       getLog().debug("wroManagerFactory: " + wroManagerFactory);
       getLog().debug("incrementalBuildEnabled: " + incrementalBuildEnabled);
       getLog().debug("extraConfig: " + extraConfigFile);
@@ -431,6 +436,7 @@ public abstract class AbstractWro4jMojo
    * Invoked right after execution completion. This method is invoked also if the execution failed with an exception.
    */
   protected void onAfterExecute() {
+    resourceChangeHandler.persist();
   }
 
   /**

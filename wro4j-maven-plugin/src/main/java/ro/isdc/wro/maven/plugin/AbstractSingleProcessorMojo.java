@@ -61,18 +61,16 @@ public abstract class AbstractSingleProcessorMojo
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
-        final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
-
         if (isParallelProcessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
-              processGroup(groupWithExtension);
+              processGroup(group, resourceType);
               return null;
             }
           }));
         } else {
-          processGroup(groupWithExtension);
+          processGroup(group, resourceType);
         }
       }
     }
@@ -85,24 +83,38 @@ public abstract class AbstractSingleProcessorMojo
    * @param group
    *          the name of the group to process.
    */
-  private void processGroup(final String group)
+  private void processGroup(final String groupName, final ResourceType resourceType)
       throws Exception {
-    getLog().info("processing group: " + group);
+    if (wantProcessGroup(groupName, resourceType)) {
+      // group With Extension
+      final String group = groupName + "." + resourceType.name().toLowerCase();
+      getLog().info("processing group: " + group);
 
-    // mock request
-    final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn(group);
-    // mock response
-    final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
+      // mock request
+      final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+      Mockito.when(request.getRequestURI()).thenReturn(group);
+      // mock response
+      final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+      Mockito.when(response.getOutputStream()).thenReturn(new DelegatingServletOutputStream(new NullOutputStream()));
 
-    // init context
-    final WroConfiguration config = Context.get().getConfig();
-    Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
-    // perform processing
-    getManagerFactory().create().process();
+      // init context
+      final WroConfiguration config = Context.get().getConfig();
+      Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
+      // perform processing
+      getManagerFactory().create().process();
 
-    getLog().debug("Processing group: " + group + " [OK]");
+      getLog().debug("Processing group: " + group + " [OK]");
+    }
+  }
+
+  /**
+   * Allow subclasses to decide if a group needs to be processed. Useful for plugins which process only resources of a
+   * certain type (ex: jshint).
+   *
+   * @return true if the resource of a certain type from a group should be processed.
+   */
+  protected boolean wantProcessGroup(final String groupName, final ResourceType resourceType) {
+    return true;
   }
 
   /**
@@ -129,7 +141,6 @@ public abstract class AbstractSingleProcessorMojo
    * Factory method responsible for creating the processor which will be applied for this build.
    */
   protected abstract ResourcePreProcessor createResourceProcessor();
-
 
   /**
    * @return raw representation of the option value.
