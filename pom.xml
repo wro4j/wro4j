@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>   
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.8.2</version>
+                <version>1.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
