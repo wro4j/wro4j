@@ -15,9 +15,7 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -76,6 +74,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     final URLConnection connection = url.openConnection();
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
+    connection.setRequestProperty("User-Agent", "");
 
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
@@ -89,7 +88,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * The read & connect timeout value (in milliseconds) used to limit wait period to a reasonable value. By default
    * {@value WroConfiguration#DEFAULT_CONNECTION_TIMEOUT} ms is used.
    */
-  public void setTimeout(int timeout) {
+  public void setTimeout(final int timeout) {
     this.timeout = timeout;
   }
 }

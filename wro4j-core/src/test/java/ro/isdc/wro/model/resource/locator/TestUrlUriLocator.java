@@ -54,7 +54,7 @@ public class TestUrlUriLocator {
   @Test
   public void testValidUrl()
       throws IOException {
-    victim.locate("http://www.google.com");
+    victim.locate("http://cdn.datatables.net/1.10.5/js/jquery.dataTables.js");
   }
 
   @Test(expected = IOException.class)
