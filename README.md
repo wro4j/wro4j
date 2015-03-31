@@ -1,4 +1,6 @@
 # <img src="http://code.google.com/p/wro4j/logo"> Web Resource Optimizer for Java
+
+[![Join the chat at https://gitter.im/wro4j/wro4j](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wro4j/wro4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://api.travis-ci.org/alexo/wro4j.svg)](http://travis-ci.org/alexo/wro4j)
 [<img src="https://badges.gitter.im/alexo/wro4j.svg" class="copy-button view" data-copy-text="[![Gitter chat](https://badges.gitter.im/alexo/wro4j.svg)]">](https://gitter.im/alexo/wro4j)
 
