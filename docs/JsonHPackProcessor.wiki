@@ -1,0 +1,19 @@
+#summary Short description about JsonHPackProcessor and its purpose.
+
+= Introduction =
+JsonHPackProcessor performs the following: compress/uncompress JSON content using using [https://github.com/WebReflection/json.hpack JsonHPack compression algorithm]. 
+
+= Details =
+This processor should be applied only on JS resources, and especially on resources which content is a JSON only, otherwise it won't work as expected. When a non JSON content is processed, the processor won't affect the output and will leave it unchanged. This processor was created mostly for experimental usage and was used for a [http://www.dzone.com/links/json_compression_algorithms.html small research about JSON compression algorithms]. The algorithm used by this processor is faster and much more efficient than the one used by [CJsonProcessor].
+
+==JsonHPackProcessor usage==
+The processor provides a factory method for creating processor.
+This is how you create an instance responsible for packing JSON:
+{{{
+ResourcePreProcessor packProcessor = JsonHPackProcessor.packProcessor();
+}}}
+This is how you create an instance responsible for unpacking JSON:
+{{{
+ResourcePreProcessor unpackProcessor = JsonHPackProcessor.unpackProcessor();
+}}}
+In order to integrate the processor into wro4j chain of processor, follow [ProcessorsManagement these instructions].

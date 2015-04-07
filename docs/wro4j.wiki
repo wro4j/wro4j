@@ -1,0 +1,7 @@
+#summary The majority of the java classes used by wro4j and their inter-relations.
+
+= wro4j Java Class Diagram =
+=== Notes ===
+This class diagram is outdated and will be replaced soon with a more actual version. But in the meantime it can give you an overall idea.
+
+[http://wro4j.googlecode.com/svn/wiki/ClassDiagram.jpg]

@@ -1,0 +1,20 @@
+#summary List some of the sites using wro4j
+  # [http://mobile.de Mobile.de]
+  # [http://www.truegether.com/ TrueGether]
+  # [https://www.klp.no/ KLP]
+  # [http://www.betfair.com/sport Betfair Sportsbook]
+  # [http://www.betfair.com/exchange/ Betfair Exchange]
+  # [http://raibledesigns.com/ Matt Raible Blog]
+  # [http://www.tracktacular.com/ Tracktacular]
+  # [http://www.munju.net/ Munju]
+  # [http://dailyfratze.de/ Dailyfratze - Community for daily photo projects]
+  # [http://www.soundpure.com/ Soundpure]
+  # [http://scriptito.com/ Scriptito]
+  # [http://www.doodle.se Doodle] 
+  # [http://www.algodeal.com Algodeal]
+  # [http://evocatus.com/ Evocatus - social taste recommendation engine for taste products like chocolate, beer, wine]
+  # [http://web-resource-optimization.blogspot.com/ wro4j Blog]
+  # [https://www.commafeed.com CommaFeed] and https://github.com/Athou/commafeed
+  
+
+Do you know other sites using wro4j? Please, post a comment here! 
