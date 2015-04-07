@@ -1,0 +1,743 @@
+#summary ChangeLog of all releases
+
+===Release 1.7.7===
+*Date: 25 Sep 2014*
+  * Issue854	 Jshint plugin should not try processing css resources
+  * Issue885	 Update less4j dependency to latest version
+  * Issue891	 Optimize hashing implementation 
+  * Issue893	 Upgrade google closure compiler dependency
+  * Issue894	 Upgrade jruby dependency (performance optimization)
+  * Issue895	 ChainedProcessor uses WroTestUtils which uses junit, making it not work at runtime
+  * Issue896	 Confusing exception with incrementalBuildEnabled 
+  * Issue897	 Optimize how often files are checksummed 
+  * Issue900	 Prevent buildDirectory from being null
+  * Issue902	 Race condition in LazyProcessorDecorator when parallelProcessing is enabled
+  * Issue903	 Update coffee-script webjars dependency to latest version
+
+===Release 1.7.6===
+*Date: 18 Jun 2014*
+  * Issue865	 wro4j-maven-plugin : cssUrlRewriting act differently on Windows and Linux
+  * Issue869	 "MinimizeEnabled" not handled by wro.properties
+  * Issue871	 DisableCache clears the Model before the ResourceAuthorizationManager access it
+  * Issue872	 ResourceProxyRequestHandler throwing UnauthorizedRequestException when resource uri contains question mark and pound
+  * Issue876	 Update less4j dependency to latest version
+  * Issue877	 CssUrlRewritingProcessor does not handle properly empty url reference [url("")]
+  * Issue878	 Add provision to take context path into account - Build Time Solution using MavenPlugin
+  * Issue879	 Adding CssUrlAuthorizationProcessor post processor
+  * Issue880	 Update webjars-locator dependency to latest version
+  * Issue882	 Update google closure dependency
+  * Issue883	 Update dependency of emberjs webjar
+
+===Release 1.7.5===
+*Date: 9 Apr 2014*
+  * Issue860	mvn wro4j:run fails due to optional configuration missing
+  * Issue861	Less4jProcessor doesn't process properly imports on windows platform
+  * Issue862	Update less4j dependency to latest version
+  * Issue864	File descriptor leak
+  * Issue866	Update handlebars webjar dependency version
+
+===Release 1.7.4===
+*Date: 21 Mar 2014*
+  * Issue511	ResourceWatcher should check for changes in parallel
+  * Issue715	java.lang.NullPointerException in AbstractNodeWithFallbackProcessor.java:62
+  * Issue830	Using 'parallelProcessing' in Maven plugin produces intermittent NullPointerException during build process
+  * Issue834	The grails plugin sometimes returns 404 for first request
+  * Issue835	Upgrade coffee-script webjar dependency
+  * Issue836	Upgrade emberjs webjar dependency
+  * Issue837	Upgrade handlebars webjar dependency
+  * Issue838	Resource watcher doesn't invalidate cache when change detected for wro4j-grails-plugin
+  * Issue840	ResourceProxyRequestHandler accept method failing to match in v1.7.3, results in 404s
+  * Issue841	Update jruby dependency version
+  * Issue842	Create Less4jProcessorFilter
+  * Issue843	ro.isdc.wro.extensions.processor.js.NgMinProcessor is never supported
+  * Issue844	Upgrade jshint webjar version
+  * Issue845	Less4jProcessor should process import statements
+  * Issue850	Update less4j dependency to latest version
+  * Issue851	Improve google closure processor in multithreaded environment
+  * Issue853	ServletContextUriLocator fails to use requestDispatcher
+  * Issue855	cssImport tries to import absolute URLs (http://...)
+  * Issue858	Fix RubySass compile error for non-ascii characters
+  * Issue859	AbstractProcessorFilter doesn't handle 30x reponse status code
+
+
+===Release 1.7.3===
+*Date: 23 Jan 2014*
+  * Issue789	java.lang.StringIndexOutOfBoundsException: at org.webjars.WebJarAssetLocator.aggregateFile()
+  * Issue813	Combining a javascript file that ends with a comment (without a newline) results in unexpected output
+  * Issue814	Update less4j dependency to latest version
+  * Issue822	ResourceWatcher should allow check for changes asynchronously
+  * Issue824	Context leaks when requests are nested
+  * Issue826	UriLocator fails to retrieve valid resource when it contains question mark
+  * Issue827	Update jshint dependency
+  * Issue828	Update emberjs dependency to latest version.
+  * Issue829	Update handlebars webjar dependency to latest version
+  * Issue832	BuildContextHolder used for incremental build does not clean up properly
+
+===Release 1.7.2===
+*Date: 5 Nov 2013*
+  * Issue660	JsMin fails when processing a regex
+  * Issue785	Wro4jCommandLineRunner not governed by wro.properties
+  * Issue786	Extending customization using SPI doesn't work with maven plugin
+  * Issue787	wro4j-runner should allow custom location of wro.properties
+  * Issue788	Multiple context folders for maven plugin
+  * Issue790	ignoreMissingResources property from wro.properties ignored when using maven plugin
+  * Issue792	Incremental build support for linters in maven plugin
+  * Issue793	Update emberjs dependency version
+  * Issue794	Update handlebars dependency version
+  * Issue800	groupNameMappingFile doesn't support filepaths that don't yet exist
+  * Issue802	Expose an alias for SingleLineCommentStripperProcessor 
+  * Issue803	Allow wro4j-maven-plugin callers to skip execution
+  * Issue805	upgrade to latest version of jruby
+  * Issue807	Listener for resourceWatcher
+
+===Release 1.7.1===
+*Date: 19 Sept 2013*
+  * Issue536	parallelize maven plugin
+  * Issue745	Pooling processors may leak timer threads
+  * Issue746	Loading WebJar assets fails if path contains whitespace
+  * Issue747	Aggregate Path Prefix for ImageUrlRewriter calculated incorrectly on Windows
+  * Issue749	ResourceWatcher is not working since 1.7.0
+  * Issue751	No pre/postProcessors with extended ConfigurableWroManagerFactory
+  * Issue752	Maven plugin won't run on ARM architecture - jruby failure
+  * Issue753	jruby-complete pulls in unwanted classes
+  * Issue757	Allow turning off of resource minification through JMX MBean
+  * Issue760	failFast option is causing Exception in onAfterExecute
+  * Issue764	Handling Request, forward and error dispatches with grails plugin
+  * Issue773	Update less4j dependency to latest version
+  * Issue774	Move wro4j-examples projects to a dedicated repository
+  * Issue775	Move wro4j-grails project to a dedicated repository
+  * Issue777	add SERVLET_CONTEXT_ONLY LocatorStrategy
+  * Issue779	Incremental build support for maven plugin
+  * Issue782	Parallel pre processing is not enabled with maven plugin.
+
+
+===Release 1.7.0===
+*Date: 10 Jun 2013*
+  * Issue619	Simplify jsHint upgrade without a wro4j release required
+  * Issue631	Import of model with no groups or model not found crashes the model creation
+  * Issue633	ResourceWatcherUpdatePeriod clear the cache also when there is no change
+  * Issue642	Create webjar resource locator
+  * Issue648	Update JsHintProcessor to latest dependency
+  * Issue692	Upgrade less4j to latest version
+  * Issue693	Update to latest version of google closure
+  * Issue695	AbstractCssImportPreProcessor leaks ThreadLocal variable during Tomcat shutdown
+  * Issue696	Error with v1.6.3 and CSS data URLs
+  * Issue697	wro4j-runner missing required dependency
+  * Issue701	Allow all errors to be found before the build fails.
+  * Issue702	wro4j-maven-plugin doesn't persist fingerprints for imported css
+  * Issue703	Rhino Less CSS processor breaks on // in a string, eg http://example.com
+  * Issue704	Less4j warning log improvement
+  * Issue705	Create filter responsible for gzipping resource contents
+  * Issue709	Upgrade rhinoCoffeeScriptProcessor to version 1.6.2
+  * Issue711	import-once not working
+  * Issue716	Update jslint to latest version
+  * Issue720	JMX bean is not unregistered during destroy
+  * Issue722	NodeCoffeeScriptProcessor does not support additional command-line options, such as --bare
+  * Issue723	No exception thrown when using invalid resource uri is used
+  * Issue724	DefaultUriLocator should use all locators found in classpath
+  * Issue726	Upgrade handlebars processor to latest version
+  * Issue728	Improve problem reporting for Less4jProcessor
+  * Issue729	Upgrade ember.js processor to latest version
+  * Issue730	Incremental change build should process the target group when the target folder does not exist anymore
+  * Issue731	Reduce logging of the JSHint maven plugin
+  * Issue732	Incremental build feature doesn't use {{{<targetGroups>}}} configuration
+  * Issue733	consoleStripper regex changes.
+  * Issue736	ConfigurableWroFilter ignores managerFactoryClassName configuration property
+  * Issue739	Improve error message when jshint is provided with invalid options
+  * Issue740	Non-synchronized WeakHashMap causes infinite loop in Injector
+  * Issue742	CssUrlRewriting issue when dealing with classpath resource referring context relative resources
+  * Issue743	Resources served through ResourceProxyRequestHandler do not use cache headers
+  * Issue744	Empty content gzip response issue
+
+
+
+===Release 1.6.3===
+*Date: 11 Mar 2013*
+
+  * Issue458	LifecycleCallback should be thread safe.
+  * Issue544	Improved configuration of the preferred model DSL 
+  * Issue558	Support for abstract group in Groovy DSL
+  * Issue628	WroManager should be immutable
+  * Issue650	cssImport processor translates urls incorrectly
+  * Issue654	Create RhinoTypeScriptProcessor.
+  * Issue655	Less4jProcessor should log all errors when fails
+  * Issue656	Upgrade cssLintProcessor
+  * Issue658	Upgrade ember.js to latest version
+  * Issue659	Maven-plugin: ReportFormat set in pom file seem to not be read
+  * Issue661	Add a reportFormat option to the JSHint processor that works similar to the CSSLint processor's reportFormat option
+  * Issue664	Running JSHint processor in an Execution step via the WRO4J 1.6.2 Maven Plugin is outputting {{{<lint>}}} rather than {{{<jslint>}}} element
+  * Issue665	Deprecate InjectableWroManagerFactoryDecorator   
+  * Issue668    groupNameMappingFile and incremental eclipse builds
+  * Issue670	Minimize dependencies of SmartWroModelFactory 
+  * Issue672	Last-modified and Expires headers use system-default Locale
+  * Issue675	Get rid of largest dependencies for wro4j-runner 
+  * Issue679	Ember precompiler for 1.0.0 RC1
+  * Issue681	HoganJs processor compilation missing semicolon
+  * Issue682	Allow Closure Compiler errors to fail the build
+  * Issue684	cssImport should support less import-once
+  * Issue685	Upgrade less4j to latest version
+  * Issue686	Upgrade rhinoCoffeeScriptProcessor to version 1.6.1
+  * Issue687	ClasspathUriLocator fails to find wildcards resources when the application path has spaces in it
+  * Issue688	Additional JSHint property: failThreshold
+  * Issue690	JSHint execution summary
+
+
+===Release 1.6.2===
+*Date: 10 Jan 2013*
+  * Issue480	Css url rewriting doesn't compute replace properly font rule with multiple url's
+  * Issue622	Upgrade to latest version of less4j
+  * Issue623	Invalid Import of xml model shows misleading stacktrace
+  * Issue624	WildcardExpanderModelTransformer throws failure warnings if no assets are found
+  * Issue625	setting up encoding in command line 
+  * Issue632	wro4j:jshint triggers slf4j warning
+  * Issue635	change csslint.xml root xml element from csslint to lint
+  * Issue636	Create emberjs processor
+  * Issue637	Upgrade HandlebarsJsProcessor 
+  * Issue638	The groupName does not strip jsessionID
+  * Issue643	wro4j-core doesn't compile with jdk 1.5
+  * Issue644	Providers loaded from ServiceLoader cannot override default providers
+  * Issue645	Provide an alias for google closureProcessor using WHITESPACE_ONLY optimization level
+  * Issue646	Update google closure dependency version
+  * Issue647	Update rhinoLessCss processor to 1.3.3
+  * Issue649	Update JsLintProcessor with latest jslint version
+
+
+
+===Release 1.6.1===
+*Date: 25 Nov 2012*
+  * Issue598	NPE with GoogleClosureCompressorProcessor in wro4j 1.6.0
+  * Issue599	Make DustJs compiler configurable with System property
+  * Issue602	Resource watcher thinks files have been modified when they in fact have not, after upgrade to 1.6
+  * Issue603	JawrCssMinifier creates overly long lines
+  * Issue604	Upgrade Less4j dependency to latest version
+  * Issue606	jshint maven goal fails with an exception during report generation
+  * Issue608	Included Hogan JS Processor Does Not Appear Useable
+  * Issue613	Update JSHint & JsLint dependencies
+  * Issue617	JsHint xml report does not respect format expected by Jenkins
+  * Issue618	JsHint generated xml report is empty when there are errors
+
+
+
+
+===Release 1.6.0===
+*Date: 24 Oct 2012*
+  * Issue465	The cache key should be configurable with custom attributes
+  * Issue563	ResourceWatcher cannot detect change of resources referred by @import directive
+  * Issue565	Close of FileOutputStream in Wro4jMojo.writeGroupNameMap()
+  * Issue566	NodeLessCssProcessor support is not computed properly on Windows
+  * Issue567	Create TypeScriptProcessor
+  * Issue569	CssImportPreProcessor fails with stackOverflowException
+  * Issue571	Incremental build should detect changes of resources referred by @import statements
+  * Issue572	Create less4j processor
+  * Issue574	Use different log level when ignoreMissingResource=true
+  * Issue576	CssImport issue with LessCss processor
+  * Issue579	NoClassDefFoundError for 1.5.0
+  * Issue580	wro4j-runner-1.5.0 doesn't support cssImport anymore
+  * Issue581	resourceWatcherUpdatePeriod does not work for nested groups
+  * Issue585	Remove YUIJSCompressorProcessor
+  * Issue586	Add enable flag to WroFilter
+  * Issue587	Update rhinoLessCss processor to 1.3.1
+  * Issue589	Meven plugin error after upgrading to 1.5.0
+  * Issue590	Alternative way of configuring processors
+  * Issue591	ConfigurableWroManagerFactory fails when cacheUpdatePeriod is greater than 0.
+  * Issue592	Replace existing DustJS compiler with LinkedIn's updated version
+  * Issue596	Upgrade coffeeScriptProcessor to coffee-script-1.4.0
+  * Issue597	Create NodeCoffeeScriptProcessor
+
+===Release 1.5.0===
+
+*Date: 27 Sep 2012*
+  * Issue257	XML reporting for cssLint & jsHint maven plugin
+  * Issue423	Use {{{<group-ref>}}} defined in an {{{<import>}}} wro.xml
+  * Issue435	Create PathPatternProcessorDecorator
+  * Issue459	wro4j maven plugin should support incremental build
+  * Issue523	Upgrade rubySassCss processor to 3.2.1
+  * Issue530	css image request causes http 403
+  * Issue537	Update evnjs in LessCssProcessor
+  * Issue539	Background:url("" ) drops the closing "
+  * Issue541	Improve lessCss error reporting
+  * Issue542	Create  NodeLessCssProcessor based on lessc binary
+  * Issue543	Create Fallback aware LessCss processor
+  * Issue549	Update cssLint to latest version
+  * Issue550	Update rhino based processors to latest version
+  * Issue551	CssMin semicolon bug
+  * Issue552	Register RequestHandlers as service provider interface (spi)
+  * Issue553	Update google closure dependency version
+  * Issue554	reloading the cache fails 
+  * Issue555	CacheStrategy should be configurable with ConfigurableWroManagerFactory
+  * Issue557	ServletContextAttributeHelper returns uninitialized managerFactory
+  * Issue560	wro4jrunner missing log4j dependency
+  * Issue561	ModelAsJsonRequestHandler should be enabled only in DEVELOPMENT mode
+  * Issue562	A reload of model should not trigger cache reload
+  * Issue564	Too verbose logging on missing resources
+
+===Release 1.4.9===
+
+*Date: 7 Sep 2012*
+  * Issue499	Upgrade google closure to latest version
+  * Issue513	ERROR ResourceWatcherRunnable:81 - Exception while checking for resource changes logged on tomcat shutdown
+  * Issue514	Make ResourceWatcher run efficiently
+  * Issue518    Maven plugin generated resource location enhancement
+  * Issue519    Add support for abstract group concept
+  * Issue524    maven plugin configuration issue
+  * Issue526    Resource leak caused by CssImportPreProcessor 
+  * Issue528    Redundand CacheStrategy decoration
+  * Issue529    Missing cache header attributes in css images
+  * Issue534    Suppress logging of ClientAbortException in WroFilter.
+	
+===Release 1.4.8.1===
+
+*Date: 12 Aug 2012*
+  * Issue507	Processing cssImport of custom jquery-ui.css StackOverflowError
+  * Issue510	Log version when logging configuration
+  * Issue512	Too verbose logging on missing resources when resourceWatcher is enabled
+  * Issue515    Upgrade sass-gems to latest version	
+
+===Release 1.4.8===
+
+*Date: 9 Aug 2012*
+  * Issue185	Invalidate parts of the cache on resource change
+  * Issue478	WroFilter#newWroConfigurationFactory() extendability is difficult
+  * Issue479	Too verbose logging on missing resources
+  * Issue482	Referencing not existing files in path in the same as wroFilter mapped to causes threads spawning and locking in when disableCache=true
+  * Issue483	ServletContextPropertyWroConfigurationFactory#createProperties is not closing stream.
+  * Issue484	HandlebarsJs & HoganJs processors always generate null template name
+  * Issue485	Content length is not computed correctly
+  * Issue495	Default expires headers should be configurable
+  * Issue196	ConfigurableWroManagerFactory does not invoke methods responsible for contributing processors
+  * Issue497	ModelAsJsonRequestHandler doesn't  display the minimize attribute
+  * Issue498	GoogleClosure processor is not threadSafe
+  * Issue500	WroContextFilter causing the Context to create new WroConfiguration everytime
+  * Issue502	Twitter Bootstrap 2.0  is not compiled well by less-processor 
+  * Issue505	CssImport processor recursion detection is not thread-safe
+  * Issue506	CssImportPreProcessor: Remove imports in CSS comments
+
+===Release 1.4.7===
+*Date: 30 June 2012*
+  * Issue225	Expose model resources in filter as JSON
+  * Issue405	cssUrlRewriting does not take context path into account
+  * Issue414	Create handlebars processor
+  * Issue430	Add support for HoganJs
+  * Issue431	WroManager cannot be created using ServletContextAttributeHelper outside the request cycle
+  * Issue432	ConfigurableWroFilter cannot load extentions
+  * Issue433	Bourbon Sass Mixins library support
+  * Issue434	CSS being randomly mixed in with JS (on OSx)
+  * Issue436	Change http-server used in demo-projects 
+  * Issue438	Support for RequestHandlers concept
+  * Issue439	reloadCache & reloadModel api calls are broken
+  * Issue440	WildcardExpanderModelTransformer problem with /** url
+  * Issue442	Allow configuration of processor failing behavior
+  * Issue443	Add options to the uglifyJs processor or an uglifyJsAdvanced processor
+  * Issue445	Resources cannot be located when jRebel is enabled
+  * Issue447	ConfigurableProcessorsFactory processor creation is not thread safe
+  * Issue448	Create alternative cssDataUri processor implementation
+  * Issue449	Create a ProcessorsFactory which uses ServiceRegistry for loading processors
+  * Issue452	DefaultWroManagerFactory doesn't implement WroConfigurationChangeListener
+  * Issue453	Headers set after content send
+  * Issue454	Simplify NamingStrategy & HashStrategy configuration using ConfigurableWroManagerFactory
+  * Issue455	WildcardExpanderModelTransformer is not thread safe
+  * Issue456	SassCssSupport doesn't handle spaces instead of tabs
+  * Issue460	Stack overflow compiling wro4j-bootstrap-sample using the default !WroManagerFactory
+  * Issue462	CssDataUriPreProcessor hits error (unknown mime type) for linked fonts
+  * Issue463	CSS Image URL rewriting not working for CSS hosted external servers.
+  * Issue467	Provide access to individual wro-resources
+  * Issue468	Allow UriLocators configuration using ServiceRegistry
+  * Issue469	Given a resource URI, simplify a way to find out which group it belongs to
+  * Issue472	UriLocators configuration are not picked up from wro.properties config file
+  * Issue473	ServletContextUriLocator should use fallback strategy when dispatcher fails
+  * Issue475	Update rhino based processors to latest version
+  * Issue476	CSSMin.parseProperties doesn't check for empty property
+
+
+===Release 1.4.6===
+*Date: 10 May 2012*
+  * Issue304     Use of !InheritableThreadLocal in ro.isdc.wro.config.Context questionable
+  * Issue358     Migrate to rhino 1.7R3 version
+  * Issue372     Create !SassCssProcessor using jRuby underlying implementation
+  * Issue400     Lazy loading instantiation of processors and locators 
+  * Issue415     Maven plugin processor extension configuration
+  * Issue416     !ServletContextUriLocator not working with Spring mvc resources
+  * Issue417     Allow configuration using !ServletContextListener
+  * Issue418     Suppress logging level for maven plugin
+  * Issue419     Encoding value is not initialized properly
+  * Issue420     Content length is not set
+  * Issue424     Memory & Performance improvements
+  * Issue425     !CssImportPreProcessor and !CssUrlRewritingProcessor produce invalid image URL when using nested imports
+  * Issue427     Allow !ConsoleStripperProcessor be added through wro.properties
+  * Issue428     Update rhino based processors to latest version
+  * Issue429     Update google closure dependency version
+
+===Release 1.4.5===
+*Date: 7 April 2012*
+  * Issue12     Create console.log & console.debug stripper JS processor
+  * Issue382    Rhino based processors fails when slf4j-api is not included
+  * Issue383     Backslashes in CSS duplicated
+  * Issue384     Test failing on osx platform
+  * Issue385     !ServletContextUriLocator does not work on !WebSphere 6.1
+  * Issue389     Configure connectionTimeout in milliseconds instead of seconds
+  * Issue390     Create !DustJs processor
+  * Issue391     Create !CoffeeScript & Less Filters
+  * Issue393     Error while using the 'import' tag in the wro.xml file
+  * Issue394     !CopyrightKeeperProcessorDecorator ignores Resource#isMinimize()
+  * Issue395     Add postProcessors support to wro4j-runner
+  * Issue397     Update less.js processor 
+  * Issue407     Update rhino based processors to latest version
+  * Issue408     Update google closure dependency version
+  * Issue409     Proceed with filter chain when requesting a group with no resources
+  * Issue410     Reload Cache scheduler should process only requested groups
+  * Issue411     Locator cannot find resources during scheduler update
+  * Issue412     !ConnectionTimeout cannot be configured using wro.properties
+  * Issue413     Group is not extracted correctly when resource url contains jsessionID 
+
+===Release 1.4.4===
+*Date: 20 February 2012*
+  * Issue88	Invalidate the cache when model is updated
+  * Issue359	!PerformanceLoggerCallback doesn't work properly in some situations
+  * Issue361	!LessCssProcessor fails silently
+  * Issue362	Deep recursive wildcard pattern ** in classpath groups
+  * Issue364	!ObjectPoolHelper should use WHEN_EXHAUSTED_GROW policy
+  * Issue365	Problem in !LessCss extensibility
+  * Issue366	csslint not working via maven since 1.4.2
+  * Issue369	Upgrade rhino based processors to latest versions
+  * Issue370	reloadModel and reloadCache should be ignored if wro is not initialized yet
+  * Issue373	!NullPointerException while creating a !ProcessorsFactory which has decorated processors
+  * Issue378	CSSMin bug on Properties containing colon ":"
+  * Issue381	Exception while rewriting css url's containing $ character.
+
+
+===Release 1.4.3===
+*Date: 8 January 2012*
+  * Issue253	New UTF-8 encoding issues 
+  * Issue316	Callbacks support
+  * Issue339	Add a timestamp naming strategy.
+  * Issue341	No content type header sent for large resources
+  * Issue343	!WroManagerFactory should be injectable to the filter
+  * Issue345	ETag must be set before the content is written.
+  * Issue346	Reserved names support for !UglifyJsProcessor
+  * Issue347	!WroConfiguration and Context should be Injectable
+  * Issue350	Upgrade uglifyJs processor to latest version
+  * Issue353	wro4j-core doesn't work with jdk 1.5
+  * Issue354	Parallel preProcessing flag for wro4j-runner
+  * Issue355	Update less.js processor to latest version
+  * Issue356	Update uglifyJs processor to latest version
+  * Issue357	Update linters dependencies to latest version
+
+===Release 1.4.2===
+*Date: 7 December 2011*
+  * Issue100	JS Lint integration
+  * Issue305	Multiple concurrent calls into !WroFilter when Context.get().getConfig().getCacheUpdatePeriod() > 0 cause multiple watcher thread factories
+  * Issue306	wro4j filter fails on concurrent requests
+  * Issue308	Update google closure dependency version
+  * Issue309	Incorrect WARN statements report
+  * Issue310	Rhino is not exited, leaks memory
+  * Issue312	Wildcard resources are not order properly 
+  * Issue321	FileNotFoundException and NullPointerException are raised when multiple applications on tomcat
+  * Issue322	CSS url rewriting doesn't handle properly whitespace
+  * Issue323	Allow gzipped content to be cached
+  * Issue324	Changing cacheUpdatePeriod with JMX is broken
+  * Issue325	Expose additional properties through JMX
+  * Issue326	Google Closure externs configuration support
+  * Issue327	Processors relying on rhino are not thread-safe
+  * Issue328	Multiline comment stripper processor issue
+  * Issue329	Update cssLint processor to latest version
+  * Issue331	Parallel resource preProcessing  support
+  * Issue332	Update uglifyJs processor to latest version
+  * Issue334	Runner: exceptions are caught & logged, but, should exit with System.exit(1) so Ant and other CLI interfaces know there was an error
+  * Issue335	JsHint predef options bug
+  * Issue336	Maven plugin configuration issue
+
+===Release 1.4.1===
+*Date: 18 September 2011*
+  * Issue286	Upgrade dojoShrinksafe processor
+  * Issue287	!ConfigurableWroFilter and no processors defined
+  * Issue288	jshint maven plugin goal and customManagerFactory
+  * Issue290	Update jsHint processor to latest version
+  * Issue291	Update cssLint processor to latest version
+  * Issue293	Exceptions are not always logged
+  * Issue295	Create !ExtensionAwareProcessorDecorator
+  * Issue296	Extend !JsHint option configuration
+  * Issue297	Wrong report of the line number in jsHint
+  * Issue298	Make alias processor configuration extension aware
+  * Issue299	Problem with image background in maven plugin
+  * Issue300	Update uglifyJs processor to latest version
+  * Issue301	Upgrade !CoffeeScript to latest version
+
+===Release 1.4.0===
+[Release_Highlights_1_4_0 Release Higlights]
+*Date: 26 August 2011*
+  * Issue23	Create [GrailsPlugin Grails plugin]
+  * Issue196	Build wro model with [GroovyWroModel groovy script]
+  * Issue221	Normalize css url path generated by !CssUrlRewritingProcessor
+  * Issue245	Wildcard classpath resources and maven plugin
+  * Issue246	JsonHPack packer should accept plain JSON object
+  * Issue247	Wildcards expander support
+  * Issue252	Create [SmartWroModelFactory]
+  * Issue254	Simplify maven plugin processors configuration
+  * Issue255	Add !ModelTransformer support
+  * Issue256	Update uglifyJs processor to version 1.0.6
+  * Issue259	Problem with background url in css after aggregation
+  * Issue260	Update less.js to latest version
+  * Issue261	Remove BOM characters by default
+  * Issue262	Google closure compiler extensibility
+  * Issue263	Update cssLint processor to latest version
+  * Issue264	Configuration of pre processors for wro4j-runner
+  * Issue269	Processors configuration in config properties file
+  * Issue270	Improve performance of processors depending on Rhino
+  * Issue272	OOM in !LessCSS engine
+  * Issue277	google closure version upgrade
+  * Issue281	Reload model bug
+  * Issue283	Create a properties file to hold the mapping between original & renamed resource for maven plugin
+  * Issue284	Simplify processors configuration with !ConfigurableWroFilter
+
+
+===New release (1.3.8)===
+
+*Date: 22 June 2011*
+  * Issue226 !CopyrightKeeperProcessorDecorator doesn't inherit @Minimize annotation
+  * Issue228 !ServletContextLocator doesn't handle jsp files
+  * Issue229 Create JSON pack/unpack processors
+  * Issue230 Create !PlaceholderProcessor
+  * Issue231 minimizing new CSS 3 "@media" features.
+  * Issue232 Create !CssLint processor
+  * Issue233 WroConfiguration always print a warning message "You cannot disable cache in DEPLOYMENT mode"
+  * Issue234 Create !GoogleAdvancedStandaloneManagerFactory
+  * Issue235 Allow configure !WroFilter from properties file
+  * Issue236 Configure managerFactoryClassName from property configuration file
+  * Issue237 Create !CssLint maven plugin
+  * Issue238 Pre processors error reporting enhancement 
+  * Issue239 Change Wro4j maven plugin execution phase to compile
+  * Issue240 !SemicolonAppenderPreProcessor and empty scripts
+  * Issue241 !CssImportPreProcessor and ignoreMissingResources 
+  * Issue242 Add more processors to wro4j runner 
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.8
+
+===New release (1.3.7)===
+
+*Date: 31 May 2011*
+  * Issue190 Add coffeScript support to wro4j-runner
+  * Issue208 Ability to specify file.encoding in ConfigurableWroFilter	 
+  * Issue209 wro4j maven plugin detailed exception message	 
+  * Issue212 use a factory for WroConfiguration creation	 
+  * Issue214 Create Copyright Information Processor	
+  * Issue215 Update google closure dependency version	 
+  * Issue216 ConfigurableWroFilter configuration with Properties file	 
+  * Issue222 Upgrade CoffeeScript to version 1.1.1 & processor extensibility support	
+  * Issue223 Update uglifyJs processor to version 1.0.2
+  * Issue224 upgrade LessCss processor to latest version
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.7
+
+===New release (1.3.6)===
+
+*Date: 12 April 2011*
+  * Issue33 Integrate LRU cache strategy
+  * Issue92 Build wro model with JSON 
+  * Issue138 Externalize processor provider capability
+  * Issue181 Allow multiple wro.xml
+  * Issue182 WroModelFactory refactoring
+  * Issue183 ClassPathUriLocator wildcard support doesn't work with resources inside JARs
+  * Issue186 Less Css processor errors are not intuitive
+  * Issue187 Create [http://jashkenas.github.com/coffee-script/ Coffee script] processor
+  * Issue192 wro4j with jawrCssMinifier cannot handle css3 attribute selectors
+  * Issue197 Update google closure dependency version
+  * Issue200 Update uglifyJs compressor to latest version (1.0.1)
+  * Issue203 CssDataUri doesn't work with absolute url images
+  * Issue204 Add CssDataUriPreProcessor to ConfigurableWroManagerFactory
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.6
+
+===New release (1.3.5)===
+
+*Date: 10 March 2011*
+  * Issue141 CssDataUriPreProcessor should detect duplicate uri's
+  * Issue171 Browser loads optimized script/css and then waits for 20 seconds...
+  * Issue172 Create a jsHint processor
+  * Issue174 Gzipping resources doesn't not work on server enforcing response.setContentLength	
+  * Issue176 Create JsHint maven plugin (@see http://web-resource-optimization.blogspot.com/2011/03/build-time-javascript-code-analysis.html)
+  * Issue180 Upgrade uglifyJs
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.5
+
+===New release (1.3.4)===
+*Date: 13 February 2011*
+  * Issue46 Create command line tool (http://web-resource-optimization.blogspot.com/2011/02/simple-client-side-build-system-with.html) called wro4j-runner.
+  * Issue162 Input stream has been finalized or forced closed without being explicitly closed
+  * Issue163 lessCss parser shows INFO logging
+  * Issue164 Wildcard resources and classpath locator are not working properly
+  * Issue166 Add disableCacheInDevelopment flag to settings
+  * Issue168 Change Caching Headers in DEVELOPMENT Mode
+  * Issue169 Upgrade less.js version to 1.0.41
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.4
+
+===New release (1.3.3)===
+
+*Date: 11 January 2011*
+  * Issue155 Use DefaultCodingConvention for GoogleClosure compiler processor.
+  * Issue156 Improve Gzip compression support
+  * Issue157 Enclose ETag value in quotes
+  * Issue158 Prevent specific files from being compressed/minified
+  * Issue159 SemicolonAppenderPreProcessor should append semicolon only if needed
+  * Issue160 Update uglifyJs processor to latest version
+  * Issue161 Supress spurious duplicate resource detection on reload
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.3
+
+===New release (1.3.2)===
+
+*Date: 11 December 2010*
+  * Issue146 Resource status code is always 200
+  * Issue147 Use official google closure dependency
+  * Issue148 Update less.js processor 
+  * Issue149 CssImportPreProcessor uses a too restrictive PATTERN for finding imports
+  * Issue150 Maven artifact for wro4j-core and wro4j-extensions pulls unnecessary dependencies
+  * Issue151 ServletContext missing resources on Tomcat 
+  * Issue152 Wildcard Resources are not ordered alphabetically
+  * Issue153 Update uglifyJs processor to latest version
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.2
+
+===New release (1.3.1)===
+
+*Date: 7 November 2010*
+  * Issue122 Create UglifyJs processor
+  * Issue142 YuiJsMin compressor is broken in wro4j-1.3.0
+  * Issue143 Integrate DojoShrinksafe compressor
+  * Issue144 Prevent caching of wro api requests
+  * Issue145 Create beautifyJsProcessor based on UglifyJs beautifier
+
+Details: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.1
+
+===New release (1.3.0)===
+
+*Date: 1 November 2010*
+  * Issue13 Resource fingerprinting
+  * Issue68 Find an alternative way to set configuration mode
+  * Issue80 Maven plugin classpath resources support
+  * Issue86 Integrate SASS css meta framework
+  * Issue96 Demo web module
+  * Issue97 Trigger cache & model update through http request
+  * Issue99 Enable customized versioning of output resource for wro4j maven plugin
+  * Issue101 Dynamic resource locator must support redirects
+  * Issue102 Replace current LessCss processor implementation with a newer one
+  * Issue103 Create a processor for Packer JS compressor
+  * Issue104 Create preconfigured WroManagerFactories for maven using YUI & Google Closure 
+  * Issue105 WroConfiguration should not be the same for many applications 
+  * Issue106 Make targetGroups parameter optional for wro4j maven plugin 
+  * Issue107 Use daemon threads for schedulers 
+  * Issue108 Use scheduleWithFixedDelay when scheduling model update 
+  * Issue109 Create Conform Colors Css processor 
+  * Issue110 Create VariablizeColors css processor 
+  * Issue112 Create a css processor based on Andy Roberts CssCompressor 
+  * Issue113 Encoding issue 
+  * Issue114 Maven plugin doesn't handle correctly wildcards 
+  * Issue115 Detect duplicated resources  
+  * Issue116 Maven plugin shouldn't create empty files 
+  * Issue117 Maven plugin should allow configuration of naming strategy 
+  * Issue121 wro4j does not work behind a RequestDispatcher.include  
+  * Issue123 Reuse YUICompressor code & remove dependency
+  * Issue124 newCacheStrategy method should be protected in BaseWroManagerFactory 
+  * Issue125 Processors execution order
+  * Issue128 Upgrade LessCss to 1.0.36 version 
+  * Issue129 Upgrade google closure dependency to latest revision 
+  * Issue131 Classpath UriLocator doesn't accept empty spaces
+  * Issue134 Resource comparison test - refactoring 
+  * Issue135 Get rid of wro4j-test-utils artifact
+
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.3.0
+
+
+===New release (1.2.8)===
+*Date: 27 June 2010*
+  * Issue91 CSS url rewriting creates incorrect urls for CSS rules that include quoted urls
+  * Issue93 Use scheduleWithFixedDelay when scheduling cache update 
+
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.8
+
+===New release (1.2.7)===
+*Date: 10 May 2010*
+  * Issue21 Wildcard syntax support in group definition
+  * Issue38 Add support for base 64-encoded image in CSS	
+  * Issue48 interpoloation of the wro.xml
+  * Issue81 Create NoProcessors ManagerFactory
+  * Issue83 GroupExtractor should use HttpServletRequest to get the group name
+  * Issue84 Slf4j dependency is not added by maven	
+  * Issue85 Create a google closure distribution for wro4j integration	
+  * Issue87 UriLocators implementations shouldn't be final
+  * Issue89 Add ServletContext parameter to newModelFactory method
+  * Issue90 BomStripper should support also CSS resources 
+
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.7
+ 
+===New release (1.2.6)===
+*Date: 22 apr 2010*
+  * Issue15 Integrate CSS meta frameworks (See [LessCssSupport] wiki page)
+  * Issue77 Compatibility with servlet-api-2.3
+  * Issue78 Add granular destinationFolder control for maven plugin
+  * Issue79 HashCode implementation of Group and Resource classes
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.6
+ 
+===New release (1.2.5)===
+*Date: 19 apr 2010*
+  * Issue74 wro4j-maven-plugin-1.2.3 is broken 
+  * Issue76 Make wro4j compatible with java 1.5
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.5
+
+===New release (1.2.4)===
+*Date: 18 apr 2010*
+  * Issue25 Integrate Google Closure compiler
+  * Issue69 Configurable MBean object name
+  * Issue70 ConfigurableWroManagerFactory JMX problem
+  * Issue71 CssVariablesProcessor must be before CssUrlRewritingProcessor
+  * Issue72 Add ignoreMissingResources to wro4j Maven Plugin
+  * Issue73 Processors execution order in ConfigurableWroManagerFactory
+  * Issue75 Create ExtensionsConfigurableWroManagerFactory
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.4
+
+===New release (1.2.3)===
+*Date: 15 apr 2010*
+  * Issue27 Configure expires headers using init-param
+  * Issue61 ConfigurableWroManagerFactory related exception
+  * Issue62 Create a fallback aware ModelFactory
+  * Issue63 Reloading cache is not working properly
+  * Issue64 CssUrlRewriting for css from WEB-INF folder
+  * Issue65 Exception when dealing with dynamic resources
+  * Issue66 Update caching headers when the resources cache is updated
+  * Issue67 Allow custom handling of WroRuntimeException
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.3
+
+===New release (1.2.2)===
+*Date: 9 apr 2010*
+  * Issue58 Configurable GroupsProcessors for Wro4j maven plugin
+  * Issue59 JMX Configurations
+  * Issue60 Failure when attempting to set Content-Encoding
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.2
+
+
+===New release (1.2.1)===
+  * Issue51 wro4j maven plugin enhancements
+  * Issue52 Invalid resource handling
+  * Issue54 Make cacheUpdatePeriod and modelUpdatePeriod configurable
+  * Issue55 Create semicolon Appender Javascript pre processor
+  * Issue56 Switch minimization on/off in DEVELOPMENT mode
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.1
+
+===New release (1.2.0)===
+  * Issue2 Enable/disable Gzip using request parameter
+  * Issue3 Remove logic from WroFilter
+  * Issue5 Document "How to extend & integrate"
+  * Issue6 Create maven 2 plugin
+  * Issue16 Upload wro4j to maven central repository
+  * Issue17 Support @import in css resources
+  * Issue18 Variables cannot be externalized
+  * Issue26 Create WroManagerFactory capable of being configured using init-params
+  * Issue28 JMX support to change the behaviour at runtime
+  * Issue30 Create security strategy for resource streaming
+  * Issue35 Create MultipleGroup uriRequestProcessor
+  * Issue36 Runtime Configuration Option
+  * Issue40 XmlModelFactory improvements
+  * Issue43 Move code base to GitHub
+  * Issue47 BOM Characters at beginning of JS files breaks JS concatenation
+  * Issue50 Core dependency to slf4j-log4j12
+See details here: http://code.google.com/p/wro4j/issues/list?can=1&q=milestone:1.2.0
