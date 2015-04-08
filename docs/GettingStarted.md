@@ -7,22 +7,22 @@ Before configuring wro4j into your application, it might be a good idea to see t
 
 
 Getting started is as simple as following 3 steps:
-  # Configure [Installation wro4j filter in web.xml]
-  # Create [WroFileFormat WEB-INF/wro.xml] file
-  # Add resource to your html
+    * Configure [Installation wro4j filter in web.xml]
+    * Create [WroFileFormat WEB-INF/wro.xml] file
+    * Add resource to your html
 
 
 ## Step 1: Add the binary distribution of wro4j to you project classpath 
 
 You have three options here:
   ** Add wro4j maven dependency. It can be found on maven central repo.
-{{{
+```xml
 <dependency>
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-core</artifactId>
   <version>${wro4j.version}</version>
 </dependency>
-}}}
+```
 
 If you want to use additional features (like Google closure compiler or YUI compressor), add also wro4j-extensions dependency. The only requirement is to use at least JDK 1.6.
 ```xml
@@ -35,10 +35,10 @@ If you want to use additional features (like Google closure compiler or YUI comp
 
 Note: using maven is the recommended option, because it will bring for you all dependencies (like commons-io, google closure or rhino).
 
-  ** Second option is to download the binary distribution from [http://code.google.com/p/wro4j/downloads/list Downloads] page and to put it in the classpath. <br><br>
-  ** The third option is to build the library yourself:    
-    ** Checkout from [https://github.com/alexo/wro4j github]).
-    ** Build instruction with maven:
+    * Second option is to download the binary distribution from [http://code.google.com/p/wro4j/downloads/list Downloads] page and to put it in the classpath. <br><br>
+    * The third option is to build the library yourself:    
+        ** Checkout from [https://github.com/alexo/wro4j github]).
+        ** Build instruction with maven:
 ```
 cd wro4j
 mvn install
@@ -81,10 +81,10 @@ More details can be found [Installation here]
 A group is a logical bundle of resources. A single group can contain both CSS and !JavaScript resources.  A file will be built for each different type of resource included in the group. For example, if a group named 'core-scripts' only contains '.js' files, then a single file named 'core-scripts.js' will be generated.  If a group named 'main' contains both '.js' and '.css' files, then two files will be generated, named 'main.js' and 'main.css'.
 
 When creating groups, you may adopt different strategies. For instance:
-  # You can create a single group containing all files... (not so nice:)
-  # Each group may refer the resources contained in for each page of the application, like: home, contact, checkout, etc... 
-  # A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
-  # Or you can group your resources whatever way you like...
+    * You can create a single group containing all files... (not so nice:)
+    * Each group may refer the resources contained in for each page of the application, like: home, contact, checkout, etc... 
+    * A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
+    * Or you can group your resources whatever way you like...
 
 ## Step 4: Include desired groups as js or css resources ==
 
