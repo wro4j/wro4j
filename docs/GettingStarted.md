@@ -1,22 +1,22 @@
 #summary How to get started with wro4j.
 #labels Featured,Phase-Implementation,Phase-Design
 
-Related Pages: [http://alexo.github.com/wro4j wro4j in a nutshell], [Installation], [MavenPlugin],[DesignOverview]
+Related Pages: [wro4j in a nutshell](http://wro4j.github.com/wro4j), [Installation](Installation), [MavenPlugin](MavenPlugin),[DesignOverview](DesignOverview)
 
 Before configuring wro4j into your application, it might be a good idea to see the [DesignOverview overall picture of wro4j design]. 
 
 
 Getting started is as simple as following 3 steps:
 
-    *   Configure [Installation wro4j filter in web.xml]
-    *   Create [WroFileFormat WEB-INF/wro.xml] file
-    *   Add resource to your html
+* Configure [Installation wro4j filter in web.xml]
+* Create [WroFileFormat WEB-INF/wro.xml] file
+* Add resource to your html)
 
 
 ## Step 1: Add the binary distribution of wro4j to you project classpath 
 
 You have three options here:
-  ** Add wro4j maven dependency. It can be found on maven central repo.
+* Add wro4j maven dependency. It can be found on maven central repo.
 ```xml
 <dependency>
   <groupId>ro.isdc.wro4j</groupId>
@@ -36,11 +36,12 @@ If you want to use additional features (like Google closure compiler or YUI comp
 
 Note: using maven is the recommended option, because it will bring for you all dependencies (like commons-io, google closure or rhino).
 
-    *   Second option is to download the binary distribution from [http://code.google.com/p/wro4j/downloads/list Downloads] page and to put it in the classpath. <br><br>
-    *   The third option is to build the library yourself:    
-        **   Checkout from [https://github.com/alexo/wro4j github]).
-        **   Build instruction with maven:
-```
+* Second option is to download the binary distribution from [http://code.google.com/p/wro4j/downloads/list Downloads] page and to put it in the classpath. <br><br>
+* The third option is to build the library yourself:    
+--* Checkout from [https://github.com/alexo/wro4j github]).
+--* Build instruction with maven:
+
+```python
 cd wro4j
 mvn install
 ```
@@ -83,10 +84,10 @@ A group is a logical bundle of resources. A single group can contain both CSS an
 
 When creating groups, you may adopt different strategies. For instance:
 
-    *   You can create a single group containing all files... (not so nice:)
-    *   Each group may refer the resources contained in for each page of the application, like: home, contact, checkout, etc... 
-    *   A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
-    *   Or you can group your resources whatever way you like...
+* You can create a single group containing all files... (not so nice:)
+* Each group may refer the resources contained in for each page of the application, like: home, contact, checkout, etc... 
+* A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
+* Or you can group your resources whatever way you like...
 
 ## Step 4: Include desired groups as js or css resources 
 
