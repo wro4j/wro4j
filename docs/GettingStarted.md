@@ -45,7 +45,7 @@ mvn install
 ```
 
 
-## Step 2: Configure the wro4j Servlet Filter in web.xml ==
+## Step 2: Configure the wro4j Servlet Filter in web.xml 
 More details can be found [Installation here]
 
 ## Step 3: Create wro.xml under WEB-INF directory and organize your resources in groups 
@@ -86,7 +86,7 @@ When creating groups, you may adopt different strategies. For instance:
     * A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
     * Or you can group your resources whatever way you like...
 
-## Step 4: Include desired groups as js or css resources ==
+## Step 4: Include desired groups as js or css resources 
 
 Here is an example on how to include in a page all resources from group g2. Please not that you use only one reference to link all CSS resources in a group (same applies for JS resources). You have to use the correct extension '.css' or '.js' after the group name.
 
