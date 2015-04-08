@@ -12,7 +12,7 @@ Getting started is as simple as following 3 steps:
   # Add resource to your html
 
 
-== Step 1: Add the binary distribution of wro4j to you project classpath ==
+## Step 1: Add the binary distribution of wro4j to you project classpath 
 
 You have three options here:
   ** Add wro4j maven dependency. It can be found on maven central repo.
@@ -25,13 +25,13 @@ You have three options here:
 }}}
 
 If you want to use additional features (like Google closure compiler or YUI compressor), add also wro4j-extensions dependency. The only requirement is to use at least JDK 1.6.
-{{{
+```xml
 <dependency>
   <groupId>ro.isdc.wro4j</groupId>
   <artifactId>wro4j-extensions</artifactId>
   <version>${wro4j.version}</version>
 </dependency>
-}}}
+```
 
 Note: using maven is the recommended option, because it will bring for you all dependencies (like commons-io, google closure or rhino).
 
@@ -39,18 +39,18 @@ Note: using maven is the recommended option, because it will bring for you all d
   ** The third option is to build the library yourself:    
     ** Checkout from [https://github.com/alexo/wro4j github]).
     ** Build instruction with maven:
-{{{
+```
 cd wro4j
 mvn install
-}}}
+```
 
 
-== Step 2: Configure the wro4j Servlet Filter in web.xml ==
+## Step 2: Configure the wro4j Servlet Filter in web.xml ==
 More details can be found [Installation here]
 
-== Step 3: Create wro.xml under WEB-INF directory and organize your resources in groups ==
+## Step 3: Create wro.xml under WEB-INF directory and organize your resources in groups 
 
-{{{
+```xml
 <groups xmlns="http://www.isdc.ro/wro">
   <group name="g1">
     <js>classpath:com/mysite/resource/js/1.js</js>
@@ -73,11 +73,11 @@ More details can be found [Installation here]
   </group>
 
 </groups>
-}}}
+```
 
   (For more information, see the [WroFileFormat 'wro.xml' File Format specification].)
 
-=== About groups ===
+### About groups 
 A group is a logical bundle of resources. A single group can contain both CSS and !JavaScript resources.  A file will be built for each different type of resource included in the group. For example, if a group named 'core-scripts' only contains '.js' files, then a single file named 'core-scripts.js' will be generated.  If a group named 'main' contains both '.js' and '.css' files, then two files will be generated, named 'main.js' and 'main.css'.
 
 When creating groups, you may adopt different strategies. For instance:
@@ -86,11 +86,11 @@ When creating groups, you may adopt different strategies. For instance:
   # A group may contain widget related resources. Lets say you use tableSorter jquery widget which besides a js, has also few css used for default styling. In this case you can create a group called *tableSorter* which will include associated js & css resources. 
   # Or you can group your resources whatever way you like...
 
-== Step 4: Include desired groups as js or css resources ==
+## Step 4: Include desired groups as js or css resources ==
 
 Here is an example on how to include in a page all resources from group g2. Please not that you use only one reference to link all CSS resources in a group (same applies for JS resources). You have to use the correct extension '.css' or '.js' after the group name.
 
-{{{
+```html
 <html>
   <head>
     <title>Web Frameworks Comparison</title>
@@ -101,10 +101,10 @@ Here is an example on how to include in a page all resources from group g2. Plea
     //Body
   </body>
 </html>
-}}}
+```
 
 ----
 
-== Class Diagram ==
+## Class Diagram 
 
 [http://wro4j.googlecode.com/svn/wiki/ClassDiagram.jpg The code class structure is diagrammed here].
