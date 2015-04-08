@@ -1,6 +1,3 @@
-#summary How to get started with wro4j.
-#labels Featured,Phase-Implementation,Phase-Design
-
 Related Pages: [wro4j in a nutshell](http://wro4j.github.com/wro4j), [Installation](Installation), [MavenPlugin](MavenPlugin),[DesignOverview](DesignOverview)
 
 Before configuring wro4j into your application, it might be a good idea to see the [DesignOverview overall picture of wro4j design]. 
@@ -8,7 +5,7 @@ Before configuring wro4j into your application, it might be a good idea to see t
 
 Getting started is as simple as following 3 steps:
 
-* Configure [Installation wro4j filter in web.xml]
+* Configure [wro4j filter in web.xml](Installation)
 * Create [WroFileFormat WEB-INF/wro.xml] file
 * Add resource to your html)
 
