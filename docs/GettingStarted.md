@@ -6,7 +6,7 @@ Before configuring wro4j into your application, it might be a good idea to see t
 Getting started is as simple as following 3 steps:
 
 * Configure [wro4j filter in web.xml](Installation)
-* Create [WroFileFormat WEB-INF/wro.xml] file
+* Create [WEB-INF/wro.xml](WroFileFormat) file
 * Add resource to your html)
 
 
@@ -33,9 +33,9 @@ If you want to use additional features (like Google closure compiler or YUI comp
 
 Note: using maven is the recommended option, because it will bring for you all dependencies (like commons-io, google closure or rhino).
 
-* Second option is to download the binary distribution from [http://code.google.com/p/wro4j/downloads/list Downloads] page and to put it in the classpath. <br><br>
+* Second option is to download the binary distribution from [Downloads](https://drive.google.com/folderview?id=0Bw_8FNG2SipAT2VHOHlHbW9WLUE&usp=sharing) page and to put it in the classpath. <br><br>
 * The third option is to build the library yourself:    
---* Checkout from [https://github.com/alexo/wro4j github]).
+--* Checkout from [github](https://github.com/wro4j/wro4j)).
 --* Build instruction with maven:
 
 ```python
@@ -45,7 +45,7 @@ mvn install
 
 
 ## Step 2: Configure the wro4j Servlet Filter in web.xml 
-More details can be found [Installation here]
+More details can be found [here](Installation)
 
 ## Step 3: Create wro.xml under WEB-INF directory and organize your resources in groups 
 
@@ -107,4 +107,4 @@ Here is an example on how to include in a page all resources from group g2. Plea
 
 ## Class Diagram 
 
-[http://wro4j.googlecode.com/svn/wiki/ClassDiagram.jpg The code class structure is diagrammed here].
+[The code class structure is diagrammed here](http://wro4j.googlecode.com/svn/wiki/ClassDiagram.jpg).
