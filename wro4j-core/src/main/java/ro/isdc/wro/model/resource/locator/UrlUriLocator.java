@@ -76,7 +76,8 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     final URLConnection connection = url.openConnection();
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
-
+    //add explicit user agent header. This is required by some cdn resources which otherwise would return 403 status code.
+    connection.setRequestProperty("User-Agent", "java");
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.
     connection.setConnectTimeout(timeout);
