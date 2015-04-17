@@ -1,8 +1,8 @@
 # The project is moving to a [new location] (https://github.com/wro4j/wro4j)
 
 # <img src="http://code.google.com/p/wro4j/logo"> Web Resource Optimizer for Java
-[![Build Status](https://api.travis-ci.org/alexo/wro4j.svg)](http://travis-ci.org/alexo/wro4j)
-[<img src="https://badges.gitter.im/alexo/wro4j.svg" class="copy-button view" data-copy-text="[![Gitter chat](https://badges.gitter.im/alexo/wro4j.svg)]">](https://gitter.im/alexo/wro4j)
+[![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
+[<img src="https://badges.gitter.im/wro4j/wro4j.svg" class="copy-button view" data-copy-text="[![Gitter chat](https://badges.gitter.im/wro4j/wro4j.svg)]">](https://gitter.im/alexo/wro4j)
 
 
 wro4j is a free and Open Source Java project which will help you to [easily improve](http://alexo.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://code.google.com/p/wro4j/wiki/WroFileFormat), merge & minify them at [run-time](http://code.google.com/p/wro4j/wiki/Installation) (using a simple filter) or [build-time](http://code.google.com/p/wro4j/wiki/MavenPlugin) (using maven plugin) and has a [dozen of features](http://code.google.com/p/wro4j/wiki/Features) you may find useful when dealing with web resources.

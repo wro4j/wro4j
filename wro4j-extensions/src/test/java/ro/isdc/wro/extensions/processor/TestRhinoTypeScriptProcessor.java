@@ -17,6 +17,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -35,6 +36,7 @@ import ro.isdc.wro.util.WroTestUtils;
  *
  * @author Alex Objelean
  */
+@Ignore
 public class TestRhinoTypeScriptProcessor {
   private ResourcePreProcessor victim;
 

@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.8.3</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -243,8 +243,13 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>webjars-locator</artifactId>
-                <version>0.19</version>
+                <version>0.21</version>
             </dependency>
+	    <dependency>
+		<groupId>org.mozilla</groupId>
+		<artifactId>rhino</artifactId>
+		<version>1.7.6</version>
+	    </dependency>
             <!-- Unit tests -->
             <dependency>
                 <groupId>junit</groupId>
