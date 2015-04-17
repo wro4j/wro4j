@@ -74,7 +74,7 @@ p + h1 {
 #important {
   color: red !important;
   width: 100% !important;
-  height: 20px !important;
+  height: 20px ! important;
 }
 #data-uri {
   background: url(data:image/png;charset=utf-8;base64,
