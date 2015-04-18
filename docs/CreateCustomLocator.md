@@ -93,7 +93,7 @@ public class MyConfigurableProvider
 }
 ```
 
-Notice that the ```DefaultConfigurableProvider``` extends ```ConfigurableProviderSupport}}} which provides default implementation for all interfaces the ```ro.isdc.wro.util.provider.ConfigurableProvider``` extends.
+Notice that the ```DefaultConfigurableProvider``` extends ```ConfigurableProviderSupport``` which provides default implementation for all interfaces the ```ro.isdc.wro.util.provider.ConfigurableProvider``` extends.
 
 The next step is to register that implementation as a service at the following location in the classpath:
 
