@@ -91,7 +91,7 @@ public class MyConfigurableProvider
     return //provide a map with custom locators
   }
 }
-}}}
+```
 
 Notice that the ```DefaultConfigurableProvider``` extends ```ConfigurableProviderSupport}}} which provides default implementation for all interfaces the ```ro.isdc.wro.util.provider.ConfigurableProvider``` extends.
 
