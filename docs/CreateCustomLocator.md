@@ -1,22 +1,22 @@
 # Introduction 
-By default, wro4j provides 3 locators: !ClasspathUriLocator, !UrlUriLocator, !ServletContextUriLocator. It is very unlikely that you would require a custom locator, because existing one covers almost all use-cases you may have. 
+By default, wro4j provides 3 locators: ClasspathUriLocator, UrlUriLocator, ServletContextUriLocator. It is very unlikely that you would require a custom locator, because existing one covers almost all use-cases you may have. 
 
 
 # Implement Custom Locator
 But, in case you still need a custom one, just implement UriLocator interface:
 
-{{{
+```java
 public interface UriLocator {
   InputStream locate(final String uri) throws IOException;
   boolean accept(final String uri);
 }
-}}}
+```
 
 # Configure Custom Locator 
 There are more options to configure custom locator with wro4j. 
 
 ## Using Custom managerFactory 
-The most low level approach is to create a custom !WroManagerFactory which implements the !UriLocatorFactory interface. 
+The most low level approach is to create a custom WroManagerFactory which implements the UriLocatorFactory interface. 
 
 ```java
 public class CustomWroManagerFactory extends BaseWroManagerFactory {
@@ -27,9 +27,9 @@ public class CustomWroManagerFactory extends BaseWroManagerFactory {
 }
 ```
 
-The last thing to do, is to configure *!CustomWroManager* to be used by [Installation wroFilter] or [MavenPlugin maven plugin]
+The last thing to do, is to configure *CustomWroManager* to be used by [wroFilter](Installation) or [maven plugin](MavenPlugin)
 
-== Using ConfigurableWroManagerFactory ==
+## Using ConfigurableWroManagerFactory 
 ConfigurableWroManagerFactory allows a simplified configuration with aliases. The idea is that each locator has an associated alias and the locators can be configured in wro.properties (the location and name of this file is configurable) like this:
 
 ```xml
@@ -38,9 +38,9 @@ uriLocators=servletContext,uri,classpath
 
 It is possible to associated new (or even same) aliases with new custom locator implementations. 
 
-### Using !LocatorProvider 
+### Using LocatorProvider 
 This option is available since 1.4.7.
-One option to provide custom associations of locator alias and corresponding implementation is to create a class which implements {{{ro.isdc.wro.model.resource.locator.support.LocatorProvider}}} interface. For instance the default aliases are provided like this:
+One option to provide custom associations of locator alias and corresponding implementation is to create a class which implements ```ro.isdc.wro.model.resource.locator.support.LocatorProvider``` interface. For instance the default aliases are provided like this:
 
 ```java
 public class DefaultLocatorProvider
