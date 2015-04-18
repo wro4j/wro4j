@@ -140,7 +140,7 @@ public class MyConfigurableWroManagerFactory
 ```
 
 And finally, update the filter configuration in web.xml:
-{{{
+```xml
   <filter>
     <filter-name>WebResourceOptimizer</filter-name>
     <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
@@ -161,36 +161,36 @@ And finally, update the filter configuration in web.xml:
       <param-value>myPostProcessor</param-value>
     </init-param>
   </filter>
-}}}
+```
 
-===Available Locators===
-|| *Name* || *Class* || 
-|| servletContext || ServletContextUriLocator ||
-|| classpath || ClasspathUriLocator ||
-|| url || UrlUriLocator ||
+### Available Locators
+| *Name* | *Class* | 
+| servletContext | ServletContextUriLocator |
+| classpath | ClasspathUriLocator |
+| url | UrlUriLocator |
 
 
-== ExtensionsConfigurableWroManagerFactory ==
+## ExtensionsConfigurableWroManagerFactory 
 The ExtensionsConfigurableWroManagerFactory is an extension of ConfigurableWroManagerFactory located in extensions module, contributing with the following processors:
 
-  * yuiCssMin - YUICssCompressorProcessor()
-  * yuiJsMin - YUIJsCompressorProcessor()
-  * googleClosureSimple - GoogleClosureCompressorProcessor()
-  * googleClosureAdvanced - GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS)
+* yuiCssMin - YUICssCompressorProcessor()
+* yuiJsMin - YUIJsCompressorProcessor()
+* googleClosureSimple - GoogleClosureCompressorProcessor()
+* googleClosureAdvanced - GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS)
 
 In order to use it, all you have to do is:
 # add wro4j-extensions to classpath, manually or by adding wro4j-extensions dependency to pom.xml:
-{{{
+```xml
 <dependency>
     <groupId>ro.isdc.wro4j</groupId>
     <artifactId>wro4j-extensions</artifactId>
     <version>${wro4j.version}</version>
 </dependency>
-}}}
+```
 where *wro4j.version* - is the latest version of wro4j.
-# configure the filter this way:
+configure the filter this way:
 
-{{{
+```xml
   <filter>
     <filter-name>WebResourceOptimizer</filter-name>
     <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
@@ -211,4 +211,4 @@ where *wro4j.version* - is the latest version of wro4j.
       <param-value>cssVariables,googleClosureSimple,yuiCssMin</param-value>
     </init-param>
   </filter>
-}}}
+```
