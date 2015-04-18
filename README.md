@@ -1,5 +1,3 @@
-# The project is moving to a [new location] (https://github.com/wro4j/wro4j)
-
 # <img src="http://code.google.com/p/wro4j/logo"> Web Resource Optimizer for Java
 [![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
 [<img src="https://badges.gitter.im/wro4j/wro4j.svg" class="copy-button view" data-copy-text="[![Gitter chat](https://badges.gitter.im/wro4j/wro4j.svg)]">](https://gitter.im/alexo/wro4j)
