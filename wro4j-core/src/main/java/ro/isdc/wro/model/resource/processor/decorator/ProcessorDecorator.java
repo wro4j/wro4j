@@ -79,9 +79,6 @@ public class ProcessorDecorator
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     if (isEnabled(resource)) {
@@ -123,9 +120,6 @@ public class ProcessorDecorator
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return getDecoratedObject().toString();
