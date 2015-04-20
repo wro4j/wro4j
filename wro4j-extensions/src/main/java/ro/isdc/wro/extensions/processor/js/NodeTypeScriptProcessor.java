@@ -92,6 +92,7 @@ public class NodeTypeScriptProcessor
     // the file holding the input file to process
     File tempSource = null;
     File tempDest = null;
+    InputStream tempInputStream = null;
     try {
       tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
@@ -101,7 +102,8 @@ public class NodeTypeScriptProcessor
 
       final Process process = createProcess(tempSource, tempDest);
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
-      final String result = IOUtils.toString(new FileInputStream(tempDest), encoding);
+      tempInputStream = new FileInputStream(tempDest);
+      final String result = IOUtils.toString(tempInputStream, encoding);
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
         String errorMessage = IOUtils.toString(process.getInputStream(), encoding);
@@ -114,6 +116,8 @@ public class NodeTypeScriptProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
+      //close input stream to allow file to be deleted (otherwise deletion fails).
+      IOUtils.closeQuietly(tempInputStream);
       IOUtils.closeQuietly(shellIn);
       // always cleanUp
       FileUtils.deleteQuietly(tempSource);
