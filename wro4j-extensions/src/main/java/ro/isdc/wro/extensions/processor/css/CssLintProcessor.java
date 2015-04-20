@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLint;
+import ro.isdc.wro.extensions.processor.support.csslint.CssLintError;
 import ro.isdc.wro.extensions.processor.support.csslint.CssLintException;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
@@ -25,135 +26,134 @@ import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
 
-
 /**
- * Processor which analyze the css code and warns you found problems. The processing result won't change no matter if
- * the processed script contains errors or not. The underlying implementation uses CSSLint script utility {@link https
- * ://github.com/stubbornella/csslint}.
+ * Processor which analyze the css code and warns you found problems. The processing result won't change no matter if the processed script
+ * contains errors or not. The underlying implementation uses CSSLint script utility {@link https ://github.com/stubbornella/csslint}.
  *
  * @author Alex Objelean
  * @since 1.3.8
  * @created 19 Jun 2011
  */
 @SupportedResourceType(ResourceType.CSS)
-public class CssLintProcessor
-  implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
-  private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
-  public static final String ALIAS = "cssLint";
-  /**
-   * CSV Options.
-   */
-  private String options;
+public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
+    private static final Logger LOG = LoggerFactory.getLogger(CssLintProcessor.class);
+    public static final String ALIAS = "cssLint";
+    /**
+     * CSV Options.
+     */
+    private String options;
 
-  private ObjectPoolHelper<CssLint> enginePool;
+    private ObjectPoolHelper<CssLint> enginePool;
 
-  public CssLintProcessor() {
-    enginePool = new ObjectPoolHelper<CssLint>(new ObjectFactory<CssLint>() {
-      @Override
-      public CssLint create() {
-        return newCssLint();
-      }
-    });
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    final String content = IOUtils.toString(reader);
-    final CssLint cssLint = enginePool.getObject();
-    try {
-      cssLint.setOptions(getOptions()).validate(content);
-    } catch (final CssLintException e) {
-      onCssLintException(e, resource);
-    } catch (final WroRuntimeException e) {
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.error("Exception while applying " + ALIAS + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
-      onException(e);
-    } finally {
-      // don't change the processed content no matter what happens.
-      writer.write(content);
-      reader.close();
-      writer.close();
-      enginePool.returnObject(cssLint);
+    public CssLintProcessor() {
+        enginePool = new ObjectPoolHelper<CssLint>(new ObjectFactory<CssLint>() {
+            @Override
+            public CssLint create() {
+                return newCssLint();
+            }
+        });
     }
-  }
 
-  /**
-   * Invoked when an unexpected exception occurred during processing. By default the exception is thrown further.
-   */
-  protected void onException(final WroRuntimeException e) {
-    throw e;
-  }
-
-  /**
-   * @return {@link CssLint} instance.
-   */
-  protected CssLint newCssLint() {
-    return new CssLint();
-  }
-
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(final Reader reader, final Writer writer) throws IOException {
-    process(null, reader, writer);
-  }
-
-  /**
-   * Called when {@link CssLintException} is thrown. Allows subclasses to re-throw this exception as a
-   * {@link RuntimeException} or handle it differently.
-   *
-   * @param e {@link CssLintException} which has occurred.
-   * @param resource the processed resource which caused the exception.
-   */
-  protected void onCssLintException(final CssLintException e, final Resource resource) {
-    LOG.error("The following resource: " + resource + " has " + e.getErrors().size() + " errors.", e);
-  }
-
-  /**
-   * @param options a CSV representation of options.
-   */
-  public CssLintProcessor setOptionsAsString(final String options) {
-    this.options = options;
-    return this;
-  }
-
-  /**
-   * Sets an array of options.
-   * Use {@link #setOptionsAsString(String)} instead.
-   */
-  @Deprecated
-  public CssLintProcessor setOptions(final String... options) {
-    this.options = StringUtils.join(options, ',');
-    LOG.debug("setOptions: {}", this.options);
-    return this;
-  }
-
-  /**
-   * @return an options as CSV.
-   */
-  private String getOptions() {
-    if (options == null) {
-      options = createDefaultOptions();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
+        final String content = IOUtils.toString(reader);
+        final CssLint cssLint = enginePool.getObject();
+        try {
+            cssLint.setOptions(getOptions()).validate(content);
+        } catch (final CssLintException e) {
+            onCssLintException(e, resource);
+        } catch (final WroRuntimeException e) {
+            final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+            LOG.error("Exception while applying " + ALIAS + " processor on the " + resourceUri
+                    + " resource, no processing applied...", e);
+            onException(e);
+        } finally {
+            // don't change the processed content no matter what happens.
+            writer.write(content);
+            reader.close();
+            writer.close();
+            enginePool.returnObject(cssLint);
+        }
     }
-    return options;
-  }
 
-  /**
-   * @return default options to use for linting.
-   */
-  protected String createDefaultOptions() {
-    return "";
-  }
+    /**
+     * Invoked when an unexpected exception occurred during processing. By default the exception is thrown further.
+     */
+    protected void onException(final WroRuntimeException e) {
+        throw e;
+    }
 
-  @Override
-  public void destroy() throws Exception {
-    enginePool.destroy();
-  }
+    /**
+     * @return {@link CssLint} instance.
+     */
+    protected CssLint newCssLint() {
+        return new CssLint();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void process(final Reader reader, final Writer writer) throws IOException {
+        process(null, reader, writer);
+    }
+
+    /**
+     * Called when {@link CssLintException} is thrown. Allows subclasses to re-throw this exception as a {@link RuntimeException} or handle
+     * it differently.
+     *
+     * @param e {@link CssLintException} which has occurred.
+     * @param resource the processed resource which caused the exception.
+     */
+    protected void onCssLintException(final CssLintException e, final Resource resource) {
+        final String uri = resource == null ? StringUtils.EMPTY : resource.getUri();
+        LOG.error("The following resource: " + uri + " has " + e.getErrors().size() + " errors.");
+        for (final CssLintError x : e.getErrors()) {
+            LOG.error(uri + " line " + x.getLine() + " column " + x.getCol() + ": " + x.getType() + " "
+                    + x.getMessage());
+        }
+    }
+
+    /**
+     * @param options a CSV representation of options.
+     */
+    public CssLintProcessor setOptionsAsString(final String options) {
+        this.options = options;
+        return this;
+    }
+
+    /**
+     * Sets an array of options. Use {@link #setOptionsAsString(String)} instead.
+     */
+    @Deprecated
+    public CssLintProcessor setOptions(final String... options) {
+        this.options = StringUtils.join(options, ',');
+        LOG.debug("setOptions: {}", this.options);
+        return this;
+    }
+
+    /**
+     * @return an options as CSV.
+     */
+    private String getOptions() {
+        if (options == null) {
+            options = createDefaultOptions();
+        }
+        return options;
+    }
+
+    /**
+     * @return default options to use for linting.
+     */
+    protected String createDefaultOptions() {
+        return "";
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        enginePool.destroy();
+    }
 }
