@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -113,7 +114,7 @@ public class Wro4jMojo
     if (groupNameMappingFile != null && isIncrementalBuild()) {
       try {
         // reuse stored properties for incremental build
-        groupNames.load(new FileInputStream(groupNameMappingFile));
+        groupNames.load(new AutoCloseInputStream(new FileInputStream(groupNameMappingFile)));
       } catch (final IOException e) {
         getLog().debug("Cannot load " + groupNameMappingFile.getPath());
       }

@@ -193,7 +193,7 @@ public class XmlModelFactory
     try {
       final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
-      final Document document = factory.newDocumentBuilder().parse(getModelResourceAsStream());
+      final Document document = factory.newDocumentBuilder().parse(new AutoCloseInputStream(getModelResourceAsStream()));
       document.getDocumentElement().normalize();
       if (isValidateXml()) {
         validate(document);
@@ -218,7 +218,7 @@ public class XmlModelFactory
   private InputStream getSchemaStream()
       throws IOException {
     // use the class located in same package where xsd is located
-    return WroRuntimeException.class.getResourceAsStream(XML_SCHEMA_FILE);
+    return new AutoCloseInputStream(WroRuntimeException.class.getResourceAsStream(XML_SCHEMA_FILE));
   }
 
   /**

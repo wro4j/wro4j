@@ -1,5 +1,8 @@
 package ro.isdc.wro.model.resource.locator.wildcard;
 
+import static org.apache.commons.lang3.Validate.isTrue;
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +19,6 @@ import java.util.jar.JarFile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ public class JarWildcardStreamLocator
   @Override
   public InputStream locateStream(final String uri, final File folder)
       throws IOException {
-    Validate.notNull(folder);
+    notNull(folder);
     final File jarPath = getJarFile(folder);
     if (isSupported(jarPath)) {
       return locateStreamFromJar(uri, jarPath);
@@ -109,7 +111,7 @@ public class JarWildcardStreamLocator
    *  @VisibleForTestOnly
    */
   JarFile open(final File jarFile) throws IOException {
-    Validate.isTrue(jarFile.exists(), "The JAR file must exists.");
+    isTrue(jarFile.exists(), "The JAR file must exists.");
     return new JarFile(jarFile);
   }
 
@@ -127,37 +129,42 @@ public class JarWildcardStreamLocator
    */
   private InputStream locateStreamFromJar(final String uri, final File jarPath)
       throws IOException {
-    LOG.debug("Locating stream from jar: {}", jarPath);
-    final WildcardContext wildcardContext = new WildcardContext(uri, jarPath);
-    String classPath = FilenameUtils.getPath(uri);
+    JarFile jarFile = null;
+    try {
+      LOG.debug("Locating stream from jar: {}", jarPath);
+      final WildcardContext wildcardContext = new WildcardContext(uri, jarPath);
+      String classPath = FilenameUtils.getPath(uri);
 
-    if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
-      classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
-    }
-
-    final JarFile file = open(jarPath);
-    final List<JarEntry> jarEntryList = Collections.list(file.entries());
-    final List<JarEntry> filteredJarEntryList = new ArrayList<JarEntry>();
-    final List<File> allFiles = new ArrayList<File>();
-    for (final JarEntry entry : jarEntryList) {
-      final String entryName = entry.getName();
-      //ignore the parent folder itself and accept only child resources
-      final boolean isSupportedEntry = entryName.startsWith(classPath) && !entryName.equals(classPath)
-        && accept(entryName, wildcardContext.getWildcard());
-      if (isSupportedEntry) {
-        allFiles.add(new File(entryName));
-        LOG.debug("\tfound jar entry: {}", entryName);
-        filteredJarEntryList.add(entry);
+      if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
+        classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
       }
-    }
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    triggerWildcardExpander(allFiles, wildcardContext);
-    for (final JarEntry entry : filteredJarEntryList) {
-      final InputStream is = file.getInputStream(entry);
-      IOUtils.copy(is, out);
-      is.close();
+      jarFile = open(jarPath);
+      final List<JarEntry> jarEntryList = Collections.list(jarFile.entries());
+      final List<JarEntry> filteredJarEntryList = new ArrayList<JarEntry>();
+      final List<File> allFiles = new ArrayList<File>();
+      for (final JarEntry entry : jarEntryList) {
+        final String entryName = entry.getName();
+        // ignore the parent folder itself and accept only child resources
+        final boolean isSupportedEntry = entryName.startsWith(classPath) && !entryName.equals(classPath)
+            && accept(entryName, wildcardContext.getWildcard());
+        if (isSupportedEntry) {
+          allFiles.add(new File(entryName));
+          LOG.debug("\tfound jar entry: {}", entryName);
+          filteredJarEntryList.add(entry);
+        }
+      }
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+      triggerWildcardExpander(allFiles, wildcardContext);
+      for (final JarEntry entry : filteredJarEntryList) {
+        final InputStream is = jarFile.getInputStream(entry);
+        IOUtils.copy(is, out);
+        is.close();
+      }
+      return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
+    } finally {
+      IOUtils.closeQuietly(jarFile);
     }
-    return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
 }

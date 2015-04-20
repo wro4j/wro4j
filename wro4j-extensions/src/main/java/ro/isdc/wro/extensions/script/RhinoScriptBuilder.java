@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
@@ -68,7 +69,7 @@ public final class RhinoScriptBuilder {
     InputStream script = null;
     final ScriptableObject scriptCommon = (ScriptableObject) context.initStandardObjects(initialScope);
     try {
-      script = getClass().getResourceAsStream("commons.js");
+      script = new AutoCloseInputStream(getClass().getResourceAsStream("commons.js"));
       context.evaluateReader(scriptCommon, new InputStreamReader(script), "commons.js", 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
@@ -102,7 +103,8 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addJSON() {
     try {
-      final InputStream script = new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js"));
+      final InputStream script = new AutoCloseInputStream(
+          new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js")));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);

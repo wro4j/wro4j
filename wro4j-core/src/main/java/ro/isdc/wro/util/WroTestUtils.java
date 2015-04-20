@@ -31,6 +31,7 @@ import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
@@ -211,12 +212,14 @@ public class WroTestUtils {
     for (final File file : files) {
       LOG.debug("processing: {}", file.getName());
       File targetFile = null;
+      InputStream targetFileStream = null;
+      InputStream sourceFileStream = null;
       try {
         targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
-        final InputStream targetFileStream = new FileInputStream(targetFile);
+        targetFileStream = new FileInputStream(targetFile);
         LOG.debug("comparing with: {}", targetFile.getName());
         try {
-          compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
+          compare(sourceFileStream = new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
             public void process(final Reader reader, final Writer writer)
                 throws IOException {
               // ResourceType doesn't matter here
@@ -233,6 +236,9 @@ public class WroTestUtils {
             e.getCause());
       } catch (final Exception e) {
         throw WroRuntimeException.wrap(e);
+      } finally {
+        IOUtils.closeQuietly(targetFileStream);
+        IOUtils.closeQuietly(sourceFileStream);
       }
     }
     logSuccess(processedNumber);
@@ -348,11 +354,11 @@ public class WroTestUtils {
       File targetFile = null;
       try {
         targetFile = new File(targetFolder, toTargetFileName.transform(file.getName()));
-        final InputStream targetFileStream = new FileInputStream(targetFile);
+        final InputStream targetFileStream = new AutoCloseInputStream(new FileInputStream(targetFile));
         LOG.debug("=========== processing: {} ===========", file.getName());
         // ResourceType doesn't matter here
         try {
-          compare(new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
+          compare(new AutoCloseInputStream(new FileInputStream(file)), targetFileStream, new ResourcePostProcessor() {
             public void process(final Reader reader, final Writer writer)
                 throws IOException {
               // ResourceType doesn't matter here
