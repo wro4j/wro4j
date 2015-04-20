@@ -5,11 +5,13 @@ package ro.isdc.wro.extensions.processor.js;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -60,6 +62,30 @@ public class NodeTypeScriptProcessor
    */
   private final boolean isWindows;
 
+  private static class StreamGobbler
+      extends Thread {
+    InputStream is;
+    String type;
+
+    public StreamGobbler(final InputStream is, final String type) {
+      this.is = is;
+      this.type = type;
+    }
+
+    @Override
+    public void run() {
+      try {
+        final InputStreamReader isr = new InputStreamReader(is);
+        final BufferedReader br = new BufferedReader(isr);
+        String line = null;
+        while ((line = br.readLine()) != null)
+          LOG.debug(type + ">" + line);
+      } catch (final IOException ioe) {
+        ioe.printStackTrace();
+      }
+    }
+  }
+
   public NodeTypeScriptProcessor() {
     // initialize this field at construction.
     final String osName = System.getProperty("os.name");
@@ -100,6 +126,7 @@ public class NodeTypeScriptProcessor
       LOG.debug("absolute path: {}", tempSource.getAbsolutePath());
 
       final Process process = createProcess(tempSource, tempDest);
+
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
       final String result = IOUtils.toString(new AutoCloseInputStream(new FileInputStream(tempDest)), encoding);
       if (exitStatus != 0) {
@@ -114,6 +141,7 @@ public class NodeTypeScriptProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
+      // close input stream to allow file to be deleted (otherwise deletion fails).
       IOUtils.closeQuietly(shellIn);
       IOUtils.closeQuietly(tempSourceStream);
       // always cleanUp
@@ -156,7 +184,17 @@ public class NodeTypeScriptProcessor
     notNull(sourceFile);
     final String[] commandLine = getCommandLine(sourceFile.getPath(), destFile.getPath());
     LOG.debug("CommandLine arguments: {}", Arrays.asList(commandLine));
-    return new ProcessBuilder(commandLine).redirectErrorStream(true).start();
+    final Process process = new ProcessBuilder(commandLine).redirectErrorStream(true).start();
+
+    //Gobblers responsible for reading stream to avoid blocking of the process when the buffer is full.
+    final StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
+    // any output?
+    final StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");
+    // kick them off
+    errorGobbler.start();
+    outputGobbler.start();
+
+    return process;
   }
 
   /**

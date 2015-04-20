@@ -716,7 +716,6 @@ public class TestWroFilter {
     when(mockRequest.getParameter(ResourceProxyRequestHandler.PATH_API)).thenReturn(ResourceProxyRequestHandler.PATH_RESOURCES);
     when(mockRequest.getRequestURI()).thenReturn(ResourceProxyRequestHandler.createProxyPath("", resourceId));
 
-    final WroConfiguration config = new WroConfiguration();
     // we don't need caching here, otherwise we'll have clashing during unit tests.
     Context.unset();
     Context.set(Context.webContext(mockRequest, mockResponse, mockFilterConfig), newConfigWithUpdatePeriodValue(0));

@@ -28,12 +28,13 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestGroup {
-  
+  private static Random RANDOM;
   @BeforeClass
   public static void onBeforeClass() {
+    RANDOM = new Random();
     assertEquals(0, Context.countActive());
   }
-  
+
   @Test(expected = NullPointerException.class)
   public void cannotCreateGroupWithNullName() {
     new Group(null);
@@ -158,7 +159,7 @@ public class TestGroup {
     WroTestUtils.runConcurrently(new Callable<Void>() {
       public Void call()
           throws Exception {
-        if (new Random().nextBoolean()) {
+        if (RANDOM.nextBoolean()) {
           group.setResources(resources);
         } else {
           group.addResource(r1);

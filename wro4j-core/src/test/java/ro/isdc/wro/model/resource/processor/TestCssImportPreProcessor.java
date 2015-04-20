@@ -40,6 +40,7 @@ import ro.isdc.wro.util.WroTestUtils;
  * @author Alex Objelean
  */
 public class TestCssImportPreProcessor {
+  private static final Random RANDOM = new Random();
   private ResourcePreProcessor victim;
 
   @Before
@@ -169,7 +170,7 @@ public class TestCssImportPreProcessor {
         final Reader reader = new StringReader("@import('/path/to/imported');");
         final Resource resource1 = Resource.create("resource1.css");
         final Resource resource2 = Resource.create("resource2.css");
-        if (new Random().nextBoolean()) {
+        if (RANDOM.nextBoolean()) {
           victim.process(resource1, reader, new StringWriter());
         } else {
           victim.process(resource2, reader, new StringWriter());

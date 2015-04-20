@@ -49,6 +49,7 @@ import ro.isdc.wro.util.WroTestUtils;
  */
 public class TestCssUrlRewritingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestCssUrlRewritingProcessor.class);
+  private static final Random RANDOM = new Random();
   @Mock
   private HttpServletRequest request;
   @Mock
@@ -255,7 +256,7 @@ public class TestCssUrlRewritingProcessor {
           throws Exception {
         try {
           Context.set(Context.standaloneContext());
-          if (new Random().nextBoolean()) {
+          if (RANDOM.nextBoolean()) {
             processServletContextResourceTypeWithAggregatedFolderSet();
           } else {
             // ensure that a thread uses null aggregatedFolderPath which is injected into processor.
