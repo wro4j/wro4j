@@ -68,9 +68,6 @@ public class NodeCoffeeScriptProcessor
     isWindows = osName != null && osName.contains("Windows");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {

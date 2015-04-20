@@ -21,6 +21,7 @@ import groovy.lang.Script;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class GroovyModelFactory
     final Script script;
     try {
       stopWatch.start("parseStream");
-      script = new GroovyShell().parse(new InputStreamReader(getModelResourceAsStream()));
+      script = new GroovyShell().parse(new InputStreamReader(new AutoCloseInputStream(getModelResourceAsStream())));
       LOG.debug("Parsing groovy script to build the model");
       stopWatch.stop();
 

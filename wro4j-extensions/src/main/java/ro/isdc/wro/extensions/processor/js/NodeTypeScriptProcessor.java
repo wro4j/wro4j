@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,25 +114,24 @@ public class NodeTypeScriptProcessor
 
   private String process(final String resourceUri, final String content) {
     final InputStream shellIn = null;
+    OutputStream tempSourceStream = null;
     // the file holding the input file to process
     File tempSource = null;
     File tempDest = null;
-    InputStream tempInputStream = null;
     try {
       tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final String encoding = "UTF-8";
-      IOUtils.write(content, new FileOutputStream(tempSource), encoding);
+      IOUtils.write(content, tempSourceStream = new FileOutputStream(tempSource), encoding);
       LOG.debug("absolute path: {}", tempSource.getAbsolutePath());
 
       final Process process = createProcess(tempSource, tempDest);
 
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
-      tempInputStream = new FileInputStream(tempDest);
-      final String result = IOUtils.toString(tempInputStream, encoding);
+      final String result = IOUtils.toString(new AutoCloseInputStream(new FileInputStream(tempDest)), encoding);
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
-        String errorMessage = IOUtils.toString(process.getInputStream(), encoding);
+        String errorMessage = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
         // find a way to get rid of escape character found at the end (minor issue)
         errorMessage = MessageFormat.format("Error in Typescript: \n{0}",
             errorMessage.replace(tempSource.getPath(), resourceUri));
@@ -141,8 +142,8 @@ public class NodeTypeScriptProcessor
       throw WroRuntimeException.wrap(e);
     } finally {
       // close input stream to allow file to be deleted (otherwise deletion fails).
-      IOUtils.closeQuietly(tempInputStream);
       IOUtils.closeQuietly(shellIn);
+      IOUtils.closeQuietly(tempSourceStream);
       // always cleanUp
       FileUtils.deleteQuietly(tempSource);
       FileUtils.deleteQuietly(tempDest);
@@ -209,7 +210,8 @@ public class NodeTypeScriptProcessor
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final Process process = createProcess(tempSource, tempDest);
       final int exitValue = process.waitFor();
-      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
+      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue,
+          IOUtils.toString(new AutoCloseInputStream(process.getInputStream())));
       if (exitValue != 0) {
         throw new UnsupportedOperationException("Tsc is not a supported operation on this platform");
       }

@@ -6,8 +6,10 @@ package ro.isdc.wro.maven.plugin;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
@@ -95,16 +97,19 @@ public abstract class AbstractLinterMojo<T>
 
   private void generateReport() {
     if (shouldGenerateReport()) {
+      OutputStream reportFileStream = null;
       try {
         getReportFile().getParentFile().mkdirs();
         getReportFile().createNewFile();
         getLog().debug("creating report at location: " + getReportFile());
         final FormatterType type = FormatterType.getByFormat(getReportFormat());
         if (type != null) {
-          createXmlFormatter(lintReport, type).write(new FileOutputStream(getReportFile()));
+          createXmlFormatter(lintReport, type).write(reportFileStream = new FileOutputStream(getReportFile()));
         }
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + getReportFile(), e);
+      } finally {
+        IOUtils.closeQuietly(reportFileStream);
       }
     }
   }
@@ -173,19 +178,20 @@ public abstract class AbstractLinterMojo<T>
 
   /**
    * Used by unit test to check if mojo doesn't fail.
+   *
    * @VisibleForTesting
    */
   void onException(final Exception e) {
   }
 
   /**
-   * @param failNever the failFast to set.
+   * @param failNever
+   *          the failFast to set.
    */
   @Override
   public void setFailNever(final boolean failNever) {
     this.failNever = failNever;
   }
-
 
   public void setFailThreshold(final int failThreshold) {
     this.failThreshold = failThreshold;
@@ -216,7 +222,8 @@ public abstract class AbstractLinterMojo<T>
   }
 
   /**
-   * @param failFast flag to set.
+   * @param failFast
+   *          flag to set.
    */
   public void setFailFast(final boolean failFast) {
     this.failFast = failFast;
