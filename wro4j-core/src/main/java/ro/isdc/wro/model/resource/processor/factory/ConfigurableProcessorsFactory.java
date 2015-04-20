@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.resource.processor.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,6 @@ import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 
 /**
  * A {@link ProcessorsFactory} implementation which is easy to configure using a {@link Properties} object.
- * 
+ *
  * @author Alex Objelean
  * @created 30 Jul 2011
  * @since 1.4.0
@@ -34,7 +35,7 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
 public class ConfigurableProcessorsFactory
     implements ProcessorsFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableProcessorsFactory.class);
-  
+
   /**
    * Property name to specify pre processors.
    */
@@ -43,14 +44,14 @@ public class ConfigurableProcessorsFactory
    * Property name to specify post processors.
    */
   public static final String PARAM_POST_PROCESSORS = "postProcessors";
-  private Map<String, ResourcePreProcessor> preProcessorsMap;
-  private Map<String, ResourcePostProcessor> postProcessorsMap;
+  private volatile Map<String, ResourcePreProcessor> preProcessorsMap;
+  private volatile Map<String, ResourcePostProcessor> postProcessorsMap;
 
   /**
    * Holds the configurations describing available processors.
    */
   private Properties properties;
-  
+
   private final AbstractConfigurableMultipleStrategy<ResourcePreProcessor, ProcessorProvider> configurablePreProcessors = createConfigurablePreProcessorsStrategy();
 
   private final AbstractConfigurableMultipleStrategy<ResourcePostProcessor, ProcessorProvider> configurablePostProcessors = createConfigurablePostProcessorsStrategy();
@@ -65,23 +66,23 @@ public class ConfigurableProcessorsFactory
       protected String getStrategyKey() {
         return PARAM_POST_PROCESSORS;
       }
-      
+
       @Override
       protected void overrideDefaultStrategyMap(final Map<String, ResourcePostProcessor> map) {
         copyAll(ConfigurableProcessorsFactory.this.getPostProcessorsMap(), map);
       }
-      
+
       @Override
       protected Map<String, ResourcePostProcessor> getStrategies(final ProcessorProvider provider) {
         return getPostProcessorStrategies(provider);
       }
-      
+
       @Override
       protected ResourcePostProcessor getStrategyForAlias(final String alias) {
         ResourcePostProcessor processor = super.getStrategyForAlias(alias);
         if (processor == null) {
           final String extension = FilenameUtils.getExtension(alias);
-          boolean hasExtension = !StringUtils.isEmpty(extension);
+          final boolean hasExtension = !StringUtils.isEmpty(extension);
           if (hasExtension) {
             final String processorName = FilenameUtils.getBaseName(alias);
             LOG.debug("processorName: {}", processorName);
@@ -95,7 +96,7 @@ public class ConfigurableProcessorsFactory
         }
         return processor;
       }
-      
+
       @Override
       protected Properties newProperties() {
         return ConfigurableProcessorsFactory.this.getProperties();
@@ -112,7 +113,7 @@ public class ConfigurableProcessorsFactory
       protected String getStrategyKey() {
         return PARAM_PRE_PROCESSORS;
       }
-      
+
       @Override
       protected void overrideDefaultStrategyMap(final Map<String, ResourcePreProcessor> map) {
         copyAll(ConfigurableProcessorsFactory.this.getPreProcessorsMap(), map);
@@ -122,13 +123,13 @@ public class ConfigurableProcessorsFactory
       protected Map<String, ResourcePreProcessor> getStrategies(final ProcessorProvider provider) {
         return getPreProcessorStrategies(provider);
       }
-      
+
       @Override
       protected ResourcePreProcessor getStrategyForAlias(final String alias) {
         ResourcePreProcessor processor = super.getStrategyForAlias(alias);
         if (processor == null) {
           final String extension = FilenameUtils.getExtension(alias);
-          boolean hasExtension = !StringUtils.isEmpty(extension);
+          final boolean hasExtension = !StringUtils.isEmpty(extension);
           if (hasExtension) {
             final String processorName = FilenameUtils.getBaseName(alias);
             LOG.debug("processorName: {}", processorName);
@@ -149,52 +150,52 @@ public class ConfigurableProcessorsFactory
     };
   }
 
-  
+
   /**
    * @return default implementation of {@link Properties} containing the list of pre & post processors.
    */
   protected Properties newProperties() {
     return new Properties();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public final Collection<ResourcePreProcessor> getPreProcessors() {
     return configurablePreProcessors.getConfiguredStrategies();
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public final Collection<ResourcePostProcessor> getPostProcessors() {
     return configurablePostProcessors.getConfiguredStrategies();
   }
-  
+
   /**
    * @param map
    *          containing preProcessors with corresponding alias (as key). The map must not be null and once set, the
    *          default map will be overridden.
    */
   public ConfigurableProcessorsFactory setPreProcessorsMap(final Map<String, ResourcePreProcessor> map) {
-    Validate.notNull(map);
+    notNull(map);
     this.preProcessorsMap = map;
     return this;
   }
-  
+
   /**
    * @param map
    *          containing postProcessors with corresponding alias (as key). The map must not be null and once set, the
    *          default map will be overridden.
    */
   public ConfigurableProcessorsFactory setPostProcessorsMap(final Map<String, ResourcePostProcessor> map) {
-    Validate.notNull(map);
+    notNull(map);
     this.postProcessorsMap = map;
     return this;
   }
-  
+
   public ConfigurableProcessorsFactory setProperties(final Properties properties) {
-    Validate.notNull(properties);
+    notNull(properties);
     this.properties = properties;
     return this;
   }
@@ -202,23 +203,23 @@ public class ConfigurableProcessorsFactory
   /**
    * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
    * folder of each dependency).
-   * 
+   *
    * @return a default map of preProcessors.
    */
   protected Map<String, ResourcePreProcessor> newPreProcessorsMap() {
     return new HashMap<String, ResourcePreProcessor>();
   }
-  
+
   /**
    * By default the processor will be discovered using {@link ServiceRegistry} pattern (by inspecting META-INF/services
    * folder of each dependency).
-   * 
+   *
    * @return a default map of postProcessors.
    */
   protected Map<String, ResourcePostProcessor> newPostProcessorsMap() {
     return new HashMap<String, ResourcePostProcessor>();
   }
-  
+
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -228,7 +229,7 @@ public class ConfigurableProcessorsFactory
     }
     return this.properties;
   }
-  
+
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -242,7 +243,7 @@ public class ConfigurableProcessorsFactory
     }
     return this.preProcessorsMap;
   }
-  
+
   /**
    * To be used for internal usage. Ensure that returned object is not null.
    */
@@ -264,7 +265,7 @@ public class ConfigurableProcessorsFactory
   Collection<ResourcePreProcessor> getAvailablePreProcessors() {
     return configurablePreProcessors.getAvailableStrategies();
   }
-  
+
   /**
    * @VisibleForTesting
    * @return the list of all available pre processors;
