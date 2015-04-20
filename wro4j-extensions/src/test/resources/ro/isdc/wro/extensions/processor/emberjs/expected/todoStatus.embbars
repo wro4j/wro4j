@@ -1,28 +1,14 @@
-(function() {Ember.TEMPLATES['todoStatus'] = Ember.Handlebars.template(
-function anonymous(Handlebars, depth0, helpers, partials, data) {
-    this.compilerInfo = [4, ">= 1.0.0"];
-    helpers = this.merge(helpers, Ember.Handlebars.helpers);
-    data = data || {};
-    var buffer = "", stack1, self = this;
-    function program1(depth0, data) {
-        data.buffer.push("s");
-    }
-    data.buffer.push("<div class=\"row-fluid span5\">\n  <strong>");
-    stack1 = helpers._triageMustache.call(depth0, "remaining", {hash: {}, hashTypes: {}, hashContexts: {}, contexts: [depth0], types: ["ID"], data: data});
-    if (stack1 || stack1 === 0) {
-        data.buffer.push(stack1);
-    }
-    data.buffer.push("</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>");
-    stack1 = helpers._triageMustache.call(depth0, "finished", {hash: {}, hashTypes: {}, hashContexts: {}, contexts: [depth0], types: ["ID"], data: data});
-    if (stack1 || stack1 === 0) {
-        data.buffer.push(stack1);
-    }
-    data.buffer.push("</strong> completed item");
-    stack1 = helpers.unless.call(depth0, "oneFinished", {hash: {}, hashTypes: {}, hashContexts: {}, inverse: self.noop, fn: self.program(1, program1, data), contexts: [depth0], types: ["ID"], data: data});
-    if (stack1 || stack1 === 0) {
-        data.buffer.push(stack1);
-    }
-    data.buffer.push("\n  </button>\n</div>");
-    return buffer;
-}
-)})();
+(function() {Ember.TEMPLATES['todoStatus'] = Ember.Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+    var stack1, helper, buffer = '';
+
+  data.buffer.push("<div class=\"row-fluid span5\">\n  <strong>");
+  data.buffer.push(this.escapeExpression,(,((helper = (helper = helpers.remaining || (depth0 != null ? depth0.remaining : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"remaining","hash":{},"hashTypes":{},"hashContexts":{},"types":[],"contexts":[],"data":data}) : helper)),));
+  data.buffer.push("</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>");
+  data.buffer.push(this.escapeExpression,(,((helper = (helper = helpers.finished || (depth0 != null ? depth0.finished : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"finished","hash":{},"hashTypes":{},"hashContexts":{},"types":[],"contexts":[],"data":data}) : helper)),));
+  data.buffer.push("</strong> completed item");
+  data.buffer.push(((stack1 = helpers.unless.call(depth0,"oneFinished",{"name":"unless","hash":{},"hashTypes":{},"hashContexts":{},"fn":this.program(1, data, 0),"inverse":this.noop,"types":["PathExpression"],"contexts":[depth0],"data":data})) != null ? stack1 : ""));
+  data.buffer.push("\n  </button>\n</div>");
+  return buffer;
+},"1":function(depth0,helpers,partials,data) {
+    data.buffer.push("s");
+},"useData":true})})();
