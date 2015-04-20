@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ import ro.isdc.wro.util.WroUtil;
  * {@link https://github.com/mishoo/UglifyJS}.
  * <p/>
  * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js.
- * 
+ *
  * @author Alex Objelean
  * @since 1.3.1
  */
@@ -46,25 +47,25 @@ public class UglifyJs {
    */
   private String reservedNames;
   private ScriptableObject scope;
-  
+
   /**
    * The type of processing supported by UglifyJs library. This enum replaces ugly boolean constructor parameter.
    */
   public static enum Type {
     BEAUTIFY, UGLIFY
   }
-  
+
   /**
    * @return the script responsible for invoking the uglifyJs script.
    */
   private String getInvokeScript()
       throws IOException {
     if (invokeScript == null) {
-      invokeScript = IOUtils.toString(UglifyJs.class.getResourceAsStream("invoke.js"));
+      invokeScript = IOUtils.toString(new AutoCloseInputStream(UglifyJs.class.getResourceAsStream("invoke.js")));
     }
     return invokeScript;
   }
-  
+
   /**
    * @param uglify
    *          if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
@@ -74,25 +75,25 @@ public class UglifyJs {
     Validate.notNull(uglifyType);
     this.uglify = uglifyType == UGLIFY ? true : false;
   }
-  
+
   /**
    * Factory method for creating the uglifyJs engine.
    */
   public static UglifyJs uglifyJs() {
     return new UglifyJs(UGLIFY);
   }
-  
+
   /**
    * Factory method for creating the beautifyJs engine.
    */
   public static UglifyJs beautifyJs() {
     return new UglifyJs(Type.BEAUTIFY);
   }
-  
+
   /**
    * some libraries rely on certain names to be used, so this option allow you to exclude such names from the mangler.
    * For example, to keep names require and $super intact you'd specify –reserved-names "require,$super".
-   * 
+   *
    * @param reservedNames
    *          the reservedNames to set
    */
@@ -100,14 +101,14 @@ public class UglifyJs {
     this.reservedNames = reservedNames;
     return this;
   }
-  
+
   /**
    * @return not null value representing reservedNames.
    */
   private String getReservedNames() {
     return this.reservedNames == null ? "" : reservedNames;
   }
-  
+
   /**
    * Initialize script builder for evaluation.
    */
@@ -127,14 +128,14 @@ public class UglifyJs {
       throw new IllegalStateException("Failed initializing js", ex);
     }
   }
-  
+
   /**
    * @return the stream of the uglify script. Override this method to provide a different script version.
    */
   protected InputStream getScriptAsStream() {
     return UglifyJs.class.getResourceAsStream(DEFAULT_UGLIFY_JS);
   }
-  
+
   /**
    * @param data
    *          js content to process.
@@ -153,16 +154,16 @@ public class UglifyJs {
     final String scriptAsString = String.format(getInvokeScript(), originalCode, optionsAsJson);
     watch.start(uglify ? "uglify" : "beautify");
     final Object result = builder.evaluate(scriptAsString, "uglifyIt");
-    
+
     watch.stop();
     LOG.debug(watch.prettyPrint());
     return String.valueOf(result);
   }
-  
+
   /**
    * Reads by default options from options.js file located in the same package. This is an example of how the options
    * could look like:
-   * 
+   *
    * <pre>
    * {
    *    codegen_options: {
@@ -174,21 +175,21 @@ public class UglifyJs {
    *    mangle: true
    * }
    * </pre>
-   * 
+   *
    * @return json representation of options.
    */
   protected String createOptionsAsJson()
       throws IOException {
     return String.format(getDefaultOptions(), !uglify, getReservedNames());
   }
-  
+
   /**
    * @return default options string representation loaded from options.js resource file.
    */
   private String getDefaultOptions()
       throws IOException {
     if (defaultOptionsAsJson == null) {
-      defaultOptionsAsJson = IOUtils.toString(UglifyJs.class.getResourceAsStream("options.js"));
+      defaultOptionsAsJson = IOUtils.toString(new AutoCloseInputStream(UglifyJs.class.getResourceAsStream("options.js")));
     }
     return defaultOptionsAsJson;
   }
