@@ -4,9 +4,7 @@ function Greeter(greeting) {
 Greeter.prototype.greet = function () {
     return "Hello, " + this.greeting;
 };
-var greeter = new Greeter({
-    message: "world"
-});
+var greeter = new Greeter({ message: "world" });
 var button = document.createElement('button');
 button.innerText = "Say Hello";
 button.onclick = function () {
