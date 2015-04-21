@@ -28,9 +28,6 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestJsHintMojo
     extends AbstractTestLinterMojo {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected AbstractLinterMojo newLinterMojo() {
     return new JsHintMojo() {
@@ -40,7 +37,7 @@ public class TestJsHintMojo
       }
     };
   }
-
+  
   @Test
   public void usePredefOptions()
       throws Exception {
@@ -48,14 +45,14 @@ public class TestJsHintMojo
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
-
+  
   @Test
   public void testMojoWithPropertiesSet()
       throws Exception {
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
   }
-
+  
   @Test
   public void testWroXmlWithInvalidResourcesAndIgnoreMissingResourcesTrue()
       throws Exception {
@@ -63,14 +60,14 @@ public class TestJsHintMojo
     getMojo().setIgnoreMissingResources(true);
     getMojo().execute();
   }
-
+  
   @Test
   public void testResourceWithUndefVariables()
       throws Exception {
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
-
+  
   @Test
   public void shouldProcessMultipleGroupsMore()
       throws Exception {
@@ -78,14 +75,14 @@ public class TestJsHintMojo
       shouldProcessMultipleGroups();
     }
   }
-
+  
   @Test
   public void shouldProcessMultipleGroups()
       throws Exception {
     getMojo().setTargetGroups("undef,valid,g3");
     getMojo().execute();
   }
-
+  
   @Test
   public void testEmptyOptions()
       throws Exception {
@@ -93,7 +90,7 @@ public class TestJsHintMojo
     getMojo().setTargetGroups("undef");
     getMojo().execute();
   }
-
+  
   @Test
   public void shouldGenerateXmlReportFile()
       throws Exception {
@@ -111,19 +108,19 @@ public class TestJsHintMojo
       FileUtils.deleteQuietly(reportFile);
     }
   }
-
+  
   @Test
   public void shouldGenerateReportWithDefaultFormat()
       throws Exception {
     generateAndCompareReportFile(null, "jshint-default.xml");
   }
-
+  
   @Test
   public void shouldGenerateReportWithCheckstyleFormat()
       throws Exception {
     generateAndCompareReportFile(FormatterType.CHECKSTYLE.getFormat(), "jshint-checkstyle.xml");
   }
-
+  
   @Test(expected = MojoExecutionException.class)
   public void cannotGenerateReportWithInvalidFormat()
       throws Exception {
@@ -141,7 +138,7 @@ public class TestJsHintMojo
       FileUtils.deleteQuietly(reportFile);
     }
   }
-
+  
   @Test
   public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
       throws Exception {
@@ -149,7 +146,7 @@ public class TestJsHintMojo
     jsHintMojo.setFailThreshold(6);
     executeResourcesWithErrors();
   }
-
+  
   @Test(expected = MojoExecutionException.class)
   public void shouldFailWhenThresholdEqualsWithNumberOfErrors()
       throws Exception {
@@ -157,7 +154,7 @@ public class TestJsHintMojo
     jsHintMojo.setFailThreshold(5);
     executeResourcesWithErrors();
   }
-
+  
   /**
    * Checks that build doesn't fail when the failFast is true and there is no resources to be processed.
    */
@@ -171,7 +168,7 @@ public class TestJsHintMojo
     jsHintMojo.setTargetGroups("invalidWildcardResource");
     getMojo().execute();
   }
-
+  
   @Test(expected = MojoExecutionException.class)
   public void shouldReportOnlyFirstErrorWhenFailFastIsTrue()
       throws Exception {
@@ -184,7 +181,7 @@ public class TestJsHintMojo
       assertEquals(1, lintReport.getReports().size());
     }
   }
-
+  
   @Test(expected = MojoExecutionException.class)
   public void shouldReportAllErrorsWhenFailFastIsFalse()
       throws Exception {
@@ -200,14 +197,14 @@ public class TestJsHintMojo
       assertEquals(2, lintReport.getReports().size());
     }
   }
-
+  
   private void executeResourcesWithErrors()
       throws MojoExecutionException {
     getMojo().setTargetGroups("invalidResources");
     getMojo().setOptions("undef, browser");
     getMojo().execute();
   }
-
+  
   private void generateAndCompareReportFile(final String reportFormat, final String expectedFileName)
       throws Exception {
     final File reportFile = WroUtil.createTempFile();
@@ -229,7 +226,7 @@ public class TestJsHintMojo
       FileUtils.deleteQuietly(reportFile);
     }
   }
-
+  
   @Test(expected = LinterException.class)
   public void shouldFailWhenThereAreLinterErrorsEvenWhenIncrementBuildIsEnabled()
       throws Throwable {

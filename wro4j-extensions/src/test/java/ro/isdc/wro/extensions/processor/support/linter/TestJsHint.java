@@ -84,20 +84,6 @@ public class TestJsHint {
     jsHint.validate("if (text == 0) {win.location.href = link; }");
   }
 
-  @Test(expected = LinterException.class)
-  public void shouldFailWhenIndentationIsNotCorrect()
-      throws Exception {
-    jsHint.setOptions("indent=2", "white");
-    jsHint.validate("function test() {\n     alert(1);\n}");
-  }
-
-  @Test
-  public void shouldNotFailWhenIndentationIsCorrect()
-      throws Exception {
-    jsHint.setOptions("indent=2", "white");
-    jsHint.validate("function test() {\n  alert(1);\n}");
-  }
-
   @Test(expected = WroRuntimeException.class)
   public void testInvalidOptions()
       throws Exception {
