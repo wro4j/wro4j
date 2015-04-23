@@ -13,12 +13,12 @@
   num = 6;
 
   lyrics = (function() {
-    var _results;
-    _results = [];
+    var results;
+    results = [];
     while (num -= 1) {
-      _results.push(num + " little monkeys, jumping on the bed. One fell out and bumped his head.");
+      results.push(num + " little monkeys, jumping on the bed. One fell out and bumped his head.");
     }
-    return _results;
+    return results;
   })();
 
 }).call(this);

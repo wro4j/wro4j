@@ -2,12 +2,12 @@
   var countdown, num;
 
   countdown = (function() {
-    var _i, _results;
-    _results = [];
-    for (num = _i = 10; _i >= 1; num = --_i) {
-      _results.push(num);
+    var i, results;
+    results = [];
+    for (num = i = 10; i >= 1; num = --i) {
+      results.push(num);
     }
-    return _results;
+    return results;
   })();
 
 }).call(this);

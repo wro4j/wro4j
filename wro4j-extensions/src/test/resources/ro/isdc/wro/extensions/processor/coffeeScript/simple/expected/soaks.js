@@ -1,6 +1,6 @@
 (function() {
-  var zip, _ref;
+  var ref, zip;
 
-  zip = typeof lottery.drawWinner === "function" ? (_ref = lottery.drawWinner().address) != null ? _ref.zipcode : void 0 : void 0;
+  zip = typeof lottery.drawWinner === "function" ? (ref = lottery.drawWinner().address) != null ? ref.zipcode : void 0 : void 0;
 
 }).call(this);
