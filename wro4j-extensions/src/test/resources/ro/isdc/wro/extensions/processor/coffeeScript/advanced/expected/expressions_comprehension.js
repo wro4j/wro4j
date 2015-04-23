@@ -2,12 +2,12 @@
   var globals, name;
 
   globals = ((function() {
-    var _results;
-    _results = [];
+    var results;
+    results = [];
     for (name in window) {
-      _results.push(name);
+      results.push(name);
     }
-    return _results;
+    return results;
   })()).slice(0, 10);
 
 }).call(this);
