@@ -54,14 +54,14 @@ The documentation for this project is located on google code project page: http:
 
 # Issues
 
-Found a bug? Report it to the issue tracker: http://code.google.com/p/wro4j/issues/list
+Found a bug? Report it to the issue tracker: https://github.com/wro4j/wro4j/issues
 
 
 # Feedback
 
 If you have any questions or suggestions, please feel free to post a comment to the discussion group: https://groups.google.com/forum/#!forum/wro4j
 
-[Follow me](http://twitter.com/#!/wro4j) on tweeter.
+[Follow me](http://twitter.com/#!/wro4j) on Twitter.
 
 
 # License
