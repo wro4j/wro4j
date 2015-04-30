@@ -76,40 +76,40 @@ public class XmlModelFactory
   /**
    * Group tag used in xml.
    */
-  private static final String TAG_GROUP = "group";
+  protected static final String TAG_GROUP = "group";
   /**
    * Import tag used in xml.
    */
-  private static final String TAG_IMPORT = "import";
+  protected static final String TAG_IMPORT = "import";
   /**
    * CSS tag used in xml.
    */
-  private static final String TAG_CSS = "css";
+  protected static final String TAG_CSS = "css";
 
   /**
    * JS tag used in xml.
    */
-  private static final String TAG_JS = "js";
+  protected static final String TAG_JS = "js";
 
   /**
    * GroupRef tag used in xml.
    */
-  private static final String TAG_GROUP_REF = "group-ref";
+  protected static final String TAG_GROUP_REF = "group-ref";
 
   /**
    * Group name attribute.
    */
-  private static final String ATTR_GROUP_NAME = "name";
+  protected static final String ATTR_GROUP_NAME = "name";
   /**
    * Group abstract attribute used to distinguish an abstract group when its value is true. By default the value is
    * false.
    */
-  private static final String ATTR_GROUP_ABSTRACT = "abstract";
+  protected static final String ATTR_GROUP_ABSTRACT = "abstract";
   /**
    * Minimize attribute specified on resource level, used to turn on/off minimization on this particular resource during
    * pre processing.
    */
-  private static final String ATTR_MINIMIZE = "minimize";
+  protected static final String ATTR_MINIMIZE = "minimize";
   /**
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
@@ -318,6 +318,25 @@ public class XmlModelFactory
       groupsInProcess.remove(name);
       return parsedGroup.getResources();
     }
+    final Group group = createGroup(element);
+    // this group is parsed, remove from unparsed collection
+    groupsInProcess.remove(name);
+    if (!isAbstractGroup) {
+      // add only non abstract groups
+      model.addGroup(group);
+    }
+    return group.getResources();
+  }
+
+  /**
+   * Creates a group and all its associated resources.
+   *
+   * @param element
+   *          Group element to parse.
+   * @return fully initialized group
+   */
+  protected Group createGroup(final Element element) {
+    final String name = element.getAttribute(ATTR_GROUP_NAME);
     final Group group = new Group(name);
     final List<Resource> resources = new ArrayList<Resource>();
     final NodeList resourceNodeList = element.getChildNodes();
@@ -329,13 +348,7 @@ public class XmlModelFactory
       }
     }
     group.setResources(resources);
-    // this group is parsed, remove from unparsed collection
-    groupsInProcess.remove(name);
-    if (!isAbstractGroup) {
-      // add only non abstract groups
-      model.addGroup(group);
-    }
-    return resources;
+    return group;
   }
 
   /**
@@ -359,14 +372,27 @@ public class XmlModelFactory
       resources.addAll(getResourcesForGroup(uri));
     }
     if (type != null) {
-      final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
-      final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true
-          : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
-      final Resource resource = Resource.create(uri, type);
-      resource.setMinimize(minimize);
+      final Resource resource = createResource(resourceElement, type);
       LOG.debug("\t\tadding resource: {}", resource);
       resources.add(resource);
     }
+  }
+
+  /**
+   * Creates a resource from a given resourceElement. The element is guaranteed to be of a simple non-recursive type
+   * (i.e. css or js).
+   *
+   * @param resourceElement
+   *          Resource element to parse.
+   */
+  protected Resource createResource(final Element resourceElement, final ResourceType type) {
+    final String uri = resourceElement.getTextContent();
+    final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
+    final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true
+      : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
+    final Resource resource = Resource.create(uri, type);
+    resource.setMinimize(minimize);
+    return resource;
   }
 
   /**
