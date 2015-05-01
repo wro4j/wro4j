@@ -1,4 +1,5 @@
-#summary Describes prerequisites for using wro4j project
+# About
+Below are the prerequisites for using wro4j project
 
   * Servlet-api-2.3 or greater
   * JDK-1.5 or greater
