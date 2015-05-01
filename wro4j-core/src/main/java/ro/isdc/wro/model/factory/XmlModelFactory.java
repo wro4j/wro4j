@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.model.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -114,14 +116,13 @@ public class XmlModelFactory
    * Map between the group name and corresponding element. Hold the map<GroupName, Element> of all group nodes to access
    * any element.
    */
-  final Map<String, Element> allGroupElements = new HashMap<String, Element>();
+  private final Map<String, Element> allGroupElements = new HashMap<String, Element>();
 
   /**
    * List of groups which are currently being processing and are partially parsed. This list is useful in order to catch
    * infinite recurse group reference.
    */
-  final Collection<String> groupsInProcess = new HashSet<String>();
-
+  private final Collection<String> groupsInProcess = new HashSet<String>();
   /**
    * Used to locate imports;
    */
@@ -152,13 +153,10 @@ public class XmlModelFactory
    * Allow aggregate processed imports during recursive model creation.
    */
   private XmlModelFactory(final Set<String> processedImports) {
-    Validate.notNull(processedImports);
+    notNull(processedImports);
     this.processedImports.addAll(processedImports);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public synchronized WroModel create() {
     model = new WroModel();
     final StopWatch stopWatch = new StopWatch("Create Wro Model from XML");
@@ -241,7 +239,7 @@ public class XmlModelFactory
       final Element element = (Element) importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
-      Validate.notNull(locatorFactory, "The Locator cannot be null!");
+      notNull(locatorFactory, "The Locator cannot be null!");
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);
@@ -355,27 +353,35 @@ public class XmlModelFactory
    * Creates a resource from a given resourceElement. It can be css, js. If resource tag name is group-ref, the method
    * will start a recursive computation.
    *
-   * @param resourceElement
    * @param resources
    *          list of parsed resources where the parsed resource is added.
    */
   private void parseResource(final Element resourceElement, final Collection<Resource> resources) {
-    ResourceType type = null;
     final String tagName = resourceElement.getTagName();
     final String uri = resourceElement.getTextContent();
+    if (TAG_GROUP_REF.equals(tagName)) {
+      // uri in this case is the group name
+      resources.addAll(getResourcesForGroup(uri));
+    }
+    if (getResourceType(resourceElement) != null) {
+      final Resource resource = createResource(resourceElement);
+      LOG.debug("\t\tadding resource: {}", resource);
+      resources.add(resource);
+    }
+  }
+  
+  /**
+   * @return the {@link ResourceType} of the provided {@link Element}. If the resource type is not known (not a js or css resource), null is returned.
+   */
+  protected final ResourceType getResourceType(final Element resourceElement) {
+    ResourceType type = null;
+    final String tagName = resourceElement.getTagName();
     if (TAG_JS.equals(tagName)) {
       type = ResourceType.JS;
     } else if (TAG_CSS.equals(tagName)) {
       type = ResourceType.CSS;
-    } else if (TAG_GROUP_REF.equals(tagName)) {
-      // uri in this case is the group name
-      resources.addAll(getResourcesForGroup(uri));
     }
-    if (type != null) {
-      final Resource resource = createResource(resourceElement, type);
-      LOG.debug("\t\tadding resource: {}", resource);
-      resources.add(resource);
-    }
+    return type;
   }
 
   /**
@@ -385,12 +391,11 @@ public class XmlModelFactory
    * @param resourceElement
    *          Resource element to parse.
    */
-  protected Resource createResource(final Element resourceElement, final ResourceType type) {
+  protected Resource createResource(final Element resourceElement) {
     final String uri = resourceElement.getTextContent();
     final String minimizeAsString = resourceElement.getAttribute(ATTR_MINIMIZE);
-    final boolean minimize = StringUtils.isEmpty(minimizeAsString) ? true
-      : Boolean.valueOf(resourceElement.getAttribute(ATTR_MINIMIZE));
-    final Resource resource = Resource.create(uri, type);
+    final boolean minimize = StringUtils.isEmpty(minimizeAsString) || Boolean.valueOf(minimizeAsString);
+    final Resource resource = Resource.create(uri, getResourceType(resourceElement));
     resource.setMinimize(minimize);
     return resource;
   }
@@ -402,20 +407,15 @@ public class XmlModelFactory
     final WroModelInspector modelInspector = new WroModelInspector(model);
     final Group foundGroup = modelInspector.getGroupByName(groupName);
     if (foundGroup == null) {
-      Collection<Resource> groupResources = null;
       final Element groupElement = allGroupElements.get(groupName);
       if (groupElement == null) {
         throw new WroRuntimeException("Invalid group-ref: " + groupName);
       }
-      groupResources = parseGroup(groupElement);
-      return groupResources;
+      return parseGroup(groupElement);
     }
     return foundGroup.getResources();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getDefaultModelFilename() {
     return DEFAULT_FILE_NAME;
