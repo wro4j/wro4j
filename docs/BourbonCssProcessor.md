@@ -1,27 +1,23 @@
-Support for the Sass mixin library Bourbon.
+# Introduction
 
+Support for Sass and the mixin library [Bourbon](http://bourbon.io).  Since 1.4.7.
+Bourbon provides a library of sass mixins that are simple and easy to use.  There are too many to list here, so check out the [bourbon [documentation]](ht(tp://bourbon.io/docs/).
 
+# Details
 
-= Introduction =
+The BourbonCssProcessor is an extension to the [RubySassCssProcessor](RubySassCssProcessor).  If you're using the BourbonCssProcessor there is no need to also configure the [RubySassCssProcessor](RubySassCssProcessor) as it's included.
 
-Support for Sass and the mixin library Bourbon. [http://bourbon.io].  Since 1.4.7.
-Bourbon provides a library of sass mixins that are simple and easy to use.  There are too many to list here, so check out the bourbon documentation [http://bourbon.io/docs/].
-
-= Details =
-
-The BourbonCssProcessor is an extension to the [RubySassCssProcessor].  If you're using the BourbonCssProcessor there is no need to also configure the [RubySassCssProcessor] as it's included.
-
-As per the RubySassCssProcessor all SassCSs syntax is supported, however the @import directive has impaired functionality.  Due to either (I'm not sure which) jRuby or the Sass implementation of @import, it uses the JVMs working directory as the starting point for import paths.  This is usually not the directory where your style sheets are located.  Using absolute file paths may work, but again is not usually practical. A better work around is to avoid using @import, and instead use the RubySassCssProcessor as a post processor and let wro4j perform the merging of your sass stylesheets before they are run through the processor.
+As per the RubySassCssProcessor all SassCss syntax is supported, however the @import directive has impaired functionality.  Due to either (I'm not sure which) jRuby or the Sass implementation of @import, it uses the JVMs working directory as the starting point for import paths.  This is usually not the directory where your style sheets are located.  Using absolute file paths may work, but again is not usually practical. A better work around is to avoid using @import, and instead use the RubySassCssProcessor as a post processor and let wro4j perform the merging of your sass stylesheets before they are run through the processor.
 
 Because bourbon is a mixture of ruby, and scss, both need to be available to wro4j.  The ruby part is not problem as it's contained in the bourbon-gem-jar dependency and is loaded directly from there.  However the scss files are a little more complicated.  As described above the @import directive does not work from wro4j, so we need to load  and merge Bourbons Sass stylesheets  using wro4j. See below for a sample wro.xml snippet that will load the Bourbon scss files.  The scss files themselves can be found in the  bourbon-gem-jar.jar, and will need to be copied to your source tree.
 
-= Integration =
+# Integration
 
 Like all of the wro4j extension processors the RubySassCssProcessor can be configured in a variety of ways.  It should be aliased as 'rubySassCss', and as described above it's recommended to use it as a post processor.
 
 
-=Example wro.xml resource group to load / merge bourbon scss reources=
-{{{
+## Example wro.xml resource group to load / merge bourbon scss reources
+```xml 
 <group name="app">
    <group-ref>bourbon</group-ref>
    <css> /resources/header.css</css>
@@ -72,4 +68,4 @@ Like all of the wro4j extension processors the RubySassCssProcessor can be confi
     <css>/resources/sass/bourbon/addons/position.scss</css>
     <css>/resources/sass/bourbon/addons/timing-functions.scss</css>
   </group>
-}}}
+``` 
