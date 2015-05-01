@@ -1,11 +1,9 @@
-#summary JSON representation of WroModel
-
-= Introduction =
+# Introduction 
 The WroModel can be created using JSON (Java script object notation). This is an alternative to XML representation. 
 
-= Details =
+# Details 
 Here is an example of how wroModel could look like in JSON format:
-{{{
+```javascript
 {
   groups: [{
     name: "g1",
@@ -31,13 +29,13 @@ Here is an example of how wroModel could look like in JSON format:
     }]
   }]
 }
-}}}
+```
 
 The class handling the creation of wroModel from a JSON object is called JsonModelFactory. This class is located in wro4j-extensions project, because it requires *gson.jar* dependency (from google). 
 
 In order to switch from xml model creation, to json model creation you have to override the *newModelFactory* method from *BaseWroManagerFactory* class:
 
-{{{
+```java
 public CustomWroManagerFactory extends BaseWroManagerFactory() {
   @Override
   protected WroModelFactory newModelFactory(final ServletContext servletContext) {
@@ -49,6 +47,6 @@ public CustomWroManagerFactory extends BaseWroManagerFactory() {
     };
   }
 }   
-}}}
+```
 
 The above code creates an extension of BaseWroManagerFactory and inform the WroManager to use a new factory for creating WroModel object based on JSON.
