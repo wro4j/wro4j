@@ -1,8 +1,7 @@
-#labels installation,configuration
+# Introduction
 This page describes how to install wro4j filter to your java web project.
 
-= Introduction =
-{{{
+```xml
 <filter>
   <filter-name>WebResourceOptimizer</filter-name>
   <filter-class>
@@ -13,19 +12,19 @@ This page describes how to install wro4j filter to your java web project.
   <filter-name>WebResourceOptimizer</filter-name>
   <url-pattern>/wro/*</url-pattern>
 </filter-mapping>
-}}}
+```
 
 This is the minimum configuration. The filter has several init-params. When using he simplest configuration, they are set to default values. 
 
-==wro4j configuration==
+## wro4j configuration
 In order to configure the option, you have the following options: 
 
 
-===Configure wro4j with a properties file===
+### Configure wro4j with a properties file
 This configuration option is available starting with 1.3.8 version. Add the *wro.properties* file under *WEB-INF* folder (the location of the properties file and its name can be changed, by extending WroFilter). 
 
 This is an example of *wro.properties* file:
-{{{
+```
 cacheUpdatePeriod=0
 modelUpdatePeriod=0
 debug=true
@@ -34,20 +33,19 @@ gzipResources=true
 ignoreMissingResources=false
 jmxEnabled=true
 managerFactoryClassName=ro.isdc.wro.examples.manager.CustomWroManager
-}}}
+```
 
 If you are using wro.properties file and there is still an init-param providing a different configuration, the later will override the configuration from the properties file. Both type of configuration can coexist. This was designed in order to be backward compatible with earlier versions. 
 
-For a detailed list of available configuration view [ConfigurationOptions] page.
+For a detailed list of available configuration view [ConfigurationOptions](ConfigurationOptions) page.
 
-This is not the only way to configure wro4j. Besides using init-param in web.xml, you can also externalize all configuration properties into a separate properties file. This can greatly simplify the configuration and make it environment specific. For more details, visit this page: [ConfigureWro4jViaSpring]
+This is not the only way to configure wro4j. Besides using init-param in web.xml, you can also externalize all configuration properties into a separate properties file. This can greatly simplify the configuration and make it environment specific. For more details, visit this page: [ConfigureWro4jViaSpring](ConfigureWro4jViaSpring)
 
-
-===Configure wro4j with init-param(s)===
+### Configure wro4j with init-param(s)
 
 An extended version of filter configuration, with all init-params explained is presented below:
 
-{{{
+```xml
 <filter>
   <filter-name>WebResourceOptimizer</filter-name>
   <filter-class>
@@ -86,12 +84,13 @@ An extended version of filter configuration, with all init-params explained is p
     <param-value>true</param-value>
   </init-param>
 </filter>
-}}}
+```
 
-Note: You can configure wro4j not only with init-params. It is possible to keep all wro4j related configurations in a property file (since 1.3.7) or in any other location. More details can be found here: [ConfigureWro4jViaSpring]
+Note: You can configure wro4j not only with init-params. It is possible to keep all wro4j related configurations in a property file (since 1.3.7) or in any other location. More details can be found here: [ConfigureWro4jViaSpring](ConfigureWro4jViaSpring)
 
-===Create wro.xml under WEB-INF directory===
-{{{
+### Create wro.xml under WEB-INF directory
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns="http://www.isdc.ro/wro"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -115,10 +114,10 @@ Note: You can configure wro4j not only with init-params. It is possible to keep 
   </group>
 
 </groups>
-}}}
+```
 
-===Include desired groups as js or css resources===
-{{{
+### Include desired groups as js or css resources
+```xml
 <html>
   <head>
     <title>Web Frameworks Comparison</title>
@@ -129,8 +128,8 @@ Note: You can configure wro4j not only with init-params. It is possible to keep 
     //Body
   </body>
 </html>
-}}}
+```
 
-== Resource paths ==
+## Resource paths
 
-Paths to CSS or !JavaScript resources can be specified in several ways.  wro4j supports resource paths relative to the servlet context, from the classpath, or using a URL (including `file:` URLs.)    For more information, see the [WroFileFormat 'wro.xml' File Format specification].
+Paths to CSS or !JavaScript resources can be specified in several ways.  wro4j supports resource paths relative to the servlet context, from the classpath, or using a URL (including `file:` URLs.)    For more information, see the ['wro.xml' File Format specification](WroFileFormat).
