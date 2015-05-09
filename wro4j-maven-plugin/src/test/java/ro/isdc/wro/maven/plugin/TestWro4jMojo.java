@@ -355,7 +355,7 @@ public class TestWro4jMojo {
     cssDestinationFolder.mkdir();
     victim.setCssDestinationFolder(cssDestinationFolder);
     victim.execute();
-    assertEquals("/subfolder", Context.get().getAggregatedFolderPath());
+    assertEquals("/subfolder", WroUtil.normalize(Context.get().getAggregatedFolderPath()));
 
     victim.setContextPath("app");
     victim.execute();

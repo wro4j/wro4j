@@ -35,7 +35,6 @@ import com.google.javascript.jscomp.SourceFile;
  * Test google closure js processor.
  *
  * @author Alex Objelean
- * @created Created on Apr 18, 2010
  */
 public class TestGoogleClosureCompressorProcessor {
   private File testFolder;
