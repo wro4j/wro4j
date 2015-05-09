@@ -1,0 +1,18 @@
+List some of the sites using wro4j
+* [Mobile.de](http://mobile.de)
+* [TrueGether](http://www.truegether.com/)
+* [KLP](https://www.klp.no/)
+* [Betfair Sportsbook](http://www.betfair.com/sport)
+* [Betfair Exchange](http://www.betfair.com/exchange/)
+* [Matt Raible Blog](http://raibledesigns.com/)
+* [Tracktacular](http://www.tracktacular.com/)
+* [Munju](http://www.munju.net/)
+* [Dailyfratze - Community for daily photo projects](http://dailyfratze.de/)
+* [Soundpure](http://www.soundpure.com/)
+* [Scriptito](http://scriptito.com/)
+* [Doodle](http://www.doodle.se) 
+* [Algodeal](http://www.algodeal.com)
+* [Evocatus - social taste recommendation engine for taste products like chocolate, beer, wine](http://evocatus.com/)
+* [wro4j Blog](http://web-resource-optimization.blogspot.com/)
+* [CommaFeed](https://www.commafeed.com) and on [github](https://github.com/Athou/commafeed)
+  

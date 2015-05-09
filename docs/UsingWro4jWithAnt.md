@@ -1,8 +1,7 @@
-#summary Describes how to use wro4j with Ant build tool
-
+# Introduction
 Using wro4j with Ant build tool is not supported out of the box, but you can easily use it with wro4j-runner help. Below is a configuration example:
 
-{{{
+```xml
 <project name="wro4j" default="minify" basedir=".">
         
         <!-- properties file --> 
@@ -41,4 +40,4 @@ Using wro4j with Ant build tool is not supported out of the box, but you can eas
         </target>
 
 </project>
-}}}
+```
