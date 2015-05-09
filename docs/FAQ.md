@@ -1,16 +1,15 @@
 # Frequently Asked Questions
 
 ## I have a question or a suggestion, where can I post it?
-> Are you using wro4j on your site? Have you implemented something similar yourself? If so, please let us know! If you have any questions or ideas about some features you would like to see, if it's working for you, we'd love to hear about it, and if it's not, well we'd love to hear about that too! You could post to the wro4j group: http://groups.google.com/group/wro4j
+> Are you using wro4j on your site? Have you implemented something similar yourself? If so, please let us know! If you have any questions or ideas about some features you would like to see, if it's working for you, we'd love to hear about it, and if it's not, well we'd love to hear about that too! You could post to the [wro4j group](http://groups.google.com/group/wro4j).
 
 ## Where can I download the nightly builds?
-> The latest snapshot are available on nexus snapshot repositories which are located either here:
-https://oss.sonatype.org/content/groups/public/
-or here: 
-https://oss.sonatype.org/content/repositories/snapshots/
+> The latest snapshot are available on nexus snapshot repositories which are located either [here](https://oss.sonatype.org/content/groups/public/)
+or [here](https://oss.sonatype.org/content/repositories/snapshots/) 
+
 
 ## Where are the javadocs?
-> The javadocs for the latest version can be viewed  [http://alexo.github.com/wro4j/apidocs/1.4.2/index.html here].
+> The javadocs for the latest version can be viewed  [here](http://alexo.github.com/wro4j/apidocs/1.4.2/index.html).
 
 ## Why would I use wro4j?
 > * Improve the load time of your web application
@@ -39,7 +38,7 @@ Also, the project is split into several modules: core, extensions, maven-plugin 
 > The new release is announced on [discussion group](https://groups.google.com/forum/#!forum/wro4j) and on [twitter](http://twitter.com/#!/wro4j).
 
 ## How to get the wro4j sources?
-> Initially the sources were hosted by google code (svn checkout http://wro4j.googlecode.com/svn/trunk/), later a git scm was preferred and since 1.2.0 the codebase was moved to [github](http://github.com/wro4j/wro4j). Though after each realease, there is an attempt to synchronize code base from github with google code, there may be some issues. Therefore, a checkout from github is preferred and guarantee that you have the latest source version. More about how you can checkout source can be found in the [GettingStarted](GettingStarted) page. 
+> Initially the sources were hosted by google code ```svn checkout http://wro4j.googlecode.com/svn/trunk/```, later a git scm was preferred and since 1.2.0 the codebase was moved to [github](http://github.com/wro4j/wro4j). Though after each realease, there is an attempt to synchronize code base from github with google code, there may be some issues. Therefore, a checkout from github is preferred and guarantee that you have the latest source version. More about how you can checkout source can be found in the [GettingStarted](GettingStarted) page. 
 
 ## How can I change the Configuration Mode in the runtime
 > Since 1.2.0 version, you can use JMX to change several properties, including configuration mode. Read more: [RuntimeConfigurationsUsingJMX] 
@@ -101,12 +100,12 @@ Also, the project is split into several modules: core, extensions, maven-plugin 
   </filter>
 ```
 > There are a couple of things to mention:
-> *jmxEnabled* init param is set to false. This will disable the JMX usage of wro4j.
-> *cacheUpdatePeriod* & *modelUpdatePeriod* are set to 0. That means that there will be no scheduler responsible for updating of the cache and model. By default these values are 0, so it could be easier just to not put any of these two init-params. 
+> **jmxEnabled** init param is set to false. This will disable the JMX usage of wro4j.
+> **cacheUpdatePeriod** & **modelUpdatePeriod** are set to 0. That means that there will be no scheduler responsible for updating of the cache and model. By default these values are 0, so it could be easier just to not put any of these two init-params. 
 
 ## How to update the cache at runtime
 > * If JMX is enabled you can trigger cache and/or model update through jconsole
-> * Set the cacheUpdatePeriod and/or modelUpdatePeriod to 5 seconds in your web.xml (@see http://code.google.com/p/wro4j/wiki/GettingStarted)
+> * Set the cacheUpdatePeriod and/or modelUpdatePeriod to 5 seconds in your web.xml (@see [GettingStarted](GettingStarted))
 > * Trigger cache and/or model update through HTTP with a simple GET request:
 > * for cache update - /wro/wroAPI/reloadCache
 > * for model update - /wro/wroAPI/reloadModel
@@ -118,15 +117,15 @@ These requests will be processed only in DEVELOPMENT mode.
 > * depending on number of resources and type of processors, the bundling can be CPU expensive.
 > * when using a public facing site (with a large number of users), don't forget to use DEPLOYMENT mode (equivalent of {{{ debug=false }}}). Also it is important to keep caching enabled (which is true by default). 
 > * You can provide a custom [ExtendingCachingImplementation caching strategy] based on your application needs. 
-> * You can turn on/off gzipping (use {{{ gzipResources=false }}}). This can be useful if you prefer CDN do handle the resource gzipping.
+> * You can turn on/off gzipping (use ```gzipResources=false```). This can be useful if you prefer CDN do handle the resource gzipping.
 [Read more](IsWro4jSlow) about performance concerns.
 
 ## I'm using !CssDataUriPreProcessor but it doesn't change anything
 > If CssDataUriPreProcessor or any other [similar processor](FallbackCssDataUriProcessor) doesn't change the images url's, the possible causes can be:
 >
-> * Images are too big. By default the processor applies base64 encoding transformation only on images < 32KB. You can change this limit by extending the processor and override the {{{isReplaceAccepted(final String dataUri)}}} method.
+> * Images are too big. By default the processor applies base64 encoding transformation only on images < 32KB. You can change this limit by extending the processor and override the ```isReplaceAccepted(final String dataUri)``` method.
 > * The other possible cause is that the images are not found or not available during processing.
-> * If still the images are available and smaller than 32KB and still nothing happens, the reason is that the !CssUrlRewritingProcessor was applied before the !CssDataUriPreProcessor. It is important to apply the !CssDataUriPreProcessor before !CssUrlRewritingProcessor, otherwise images cannot be located properly by processor, leaving the outcome unchanged.
+> * If still the images are available and smaller than 32KB and still nothing happens, the reason is that the **CssUrlRewritingProcessor** was applied before the **CssDataUriPreProcessor**. It is important to apply the **CssDataUriPreProcessor** before **CssUrlRewritingProcessor**, otherwise images cannot be located properly by processor, leaving the outcome unchanged.
 
 ## I'm getting 404 instead minimized resource content and nothing is reported in logs
 > The 404 is shown whenever wro4j failed to process the resources and continues with filter chaining. It worth mentioning that the logging is not  verbose at all with ERROR or INFO level (there were a lot of feature requests to make it less verbose). 
@@ -134,11 +133,11 @@ These requests will be processed only in DEVELOPMENT mode.
 > If you are interested of problems occurred during processing, you have the following options:
 > * Use development mode (debug=true) in configuration options. This will show the stacktrace in the page instead of continue with filter chaining.
 > * Configure logger with DEBUG level for the following:
->    ** {{{ro.isdc.wro}}} package for very detailed logging. Example: 
+> --* ```ro.isdc.wro``` package for very detailed logging. Example: 
 ```
 log4j.logger.ro.isdc=DEBUG
 ```
->    ** {{{ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator}}} class if you are interested in exceptions reported by processors only. This is a more selective approach. Example:
+> --* ```ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator``` class if you are interested in exceptions reported by processors only. This is a more selective approach. Example:
 ```
 log4j.logger.ro.isdc.wro.model.resource.processor.decorator.ExceptionHandlingProcessorDecorator=DEBUG
 ```
