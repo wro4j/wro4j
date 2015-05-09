@@ -1,0 +1,3 @@
+# About
+Free and Open Source Java project which brings together almost all the modern web tools: JsHint, CssLint, JsMin, Google Closure compressor, YUI Compressor, UglifyJs, Dojo Shrinksafe, Css Variables Support, JSON Compression, Less, Sass, CoffeeScript and much more. In the same time, the aim is to keep it as simple as possible and as extensible as possible in order to be easily adapted to application specific needs.
+Easily improve your web application loading time. Keep project web resources (js & css) well organized, merge & minify them at run-time (using a simple filter) or build-time (using maven plugin) and has a dozen of features you may find useful when dealing with web resources.

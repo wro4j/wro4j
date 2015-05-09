@@ -423,10 +423,11 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+            <!--
                 <module>wro4j-core</module>
                 <module>wro4j-extensions</module>
                 <module>wro4j-maven-plugin</module>
-	        <!--
+	        
                 <module>wro4j-osgi</module>
                 -->          
             </modules>
