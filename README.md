@@ -3,14 +3,12 @@
 [![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core)
 
-wro4j is a free and Open Source Java project which will help you to [easily improve](http://alexo.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://code.google.com/p/wro4j/wiki/WroFileFormat), merge & minify them at [run-time](http://code.google.com/p/wro4j/wiki/Installation) (using a simple filter) or [build-time](http://code.google.com/p/wro4j/wiki/MavenPlugin) (using maven plugin) and has a [dozen of features](http://code.google.com/p/wro4j/wiki/Features) you may find useful when dealing with web resources.
+wro4j is a free and Open Source Java project which will help you to [easily improve](http://wro4j.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://wro4j.readthedocs.org/en/stable/WroFileFormat), merge & minify them at [run-time](http://wro4j.readthedocs.org/en/stable/Installation) (using a simple filter) or [build-time](http://wro4j.readthedocs.org/en/stable/MavenPlugin) (using maven plugin) and has a [dozen of features](http://wro4j.readthedocs.org/en/stable/Features) you may find useful when dealing with web resources.
 
 
 # Getting Started
 
-
 In order to get started with wro4j, you have to follow only 3 simple steps.
-
 
 ## Step 1: Add WroFilter to web.xml
 ```xml
@@ -49,12 +47,12 @@ In order to get started with wro4j, you have to follow only 3 simple steps.
 		
 # Documentation
 
-The documentation for this project is located on google code project page: http://code.google.com/p/wro4j/
+The documentation for this project is located [here](http://wro4j.readthedocs.org/en/stable/)
 
 
 # Issues
 
-Found a bug? Report it to the issue tracker: https://github.com/wro4j/wro4j/issues
+Found a bug? Report it to the [issue tracker](: )https://github.com/wro4j/wro4j/issues)
 
 
 # Feedback
