@@ -441,7 +441,7 @@ public final class WroUtil {
   }
 
   private static String replaceWithServletContextSeparatorIfNedded(String normalized) {
-    if (normalized.startsWith(SEPARATOR_WINDOWS)) {
+    if (normalized.startsWith(SEPARATOR_WINDOWS) || normalized.contains(SEPARATOR_WINDOWS)) {
       normalized = normalized.replace(SEPARATOR_WINDOWS, ServletContextUriLocator.PREFIX);
     }
     return normalized;

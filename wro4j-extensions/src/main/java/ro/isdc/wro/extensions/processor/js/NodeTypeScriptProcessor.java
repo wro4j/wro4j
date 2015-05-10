@@ -5,11 +5,14 @@ package ro.isdc.wro.extensions.processor.js;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +62,30 @@ public class NodeTypeScriptProcessor
    */
   private final boolean isWindows;
 
+  private static class StreamGobbler
+      extends Thread {
+    InputStream is;
+    String type;
+
+    public StreamGobbler(final InputStream is, final String type) {
+      this.is = is;
+      this.type = type;
+    }
+
+    @Override
+    public void run() {
+      try {
+        final InputStreamReader isr = new InputStreamReader(is);
+        final BufferedReader br = new BufferedReader(isr);
+        String line = null;
+        while ((line = br.readLine()) != null)
+          LOG.debug(type + ">" + line);
+      } catch (final IOException ioe) {
+        ioe.printStackTrace();
+      }
+    }
+  }
+
   public NodeTypeScriptProcessor() {
     // initialize this field at construction.
     final String osName = System.getProperty("os.name");
@@ -65,9 +93,6 @@ public class NodeTypeScriptProcessor
     isWindows = osName != null && osName.contains("Windows");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
@@ -89,6 +114,7 @@ public class NodeTypeScriptProcessor
 
   private String process(final String resourceUri, final String content) {
     final InputStream shellIn = null;
+    OutputStream tempSourceStream = null;
     // the file holding the input file to process
     File tempSource = null;
     File tempDest = null;
@@ -96,15 +122,16 @@ public class NodeTypeScriptProcessor
       tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final String encoding = "UTF-8";
-      IOUtils.write(content, new FileOutputStream(tempSource), encoding);
+      IOUtils.write(content, tempSourceStream = new FileOutputStream(tempSource), encoding);
       LOG.debug("absolute path: {}", tempSource.getAbsolutePath());
 
       final Process process = createProcess(tempSource, tempDest);
+
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
-      final String result = IOUtils.toString(new FileInputStream(tempDest), encoding);
+      final String result = IOUtils.toString(new AutoCloseInputStream(new FileInputStream(tempDest)), encoding);
       if (exitStatus != 0) {
         LOG.error("exitStatus: {}", exitStatus);
-        String errorMessage = IOUtils.toString(process.getInputStream(), encoding);
+        String errorMessage = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
         // find a way to get rid of escape character found at the end (minor issue)
         errorMessage = MessageFormat.format("Error in Typescript: \n{0}",
             errorMessage.replace(tempSource.getPath(), resourceUri));
@@ -114,7 +141,9 @@ public class NodeTypeScriptProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
+      // close input stream to allow file to be deleted (otherwise deletion fails).
       IOUtils.closeQuietly(shellIn);
+      IOUtils.closeQuietly(tempSourceStream);
       // always cleanUp
       FileUtils.deleteQuietly(tempSource);
       FileUtils.deleteQuietly(tempDest);
@@ -134,9 +163,6 @@ public class NodeTypeScriptProcessor
     throw WroRuntimeException.wrap(e);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
@@ -158,7 +184,17 @@ public class NodeTypeScriptProcessor
     notNull(sourceFile);
     final String[] commandLine = getCommandLine(sourceFile.getPath(), destFile.getPath());
     LOG.debug("CommandLine arguments: {}", Arrays.asList(commandLine));
-    return new ProcessBuilder(commandLine).redirectErrorStream(true).start();
+    final Process process = new ProcessBuilder(commandLine).redirectErrorStream(true).start();
+
+    //Gobblers responsible for reading stream to avoid blocking of the process when the buffer is full.
+    final StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
+    // any output?
+    final StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), "OUTPUT");
+    // kick them off
+    errorGobbler.start();
+    outputGobbler.start();
+
+    return process;
   }
 
   /**
@@ -174,7 +210,8 @@ public class NodeTypeScriptProcessor
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final Process process = createProcess(tempSource, tempDest);
       final int exitValue = process.waitFor();
-      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
+      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue,
+          IOUtils.toString(new AutoCloseInputStream(process.getInputStream())));
       if (exitValue != 0) {
         throw new UnsupportedOperationException("Tsc is not a supported operation on this platform");
       }

@@ -1,14 +1,14 @@
 (function() {
-  var filename, _fn, _i, _len;
+  var filename, fn, i, len;
 
-  _fn = function(filename) {
+  fn = function(filename) {
     return fs.readFile(filename, function(err, contents) {
       return compile(filename, contents.toString());
     });
   };
-  for (_i = 0, _len = list.length; _i < _len; _i++) {
-    filename = list[_i];
-    _fn(filename);
+  for (i = 0, len = list.length; i < len; i++) {
+    filename = list[i];
+    fn(filename);
   }
 
 }).call(this);

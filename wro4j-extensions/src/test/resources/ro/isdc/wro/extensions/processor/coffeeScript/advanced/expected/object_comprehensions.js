@@ -8,13 +8,13 @@
   };
 
   ages = (function() {
-    var _results;
-    _results = [];
+    var results;
+    results = [];
     for (child in yearsOld) {
       age = yearsOld[child];
-      _results.push(child + " is " + age);
+      results.push(child + " is " + age);
     }
-    return _results;
+    return results;
   })();
 
 }).call(this);

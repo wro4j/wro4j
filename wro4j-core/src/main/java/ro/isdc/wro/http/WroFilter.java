@@ -351,13 +351,13 @@ public class WroFilter
    *          {@link Exception} thrown during request processing.
    */
   protected void onException(final Exception e, final HttpServletResponse response, final FilterChain chain) {
-    LOG.debug("Exception occured", e);
+    LOG.error("Exception occured", e);
     try {
-      LOG.debug("Cannot process. Proceeding with chain execution.");
+      LOG.warn("Cannot process. Proceeding with chain execution.");
       chain.doFilter(Context.get().getRequest(), response);
     } catch (final Exception ex) {
       // should never happen (use debug level to suppress unuseful logs)
-      LOG.debug("Error while chaining the request", e);
+      LOG.debug("Error while chaining the request", ex);
     }
   }
 

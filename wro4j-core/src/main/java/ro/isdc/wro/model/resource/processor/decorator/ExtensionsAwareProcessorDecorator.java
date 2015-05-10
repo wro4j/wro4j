@@ -3,11 +3,13 @@
  */
 package ro.isdc.wro.model.resource.processor.decorator;
 
+import static org.apache.commons.lang3.Validate.notBlank;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class ExtensionsAwareProcessorDecorator
    *          to add.
    */
   public ExtensionsAwareProcessorDecorator addExtension(final String extension) {
-    Validate.notBlank(extension);
+    notBlank(extension);
     extensions.add(extension);
     return this;
   }
@@ -60,9 +62,6 @@ public class ExtensionsAwareProcessorDecorator
     return new ExtensionsAwareProcessorDecorator(preProcessor);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean isEnabled(final Resource resource) {
     return super.isEnabled(resource) && isApplicable(resource);
@@ -74,7 +73,8 @@ public class ExtensionsAwareProcessorDecorator
    * @return true if the processed resource has one of the accepted extension.
    */
   private boolean isApplicable(final Resource resource) {
-    final String resourceExtension = FilenameUtils.getExtension(resource.getUri());
+    final String resourceExtension = resource != null ? FilenameUtils.getExtension(resource.getUri())
+        : StringUtils.EMPTY;
     // null resource also means that processor is applicable, since we cannot check the extension (postProcessor).
     final boolean isApplicable = resource == null || extensions.contains(resourceExtension);
     if (isApplicable) {

@@ -97,10 +97,6 @@ public class ServletContextUriLocator
     return this;
   }
 
-  private DispatcherStreamLocator newDispatcherStreamLocator() {
-    return new DispatcherStreamLocator();
-  }
-
   /**
    * {@inheritDoc}
    */

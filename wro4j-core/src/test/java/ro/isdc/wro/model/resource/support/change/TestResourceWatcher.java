@@ -315,7 +315,7 @@ public class TestResourceWatcher {
           throws Exception {
         return asyncInvoker.get() != null;
       }
-    }, timeout * 2);
+    }, timeout * 3);
     assertNotNull(asyncInvoker.get());
     assertNotNull(exceptionHolder.get());
     // We expect a request to fail, since a request a localhost using some port from where we expect to get no response.

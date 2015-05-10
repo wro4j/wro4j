@@ -107,4 +107,12 @@ public class TestUrlUriLocator {
       throws IOException {
     victim.locate(createUri("/folder with spaces/**.css", "test"));
   }
+  
+  /**
+   * The requested endpoint returns 403 status code when request doesn't contain agent header.
+   */
+  @Test
+  public void shouldRetrieveCDNResourceRequiringAgentHeader() throws IOException {
+	  victim.locate("http://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js");
+  }
 }

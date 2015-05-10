@@ -273,9 +273,6 @@ public class Context
     return this.filterConfig;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public String getAggregatedFolderPath() {
     return this.aggregatedFolderPath;
   }
@@ -287,9 +284,6 @@ public class Context
     this.aggregatedFolderPath = aggregatedFolderPath;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);

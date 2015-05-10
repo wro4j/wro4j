@@ -14,7 +14,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="Group">
-		<xsd:choice  minOccurs="1" maxOccurs="unbounded">
+		<xsd:choice  minOccurs="0" maxOccurs="unbounded">
 			<xsd:element name="css">
 				<xsd:complexType mixed="true">
 					<xsd:attribute name="minimize" type="xsd:boolean"

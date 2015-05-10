@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<Module>
+  <ModulePrefs title="Wro4j Twitter Gadget"/> 
+  <Content type="html">
+  <![CDATA[
+	<script type="text/javascript" src="http://widgets.twimg.com/j/2/widget.js"></script>
+	<script type="text/javascript">
+	new TWTR.Widget({
+	  version: 2,
+	  type: 'search',
+	  search: 'wro4j',
+	  interval: 6000,
+	  title: '',
+	  subject: 'wro4j',
+	  width: 272,
+	  height: 350,
+	  theme: {
+		shell: {
+		  background: '#8ec1da',
+		  color: '#ffffff'
+		},
+		tweets: {
+		  background: '#ffffff',
+		  color: '#444444',
+		  links: '#1985b5'
+		}
+	  },
+	  features: {
+		scrollbar: false,
+		loop: true,
+		live: true,
+		hashtags: true,
+		timestamp: true,
+		avatars: true,
+		behavior: 'default'
+	  }
+	}).render().start();
+	</script>
+  ]]>
+  </Content>
+</Module>

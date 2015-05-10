@@ -66,4 +66,9 @@ public class TestContentTypeResolver {
   public void shouldResolveFontExtensionTtf() {
     assertEquals("application/octet-stream", ContentTypeResolver.get("font.ttf"));
   }
+
+  @Test
+  public void shouldResolveSvg() {
+    assertEquals("image/svg+xml", ContentTypeResolver.get("graphic.svg"));
+  }
 }

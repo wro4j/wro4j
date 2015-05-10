@@ -242,4 +242,12 @@ public class TestXmlModelFactory {
     WroTestUtils.init(factory);
     return factory.create();
   }
+  
+  @Test
+  public void shouldAllowEmptyGroup() {
+    final WroModel model = loadModelFromLocation("emptyGroup.xml");
+    assertEquals(1, new WroModelInspector(model).getGroupNames().size());
+    assertTrue(model.getGroups().iterator().next().getResources().isEmpty());
+    LOG.debug("model: " + model);
+  }
 }

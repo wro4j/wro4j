@@ -25,6 +25,7 @@ import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.extensions.processor.js.NgAnnotateProcessor;
 import ro.isdc.wro.extensions.processor.js.NgMinProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
@@ -281,6 +282,12 @@ public class DefaultProcessorProvider
         @Override
         protected ResourcePreProcessor initialize() {
           return new NgMinProcessor();
+        }
+      }));
+    map.put(NgAnnotateProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new NgAnnotateProcessor();
         }
       }));
     return map;

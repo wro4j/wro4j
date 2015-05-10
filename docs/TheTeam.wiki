@@ -1,0 +1,33 @@
+#summary People who contributed to this project
+
+= About =
+A successful project requires many people to play many roles. Some members write code or documentation, while others are valuable as testers, submitting patches and suggestions.
+
+==Founders==
+|| *Name* || 
+|| [https://github.com/alexo Alex Objelean] || 
+|| Bogdan Csoregi || 
+
+==Contributors==
+The following is a list of developers that have directly contributed to the project.
+
+|| *Name* || 
+|| [https://github.com/alf239 Alexey Filippov] || 
+|| [https://github.com/dmitrye Dmitry Erman] || 
+|| [https://github.com/eivindw Eivind Barstad Waaler] ||
+|| [https://github.com/gconaty Garrett Conaty] || 
+|| [https://github.com/ivarconr Ivar Conradi Østhus] ||
+|| [https://github.com/julienwOL Julien Wajsberg] || 
+|| [https://github.com/lltyk lltyk] ||
+|| [https://github.com/martin-g Martin Grigorov] || 
+|| Matias Mirabelli || 
+|| [https://github.com/michael-simons Michael J. Simons] ||
+|| [https://github.com/nigelzor Neil Gentleman] || 
+|| [https://github.com/olgamelnichuk Olga Melnichuk] || 
+|| Ovidiu Hurducas || 
+|| [https://github.com/filirom1 Romain Philibert] || 
+|| [https://github.com/sebastianco Sebastian Cotarla] ||
+|| [https://github.com/blemoine Benoit Lemoine] ||
+|| [https://github.com/mwanji Moandji Ezana] ||
+
+Sorry if somebody was missed (can be added anytime)
