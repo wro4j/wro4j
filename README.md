@@ -52,12 +52,12 @@ The documentation for this project is located [here](http://wro4j.readthedocs.or
 
 # Issues
 
-Found a bug? Report it to the [issue tracker](: )https://github.com/wro4j/wro4j/issues)
+Found a bug? Report it to the [issue tracker](https://github.com/wro4j/wro4j/issues)
 
 
 # Feedback
 
-If you have any questions or suggestions, please feel free to post a comment to the discussion group: https://groups.google.com/forum/#!forum/wro4j
+If you have any questions or suggestions, please feel free to post a comment to the [discussion group](https://groups.google.com/forum/#!forum/wro4j)
 
 [Follow me](http://twitter.com/#!/wro4j) on Twitter.
 
