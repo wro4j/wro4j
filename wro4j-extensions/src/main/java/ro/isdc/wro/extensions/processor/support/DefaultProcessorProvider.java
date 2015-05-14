@@ -25,12 +25,15 @@ import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
 import ro.isdc.wro.extensions.processor.js.JsonHPackProcessor;
+import ro.isdc.wro.extensions.processor.js.LiterateCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NgAnnotateProcessor;
 import ro.isdc.wro.extensions.processor.js.NgMinProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.NodeLiterateCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
+import ro.isdc.wro.extensions.processor.js.RhinoLiterateCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoTypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.TypeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
@@ -48,6 +51,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * The implementation which contributes with processors from core module.
  *
  * @author Alex Objelean
+ * @auther Thilo Planz
  * @created 1 Jun 2012
  */
 public class DefaultProcessorProvider
@@ -194,6 +198,24 @@ public class DefaultProcessorProvider
         return new CoffeeScriptProcessor();
       }
     }));
+    map.put(RhinoLiterateCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new RhinoLiterateCoffeeScriptProcessor();
+        }
+      }));
+    map.put(NodeLiterateCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new NodeLiterateCoffeeScriptProcessor();
+        }
+      }));
+    map.put(LiterateCoffeeScriptProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new LiterateCoffeeScriptProcessor();
+        }
+      }));
     map.put(CJsonProcessor.ALIAS_PACK, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
       protected ResourcePreProcessor initialize() {
