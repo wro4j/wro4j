@@ -1,12 +1,5 @@
 package ro.isdc.wro.extensions.processor.js;
 
-import ro.isdc.wro.model.resource.Resource;
-import ro.isdc.wro.model.resource.ResourceType;
-import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
-import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
-import ro.isdc.wro.model.resource.processor.SupportAware;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,16 +19,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
+import ro.isdc.wro.model.resource.SupportedResourceType;
+import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
+import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
+import ro.isdc.wro.model.resource.processor.SupportAware;
+
 
 /**
- * Uses ng-annotate node utility.
- * <p/>
- * Ng-annotate is a "pre-minifier" for AngularJS. It modifies Angular code to prevent errors that may arise from minification.
- * <p/>
- * More details can be found here: https://github.com/olov/ng-annotate
+ * Uses ng-annotate node utility. Adds and removes AngularJS dependency injection annotations. More details can be found
+ * here: https://github.com/olov/ng-annotate
  *
  * @author Manuel S. (adapted from Janek L.B's NgMinProcessor)
- * @since ?
+ * @since 1.7.8
  * @created 30 Mar 2015
  */
 @SupportedResourceType(ResourceType.JS)
@@ -76,7 +73,7 @@ public class NgAnnotateProcessor
    * @VisibleForTesting
    */
   void doProcess(final InputStream in, final OutputStream out)
-          throws IOException {
+      throws IOException {
     final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
     final Executor executor = new DefaultExecutor();
     executor.setStreamHandler(new PumpStreamHandler(out, errorStream, in));

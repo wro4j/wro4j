@@ -67,3 +67,5 @@ Any processor can be used as both: pre processor or post processor. In the futur
 | typeScript | TypeScriptProcessor | Compiles the [typescript](http://www.typescriptlang.org/) code into javascript. Available since 1.6.0. Uses node.js for compilation. Not supported on all platforms. |
 | less4j | Less4jProcessor | Available since 1.6.0. Compiles less into css. Uses [less4j](https://github.com/SomMeri/less4j) open source java library | 
 | emberJs | EmberJsProcessor | Available since 1.6.2. Compiles templates into javascript using [emberjs](http://emberjs.com/) library. |
+| ngMin | NgMinProcessor | Available since 1.7.4. [ngMin](http://www.thinkster.io/pick/XlWneEZCqY/angularjs-ngmin) is a "pre-minifier" for AngularJS. It modifies Angular code to prevent errors that may arise from minification. The implementation assume the required npm is installed. |
+| ngAnnotate | NgAnnotateProcessor | Available since 1.7.8. [Ng-annotate](https://github.com/olov/ng-annotate) Adds and removes AngularJS dependency injection annotations. The implementation assume the required npm is installed. |
