@@ -16,16 +16,21 @@ package ro.isdc.wro.extensions.processor.js;
 
 import ro.isdc.wro.extensions.processor.support.coffeescript.CoffeeScript;
 
+
+/**
+ * A rhino based implementation of literate coffeeScript.
+ *
+ * @author Thilo Planz
+ * @since 1.7.9
+ */
 public class RhinoLiterateCoffeeScriptProcessor extends RhinoCoffeeScriptProcessor {
-    
+    private static final String OPTION_LITERATE = "literate";
     public static final String ALIAS = "rhinoLiterateCoffeeScript";
 
     @Override
     protected CoffeeScript newCoffeeScript() {
-        
-        CoffeeScript s = super.newCoffeeScript();
-        s.setOptions("literate");
+        final CoffeeScript s = super.newCoffeeScript();
+        s.setOptions(OPTION_LITERATE);
         return s;
     }
-    
 }

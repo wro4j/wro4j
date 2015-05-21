@@ -33,15 +33,16 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
  * <p/>
  *
  * @author Thilo Planz
+ * @since 1.7.9
  */
 @SupportedResourceType(ResourceType.JS)
 public class NodeLiterateCoffeeScriptProcessor extends NodeCoffeeScriptProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, SupportAware {
- 
+
   public static final String ALIAS = "nodeLiterateCoffeeScript";
-  
+
   private static final String[] LITERATE_MODE_FLAG = new String[]{ "-l" };
-  
+
   @Override
   protected final String[] buildOptionalArguments() {
     return LITERATE_MODE_FLAG;
