@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.css.sac.CSSParseException;
 
 import ro.isdc.wro.extensions.processor.css.VaadinSassProcessor;
 import ro.isdc.wro.util.WroTestUtils;
@@ -62,7 +63,7 @@ public class TestVaadinSassProcessor {
   /**
    * Test that processing invalid sass css produces exceptions.
    */
-  @Test(expected = Exception.class)
+  @Test(expected = CSSParseException.class)
   public void shouldFailWhenInvalidSassCssIsProcessed()
       throws Exception {
     processor.process(null, new StringReader("akfj32#$%"), new StringWriter());

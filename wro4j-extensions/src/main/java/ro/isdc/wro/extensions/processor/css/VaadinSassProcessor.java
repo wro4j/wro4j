@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.w3c.css.sac.CSSException;
+import org.w3c.css.sac.CSSParseException;
 import org.w3c.css.sac.InputSource;
 
 import ro.isdc.wro.model.resource.Resource;
@@ -12,6 +14,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 import com.vaadin.sass.internal.handler.SCSSDocumentHandler;
 import com.vaadin.sass.internal.handler.SCSSDocumentHandlerImpl;
+import com.vaadin.sass.internal.handler.SCSSErrorHandler;
 import com.vaadin.sass.internal.parser.Parser;
 
 
@@ -44,6 +47,21 @@ public class VaadinSassProcessor
     final Parser parser = new Parser();
     final SCSSDocumentHandler handler = new SCSSDocumentHandlerImpl();
     parser.setDocumentHandler(handler);
+    parser.setErrorHandler(new SCSSErrorHandler() {
+      @Override
+      public void fatalError(final CSSParseException exception)
+          throws CSSException {
+        super.error(exception);
+        throw exception;
+      }
+      @Override
+      public void error(final CSSParseException exception)
+          throws CSSException {
+        super.error(exception);
+        throw exception;
+      }
+
+    });
     return parser;
   }
 }
