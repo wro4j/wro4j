@@ -47,9 +47,6 @@ public class RubySassCssProcessor
     });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
@@ -92,9 +89,6 @@ public class RubySassCssProcessor
     return new RubySassEngine();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
