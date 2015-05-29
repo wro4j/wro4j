@@ -180,6 +180,11 @@ public class TestJsMinProcessor {
     jsmin("var r = /a/*comment");
   }
   
+  @Test
+  public void shouldProcessFunctionReturningRegExp() throws Exception {
+      jsmin("function getFullDateMatcher { return /^\\d?\\d([.\\/-])\\d?\\d1\\d\\d\\d?\\d?/; }");
+  }
+  
   private String jsmin(final String inputScript)
       throws Exception {
     final StringReader reader = new StringReader(inputScript);
@@ -189,4 +194,6 @@ public class TestJsMinProcessor {
     new JSMin(is, os).jsmin();
     return writer.toString();
   }
+  
+  
 }
