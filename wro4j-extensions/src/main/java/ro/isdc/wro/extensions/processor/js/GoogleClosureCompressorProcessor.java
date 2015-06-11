@@ -3,13 +3,22 @@
  */
 package ro.isdc.wro.extensions.processor.js;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -36,7 +45,7 @@ import com.google.javascript.jscomp.CompilerOptions;
 import com.google.javascript.jscomp.DiagnosticGroups;
 import com.google.javascript.jscomp.Result;
 import com.google.javascript.jscomp.SourceFile;
-
+import com.google.javascript.jscomp.SourceMap;
 
 /**
  * Uses Google closure compiler for js minimization.
@@ -112,6 +121,10 @@ public class GoogleClosureCompressorProcessor
       if (externs == null) {
         // fallback to empty array when null is provided.
         externs = new SourceFile[] {};
+      }
+      // js source map creation
+      if (isJsSourceMapEnabled()) {
+        createMapFile(externs);
       }
       Result result = null;
       result = compiler.compile(Arrays.asList(externs), Arrays.asList(input), compilerOptions);
@@ -200,7 +213,107 @@ public class GoogleClosureCompressorProcessor
     options.setOutputCharset(getEncoding());
     // set it to warning, otherwise compiler will fail
     options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES, CheckLevel.WARNING);
+    // javascript source maps creation 
+    if( isJsSourceMapEnabled() ) {
+    	options.setSourceMapOutputPath(Context.get().getConfig().getJsSourceMapPath());
+    	options.setSourceMapDetailLevel(SourceMap.DetailLevel.ALL);
+    	options.setSourceMapFormat(SourceMap.Format.DEFAULT);
+    }
+    // jQuery pass flag set (only useful if adavanced mode is set)
+    if( Context.get().getConfig().isJqueryPass() ) {
+    	options.jqueryPass = true;
+    }
     return options;
+  }
+  
+  /**
+   * @return flag describing if js source map should be created
+   */
+  private boolean isJsSourceMapEnabled() {
+	  WroConfiguration config = Context.get().getConfig();
+	  return config.isMinimizeEnabled() && null != config.getJsSourceMapPath();
+  }
+  
+  /**
+   * Creates the map file compiling the whole list of resources at once
+   * 
+   * @param externs
+   */
+  private void createMapFile(SourceFile[] externs) {
+	  WroConfiguration config = Context.get().getConfig();
+	  if( !config.isJsSourceMapCreated() ){
+		  try {
+			  final CompilerOptions compilerOptions = optionsPool.getObject();
+			  final Compiler compiler = newCompiler(compilerOptions);
+			  
+			  FileOutputStream mapFile = new FileOutputStream(config.getJsSourceMapPath());
+			  Writer mapWriter = new BufferedWriter(new OutputStreamWriter(mapFile, config.getEncoding()));
+			  
+			  compiler.compile(new ArrayList<SourceFile>(1), getResourcesForCompile(config.getResources(), config.getJsSourceMapPath().substring(0, config.getJsSourceMapPath().lastIndexOf(File.separatorChar))), compilerOptions);
+			  compiler.toSource();
+			  // source map code append
+			  compiler.getSourceMap().appendTo(mapWriter, new File(config.getJsSourceMapPath()).getName().replaceFirst(".map",".js"));
+			  
+			  // data to file
+			  mapWriter.flush();
+			  // clean the source urls cause resources use absolute path 
+			  cleanMapFileSources();
+			  // finalize file
+			  mapWriter.close();
+			  
+			  config.setJsSourceMapCreated(true);
+		  } catch (IOException e){
+		      e.printStackTrace();
+		  }
+	  }
+  }
+  
+  /**
+   * Prepare the resources list to be consumed by Compiler
+   * 
+   * @param resources
+   * @return {List<SourceFile>}
+   */
+  private List<SourceFile> getResourcesForCompile(List<Resource> resources, String contextPath) {
+	List<SourceFile> inputs = new ArrayList<SourceFile>(resources.size());
+	for( Resource resource : resources ) {
+	  String splitter = File.separatorChar == '\\' ? "\\\\" : "////";
+	  String context = Paths.get(contextPath).toString().concat(File.separator);
+	  
+	  String[] p = Paths.get(resource.getUri()).toString().split(splitter);
+      for (int i=0; i<=p.length-1; i++) {
+		if (p[i].length() > 0) {
+		  context = context.replace(p[i], "");
+		}
+      }
+	  context = Paths.get(context).toString();
+	  
+	  inputs.add(SourceFile.fromFile(context.concat(resource.getUri()), Charset.forName(Context.get().getConfig().getEncoding())));
+	}
+	return inputs;
+  }
+  
+  /**
+   * Map file sources absolute paths replaced by relative paths.
+   * Normally, resultant path would be the same as passed in the
+   * group list in wro.xml 
+   */
+  private void cleanMapFileSources(){
+	WroConfiguration config = Context.get().getConfig();
+	try {
+	  File file = new File(config.getJsSourceMapPath());
+	  List<String> lines = FileUtils.readLines(file, config.getEncoding());
+	  String sources = lines.get(5);
+	  String path = file.getParent();
+	  if (File.separatorChar == '\\') {
+		path = path.replace(File.separatorChar, '/').concat("/");
+	  }
+	  sources = sources.replaceAll(path, "");
+	  lines.set(5, sources);
+	  FileUtils.writeLines(file, lines, "\n");
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
   }
 
   /**

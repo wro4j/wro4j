@@ -94,6 +94,31 @@ public class Wro4jMojo
    */
   private String contextPath;
   /**
+   * Using Google Clousure, determines if javascript source maps should be created
+   * 
+   * @parameter default-value="false" property="createJsSourceMaps"
+   * @optional
+   */
+  private Boolean createJsSourceMaps;
+  /**
+   * Javascript source maps path 
+   */
+  private File mapsFolder;
+  /**
+   * Using Google Clousure, determines if it should take care of jQuery aliases
+   * 
+   * @parameter default-value="false" property="jqueryPass"
+   * @optional
+   */
+  private Boolean jqueryPass;
+  /**
+   * Avoid CSS url rewriting
+   * 
+   * @parameter default-value="true" property="cssUrlRewriting"
+   * @optional
+   */
+  private Boolean cssUrlRewriting;
+  /**
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
@@ -137,6 +162,16 @@ public class Wro4jMojo
     if (groupNameMappingFile != null) {
       getLog().info("groupNameMappingFile: " + groupNameMappingFile);
     }
+    if (createJsSourceMaps != null && createJsSourceMaps) {
+    	getLog().info("createJsSourceMaps: " + createJsSourceMaps);
+    }
+    if (jqueryPass != null && jqueryPass) {
+    	getLog().info("jQuery: " + jqueryPass);
+    }
+    if (cssUrlRewriting != null) {
+    	getLog().info("noCssUrlRewriting: " + cssUrlRewriting);
+    	Context.get().getConfig().setCssUrlRewriting(cssUrlRewriting);
+    }
     final Collection<String> groupsAsList = getTargetGroupsAsList();
     final StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
@@ -159,6 +194,10 @@ public class Wro4jMojo
         } else {
           processGroup(groupWithExtension, destinationFolder);
         }
+      }
+      // reset the source map created flag
+      if (Context.get().getConfig().isJsSourceMapEnabled()) {
+    	  Context.get().getConfig().setJsSourceMapCreated(false);
       }
     }
     if (isParallelProcessing()) {
@@ -228,6 +267,9 @@ public class Wro4jMojo
       if (jsDestinationFolder != null) {
         folder = jsDestinationFolder;
       }
+      if (createJsSourceMaps != null && createJsSourceMaps) {
+    	  mapsFolder = folder.getAbsoluteFile();
+      }
     }
     if (resourceType == ResourceType.CSS) {
       if (cssDestinationFolder != null) {
@@ -269,6 +311,16 @@ public class Wro4jMojo
       final WroConfiguration config = Context.get().getConfig();
       // the maven plugin should ignore empty groups, since it will try to process all types of resources.
       config.setIgnoreEmptyGroup(true);
+      // sourceMaps related configuration for Google Clousure Compiler
+      if (isClousureMapEnabled() && group.endsWith(".js")) {
+	    config.setJsSourceMapEnabled(true);
+	    config.setJsSourceMapPath(mapsFolder.getAbsolutePath().concat(Character.toString(IOUtils.DIR_SEPARATOR)).concat(group.replaceFirst(".js",".map")));
+	    config.setJsSourceMapCreated(false);
+      }
+      // jqueryPass flag for Google Clousure Compiler in Advanced Mode
+      if (jqueryPass) {
+    	config.setJqueryPass(jqueryPass);
+      }
       Context.set(Context.webContext(request, response, Mockito.mock(FilterConfig.class)), config);
 
       Context.get().setAggregatedFolderPath(getAggregatedPathResolver().resolve());
@@ -290,6 +342,12 @@ public class Wro4jMojo
       final OutputStream fos = new FileOutputStream(destinationFile);
       // use reader to detect encoding
       IOUtils.copy(resultInputStream, fos);
+	  // append the //@ sourceMappingURL={name}.map
+      if (isClousureMapEnabled() && group.endsWith(".js")) {
+		String sourceMapLink = "//@ sourceMappingURL=".concat(config.getJsSourceMapPath().substring(parentFolder.getAbsolutePath().length()+1, config.getJsSourceMapPath().length()));
+	  	IOUtils.write(sourceMapLink, fos);
+	  	getLog().info("Created javascript source map for " + destinationFile.getName());
+	  }
       fos.close();
       // delete empty files
       if (destinationFile.length() == 0) {
@@ -391,5 +449,16 @@ public class Wro4jMojo
    */
   void setContextPath(final String contextPath) {
     this.contextPath = contextPath;
+  }
+  
+  /**
+   * Full check to know if Google Closure Compiler js source map options should be set 
+   * 
+   * @return true/false 
+   */
+  private boolean isClousureMapEnabled() {
+	return (null != mapsFolder && 
+	  (getManagerFactory().getClass().getSimpleName().equalsIgnoreCase("GoogleStandaloneManagerFactory") ||
+	  getManagerFactory().getClass().getSimpleName().equalsIgnoreCase("GoogleAdvancedStandaloneManagerFactory")));
   }
 }

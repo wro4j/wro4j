@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.cache.CacheKey;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.model.WroModel;
@@ -80,6 +81,12 @@ public class GroupsProcessor {
           throw new WroRuntimeException("No resources found in group: " + group.getName());
         }
       }
+      
+      // set the resources list into the Context for Google Closure Compiler based js source map
+      if (Context.get().getConfig().isJsSourceMapEnabled()) {
+    	Context.get().getConfig().setResources(filteredGroup.getResources());
+      }
+      
       final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), cacheKey.isMinimize());
       return applyPostProcessors(cacheKey, result);
     } catch (final IOException e) {

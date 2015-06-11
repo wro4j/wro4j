@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
@@ -149,7 +150,7 @@ public abstract class AbstractCssUrlRewritingProcessor
    * @return true if url needs to be replaced or remain unchanged.
    */
   protected boolean isReplaceNeeded(final String url) {
-    return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim()));
+    return !(UrlUriLocator.isValid(url) || DataUriGenerator.isDataUri(url.trim())) && Context.get().getConfig().isCssUrlRewriting();
   }
 
   /**

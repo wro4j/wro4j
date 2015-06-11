@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.model.resource.Resource;
 
 
 /**
@@ -122,6 +123,33 @@ public final class WroConfiguration
       1);
   private final transient List<PropertyChangeListener> modelUpdatePeriodListeners = new ArrayList<PropertyChangeListener>(
       1);
+  //Google Clousure Options
+  /**
+   * JS source map creation flag (only works for Google Clousure Compiler)
+   */
+  private boolean jsSourceMapEnabled = false;
+  /**
+   * JS source map file path (only works for Google Clousure Compiler)
+   */
+  private String jsSourceMapPath;
+  /**
+   * jQuery pass activation (only works for Google Clousure Compiler in Advanced mode)
+   */
+  private boolean jqueryPass = false;
+  /**
+   * Resources list to do bulk compilation with Google Closure Compiler to define source maps.
+   */
+  private List<Resource> resources;
+  /**
+   * A flag to avoid redoing bulk compilation with Google Closure Compiler to define source maps.
+   */
+  private boolean jsSourceMapCreated;
+  /**
+   * A flag to avoid URLs recalculation for CssUrlRewritingProcessor
+   * This flag is set true by default, which is default behavior on
+   * the preprocessor, but the flag becomes really useful in some projects.  
+   */
+  private boolean cssUrlRewriting = true;
 
   /**
    * @return the name of the object used to register the MBean.
@@ -480,5 +508,92 @@ public final class WroConfiguration
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE).toString();
+  }
+  
+  // Google Clousure Options
+  /**
+   * @return flag indicating if the source map creation is enabled.
+   */
+  public boolean isJsSourceMapEnabled() {
+	  return jsSourceMapEnabled;
+  }
+  
+  /**
+   * @param jsSourceMapEnabled
+   *          flag for turning on/off the source map creation.
+   */
+  public void setJsSourceMapEnabled(boolean jsSourceMapEnabled) {
+	  this.jsSourceMapEnabled = jsSourceMapEnabled;
+  }
+  
+  /**
+   * @return the js source map file path
+   */
+  public String getJsSourceMapPath() {
+	  return jsSourceMapPath;
+  }
+  
+  /**
+   * @param jsSourceMapPath
+   *          js source map file path setter
+   */
+  public void setJsSourceMapPath(String jsSourceMapPath) {
+	  this.jsSourceMapPath = jsSourceMapPath;
+  }
+  
+  /**
+   * @return flag indicating if jQuery pass should be applied
+   */
+  public boolean isJqueryPass() {
+	  return jqueryPass;
+  }
+  /**
+   * @param jqueryPass
+   * 		  jQuery pass flag
+   */
+  public void setJqueryPass(boolean jqueryPass) {
+	  this.jqueryPass = jqueryPass;
+  }
+  
+  /**
+   * @param jsSourceMapCreated
+   * 		  a boolean to determine if js source map was created
+   */
+  public void setJsSourceMapCreated(boolean jsSourceMapCreated) {
+	this.jsSourceMapCreated = jsSourceMapCreated;
+  }
+  /**
+   * @return flag telling if js source map was created
+   */
+  public boolean isJsSourceMapCreated() {
+	return jsSourceMapCreated;
+  }
+
+  /**
+   * @param resources
+   * 		  a list of resources to process
+   */
+  public void setResources(List<Resource> resources) {
+	this.resources = resources;
+  }
+  /**
+   * @return the list of resource to process
+   */
+  public List<Resource> getResources() {
+	return resources;
+  }
+
+  /**
+   * @param cssUrlRewriting
+   * 		  flag to set URLs recalculation for CssUrlRewrittingProcessor
+   */
+  public void setCssUrlRewriting(Boolean cssUrlRewriting) {
+	this.cssUrlRewriting = cssUrlRewriting;
+  }
+  /**
+   * @return cssUrlRewriting flag
+   */
+  public boolean isCssUrlRewriting() {
+	return cssUrlRewriting;
   }
 }
