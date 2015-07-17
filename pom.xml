@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.12.0</version>
+                <version>1.13.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -243,7 +243,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>webjars-locator</artifactId>
-                <version>0.21</version>
+                <version>0.27</version>
             </dependency>
 	    <dependency>
 		<groupId>org.mozilla</groupId>
