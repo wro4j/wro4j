@@ -60,14 +60,14 @@
     <properties>
         <wro4j.version>1.5.1-SNAPSHOT</wro4j.version>
         <commons-io.version>2.4</commons-io.version>
-        <commons-lang.version>3.1</commons-lang.version>
+        <commons-lang.version>3.4</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
-        <closure.version>v20150505</closure.version>
-        <slf4j.version>1.7.7</slf4j.version>
+        <closure.version>v20150609</closure.version>
+        <slf4j.version>1.7.12</slf4j.version>
         <maven.version>3.0.4</maven.version>
-        <mockito.version>1.9.5</mockito.version>
-        <junit.version>4.11</junit.version>
-	    <jruby.version>1.7.14</jruby.version>
+        <mockito.version>2.0.28-beta</mockito.version>
+        <junit.version>4.12</junit.version>
+	<jruby.version>1.7.14</jruby.version>
         <spring.version>3.1.1.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -248,7 +248,7 @@
 	    <dependency>
 		<groupId>org.mozilla</groupId>
 		<artifactId>rhino</artifactId>
-		<version>1.7.6</version>
+		<version>1.7.7</version>
 	    </dependency>
             <!-- Unit tests -->
             <dependency>
