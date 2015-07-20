@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ import ro.isdc.wro.model.resource.ResourceType;
  * @author Alex Objelean
  * @created Created on Oct 30, 2008
  */
-public final class Group {
+public final class Group implements Comparable<Group> {
   private static final Logger LOG = LoggerFactory.getLogger(Group.class);
   /**
    * Group name.
@@ -54,7 +53,7 @@ public final class Group {
    *          of the group.
    */
   public Group(final String name) {
-    Validate.notNull(name, "Group name cannot be null.");
+    notNull(name, "Group name cannot be null.");
     this.name = name;
   }
 
@@ -66,7 +65,7 @@ public final class Group {
    * @return true if at least one resource of some type exists.
    */
   public final boolean hasResourcesOfType(final ResourceType resourceType) {
-    Validate.notNull(resourceType, "ResourceType cannot be null!");
+    notNull(resourceType, "ResourceType cannot be null!");
     for (final Resource resource : resources) {
       if (resourceType.equals(resource.getType())) {
         return true;
@@ -116,8 +115,8 @@ public final class Group {
    */
   public void replace(final Resource resource, final List<Resource> expandedResources) {
     LOG.debug("replacing resource {} with expanded resources: {}", resource, expandedResources);
-    Validate.notNull(resource);
-    Validate.notNull(expandedResources);
+    notNull(resource);
+    notNull(expandedResources);
     synchronized (this) {
       boolean found = false;
       // use set to avoid duplicates
@@ -151,7 +150,7 @@ public final class Group {
    *         name.
    */
   public final Group collectResourcesOfType(final ResourceType type) {
-    Validate.notNull(type);
+    notNull(type);
     final List<Resource> allResources = new ArrayList<Resource>();
     allResources.addAll(getResources());
 
@@ -185,7 +184,8 @@ public final class Group {
    * <p/>
    * The implementation is synchronized, because it mutates the collection.
    *
-   * @param resource {@link Resource} to add to this group (at the end).
+   * @param resource
+   *          {@link Resource} to add to this group (at the end).
    * @return the reference to Group (fluent interface).
    */
   public Group addResource(final Resource resource) {
@@ -219,8 +219,16 @@ public final class Group {
   }
 
   /**
-   * {@inheritDoc}
+   * @return the name
    */
+  public String getName() {
+    return name;
+  }
+
+  public int compareTo(final Group o) {
+    return getName().compareTo(o.getName());
+  }
+
   @Override
   public boolean equals(final Object obj) {
     // Because name is unique, we can consider two groups are equals if their name is the same
@@ -231,24 +239,11 @@ public final class Group {
     return false;
   }
 
-  /**
-   * @return the name
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode() {
     return getName().hashCode();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
