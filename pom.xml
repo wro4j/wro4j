@@ -67,7 +67,7 @@
         <maven.version>3.0.4</maven.version>
         <mockito.version>2.0.28-beta</mockito.version>
         <junit.version>4.12</junit.version>
-	<jruby.version>9.0.0.0.pre2</jruby.version>
+	<jruby.version>9.0.0.0</jruby.version>
         <spring.version>3.1.1.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
