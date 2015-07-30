@@ -137,7 +137,6 @@ public class TestModelAsJsonRequestHandler {
     injector.inject(victim);
 
     victim.handle(mockRequest, mockResponse);
-
     assertEquals(readJsonFile("wroModel_external.json"), outputStream.toString());
   }
 

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -36,7 +37,7 @@ public final class WroModel {
   /**
    * Set of groups.
    */
-  private Set<Group> groups = new HashSet<Group>();
+  private Set<Group> groups = new TreeSet<Group>();
 
   /**
    * @return a readonly collection of groups.
@@ -60,7 +61,7 @@ public final class WroModel {
   /**
    * @param resource
    *          the {@link Resource} to search in all available groups.
-   * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty
+   * @return t collection of group names containing provided resource. If the resource is not available, an empty
    *         collection will be returned.
    * @deprecated use {@link WroModelInspector#getGroupNamesContainingResource(String)}
    */
@@ -126,7 +127,7 @@ public final class WroModel {
    * @param group a not null {@link Group}.
    */
   public WroModel addGroup(final Group group) {
-    Validate.notNull(group);
+    notNull(group);
     groups.add(group);
     return this;
   }
