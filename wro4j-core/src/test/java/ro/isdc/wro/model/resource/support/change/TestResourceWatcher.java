@@ -149,8 +149,7 @@ public class TestResourceWatcher {
     final WroModelFactory modelFactory = WroTestUtils.simpleModelFactory(model);
     final WroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setUriLocatorFactory(
         locatorFactory).setCacheStrategy(cacheStrategy);
-    final Injector injector = InjectorBuilder.create(factory).build();
-    return injector;
+    return InjectorBuilder.create(factory).build();
   }
 
   @Test(expected = NullPointerException.class)

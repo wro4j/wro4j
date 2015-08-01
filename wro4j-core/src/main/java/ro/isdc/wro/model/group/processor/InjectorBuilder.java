@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Collections;
@@ -90,7 +91,6 @@ public class InjectorBuilder {
 
   private void initMap() {
     map.put(CacheStrategy.class, createCacheStrategyProxy());
-//    map.put(WroConfiguration.class, createConfigProxy());
 
     map.put(PreProcessorExecutor.class, createPreProcessorExecutorProxy());
     map.put(GroupsProcessor.class, createGroupsProcessorProxy());
@@ -137,25 +137,6 @@ public class InjectorBuilder {
       }
     };
   }
-//
-//  private Object createConfigProxy() {
-////    return new InjectorObjectFactory<WroConfiguration>() {
-////      public WroConfiguration create() {
-////        LOG.warn("Do not @Inject WroConfiguration. Prefer using @Inject ReadOnlyContext context; (and context.getConfig()).");
-////        return Context.get().getConfig();
-////      }
-////    };
-//    
-//    return ProxyFactory.proxy(new TypedObjectFactory<WroConfiguration>() {
-//      public WroConfiguration create() {
-//        return Context.get().getConfig();
-//      }
-//
-//      public Class<WroConfiguration> getObjectClass() {
-//        return WroConfiguration.class;
-//      }
-//    }, WroConfiguration.class);
-//  }
 
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {
@@ -184,7 +165,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<Injector> createInjectorProxy() {
     return new InjectorObjectFactory<Injector>() {
       public Injector create() {
-        Validate.isTrue(injector != null);
+        isTrue(injector != null);
         return injector;
       }
     };

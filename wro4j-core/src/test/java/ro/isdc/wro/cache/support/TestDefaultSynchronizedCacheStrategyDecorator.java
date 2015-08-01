@@ -93,8 +93,7 @@ public class TestDefaultSynchronizedCacheStrategyDecorator {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory().setModelFactory(modelFactory).setUriLocatorFactory(
         locatorFactory);
     factory.setProcessorsFactory(new SimpleProcessorsFactory());
-    final Injector injector = InjectorBuilder.create(factory).setResourceWatcher(mockResourceWatcher).build();
-    return injector;
+    return InjectorBuilder.create(factory).setResourceWatcher(mockResourceWatcher).build();
   }
 
   @Test(expected = NullPointerException.class)
