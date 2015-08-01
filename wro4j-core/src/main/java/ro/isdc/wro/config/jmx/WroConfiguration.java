@@ -25,7 +25,7 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
  *
  * @author Alex Objelean
  */
-public final class WroConfiguration
+public class WroConfiguration
     implements WroConfigurationMBean {
   private static final Logger LOG = LoggerFactory.getLogger(WroConfiguration.class);
   /**

@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.model.group.processor;
 
+import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Collections;
@@ -89,6 +90,8 @@ public class InjectorBuilder {
   }
 
   private void initMap() {
+    map.put(CacheStrategy.class, createCacheStrategyProxy());
+
     map.put(PreProcessorExecutor.class, createPreProcessorExecutorProxy());
     map.put(GroupsProcessor.class, createGroupsProcessorProxy());
     map.put(LifecycleCallbackRegistry.class, createCallbackRegistryProxy());
@@ -100,8 +103,6 @@ public class InjectorBuilder {
     map.put(NamingStrategy.class, createNamingStrategyProxy());
     map.put(HashStrategy.class, createHashStrategyProxy());
     map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
-    map.put(WroConfiguration.class, createConfigProxy());
-    map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
     map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
     map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
@@ -137,15 +138,6 @@ public class InjectorBuilder {
     };
   }
 
-  private InjectorObjectFactory<WroConfiguration> createConfigProxy() {
-    return new InjectorObjectFactory<WroConfiguration>() {
-      public WroConfiguration create() {
-        LOG.warn("Do not @Inject WroConfiguration. Prefer using @Inject ReadOnlyContext context; (and context.getConfig()).");
-        return Context.get().getConfig();
-      }
-    };
-  }
-
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {
       public PreProcessorExecutor create() {
@@ -173,7 +165,7 @@ public class InjectorBuilder {
   private InjectorObjectFactory<Injector> createInjectorProxy() {
     return new InjectorObjectFactory<Injector>() {
       public Injector create() {
-        Validate.isTrue(injector != null);
+        isTrue(injector != null);
         return injector;
       }
     };

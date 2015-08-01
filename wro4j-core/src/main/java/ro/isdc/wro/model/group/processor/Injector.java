@@ -51,9 +51,9 @@ public final class Injector {
    */
   public <T> T inject(final T object) {
     notNull(object);
-    if (!Context.isContextSet()) {
-      throw new WroRuntimeException("No Context Set");
-    }
+//    if (!Context.isContextSet()) {
+//      throw new WroRuntimeException("No Context Set");
+//    }
     if (!injectedObjects.containsKey(computeKey(object))) {
       injectedObjects.put(computeKey(object), true);
       processInjectAnnotation(object);
