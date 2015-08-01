@@ -1,9 +1,13 @@
 package ro.isdc.wro.http.handler;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
@@ -29,6 +33,14 @@ public class LazyRequestHandlerDecorator
       private Injector injector;
       @Override
       protected RequestHandler initialize() {
+        System.out.println("injector set in this: " + this + ", injector: " + injector);
+        if (injector == null) {
+          System.err.println("This object was not initialized: " + this);
+          throw new RuntimeException("oops");
+        }
+        
+        notNull(injector, "This object was not initialized:" + this);
+        
         final RequestHandler handler = super.initialize();
         injector.inject(handler);
         return handler;

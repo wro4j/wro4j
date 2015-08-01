@@ -114,11 +114,7 @@ public class WroFilter
     this.wroManagerFactory = createWroManagerFactory();
     this.injector = InjectorBuilder.create(wroManagerFactory).build();
     headersConfigurer = newResponseHeadersConfigurer();
-    requestHandlerFactory = DefaultRequestHandlerFactory.decorate(newRequestHandlerFactory(), new ObjectFactory<Injector>() {
-      public Injector create() {
-        return getInjector();
-      }
-    });
+    requestHandlerFactory = newRequestHandlerFactory();
     registerChangeListeners();
     registerMBean();
     doInit(config);
@@ -309,6 +305,7 @@ public class WroFilter
     notNull(handlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
     for (final RequestHandler requestHandler : handlers) {
+      getInjector().inject(requestHandler);
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         return true;

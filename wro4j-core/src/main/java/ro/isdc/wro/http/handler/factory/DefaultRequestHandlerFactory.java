@@ -28,25 +28,6 @@ public class DefaultRequestHandlerFactory
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRequestHandlerFactory.class);
 
   /**
-   * Decorates the provided {@link RequestHandlerFactory} with an implementation which ensure that all
-   * {@link RequestHandler}'s are injected during creation.
-   *
-   * @return an instance of {@link RequestHandlerFactory} with all handlers being injected properly.
-   */
-  public static RequestHandlerFactory decorate(final RequestHandlerFactory decorated,
-      final ObjectFactory<Injector> injectorProvider) {
-    return new RequestHandlerFactory() {
-      public Collection<RequestHandler> create() {
-        final Collection<RequestHandler> handlers = decorated.create();
-        for (final RequestHandler handler : handlers) {
-          injectorProvider.create().inject(handler);
-        }
-        return handlers;
-      }
-    };
-  }
-
-  /**
    * Creates a factory with a list of default handlers.
    */
   public DefaultRequestHandlerFactory() {
