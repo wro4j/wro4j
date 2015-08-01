@@ -74,7 +74,6 @@ public final class Injector {
    */
   private void processInjectAnnotation(final Object object) {
     try {
-      Thread.sleep(10);
       final Collection<Field> fields = getAllFields(object);
       for (final Field field : fields) {
         if (field.isAnnotationPresent(Inject.class)) {

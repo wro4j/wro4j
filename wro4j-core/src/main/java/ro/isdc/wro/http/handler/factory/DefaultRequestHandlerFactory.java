@@ -1,7 +1,6 @@
 package ro.isdc.wro.http.handler.factory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.spi.RequestHandlerProvider;
-import ro.isdc.wro.model.group.processor.Injector;
-import ro.isdc.wro.util.ObjectFactory;
 import ro.isdc.wro.util.provider.ProviderFinder;
 
 
