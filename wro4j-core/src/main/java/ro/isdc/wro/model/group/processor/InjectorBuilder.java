@@ -89,6 +89,9 @@ public class InjectorBuilder {
   }
 
   private void initMap() {
+    map.put(CacheStrategy.class, createCacheStrategyProxy());
+//    map.put(WroConfiguration.class, createConfigProxy());
+
     map.put(PreProcessorExecutor.class, createPreProcessorExecutorProxy());
     map.put(GroupsProcessor.class, createGroupsProcessorProxy());
     map.put(LifecycleCallbackRegistry.class, createCallbackRegistryProxy());
@@ -100,8 +103,6 @@ public class InjectorBuilder {
     map.put(NamingStrategy.class, createNamingStrategyProxy());
     map.put(HashStrategy.class, createHashStrategyProxy());
     map.put(ReadOnlyContext.class, createReadOnlyContextProxy());
-    map.put(WroConfiguration.class, createConfigProxy());
-    map.put(CacheStrategy.class, createCacheStrategyProxy());
     map.put(ResourceAuthorizationManager.class, createResourceAuthorizationManagerProxy());
     map.put(MetaDataFactory.class, createMetaDataFactoryProxy());
     map.put(ResourceBundleProcessor.class, createResourceBundleProcessorProxy());
@@ -136,15 +137,25 @@ public class InjectorBuilder {
       }
     };
   }
-
-  private InjectorObjectFactory<WroConfiguration> createConfigProxy() {
-    return new InjectorObjectFactory<WroConfiguration>() {
-      public WroConfiguration create() {
-        LOG.warn("Do not @Inject WroConfiguration. Prefer using @Inject ReadOnlyContext context; (and context.getConfig()).");
-        return Context.get().getConfig();
-      }
-    };
-  }
+//
+//  private Object createConfigProxy() {
+////    return new InjectorObjectFactory<WroConfiguration>() {
+////      public WroConfiguration create() {
+////        LOG.warn("Do not @Inject WroConfiguration. Prefer using @Inject ReadOnlyContext context; (and context.getConfig()).");
+////        return Context.get().getConfig();
+////      }
+////    };
+//    
+//    return ProxyFactory.proxy(new TypedObjectFactory<WroConfiguration>() {
+//      public WroConfiguration create() {
+//        return Context.get().getConfig();
+//      }
+//
+//      public Class<WroConfiguration> getObjectClass() {
+//        return WroConfiguration.class;
+//      }
+//    }, WroConfiguration.class);
+//  }
 
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {

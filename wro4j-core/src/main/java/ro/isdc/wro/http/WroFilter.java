@@ -261,7 +261,7 @@ public class WroFilter
   }
 
   private long valueAsLong(final Object value) {
-    Validate.notNull(value);
+    notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
   }
 
@@ -399,7 +399,7 @@ public class WroFilter
    *          to set
    */
   public void setRequestHandlerFactory(final RequestHandlerFactory requestHandlerFactory) {
-    Validate.notNull(requestHandlerFactory);
+    notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
 
