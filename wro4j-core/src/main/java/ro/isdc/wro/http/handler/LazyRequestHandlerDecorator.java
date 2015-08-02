@@ -33,14 +33,7 @@ public class LazyRequestHandlerDecorator
       private Injector injector;
       @Override
       protected RequestHandler initialize() {
-        System.out.println("injector set in this: " + this + ", injector: " + injector);
-        if (injector == null) {
-          System.err.println("This object was not initialized: " + this);
-          throw new RuntimeException("oops");
-        }
-        
         notNull(injector, "This object was not initialized:" + this);
-        
         final RequestHandler handler = super.initialize();
         injector.inject(handler);
         return handler;

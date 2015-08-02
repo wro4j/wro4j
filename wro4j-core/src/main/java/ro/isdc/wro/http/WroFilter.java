@@ -113,19 +113,23 @@ public class WroFilter
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
-    this.injector = InjectorBuilder.create(wroManagerFactory).build();
+    this.injector = createInjector();
     headersConfigurer = newResponseHeadersConfigurer();
-    
-    requestHandlers = requestHandlerFactory.create();
-    for (final RequestHandler requestHandler : requestHandlers) {
-      injector.inject(requestHandler);
-    }
+    requestHandlers = createRequestHandlers();
     
     registerChangeListeners();
     registerMBean();
     doInit(config);
     LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
     LOG.info("wro4j configuration: {}", wroConfiguration);
+  }
+
+  private Collection<RequestHandler> createRequestHandlers() {
+    requestHandlers = requestHandlerFactory.create();
+    for (final RequestHandler requestHandler : requestHandlers) {
+      injector.inject(requestHandler);
+    }
+    return requestHandlers;
   }
 
   /**
@@ -322,8 +326,8 @@ public class WroFilter
    * @return {@link Injector} used to inject {@link RequestHandler}'s.
    * @VisibleForTesting
    */
-  Injector getInjector() {
-    return injector;
+  Injector createInjector() {
+    return InjectorBuilder.create(wroManagerFactory).build();
   }
 
   /**
