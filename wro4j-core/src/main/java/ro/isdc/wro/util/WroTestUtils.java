@@ -118,8 +118,7 @@ public class WroTestUtils {
   public static ResourcePreProcessor initProcessor(final ResourcePreProcessor processor) {
     final BaseWroManagerFactory factory = new BaseWroManagerFactory();
     factory.setProcessorsFactory(new SimpleProcessorsFactory().addPreProcessor(processor));
-    final Injector injector = InjectorBuilder.create(factory).build();
-    injector.inject(processor);
+    InjectorBuilder.create(factory).build().inject(processor);
     return processor;
   }
 
