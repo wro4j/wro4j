@@ -100,6 +100,7 @@ public class PreProcessorExecutor {
       } else {
         for (final Resource resource : resources) {
           LOG.debug("\tmerging resource: {}", resource);
+          LOG.info("\tmerging resource: {} of type {}", resource.getUri(), resource.getType());
           result.append(applyPreProcessors(resource, criteria));
         }
       }
@@ -209,6 +210,12 @@ public class PreProcessorExecutor {
         resourceContent = writer.toString();
       }
     }
+	// following block of code provided by Umar Ali Khan 2-Jul-2015 12:40am PST
+	if (resourceContent.length() == 2) { 
+	  // resourceContent = resourceContent.trim();
+	  // LOG.info("\rresourceContent : {}; length : {}", resourceContent, resourceContent.length());
+	  resourceContent = "";
+	}
     // add explicitly new line at the end to avoid unexpected comment issue
     return String.format("%s%n", resourceContent);
   }

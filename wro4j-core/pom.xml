@@ -9,9 +9,14 @@
 	</parent>
 
 	<artifactId>wro4j-core</artifactId>
+	<version>1.7.8</version>
 	<packaging>jar</packaging>
 	<name>wro4j core</name>
 
+    <properties>
+		<maven.test.skip>true</maven.test.skip>
+    </properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

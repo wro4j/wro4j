@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -32,6 +34,7 @@ import ro.isdc.wro.http.WroFilter;
  */
 public class Context
     implements ReadOnlyContext {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
   /**
    * Maps correlationId with a Context.
    */
@@ -106,6 +109,7 @@ public class Context
   public static Context get() {
     validateContext();
     final String correlationId = CORRELATION_ID.get();
+    // LOG.info("returning context for correlationId : " + correlationId);
     return CONTEXT_MAP.get(correlationId);
   }
 
@@ -145,6 +149,7 @@ public class Context
     final String correlationId = generateCorrelationId();
     CORRELATION_ID.set(correlationId);
     CONTEXT_MAP.put(correlationId, context);
+    // LOG.info("correlationId set : " + correlationId + " and stored...");
   }
 
   /**

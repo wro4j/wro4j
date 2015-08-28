@@ -153,6 +153,7 @@ public class WroManager
   public final void process()
       throws IOException {
     // reschedule cache & model updates
+    // LOG.info("process uri...");
     final WroConfiguration config = Context.get().getConfig();
     cacheSchedulerHelper.scheduleWithPeriod(config.getCacheUpdatePeriod());
     modelSchedulerHelper.scheduleWithPeriod(config.getModelUpdatePeriod());
@@ -170,6 +171,7 @@ public class WroManager
     final CacheKey key = new CacheKey(groupName, resourceType, minimize);
     final CacheValue cacheValue = cacheStrategy.get(key);
     final String groupUrl = groupExtractor.encodeGroupUrl(groupName, resourceType, minimize);
+    LOG.info("groupUrl : " + groupUrl + " for " + cacheValue);
     // encode the fingerprint of the resource into the resource path
     return formatVersionedResource(cacheValue.getHash(), groupUrl);
   }

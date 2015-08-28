@@ -148,6 +148,14 @@ public class BaseWroManagerFactory
       final WroManager manager = managerBuilder.build();
 
       onAfterInitializeManager(manager);
+	// LOG.info("wro Naming Strategy : " + namingStrategy.toString());
+	// LOG.info("wro group Extractor : " + groupExtractor.toString());
+	// LOG.info("wro Model Factory : " + modelFactory.toString());
+	// LOG.info("wro cache Key Strategy : " + cacheKeyFactory.toString());
+	// LOG.info("wro cache Strategy : " + cacheStrategy.toString());
+	// LOG.info("wro uri Locator Factory : " + uriLocatorFactory.toString());
+	// LOG.info("wro Processors Factory : " + processorsFactory.toString());
+	// LOG.info("wro meta Data Factory : " + metaDataFactory.toString());
       return manager;
     }
   };

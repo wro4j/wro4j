@@ -90,6 +90,7 @@ public class InjectorBuilder {
   }
 
   private void initMap() {
+    // LOG.info("initializing injection map...");
     map.put(CacheStrategy.class, createCacheStrategyProxy());
 
     map.put(PreProcessorExecutor.class, createPreProcessorExecutorProxy());

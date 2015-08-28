@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.ProcessorDecorator;
@@ -35,10 +38,12 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  */
 public class DefaultProcessorProvider
     implements ProcessorProvider {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultProcessorProvider.class);
   /**
    * {@inheritDoc}
    */
   public Map<String, ResourcePreProcessor> providePreProcessors() {
+    // LOG.info("creating map of preProcessors...");
     final Map<String, ResourcePreProcessor> map = new HashMap<String, ResourcePreProcessor>();
     populateProcessorsMap(map);
     return map;
@@ -57,6 +62,7 @@ public class DefaultProcessorProvider
    */
   private Map<String, ResourcePostProcessor> toPostProcessors(
       final Map<String, ResourcePreProcessor> preProcessorsMap) {
+    LOG.info("creating map of postProcessors...");
     final Map<String, ResourcePostProcessor> map = new HashMap<String, ResourcePostProcessor>();
     for (final Entry<String, ResourcePreProcessor> entry : preProcessorsMap.entrySet()) {
       map.put(entry.getKey(), new ProcessorDecorator(entry.getValue()));

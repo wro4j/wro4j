@@ -145,6 +145,7 @@ public class WroFilter
     if (configAttribute != null) {
       setConfiguration(configAttribute);
     }
+	LOG.info("creating a new configuration...");
     return getWroConfigurationFactory().create();
   }
 

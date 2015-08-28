@@ -123,6 +123,7 @@ public class ResourceBundleProcessor {
   private void initAggregatedFolderPath(final HttpServletRequest request, final ResourceType type) {
     if (ResourceType.CSS == type && context.getAggregatedFolderPath() == null) {
       final String requestUri = request.getRequestURI();
+      LOG.info("requestUri : " + requestUri);
       final String cssFolder = StringUtils.removeEnd(requestUri, FilenameUtils.getName(requestUri));
       final String aggregatedFolder = StringUtils.removeStart(cssFolder, request.getContextPath());
       LOG.debug("set aggregatedFolderPath: {}", aggregatedFolder);

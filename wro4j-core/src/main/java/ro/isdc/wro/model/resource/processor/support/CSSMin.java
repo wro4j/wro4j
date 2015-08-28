@@ -86,6 +86,7 @@ class Selector {
       throw new Exception("Warning: Unterminated selector: " + selector);
     }
     contents = StringUtils.substringBefore(contents, "}");
+	// LOG.info("selector = " + StringUtils.substringBefore(selector, "{").trim() + "; contents = " + contents);
     properties = parseProperties(contents);
     sortProperties(properties);
   }
