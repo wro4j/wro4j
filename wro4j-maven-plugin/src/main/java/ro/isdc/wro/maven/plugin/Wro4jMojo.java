@@ -401,4 +401,11 @@ public class Wro4jMojo
   void setContextPath(final String contextPath) {
     this.contextPath = contextPath;
   }
+  
+  /**
+   * @VisibleForTesting
+   */
+  void setBuildContext(final BuildContext buildContext) {
+    this.buildContext = buildContext;
+  }
 }
