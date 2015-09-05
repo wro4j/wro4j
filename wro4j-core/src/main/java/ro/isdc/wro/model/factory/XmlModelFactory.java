@@ -228,6 +228,9 @@ public class XmlModelFactory
     for (int i = 0; i < groupNodeList.getLength(); i++) {
       final Element groupElement = (Element) groupNodeList.item(i);
       final String name = groupElement.getAttribute(ATTR_GROUP_NAME);
+      if (allGroupElements.containsKey(name)) {
+        throw new WroRuntimeException("Duplicate groupName detected: " + name);
+      }
       allGroupElements.put(name, groupElement);
     }
   }

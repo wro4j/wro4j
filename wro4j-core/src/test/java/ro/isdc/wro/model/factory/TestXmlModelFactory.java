@@ -4,6 +4,7 @@
 package ro.isdc.wro.model.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -249,5 +251,18 @@ public class TestXmlModelFactory {
     assertEquals(1, new WroModelInspector(model).getGroupNames().size());
     assertTrue(model.getGroups().iterator().next().getResources().isEmpty());
     LOG.debug("model: " + model);
+  }
+  
+  @Test
+  public void shouldAllowGroupNameStartingWithDigit() {
+    final WroModel model = loadModelFromLocation("groupNameStartingWithDigit.xml");
+    WroModelInspector inspector = new WroModelInspector(model);
+    assertEquals(1, inspector.getGroupNames().size());
+    assertNotNull(inspector.getGroupByName("3rdparty"));
+  }
+  
+  @Test(expected=WroRuntimeException.class)
+  public void shouldNotAllowDuplicateGroupName() {
+    loadModelFromLocation("duplicateGroupName.xml");
   }
 }
