@@ -68,11 +68,11 @@ public class CssLint {
   }
 
   /**
-   * Validates a js using jsHint and throws {@link CssLintException} if the js is invalid. If no exception is thrown,
-   * the js is valid.
+   * Validates a css resource using cssLint and throws {@link CssLintException} if the resource is invalid. If no exception is thrown,
+   * the resource is valid.
    *
    * @param data
-   *          js content to process.
+   *          css content to process.
    * @throws CssLintException
    *           when parsed css has some kind of problems.
    */
