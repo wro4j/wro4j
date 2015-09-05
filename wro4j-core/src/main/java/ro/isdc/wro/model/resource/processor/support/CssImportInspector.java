@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -44,7 +46,7 @@ public class CssImportInspector {
     final StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       // replace @import with empty string
-      matcher.appendReplacement(sb, "");
+      matcher.appendReplacement(sb, StringUtils.EMPTY);
     }
     matcher.appendTail(sb);
     return sb.toString();
@@ -86,6 +88,6 @@ public class CssImportInspector {
    * @VisibleForTesting
    */
   final String removeImportsFromComments(final String content) {
-    return content.replaceAll(REGEX_IMPORT_FROM_COMMENTS, "");
+    return content.replaceAll(REGEX_IMPORT_FROM_COMMENTS, StringUtils.EMPTY);
   }
 }
