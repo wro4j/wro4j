@@ -94,10 +94,6 @@ public class Wro4jMojo
    * @optional
    */
   private String contextPath;
-  /** 
-   * @component 
-   */
-  private BuildContext buildContext;
   /**
    * Holds a mapping between original group name file & renamed one.
    */
@@ -306,8 +302,8 @@ public class Wro4jMojo
       }
     } finally {
       // instruct the build about the change in context of incremental build
-      if (buildContext != null) {
-        buildContext.refresh(parentFoder);
+      if (getBuildContext() != null) {
+        getBuildContext().refresh(parentFoder);
       }
       if (resultOutputStream != null) {
         resultOutputStream.close();
@@ -400,12 +396,5 @@ public class Wro4jMojo
    */
   void setContextPath(final String contextPath) {
     this.contextPath = contextPath;
-  }
-  
-  /**
-   * @VisibleForTesting
-   */
-  void setBuildContext(final BuildContext buildContext) {
-    this.buildContext = buildContext;
   }
 }
