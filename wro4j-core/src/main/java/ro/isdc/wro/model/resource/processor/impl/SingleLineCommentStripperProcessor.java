@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -32,15 +33,12 @@ public class SingleLineCommentStripperProcessor
       Pattern.MULTILINE);
   public static final String ALIAS = "singlelineStripper";
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {
       final String content = IOUtils.toString(reader);
-      String result = PATTERN.matcher(content).replaceAll("");
-      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
+      String result = PATTERN.matcher(content).replaceAll(StringUtils.EMPTY);
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll(StringUtils.EMPTY);
       writer.write(result);
     } finally {
       reader.close();
@@ -48,10 +46,6 @@ public class SingleLineCommentStripperProcessor
     }
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     // resource Uri doesn't matter.
