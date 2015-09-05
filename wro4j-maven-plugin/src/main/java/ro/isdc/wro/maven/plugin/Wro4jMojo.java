@@ -25,6 +25,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -300,6 +301,10 @@ public class Wro4jMojo
         getLog().info(destinationFile.getAbsolutePath() + " (" + destinationFile.length() + " bytes" + ")");
       }
     } finally {
+      // instruct the build about the change in context of incremental build
+      if (getBuildContext() != null) {
+        getBuildContext().refresh(parentFoder);
+      }
       if (resultOutputStream != null) {
         resultOutputStream.close();
       }

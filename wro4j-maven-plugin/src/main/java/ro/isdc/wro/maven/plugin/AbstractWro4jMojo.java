@@ -620,6 +620,13 @@ public abstract class AbstractWro4jMojo
   void setBuildContext(final BuildContext buildContext) {
     this.buildContext = buildContext;
   }
+  
+  /**
+   * @VisibleForTesting
+   */
+  BuildContext getBuildContext() {
+    return buildContext;
+  }
 
   /**
    * @VisibleForTesting
