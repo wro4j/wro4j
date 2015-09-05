@@ -129,8 +129,9 @@ public class TestJsLintMojo
   @Test
   public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
       throws Exception {
+    getMojo().setFailNever(false);
     getMojo().setFailFast(true);
-    getMojo().setFailThreshold(5);
+    getMojo().setFailThreshold(9);
     getMojo().execute();
   }
 }
