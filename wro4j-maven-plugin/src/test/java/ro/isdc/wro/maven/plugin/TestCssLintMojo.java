@@ -177,6 +177,14 @@ public class TestCssLintMojo {
       throws Exception {
     generateAndCompareReportUsingFormat(FormatterType.CHECKSTYLE.getFormat(), "csslint-checkstyle.xml");
   }
+  
+  @Test
+  public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
+      throws Exception {
+    mojo.setFailThreshold(5);
+    setWroWithValidResources();
+    mojo.execute();
+  }
 
   private void generateAndCompareReportUsingFormat(final String reportFormat, final String expectedReportFileName)
       throws Exception {

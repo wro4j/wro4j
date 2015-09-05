@@ -84,9 +84,6 @@ public abstract class AbstractLinterProcessor
     throw e;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer) throws IOException {
     process(null, reader, writer);

@@ -24,9 +24,6 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class TestJsLintMojo
     extends AbstractTestLinterMojo {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected AbstractLinterMojo newLinterMojo() {
     return new JsLintMojo() {
@@ -127,5 +124,14 @@ public class TestJsLintMojo
           new FileInputStream(reportFile));
       FileUtils.deleteQuietly(reportFile);
     }
+  }
+  
+  @Test
+  public void shouldNotFailWhenThresholdIsGreaterThanNumberOfErrors()
+      throws Exception {
+    getMojo().setFailNever(false);
+    getMojo().setFailFast(true);
+    getMojo().setFailThreshold(9);
+    getMojo().execute();
   }
 }
