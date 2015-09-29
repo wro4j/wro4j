@@ -1,3 +1,12 @@
+---
+title: Features Overview
+tags: [getting-started]
+keywords: start, introduction, begin, install, build, hello world,
+last_updated: August 12, 2015
+summary: "An overview of most important features"
+---
+
+
   *  **Free and open source**: Released under an Apache 2.0 license, wro4j can be used free of charge with or without modifications, for both commercial and noncommercial purposes.
 
   *  **[Easy to understand](DesignOverview)** - One of the wro4j goal is simplicity. Its [design](DesignOverview) is easy to understand and provides the enough flexibility to extend the framework and add new features over time or to adapt according to your project needs. 
