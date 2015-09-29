@@ -23,9 +23,7 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
  */
 public class DefaultCacheStrategyProvider
     implements CacheStrategyProvider {
-  /**
-   * {@inheritDoc}
-   */
+ 
   public Map<String, CacheStrategy<CacheKey, CacheValue>> provideCacheStrategies() {
     final Map<String, CacheStrategy<CacheKey, CacheValue>> map = new HashMap<String, CacheStrategy<CacheKey, CacheValue>>();
     map.put(MemoryCacheStrategy.ALIAS, new MemoryCacheStrategy<CacheKey, CacheValue>());
