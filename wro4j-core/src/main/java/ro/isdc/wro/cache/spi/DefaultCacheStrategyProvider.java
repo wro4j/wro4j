@@ -8,6 +8,7 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;
 import ro.isdc.wro.cache.impl.LruMemoryCacheStrategy;
 import ro.isdc.wro.cache.impl.MemoryCacheStrategy;
+import ro.isdc.wro.cache.impl.NoCacheStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 import ro.isdc.wro.model.resource.support.naming.NamingStrategyProvider;
 
@@ -29,6 +30,7 @@ public class DefaultCacheStrategyProvider
     final Map<String, CacheStrategy<CacheKey, CacheValue>> map = new HashMap<String, CacheStrategy<CacheKey, CacheValue>>();
     map.put(MemoryCacheStrategy.ALIAS, new MemoryCacheStrategy<CacheKey, CacheValue>());
     map.put(LruMemoryCacheStrategy.ALIAS, new LruMemoryCacheStrategy<CacheKey, CacheValue>());
+    map.put(NoCacheStrategy.ALIAS, new NoCacheStrategy<CacheKey, CacheValue>());
     return map;
   }
 }
