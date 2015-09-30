@@ -57,8 +57,7 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
-    <properties>
-        <wro4j.version>1.7.9-SNAPSHOT</wro4j.version>
+    <properties>        
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.4</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
