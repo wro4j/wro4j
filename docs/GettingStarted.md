@@ -1,3 +1,12 @@
+---
+title: Getting started 
+tags: [getting-started]
+keywords: start, introduction, begin, install, build, hello world,
+last_updated: August 12, 2015
+summary: "To get started with this theme, first make sure you have all the prerequisites in place; then build the theme following the sample build commands. Because this theme is set up for single sourcing projects, it doesn't follow the same pattern as most Jekyll projects (which have just a _config.yml file in the root directory)."
+---
+
+
 Related Pages: [wro4j in a nutshell](http://wro4j.github.com/wro4j), [Installation](Installation), [MavenPlugin](MavenPlugin),[DesignOverview](DesignOverview)
 
 Before configuring wro4j into your application, it might be a good idea to see the [DesignOverview overall picture of wro4j design]. 

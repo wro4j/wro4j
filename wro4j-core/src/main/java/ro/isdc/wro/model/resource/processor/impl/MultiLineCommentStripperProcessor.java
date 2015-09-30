@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -30,16 +31,12 @@ public class MultiLineCommentStripperProcessor
   public static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("comment.multiline"));
   public static final String ALIAS = "multilineStripper";
 
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader source, final Writer destination)
     throws IOException {
     try {
       final String content = IOUtils.toString(source);
-      String result = PATTERN.matcher(content).replaceAll("");
-      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll("");
+      String result = PATTERN.matcher(content).replaceAll(StringUtils.EMPTY);
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll(StringUtils.EMPTY);
       destination.write(result);
     } finally {
       source.close();
@@ -47,10 +44,6 @@ public class MultiLineCommentStripperProcessor
     }
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     // resourceUri doesn't matter

@@ -117,7 +117,7 @@ public class TestInjector {
     inner.call();
   }
 
-  @Test(expected = WroRuntimeException.class)
+  @Test
   public void canInjectContextOutsideOfContextScope()
       throws Exception {
     // remove the context explicitly
@@ -130,11 +130,11 @@ public class TestInjector {
       throws Exception {
     final Callable<?> inner = new Callable<Void>() {
       @Inject
-      private WroConfiguration object;
+      private ReadOnlyContext context;
 
       public Void call()
           throws Exception {
-        Assert.assertNotNull(object);
+        assertNotNull(context.getConfig());
         return null;
       }
     };
@@ -218,11 +218,20 @@ public class TestInjector {
     victim.inject(outer);
     outer.call();
   }
+ 
+  @Test
+  public void canInjectOutsideOfContext() {
+    Context.unset();
+    TestProcessor processor = new TestProcessor();
+    victim.inject(processor);
+  }
 
   @Test(expected = WroRuntimeException.class)
-  public void cannotInjectOutsideOfContext() {
+  public void cannotAccessConfigOutsideOfContext() {
     Context.unset();
-    victim.inject(new TestProcessor());
+    TestProcessor processor = new TestProcessor();
+    victim.inject(processor);
+    processor.context.getConfig();
   }
 
   @After

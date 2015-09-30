@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.script;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,7 +12,6 @@ import java.io.Reader;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
-import org.apache.commons.lang3.Validate;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptableObject;
@@ -87,7 +88,8 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
-      final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
+      //final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
+      final InputStream scriptEnv = new WebjarUriLocator().locate("env.rhino.js");
       evaluateChain(scriptEnv, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
@@ -125,7 +127,7 @@ public final class RhinoScriptBuilder {
    */
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
     throws IOException {
-    Validate.notNull(stream);
+    notNull(stream);
     try {
       getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
@@ -161,7 +163,7 @@ public final class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
-    Validate.notNull(script);
+    notNull(script);
     getContext().evaluateString(scope, script, sourceName, 1, null);
     return this;
   }
@@ -177,7 +179,7 @@ public final class RhinoScriptBuilder {
    */
   public Object evaluate(final Reader reader, final String sourceName)
     throws IOException {
-    Validate.notNull(reader);
+    notNull(reader);
     try {
       return evaluate(IOUtils.toString(reader), sourceName);
     } finally {
@@ -195,7 +197,7 @@ public final class RhinoScriptBuilder {
    * @throws IOException if the script couldn't be retrieved.
    */
   public Object evaluate(final String script, final String sourceName) {
-    Validate.notNull(script);
+    notNull(script);
     // make sure we have a context associated with current thread
     try {
       return getContext().evaluateString(scope, script, sourceName, 1, null);

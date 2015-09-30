@@ -50,9 +50,6 @@ public class JsLintMojo
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
     final ResourcePreProcessor processor = new JsLintProcessor() {
@@ -80,8 +77,8 @@ public class JsLintMojo
         getLog().error(errorMessage);
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
-        if (!isFailNever()) {
-          throw new WroRuntimeException("Errors found when validating resource: " + resource);
+        if (isFailAllowed()) {
+          throw e;
         }
       };
     }.setOptionsAsString(getOptions());
@@ -93,25 +90,16 @@ public class JsLintMojo
     return resourceType == ResourceType.JS;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ReportXmlFormatter createXmlFormatter(final LintReport<LinterError> lintReport, final FormatterType type) {
     return ReportXmlFormatter.createForLinterError(lintReport, type);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected File getReportFile() {
     return reportFile;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getReportFormat() {
     return reportFormat;

@@ -47,7 +47,7 @@ public abstract class AbstractLinterMojo<T>
    */
   private boolean failFast = true;
   /**
-   * Counts maximum acceptable number of jshint errors, useful for progressive code quality enhancement strategy.
+   * Counts maximum acceptable number of errors, useful for progressive code quality enhancement strategy.
    *
    * @parameter property="failThreshold"
    * @optional
@@ -69,9 +69,6 @@ public abstract class AbstractLinterMojo<T>
     lintReport.addReport(report);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onBeforeExecute() {
     progressIndicator = new ProgressIndicator(getLog());
@@ -84,9 +81,6 @@ public abstract class AbstractLinterMojo<T>
     FileUtils.deleteQuietly(getReportFile());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onAfterExecute() {
     super.onAfterExecute();

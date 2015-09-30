@@ -49,9 +49,6 @@ public class JsHintMojo
    */
   private String reportFormat = FormatterType.JSLINT.getFormat();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
     final ResourcePreProcessor processor = new JsHintProcessor() {
@@ -90,25 +87,16 @@ public class JsHintMojo
     return resourceType == ResourceType.JS;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ReportXmlFormatter createXmlFormatter(final LintReport<LinterError> lintReport, final FormatterType type) {
     return ReportXmlFormatter.createForLinterError(lintReport, type);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected File getReportFile() {
     return reportFile;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getReportFormat() {
     return reportFormat;

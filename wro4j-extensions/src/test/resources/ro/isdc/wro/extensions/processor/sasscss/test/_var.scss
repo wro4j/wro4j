@@ -1,0 +1,213 @@
+// Layout
+$boxed_layout_width:    1200px;
+$screen-sm-max:         ($screen-sm - 1);
+
+// Top header
+$header_height:             50px;           //
+$header_line_height:        20px;           // line-height of the header text
+$header_container_bg:       $dark;
+$header-border:             rgba(255,255,255,.06);
+$header_link_color:         #aaa;
+
+// Bottom footer
+$footer_height:             50px;           //**
+$footer_line_height:        20px;           //** line-height of the footer text
+$footer_width:              380px;          //**
+$footer_width-sm:           155px;          //**
+$footer_container_bg:       $skin-light;
+$footer-border:             rgba(100,100,100,.06);
+$footer_link_color:         #aaa;
+
+$button-height:				32px;
+$button-width:				125px;
+$button-width-sm:			50px;
+
+$vertical_space_sm_height:  10px;
+$vertical_space_height:     20px;
+$padding_gutter:            30px;
+
+$source_icon_width:			50px;
+$source_icon_height:		50px;
+
+$icon_sm_width:         20px;
+$icon_sm_height:        20px;
+
+$flag_width:            32px;
+$flag_height:           21px;
+
+$app-row-height:          284px;
+$app-feature-image-width: 400px;
+
+// Preview screens variables
+$preview_width_side_list:	290px;
+$preview_height_side_item: 	64px;
+
+$preview_width_home_item:		100px;
+
+$preview_height_mobile:				391px;
+$preview_height_full_mobile:	678px;
+$preview_width_main_mobile:		380px;
+$preview_width_side_mobile: 	$preview_width_side_list + $preview_width_main_mobile;
+
+$preview_height_webview_header:	64px;
+$preview_height_webview_mobile:	$preview_height_mobile - $preview_height_webview_header;
+
+$preview_height_tablet:				350px;
+$preview_height_full_tablet:	372px;
+$preview_width_full_tablet:		500px;
+$preview_width_main_tablet:		565px;
+$preview_width_side_tablet: 	$preview_width_side_list + $preview_width_main_tablet;
+
+$preview_height_webview_tablet:	$preview_height_tablet - $preview_height_webview_header;
+
+$preview_icon_holder_size:		64px;
+$preview_icon_holder_size_lg:	68px;
+$preview_icon_size: 					25px;
+$preview_icon_size_lg:				60px;
+$preview_icon_padding:				17px;
+
+// Main container, like body_bg
+$main_container_bg:   #eaeaea;
+
+$input_border_color:  #cbd5dd;
+$small_line_color: 		#3c3c3c;
+
+// truncate-multiline class variables
+$tm-font-size: 13px;
+$tm-line-height: 1.4;
+$tm-lines-to-show: 5;
+
+// Sidebar, default is vertical
+$light_bg_link_hover_bg:             transparent; //#f6f6f6;
+$light_bg_link_hover_color:          $gray-light;
+$light_bg_link_active_bg:            #f6f6f6;
+$light_bg_link_active_color:         $text-color;
+$light_bg_link_open_bg:              $light_bg_link_active_bg;      // vertical nav only
+$light_bg_link_open_color:           $light_bg_link_active_color;   // vertical nav only
+$light_bg_sub_nav_bg:                $light_bg_link_active_bg;
+$light_bg_sub_link_active_color:     $brand-primary;
+
+$dark_bg_link_hover_bg:              transparent;
+$dark_bg_link_hover_color:           rgba(255,255,255,.8);
+$dark_bg_link_active_bg:             darken($dark, 3%);
+$dark_bg_link_active_color:          rgba(255,255,255,.8);
+$dark_bg_link_open_bg:               $dark_bg_link_active_bg;      // vertical nav only
+$dark_bg_link_open_color:            $dark_bg_link_active_color;   // vertical nav only
+$dark_bg_sub_nav_bg:                 $dark_bg_link_active_bg;
+$dark_bg_sub_link_active_color:      $dark_bg_link_active_color;
+
+$horizontal_sidebar_bg:                #eee;
+$horizontal_sub_nav_bg:                darken($horizontal_sidebar_bg, 5%);
+$horizontal_link_color:                $text-color;
+$horizontal_link_active_bg:            darken($horizontal_sidebar_bg, 5%);
+$horizontal_link_active_color:         $brand-primary;
+
+$source-item-text-color:        $text-color;
+$source-item-subtext-color:     #8e8e8e;
+$source-item-bg-color:          #f8f8f8;
+$source-item-bg-color-hover:    #f2f2f2;
+$source-item-exclude-bg-color:  #fbfbfb;
+
+$facebook-btn-color:          	#6b81b2;
+$facebook-btn-color-hover:    	#133783;
+$google-plus-btn-color:  				#dd4b39;
+$google-plus-btn-color-hover:		#c53727;
+$twitter-btn-color:          		#00aced;
+$twitter-btn-color-hover:    		#0271bf;
+$instagram-btn-color:  					#6f97b6;
+$instagram-btn-color-hover:			#3f729b;
+
+$facebook-color: 		#3b5998;
+$flickr-color: 			#ff0084;
+$google-plus-color: #d95333;
+$instagram-color: 	#4878a0;
+$slideshare-color: 	#5ba6a8;
+$tumblr-color: 			#35465d;
+$twitter-color: 		#2aa9e0;
+$vimeo-color: 			#2aa9e0;
+$youtube-color: 		#c8312b;
+
+$sm_path: 							"sm/";
+$imgs_path:             "../images/";
+$color_imgs_path:       $imgs_path + "colorpicker/";
+$general_imgs_path:     $imgs_path + "general/";
+$preview_frames_path:   $imgs_path + "previews/frames/";
+$preview_icons_path:  	$imgs_path + "previews/icons/";
+$sources_icons_path:    $imgs_path + "sources/icons/";
+$sources_logos_path:    $imgs_path + "sources/logos/";
+$flag_imgs_path:        $imgs_path + "flags/flags/";
+
+$preview_frame_ipad:					$preview_frames_path + "ipad_frame.png";
+$preview_frame_ipad_portrait: $preview_frames_path + "ipad_frame_portrait.png";
+$preview_frame_ipad_tl: 			$preview_frames_path + "ipad_frame_top_left.png";
+$preview_frame_iphone_tr: 		$preview_frames_path + "iphone_frame_top_right.png";
+$preview_frame_iphone_t:			$preview_frames_path + "iphone_frame_top.png";
+$preview_frame_iphone:				$preview_frames_path + "iphone_frame.png";
+$preview_frame_ipad_iphone: 	$preview_frames_path + "ipad_iphone.png";
+
+$preview_icon_home: 								$preview_icons_path + "home.png";
+$preview_icon_minimize:							$preview_icons_path + "minimize.png";
+$preview_icon_expand:								$preview_icons_path + "expand.png";
+$preview_icon_image_placeholder_sm:	$preview_icons_path + "image_placeholder_sm.png";
+$preview_icon_image_placeholder_lg:	$preview_icons_path + "image_placeholder_lg.jpg";
+$preview_icon_calendar:							$preview_icons_path + "calendar.png";
+$preview_icon_share:								$preview_icons_path + "share.png";
+
+// The source icon constants
+$add_source_icon_rss:           $sources_icons_path + "rss.png";
+$add_source_icon_article:       $sources_icons_path + "article.png";
+$add_source_icon_google_alert: 	$sources_icons_path + "google-alert.png";
+$add_source_icon_write:         $sources_icons_path + "write.png";
+$add_source_icon_twitter:       $sources_icons_path + "twitter.png";
+$add_source_icon_facebook:      $sources_icons_path + "facebook.png";
+$add_source_icon_google_plus:   $sources_icons_path + "google-plus.png";
+$add_source_icon_youtube:       $sources_icons_path + "youtube.png";
+$add_source_icon_email:         $sources_icons_path + "email.png";
+$add_source_icon_trending:      $sources_icons_path + "trending.png";
+$add_source_icon_flipbook:     	$sources_icons_path + "flipbook.png";
+$add_source_icon_slideshare:    $sources_icons_path + "slideshare.png";
+$add_source_icon_vimeo:         $sources_icons_path + "vimeo.png";
+$add_source_icon_instagram:     $sources_icons_path + "instagram.png";
+$add_source_icon_flickr:        $sources_icons_path + "flickr.png";
+$add_source_icon_tumblr:        $sources_icons_path + "tumblr.png";
+$add_source_icon_coming_soon:		$sources_icons_path + "coming-soon.png";
+
+$add_source_icon_sm_rss:           	$sources_icons_path + $sm_path + "rss.png";
+$add_source_icon_sm_article:       	$sources_icons_path + $sm_path + "article.png";
+$add_source_icon_sm_google_alert: 	$sources_icons_path + $sm_path + "google-alert.png";
+$add_source_icon_sm_write:         	$sources_icons_path + $sm_path + "write.png";
+$add_source_icon_sm_twitter:       	$sources_icons_path + $sm_path + "twitter.png";
+$add_source_icon_sm_facebook:      	$sources_icons_path + $sm_path + "facebook.png";
+$add_source_icon_sm_google_plus:   	$sources_icons_path + $sm_path + "google+.png";
+$add_source_icon_sm_youtube:       	$sources_icons_path + $sm_path + "youtube.png";
+$add_source_icon_sm_youtube_alt:   	$sources_icons_path + $sm_path + "youtube-alt.png";
+$add_source_icon_sm_email:         	$sources_icons_path + $sm_path + "email.png";
+$add_source_icon_sm_flipbook:     	$sources_icons_path + $sm_path + "flipbook.png";
+$add_source_icon_sm_slideshare:    	$sources_icons_path + $sm_path + "slideshare.png";
+$add_source_icon_sm_slideshare_alt: $sources_icons_path + $sm_path + "slideshare-alt.png";
+$add_source_icon_sm_vimeo:         	$sources_icons_path + $sm_path + "vimeo.png";
+$add_source_icon_sm_instagram:     	$sources_icons_path + $sm_path + "instagram.png";
+$add_source_icon_sm_flickr:        	$sources_icons_path + $sm_path + "flickr.png";
+$add_source_icon_sm_tumblr:        	$sources_icons_path + $sm_path + "tumblr.png";
+
+// The source logo constants
+$add_source_logo_facebook:      $sources_logos_path + "facebook.png";
+$add_source_logo_flickr:      	$sources_logos_path + "flickr.png";
+$add_source_logo_google_plus:   $sources_logos_path + "google+.png";
+$add_source_logo_instagram:   	$sources_logos_path + "instagram.png";
+$add_source_logo_slideshare:    $sources_logos_path + "slideshare.png";
+$add_source_logo_tumblr:      	$sources_logos_path + "tumblr.png";
+$add_source_logo_twitter:      	$sources_logos_path + "twitter.png";
+$add_source_logo_vimeo:	      	$sources_logos_path + "vimeo.png";
+$add_source_logo_youtube:      	$sources_logos_path + "youtube.png";
+
+// Flags icons
+$flag_icon_america:   $flag_imgs_path + "america.png";
+$flag_icon_spain:     $flag_imgs_path + "spain.png";
+$flag_icon_germany:   $flag_imgs_path + "germany.png";
+$flag_icon_france:    $flag_imgs_path + "france.png";
+$flag_icon_italy:     $flag_imgs_path + "italy.png";
+$flag_icon_portugal:  $flag_imgs_path + "portugal.png";
+
+//Loading icon
+$loading_icon:                  $general_imgs_path + "loading.gif";

@@ -3,6 +3,7 @@ package ro.isdc.wro.extensions.processor.js;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -14,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.Resource;
@@ -54,7 +54,7 @@ public class TestCoffeeScriptProcessor {
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
     // use lazy initialization to defer constructor invocation
     victim = new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
       @Override
