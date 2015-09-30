@@ -1,11 +1,13 @@
 /**
  * Creates location object used by less.js 
 */
+/**
 var location = location || {
     protocol: "",
     hostname: "",
     port: ""
 };
+*/
 /**
  * The problem is that less.js runs in develoment mode and sets a timer (via
  * window.setInterval()). The env.rhino.js implementation of window.setInterval
@@ -15,6 +17,7 @@ var location = location || {
 window.less = {}; 
 window.less.env = 'production';
 var exports = {};
+
 
 var lessIt = function(css) {
     var result;
