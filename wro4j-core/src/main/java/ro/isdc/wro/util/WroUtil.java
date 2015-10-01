@@ -321,6 +321,7 @@ public final class WroUtil {
     try {
       final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
+	  stream.close();
       return props.getProperty(key);
     } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
