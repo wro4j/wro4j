@@ -71,4 +71,19 @@ public class TestContentTypeResolver {
   public void shouldResolveSvg() {
     assertEquals("image/svg+xml", ContentTypeResolver.get("graphic.svg"));
   }
+
+  @Test
+  public void shouldResolveWoff() {
+    assertEquals("application/font-woff", ContentTypeResolver.get("webjars/font-awesome/4.4.0/fonts/fontawesome-webfont.woff"));
+  }
+
+  @Test
+  public void shouldResolveWoffAlsoWhenQueryParamsPresent() {
+    assertEquals("application/font-woff", ContentTypeResolver.get("webjars/font-awesome/4.4.0/fonts/fontawesome-webfont.woff?v=4.4.0"));
+  }
+
+  @Test
+  public void shouldResolveWoff2() {
+    assertEquals("application/font-woff2", ContentTypeResolver.get("webjars/font-awesome/4.4.0/fonts/fontawesome-webfont.woff2"));
+  }
 }
