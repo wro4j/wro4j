@@ -18,27 +18,23 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 
 /**
- * Locator responsible for locating webjar resources. A webjar resource is a classpath resource respecting a certain
- * standard. <a href="http://www.webjars.org/">Read more</a> about webjars.
- * <p/>
- * This locator uses the following prefix to identify a locator capable of handling webjar resources:
- * <code>webjar:</code>
+ * Similar to {@link WebjarUriLocator}, but uses "/webjar/" prefix to identify a webjar resource.
  *
  * @author Alex Objelean
- * @created 6 Jan 2013
- * @since 1.6.2
+ * @created 5 Oct 2015
+ * @since 1.7.10
  */
-public class WebjarUriLocator
+public class WebjarServletUriLocator
     implements UriLocator {
-  private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WebjarServletUriLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
-  public static final String ALIAS = "webjar";
+  public static final String ALIAS = "webjarServlet";
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
-  public static final String PREFIX = format("%s:", ALIAS);
+  public static final String PREFIX = format("/%s/", ALIAS);
   private final UriLocator classpathLocator = new ClasspathUriLocator();
   private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
 
