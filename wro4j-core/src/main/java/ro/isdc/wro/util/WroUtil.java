@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.ByteArrayInputStream;
@@ -318,13 +319,15 @@ public final class WroUtil {
    * @return regular expression value.
    */
   public static String loadRegexpWithKey(final String key) {
+    InputStream stream = null;
     try {
-      final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
+      stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
-	  stream.close();
       return props.getProperty(key);
     } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
+    } finally {
+      closeQuietly(stream);
     }
   }
 
