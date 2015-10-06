@@ -1,12 +1,13 @@
 package ro.isdc.wro.manager.factory.standalone;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,9 @@ public class DefaultStandaloneContextAwareManagerFactory
    * Context used by stand-alone process.
    */
   StandaloneContext standaloneContext;
-  /**
-   * {@inheritDoc}
-   */
+
   public void initialize(final StandaloneContext standaloneContext) {
-    Validate.notNull(standaloneContext);
+    notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
     //Override the ignoreMissingResources flag only when explicitly set
     if (standaloneContext.getIgnoreMissingResourcesAsString() != null) {

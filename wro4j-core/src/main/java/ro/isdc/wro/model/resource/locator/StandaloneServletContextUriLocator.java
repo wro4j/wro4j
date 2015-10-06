@@ -1,5 +1,6 @@
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.File;
@@ -68,7 +69,7 @@ public final class StandaloneServletContextUriLocator
       return getWildcardStreamLocator().locateStream(uri, new File(realPath));
     }
 
-    final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
+    final String uriWithoutPrefix = uri.replaceFirst(PREFIX, EMPTY);
     final File file = new File(contextFolder, uriWithoutPrefix);
     LOG.debug("Opening file: " + file.getPath());
     return new FileInputStream(file);

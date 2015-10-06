@@ -51,9 +51,6 @@ public class ConfigurableWroManagerFactory
     return new PropertyWroConfigurationFactory(createProperties()).create();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected WroModelFactory newModelFactory() {
     return new ConfigurableModelFactory() {
@@ -69,9 +66,6 @@ public class ConfigurableWroManagerFactory
     };
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected NamingStrategy newNamingStrategy() {
     return new ConfigurableNamingStrategy() {

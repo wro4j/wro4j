@@ -20,9 +20,7 @@ import ro.isdc.wro.util.Ordered;
  */
 public class DefaultLocatorProvider
     implements LocatorProvider, Ordered {
-  /**
-   * {@inheritDoc}
-   */
+
   public Map<String, UriLocator> provideLocators() {
     final Map<String, UriLocator> map = new TreeMap<String, UriLocator>();
     map.put(ClasspathUriLocator.ALIAS, new ClasspathUriLocator());
