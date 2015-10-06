@@ -33,7 +33,7 @@ public class DefaultStandaloneContextAwareManagerFactory
   /**
    * Context used by stand-alone process.
    */
-  StandaloneContext standaloneContext;
+  private StandaloneContext standaloneContext;
 
   public void initialize(final StandaloneContext standaloneContext) {
     notNull(standaloneContext);
@@ -47,7 +47,6 @@ public class DefaultStandaloneContextAwareManagerFactory
     LOG.debug("config: {}", Context.get().getConfig());
   }
 
-
   @Override
   protected GroupExtractor newGroupExtractor() {
     return new GroupExtractorDecorator(super.newGroupExtractor()) {
@@ -57,7 +56,6 @@ public class DefaultStandaloneContextAwareManagerFactory
       }
     };
   }
-
 
   @Override
   protected WroModelFactory newModelFactory() {
@@ -77,6 +75,8 @@ public class DefaultStandaloneContextAwareManagerFactory
 
   @Override
   protected ServletContextUriLocator newServletContextUriLocator() {
-    return new StandaloneServletContextUriLocator(standaloneContext);
+    final StandaloneServletContextUriLocator locator = new StandaloneServletContextUriLocator();
+    locator.initialize(standaloneContext);
+    return locator;
   }
 }

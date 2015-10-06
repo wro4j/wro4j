@@ -93,8 +93,8 @@ public class ConfigurableWroManagerFactory
       @Override
       public UriLocator getInstance(final String uri) {
         final UriLocator locator = super.getInstance(uri);
-        // ensure standalone context is provided to each locator
-        if (locator instanceof StandaloneContextAware) {
+        // ensure standalone context is provided to each locator requiring it for initialization.
+        if (locator != null && locator instanceof StandaloneContextAware) {
           ((StandaloneContextAware) locator).initialize(standaloneContext);
         }
         return locator;

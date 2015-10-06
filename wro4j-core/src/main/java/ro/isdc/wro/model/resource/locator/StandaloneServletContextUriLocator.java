@@ -2,6 +2,7 @@ package ro.isdc.wro.model.resource.locator;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.Validate.notNull;
+import static org.apache.commons.lang3.Validate.validState;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,12 +35,6 @@ public final class StandaloneServletContextUriLocator
   public StandaloneServletContextUriLocator() {
   }
 
-
-  public StandaloneServletContextUriLocator(final StandaloneContext standaloneContext) {
-    notNull(standaloneContext);
-    this.standaloneContext = standaloneContext;
-  }
-
   /**
    * This implementation will try to locate the provided resource inside contextFolder configured by standaloneContext.
    * If a resource cannot be located, the next contextFolder from the list will be tried. The first successful result
@@ -48,6 +43,8 @@ public final class StandaloneServletContextUriLocator
   @Override
   public InputStream locate(final String uri)
       throws IOException {
+    validState(standaloneContext != null, "Locator was not initialized properly. StandaloneContext missing.");
+
     Exception lastException = null;
     final String[] contextFolders = standaloneContext.getContextFolders();
     for(final String contextFolder : contextFolders) {
