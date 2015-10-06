@@ -62,6 +62,7 @@ public class DefaultConfigurableProvider
 
   @Override
   public int getOrder() {
-    return Ordered.LOWEST;
+    // Increase the order to make it precede the providers from the core.
+    return Ordered.LOWEST + 1;
   }
 }
