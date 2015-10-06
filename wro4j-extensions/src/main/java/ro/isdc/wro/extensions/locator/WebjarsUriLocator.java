@@ -17,20 +17,23 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 
+
 /**
- * Similar to {@link WebjarUriLocator}, but uses "/webjar/" prefix to identify a webjar resource.
+ * Similar to {@link WebjarUriLocator}, but uses "/webjars/" prefix to identify a webjar resource. Useful when resources
+ * are located using build-time solution (maven plugin). The only disadvantage of this locator, is that it will not make
+ * it possible to have resources located inside a folder named "webjars".
  *
  * @author Alex Objelean
  * @created 5 Oct 2015
- * @since 1.7.10
+ * @since 1.8.0
  */
-public class WebjarServletUriLocator
+public class WebjarsUriLocator
     implements UriLocator {
-  private static final Logger LOG = LoggerFactory.getLogger(WebjarServletUriLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(WebjarsUriLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
-  public static final String ALIAS = "webjarServlet";
+  public static final String ALIAS = "webjars";
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
