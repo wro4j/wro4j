@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -26,9 +27,13 @@ import ro.isdc.wro.util.WroUtil;
  * @since 1.7.2
  */
 public final class StandaloneServletContextUriLocator
-    extends ServletContextUriLocator {
-  private final StandaloneContext standaloneContext;
+    extends ServletContextUriLocator implements StandaloneContextAware {
+  private StandaloneContext standaloneContext;
   private static final Logger LOG = LoggerFactory.getLogger(StandaloneServletContextUriLocator.class);
+
+  public StandaloneServletContextUriLocator() {
+  }
+
 
   public StandaloneServletContextUriLocator(final StandaloneContext standaloneContext) {
     notNull(standaloneContext);
@@ -73,5 +78,10 @@ public final class StandaloneServletContextUriLocator
     final File file = new File(contextFolder, uriWithoutPrefix);
     LOG.debug("Opening file: " + file.getPath());
     return new FileInputStream(file);
+  }
+
+  public void initialize(final StandaloneContext standaloneContext) {
+    notNull(standaloneContext);
+    this.standaloneContext = standaloneContext;
   }
 }

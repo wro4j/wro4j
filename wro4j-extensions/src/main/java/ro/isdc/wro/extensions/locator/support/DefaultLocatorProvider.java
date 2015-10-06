@@ -18,9 +18,6 @@ import ro.isdc.wro.util.Ordered;
  */
 public class DefaultLocatorProvider
     implements LocatorProvider, Ordered {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Map<String, UriLocator> provideLocators() {
     final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
