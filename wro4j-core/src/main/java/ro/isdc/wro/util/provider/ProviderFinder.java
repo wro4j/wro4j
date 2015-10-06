@@ -64,6 +64,7 @@ public class ProviderFinder<T> {
       throw WroRuntimeException.wrap(e);
     }
     Collections.sort(providers, Ordered.ASCENDING_COMPARATOR);
+    LOG.debug("found providers: {}", providers);
     return providers;
   }
 
