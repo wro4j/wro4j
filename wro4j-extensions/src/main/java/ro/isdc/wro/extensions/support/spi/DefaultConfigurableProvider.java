@@ -62,7 +62,8 @@ public class DefaultConfigurableProvider
 
   @Override
   public int getOrder() {
-    // Increase the order to make it precede the providers from the core.
+    // Increase the order to make it precede the providers from the core. This is necessary to use the WebjarsUriLocator
+    // before the ServletUriLocator.
     return Ordered.LOWEST + 1;
   }
 }
