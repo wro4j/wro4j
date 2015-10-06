@@ -99,6 +99,11 @@ public class ConfigurableWroManagerFactory
         }
         return locator;
       }
+
+      @Override
+      protected Properties newProperties() {
+        return createProperties();
+      }
     };
   }
 
