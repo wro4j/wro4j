@@ -20,7 +20,10 @@ public interface Ordered {
    * The highest order, meaning that the value will be the first when ascending comparator is used.
    */
   public static final int LOWEST = Integer.MIN_VALUE;
-  public static final Comparator<Object> ASCENDING_COMPARATOR = new Comparator<Object>() {
+  /**
+   * Sort elements from {@link #HIGHEST} to {@link #LOWEST}
+   */
+  public static final Comparator<Object> DESCENDING_COMPARATOR = new Comparator<Object>() {
     public int compare(final Object left, final Object right) {
       int priorityLeft = MEDIUM;
       int priorityRight = MEDIUM;
