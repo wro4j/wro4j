@@ -30,6 +30,6 @@ public class DefaultLocatorProvider
    * override custom configurations.
    */
   public int getOrder() {
-    return Ordered.LOWEST + 1;
+    return Ordered.LOWEST;
   }
 }
