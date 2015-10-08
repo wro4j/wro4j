@@ -47,7 +47,7 @@ public class ProviderFinder<T> {
   }
 
   /**
-   * @return the list of all providers found in classpath. The returned list should be sorted according to the {@link Ordered} interface.
+   * @return the list of all providers found in classpath. The returned list is sorted according to the {@link Ordered} interface (from {@link Ordered#LOWEST} to {@link Ordered#HIGHEST}.
    */
   public List<T> find() {
     final List<T> providers = new ArrayList<T>();
@@ -63,7 +63,8 @@ public class ProviderFinder<T> {
       LOG.error("Failed to discover providers using ServiceRegistry. Cannot continue...", e);
       throw WroRuntimeException.wrap(e);
     }
-    Collections.sort(providers, Ordered.ASCENDING_COMPARATOR);
+    Collections.sort(providers, Ordered.DESCENDING_COMPARATOR);
+    LOG.debug("found providers: {}", providers);
     return providers;
   }
 

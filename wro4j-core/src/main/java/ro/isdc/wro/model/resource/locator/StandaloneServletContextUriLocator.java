@@ -1,6 +1,8 @@
 package ro.isdc.wro.model.resource.locator;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.Validate.notNull;
+import static org.apache.commons.lang3.Validate.validState;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.util.WroUtil;
 
 
@@ -25,13 +28,11 @@ import ro.isdc.wro.util.WroUtil;
  * @since 1.7.2
  */
 public final class StandaloneServletContextUriLocator
-    extends ServletContextUriLocator {
-  private final StandaloneContext standaloneContext;
+    extends ServletContextUriLocator implements StandaloneContextAware {
+  private StandaloneContext standaloneContext;
   private static final Logger LOG = LoggerFactory.getLogger(StandaloneServletContextUriLocator.class);
 
-  public StandaloneServletContextUriLocator(final StandaloneContext standaloneContext) {
-    notNull(standaloneContext);
-    this.standaloneContext = standaloneContext;
+  public StandaloneServletContextUriLocator() {
   }
 
   /**
@@ -42,6 +43,8 @@ public final class StandaloneServletContextUriLocator
   @Override
   public InputStream locate(final String uri)
       throws IOException {
+    validState(standaloneContext != null, "Locator was not initialized properly. StandaloneContext missing.");
+
     Exception lastException = null;
     final String[] contextFolders = standaloneContext.getContextFolders();
     for(final String contextFolder : contextFolders) {
@@ -68,9 +71,14 @@ public final class StandaloneServletContextUriLocator
       return getWildcardStreamLocator().locateStream(uri, new File(realPath));
     }
 
-    final String uriWithoutPrefix = uri.replaceFirst(PREFIX, "");
+    final String uriWithoutPrefix = uri.replaceFirst(PREFIX, EMPTY);
     final File file = new File(contextFolder, uriWithoutPrefix);
     LOG.debug("Opening file: " + file.getPath());
     return new FileInputStream(file);
+  }
+
+  public void initialize(final StandaloneContext standaloneContext) {
+    notNull(standaloneContext);
+    this.standaloneContext = standaloneContext;
   }
 }

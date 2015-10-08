@@ -1,31 +1,34 @@
-package ro.isdc.wro.extensions.locator.support;
+package ro.isdc.wro.maven.plugin.support.spi;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.model.resource.locator.StandaloneServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.util.Ordered;
 
 
 /**
- * Default implementation of {@link LocatorProvider} providing all {@link UriLocator} implementations from core module.
+ * Responsible for custom providing custom locators from maven plugin module.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
- * @since 1.4.7
+ * @created 6 Oct 2015
+ * @since 1.7.10
  */
 public class DefaultLocatorProvider
     implements LocatorProvider, Ordered {
-  @Override
+
   public Map<String, UriLocator> provideLocators() {
     final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
-    map.put(WebjarUriLocator.ALIAS, new WebjarUriLocator());
+    map.put(StandaloneServletContextUriLocator.ALIAS, new StandaloneServletContextUriLocator());
     return map;
   }
 
-  @Override
+  /**
+   * The order is slightly higher than the one provided by default by core module. This is important in order to
+   * override custom configurations.
+   */
   public int getOrder() {
     return Ordered.LOWEST;
   }

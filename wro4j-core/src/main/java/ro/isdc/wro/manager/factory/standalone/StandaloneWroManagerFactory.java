@@ -21,9 +21,7 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  * @created Created on Nov 3, 2008
  */
 public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   protected WroModelFactory newModelFactory() {
     return new XmlModelFactory();
