@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,7 +42,7 @@ public class TestConfigurableLocatorFactory {
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
@@ -169,7 +169,7 @@ public class TestConfigurableLocatorFactory {
     final List<LocatorProvider> providers = new ArrayList<LocatorProvider>();
     providers.add(new LocatorProvider() {
       public Map<String, UriLocator> provideLocators() {
-        final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
+        final Map<String, UriLocator> map = new LinkedHashMap<String, UriLocator>();
         map.put("first", mockUriLocator);
         map.put("second", mockUriLocator);
         return map;
