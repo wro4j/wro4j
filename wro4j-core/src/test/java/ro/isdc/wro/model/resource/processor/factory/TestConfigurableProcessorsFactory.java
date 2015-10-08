@@ -6,6 +6,7 @@ package ro.isdc.wro.model.resource.processor.factory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +16,6 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
@@ -34,7 +34,7 @@ public class TestConfigurableProcessorsFactory {
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
     victim = new ConfigurableProcessorsFactory();
   }
 
@@ -120,7 +120,7 @@ public class TestConfigurableProcessorsFactory {
 
   @Test
   public void unorderedShouldOverrideDefault() {
-    final Properties props = new Properties();
+    final  Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, ConformColorsCssProcessor.ALIAS);
     victim.setProperties(props);
     assertSame(victim.getPreProcessors().iterator().next(), UnorderedProcessorProvider.CONFORM_COLORS);
@@ -131,6 +131,8 @@ public class TestConfigurableProcessorsFactory {
     final Properties props = new Properties();
     props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, OrderedProcessorProvider.ALIAS);
     victim.setProperties(props);
+    System.out.println(props);
+    System.out.println(victim.getPreProcessors());
     assertSame(victim.getPreProcessors().iterator().next(), OrderedProcessorProvider.CUSTOM);
   }
 }

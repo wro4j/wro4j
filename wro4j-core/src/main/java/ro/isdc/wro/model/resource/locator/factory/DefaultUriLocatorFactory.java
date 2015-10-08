@@ -14,7 +14,8 @@ import ro.isdc.wro.util.provider.ProviderFinder;
 
 /**
  * Default implementation of {@link UriLocatorFactory}. It loads all locators provided as SPI and sort them using
- * {@link Ordered#DESCENDING_COMPARATOR}.
+ * {@link Ordered#DESCENDING_COMPARATOR} (from highest to lowest priority). If there is more than one locator with same alias,
+ * the resulted list won't remove duplicates.
  *
  * @author Alex Objelean
  * @created 15 May 2011
