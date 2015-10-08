@@ -6,7 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -75,7 +75,8 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
    *         map. If two providers have same alias, the one with higher order will override those with lower order.
    */
   private final Map<String, S> newStrategyMap() {
-    final Map<String, S> map = new HashMap<String, S>();
+    //preserve the order
+    final Map<String, S> map = new LinkedHashMap<String, S>();
     final List<P> providers = getProviderFinder().find();
     //reverse before adding to map, to allow highest ordered override lowest one (assuming same alias is used).
     Collections.reverse(providers);
