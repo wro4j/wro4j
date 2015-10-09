@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
+import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.group.processor.InjectorBuilder;
@@ -48,17 +48,17 @@ public class TestWildcardExpanderModelTransformer {
   private WroModelFactory decoratedFactory;
   @Mock
   private ProcessorsFactory processorsFactory;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @AfterClass
   public static void onAfterClass() {
     assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
@@ -71,15 +71,15 @@ public class TestWildcardExpanderModelTransformer {
     final Injector injector = InjectorBuilder.create(factory).build();
     injector.inject(transformer);
   }
-  
+
   @Test
   public void testEmptyModel() {
     final WroModel model = new WroModel();
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     final WroModel changedModel = transformer.transform(model);
-    Assert.assertEquals(model.getGroups().size(), changedModel.getGroups().size());
+    assertEquals(model.getGroups().size(), changedModel.getGroups().size());
   }
-  
+
   @Test
   public void testGroupWithNoWildcard() {
     final WroModel model = new WroModel();
@@ -88,9 +88,9 @@ public class TestWildcardExpanderModelTransformer {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     final WroModel changedModel = transformer.transform(model);
-    Assert.assertEquals(1, changedModel.getGroups().size());
+    assertEquals(1, changedModel.getGroups().size());
   }
-  
+
   /**
    * Invalid resources should be ignored, leaving the model unchanged.
    */
@@ -102,9 +102,9 @@ public class TestWildcardExpanderModelTransformer {
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
     final WroModel changedModel = transformer.transform(model);
-    Assert.assertEquals(1, changedModel.getGroups().size());
+    assertEquals(1, changedModel.getGroups().size());
   }
-  
+
   @Test
   public void testExpandWildcardWithASingleResource() {
     final WroModel model = new WroModel();
@@ -112,12 +112,12 @@ public class TestWildcardExpanderModelTransformer {
         WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    
+
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
-    Assert.assertEquals(1, changedModel.getGroupByName("group").getResources().size());
+    assertEquals(1, new WroModelInspector(changedModel).getGroupByName("group").getResources().size());
   }
-  
+
   @Test
   public void testExpandWildcardWithMultipleResources() {
     final WroModel model = new WroModel();
@@ -125,19 +125,19 @@ public class TestWildcardExpanderModelTransformer {
         WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    
+
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
-    Assert.assertEquals(3, changedModel.getGroupByName("group").getResources().size());
+    assertEquals(3, new WroModelInspector(changedModel).getGroupByName("group").getResources().size());
   }
-  
+
   @Test
   public void testExpandWildcardRootDir()
       throws Exception {
     final String uri = "/**.js";
     final Resource resource = Resource.create(uri, ResourceType.JS);
     final Group group = new Group("group").addResource(resource);
-    
+
     final String baseNameFolder = WroUtil.toPackageAsFolder(getClass());
     final Function<Collection<File>, Void> expanderHandler = transformer.createExpanderHandler(group, resource,
         baseNameFolder);
@@ -145,14 +145,14 @@ public class TestWildcardExpanderModelTransformer {
     Mockito.when(mockFile1.getPath()).thenReturn(baseNameFolder + "/js1.js");
     final File mockFile2 = Mockito.mock(File.class);
     Mockito.when(mockFile2.getPath()).thenReturn(baseNameFolder + "/js2.js");
-    
+
     expanderHandler.apply(Arrays.asList(mockFile1, mockFile2));
     LOG.debug("group: {}", group);
-    Assert.assertEquals(2, group.getResources().size());
-    Assert.assertEquals("/js1.js", group.getResources().get(0).getUri());
-    Assert.assertEquals("/js2.js", group.getResources().get(1).getUri());
+    assertEquals(2, group.getResources().size());
+    assertEquals("/js1.js", group.getResources().get(0).getUri());
+    assertEquals("/js2.js", group.getResources().get(1).getUri());
   }
-  
+
   @Test
   public void shouldCorrectlyDetectFilesFromFoldersWithDirectoriesOnlyAsChildren() {
     final WroModel model = new WroModel();
@@ -160,20 +160,19 @@ public class TestWildcardExpanderModelTransformer {
         WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    
+
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
-    
+
     final String resultPathPrefix = String.format("%s%s/expander/subfolder", ClasspathUriLocator.PREFIX,
         WroUtil.toPackageAsFolder(getClass()));
-    
-    Assert.assertEquals(2, changedModel.getGroupByName("group").getResources().size());
-    Assert.assertEquals(resultPathPrefix + "/folder1/script1.js",
-        changedModel.getGroupByName("group").getResources().get(0).getUri());
-    Assert.assertEquals(resultPathPrefix + "/folder2/script2.js",
-        changedModel.getGroupByName("group").getResources().get(1).getUri());
+
+    final Group group = new WroModelInspector(changedModel).getGroupByName("group");
+    assertEquals(2, group.getResources().size());
+    assertEquals(resultPathPrefix + "/folder1/script1.js", group.getResources().get(0).getUri());
+    assertEquals(resultPathPrefix + "/folder2/script2.js", group.getResources().get(1).getUri());
   }
-  
+
   @Test
   public void wildcardResourcesAreOrderedAlphabetically() {
     final WroModel model = new WroModel();
@@ -181,22 +180,23 @@ public class TestWildcardExpanderModelTransformer {
         WroUtil.toPackageAsFolder(getClass()));
     model.addGroup(new Group("group").addResource(Resource.create(uri, ResourceType.JS)));
     Mockito.when(decoratedFactory.create()).thenReturn(model);
-    
+
     final WroModel changedModel = transformer.transform(model);
     LOG.debug("model: {}", changedModel);
-    
-    Assert.assertEquals(7, changedModel.getGroupByName("group").getResources().size());
-    final List<Resource> resources = changedModel.getGroupByName("group").getResources();
-    
-    Assert.assertEquals("01-xyc.js", FilenameUtils.getName(resources.get(0).getUri()));
-    Assert.assertEquals("02-xyc.js", FilenameUtils.getName(resources.get(1).getUri()));
-    Assert.assertEquals("03-jquery-ui.js", FilenameUtils.getName(resources.get(2).getUri()));
-    Assert.assertEquals("04-xyc.js", FilenameUtils.getName(resources.get(3).getUri()));
-    Assert.assertEquals("05-xyc.js", FilenameUtils.getName(resources.get(4).getUri()));
-    Assert.assertEquals("06-xyc.js", FilenameUtils.getName(resources.get(5).getUri()));
-    Assert.assertEquals("07-jquery-impromptu.js", FilenameUtils.getName(resources.get(6).getUri()));
+
+    final Group group = new WroModelInspector(changedModel).getGroupByName("group");
+    assertEquals(7, group.getResources().size());
+    final List<Resource> resources = group.getResources();
+
+    assertEquals("01-xyc.js", FilenameUtils.getName(resources.get(0).getUri()));
+    assertEquals("02-xyc.js", FilenameUtils.getName(resources.get(1).getUri()));
+    assertEquals("03-jquery-ui.js", FilenameUtils.getName(resources.get(2).getUri()));
+    assertEquals("04-xyc.js", FilenameUtils.getName(resources.get(3).getUri()));
+    assertEquals("05-xyc.js", FilenameUtils.getName(resources.get(4).getUri()));
+    assertEquals("06-xyc.js", FilenameUtils.getName(resources.get(5).getUri()));
+    assertEquals("07-jquery-impromptu.js", FilenameUtils.getName(resources.get(6).getUri()));
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();

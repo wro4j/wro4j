@@ -8,7 +8,9 @@
 package ro.isdc.wro.extensions.model.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -82,17 +83,21 @@ public class TestGroovyModelFactory {
       };
     };
     final WroModel model = factory.create();
-    Assert.assertNotNull(model);
-    Assert.assertEquals(Arrays.asList("g1", "g2"), new WroModelInspector(model).getGroupNames());
-    Assert.assertEquals(2, model.getGroupByName("g1").getResources().size());
-    Assert.assertTrue(model.getGroupByName("g1").getResources().get(0).isMinimize());
-    Assert.assertEquals("/static/app.js", model.getGroupByName("g1").getResources().get(0).getUri());
-    Assert.assertEquals(ResourceType.JS, model.getGroupByName("g1").getResources().get(0).getType());
-    Assert.assertTrue(model.getGroupByName("g1").getResources().get(1).isMinimize());
-    Assert.assertEquals("/static/app.css", model.getGroupByName("g1").getResources().get(1).getUri());
-    Assert.assertEquals(ResourceType.CSS, model.getGroupByName("g1").getResources().get(1).getType());
-    Assert.assertEquals(2, model.getGroupByName("g2").getResources().size());
-    Assert.assertFalse(model.getGroupByName("g2").getResources().get(1).isMinimize());
+
+    assertNotNull(model);
+
+    final WroModelInspector modelInspector = new WroModelInspector(model);
+
+    assertEquals(Arrays.asList("g1", "g2"), new WroModelInspector(model).getGroupNames());
+    assertEquals(2, modelInspector.getGroupByName("g1").getResources().size());
+    assertTrue(modelInspector.getGroupByName("g1").getResources().get(0).isMinimize());
+    assertEquals("/static/app.js", modelInspector.getGroupByName("g1").getResources().get(0).getUri());
+    assertEquals(ResourceType.JS, modelInspector.getGroupByName("g1").getResources().get(0).getType());
+    assertTrue(modelInspector.getGroupByName("g1").getResources().get(1).isMinimize());
+    assertEquals("/static/app.css", modelInspector.getGroupByName("g1").getResources().get(1).getUri());
+    assertEquals(ResourceType.CSS, modelInspector.getGroupByName("g1").getResources().get(1).getType());
+    assertEquals(2, modelInspector.getGroupByName("g2").getResources().size());
+    assertFalse(modelInspector.getGroupByName("g2").getResources().get(1).isMinimize());
 
     LOG.debug("model: ", model);
   }
@@ -107,7 +112,7 @@ public class TestGroovyModelFactory {
       }
     };
     final WroModel model = factory.create();
-    Assert.assertNotNull(model.getGroupByName("group-with-hiphen"));
+    assertNotNull(new WroModelInspector(model).getGroupByName("group-with-hiphen"));
   }
 
   @Test
@@ -119,7 +124,7 @@ public class TestGroovyModelFactory {
         return getClass().getResourceAsStream("wroGroupRefOrder.groovy");
       }
     };
-    Assert.assertNotNull(factory.create());
+    assertNotNull(factory.create());
   }
 
   @Test
@@ -194,7 +199,7 @@ public class TestGroovyModelFactory {
       @Override
       public Void call()
           throws Exception {
-        Assert.assertEquals(expectedModel, factory.create());
+        assertEquals(expectedModel, factory.create());
         return null;
       }
     });
@@ -219,7 +224,7 @@ public class TestGroovyModelFactory {
       @Override
       public Void call()
           throws Exception {
-        Assert.assertEquals(expectedModel, factory.create());
+        assertEquals(expectedModel, factory.create());
         return null;
       }
     }));
