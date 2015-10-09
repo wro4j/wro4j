@@ -77,15 +77,6 @@ public class RubySassCssProcessor
   }
 
   /**
-   * A getter used for lazy loading.
-   * @deprecated use {@link #newEngine()} instead.
-   */
-  @Deprecated
-  protected RubySassEngine getEngine() {
-      return newEngine();
-  }
-
-  /**
    * @return a fresh instance of {@link RubySassEngine}
    */
   protected RubySassEngine newEngine() {
