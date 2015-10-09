@@ -4,12 +4,13 @@
  */
 package ro.isdc.wro.config.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class FilterConfigWroConfigurationFactory
   private final FilterConfig filterConfig;
 
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
-    Validate.notNull(filterConfig);
+    notNull(filterConfig);
     this.filterConfig = filterConfig;
   }
 
