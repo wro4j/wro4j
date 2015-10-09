@@ -18,10 +18,12 @@ import ro.isdc.wro.util.Ordered;
  */
 public class DefaultLocatorProvider
     implements LocatorProvider, Ordered {
+
   @Override
   public Map<String, UriLocator> provideLocators() {
     final Map<String, UriLocator> map = new HashMap<String, UriLocator>();
     map.put(WebjarUriLocator.ALIAS, new WebjarUriLocator());
+    map.put(WebjarsUriLocator.ALIAS, new WebjarsUriLocator());
     return map;
   }
 

@@ -47,6 +47,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
+  private static final String SEPARATOR_UNIX = "/";
   private static final String SEPARATOR_WINDOWS = "\\";
   /**
    * Empty line pattern.
@@ -390,6 +391,17 @@ public final class WroUtil {
     } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
+  }
+
+  /**
+   * Join two paths (using unix separator) and make sure to use exactly one separator (by adding or removing one if required).
+   */
+  public static String joinPath(final String left, final String right) {
+    String leftHand = left;
+    if (!left.endsWith(SEPARATOR_UNIX)) {
+      leftHand += SEPARATOR_UNIX;
+    }
+    return leftHand + right.replaceFirst("^/(.*)", "$1");
   }
 
   /**
