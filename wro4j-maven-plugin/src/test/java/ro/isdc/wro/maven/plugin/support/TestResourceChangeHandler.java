@@ -2,17 +2,19 @@ package ro.isdc.wro.maven.plugin.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.Properties;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
-import ro.isdc.wro.manager.factory.WroManagerFactory;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
@@ -26,14 +28,23 @@ public class TestResourceChangeHandler {
   private BuildContextHolder buildContextHolder;
   @Mock
   private Log log;
-  private WroManagerFactory managerFactory;
+  private ConfigurableWroManagerFactory managerFactory;
   private ResourceChangeHandler victim;
 
   @Before
   public void setUp() {
+    initMocks(this);
+
     Context.set(Context.standaloneContext());
-    MockitoAnnotations.initMocks(this);
-    managerFactory = new BaseWroManagerFactory();
+
+    managerFactory = new ConfigurableWroManagerFactory() {
+      @Override
+      protected Properties createProperties() {
+        return new Properties();
+      }
+    };
+    managerFactory.initialize(new StandaloneContext());
+
     victim = ResourceChangeHandler.create(managerFactory, log);
   }
 
