@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +115,7 @@ public class WroFilter
     this.injector = createInjector();
     headersConfigurer = newResponseHeadersConfigurer();
     requestHandlers = createRequestHandlers();
-    
+
     registerChangeListeners();
     registerMBean();
     doInit(config);
@@ -456,7 +455,7 @@ public class WroFilter
    *          a not null {@link WroConfiguration} to set.
    */
   public final void setConfiguration(final WroConfiguration config) {
-    Validate.notNull(config);
+    notNull(config);
     wroConfigurationFactory = new ObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return config;

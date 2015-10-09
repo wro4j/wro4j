@@ -1,6 +1,7 @@
 package ro.isdc.wro.manager.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.InputStream;
@@ -50,7 +51,7 @@ public class TestDefaultWroManagerFactory {
     Mockito.when(servletContext.getResourceAsStream(Mockito.anyString())).then(createValidModelStreamAnswer());
     Context.set(Context.webContext(request, response, filterConfig));
   }
-  
+
   @After
   public void tearDown() {
     Context.unset();
@@ -73,8 +74,8 @@ public class TestDefaultWroManagerFactory {
   }
 
   @Test
-  public void shouldCreateADefaultManagerFactory() {
-    assertEquals(BaseWroManagerFactory.class, victim.getFactory().getClass());
+  public void shouldCreateConfigurableManagerFactoryByDefault() {
+    assertEquals(ConfigurableWroManagerFactory.class, victim.getFactory().getClass());
   }
 
   @Test
@@ -113,10 +114,10 @@ public class TestDefaultWroManagerFactory {
       }
     };
     victim.onCachePeriodChanged(0);
-    Mockito.verify(mockManagerFactory).onCachePeriodChanged(0);
+    verify(mockManagerFactory).onCachePeriodChanged(0);
 
     victim.onModelPeriodChanged(0);
-    Mockito.verify(mockManagerFactory).onModelPeriodChanged(0);
+    verify(mockManagerFactory).onModelPeriodChanged(0);
   }
 
   @Test(expected = NullPointerException.class)
@@ -169,6 +170,7 @@ public class TestDefaultWroManagerFactory {
   @Test
   public void shouldUseValidModelIsProvidedWhenUsingConfigurableWroManagerFactory() {
     useModelFactoryWithAlias(XmlModelFactory.ALIAS);
+
   }
 
   private void useModelFactoryWithAlias(final String modelFactoryAlias) {
