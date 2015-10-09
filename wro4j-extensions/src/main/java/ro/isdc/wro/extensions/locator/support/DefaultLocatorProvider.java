@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ro.isdc.wro.extensions.locator.WebjarUriLocator;
+import ro.isdc.wro.extensions.locator.WebjarsUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.util.Ordered;
