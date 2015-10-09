@@ -30,6 +30,7 @@ import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
  */
 public class WebjarUriLocator
     implements UriLocator {
+  private static final String PATTERN = ".*";
   private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
@@ -49,7 +50,7 @@ public class WebjarUriLocator
    */
   private WebJarAssetLocator newWebJarAssetLocator() {
     return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
-        Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
+        Pattern.compile(PATTERN), Thread.currentThread().getContextClassLoader()));
   }
 
   /**

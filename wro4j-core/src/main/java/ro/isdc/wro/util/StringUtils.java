@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -64,7 +66,7 @@ public final class StringUtils {
     // "file:core/../core/io/Resource.class", where the ".." should just
     // strip the first "core" directory while keeping the "file:" prefix.
     final int prefixIndex = pathToUse.indexOf(":");
-    String prefix = "";
+    String prefix = EMPTY;
     if (prefixIndex != -1) {
       prefix = pathToUse.substring(0, prefixIndex + 1);
       pathToUse = pathToUse.substring(prefixIndex + 1);
@@ -150,7 +152,7 @@ public final class StringUtils {
    */
   private static String collectionToDelimitedString(final Collection<String> coll,
       final String delim) {
-    return collectionToDelimitedString(coll, delim, "", "");
+    return collectionToDelimitedString(coll, delim, EMPTY, EMPTY);
   }
 
   /**
@@ -170,7 +172,7 @@ public final class StringUtils {
   private static String collectionToDelimitedString(final Collection<String> coll,
       final String delim, final String prefix, final String suffix) {
     if (coll == null || coll.isEmpty()) {
-      return "";
+      return EMPTY;
     }
     final StringBuffer sb = new StringBuffer();
     final Iterator<String> it = coll.iterator();

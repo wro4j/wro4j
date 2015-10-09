@@ -16,12 +16,13 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
  * Similar to {@link WebjarUriLocator}, but uses "/webjars/" prefix to identify a webjar resource. Useful when resources
  * are located using build-time solution (maven plugin). The only disadvantage of this locator, is that it will not make
- * it possible to have resources located inside a folder named "webjars".
+ * it possible to use resources located inside a folder named "webjars" (inside the application context).
  *
  * @author Alex Objelean
  * @created 5 Oct 2015
@@ -30,6 +31,7 @@ import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 public class WebjarsUriLocator
     implements UriLocator {
   private static final Logger LOG = LoggerFactory.getLogger(WebjarsUriLocator.class);
+  private static final String PATTERN = ".*";
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
@@ -37,7 +39,7 @@ public class WebjarsUriLocator
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
-  public static final String PREFIX = format("/%s/", ALIAS);
+  private static final String PREFIX = format("/%s/", ALIAS);
   private final UriLocator classpathLocator = new ClasspathUriLocator();
   private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
 
@@ -48,7 +50,7 @@ public class WebjarsUriLocator
    */
   private WebJarAssetLocator newWebJarAssetLocator() {
     return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
-        Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
+        Pattern.compile(PATTERN), Thread.currentThread().getContextClassLoader()));
   }
 
   /**
@@ -56,7 +58,7 @@ public class WebjarsUriLocator
    */
   public static String createUri(final String path) {
     notNull(path);
-    return PREFIX + path;
+    return WroUtil.joinPath(PREFIX, path);
   }
 
   @Override
