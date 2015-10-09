@@ -19,15 +19,11 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 public class ExtensionsStandaloneManagerFactory extends DefaultStandaloneContextAwareManagerFactory {
   private StandaloneContext context;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void initialize(final StandaloneContext standaloneContext) {
     super.initialize(standaloneContext);
     this.context = standaloneContext;
   }
-
 
   @Override
   protected WroModelFactory newModelFactory() {

@@ -90,9 +90,6 @@ public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProce
         return new CssLint();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void process(final Reader reader, final Writer writer) throws IOException {
         process(null, reader, writer);
@@ -119,16 +116,6 @@ public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProce
      */
     public CssLintProcessor setOptionsAsString(final String options) {
         this.options = options;
-        return this;
-    }
-
-    /**
-     * Sets an array of options. Use {@link #setOptionsAsString(String)} instead.
-     */
-    @Deprecated
-    public CssLintProcessor setOptions(final String... options) {
-        this.options = StringUtils.join(options, ',');
-        LOG.debug("setOptions: {}", this.options);
         return this;
     }
 
