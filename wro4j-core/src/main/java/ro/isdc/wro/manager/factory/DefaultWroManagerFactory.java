@@ -1,6 +1,5 @@
 package ro.isdc.wro.manager.factory;
 
-
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Properties;
@@ -42,8 +41,8 @@ public class DefaultWroManagerFactory
 
   public static DefaultWroManagerFactory create(final ObjectFactory<WroConfiguration> configurationFactory) {
     notNull(configurationFactory);
-    final Properties properties = configurationFactory instanceof PropertiesFactory ? ((PropertiesFactory) configurationFactory).createProperties()
-        : new Properties();
+    final Properties properties = configurationFactory instanceof PropertiesFactory
+        ? ((PropertiesFactory) configurationFactory).createProperties() : new Properties();
     final String wroManagerClassName = configurationFactory.create().getWroManagerClassName();
     if (wroManagerClassName != null) {
       properties.setProperty(ConfigConstants.managerFactoryClassName.name(), wroManagerClassName);
@@ -68,33 +67,35 @@ public class DefaultWroManagerFactory
    * Initialized inner factory based on provided configuration.
    */
   private WroManagerFactory initFactory(final Properties properties) {
+    WroManagerFactory factory = null;
     final String wroManagerClassName = properties.getProperty(ConfigConstants.managerFactoryClassName.name());
     if (StringUtils.isEmpty(wroManagerClassName)) {
       // If no context param was specified we return the default factory
-      return newManagerFactory();
+      factory = newManagerFactory();
     } else {
       // Try to find the specified factory class
       Class<?> factoryClass = null;
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(wroManagerClassName);
-        // Instantiate the factory
-        final WroManagerFactory factory = (WroManagerFactory)factoryClass.newInstance();
-        // inject properties if required
-        if (factory instanceof ConfigurableWroManagerFactory) {
-          ((ConfigurableWroManagerFactory) factory).addConfigProperties(properties);
-        }
-        return factory;
+        factory = (WroManagerFactory) factoryClass.newInstance();
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class:" + wroManagerClassName, e);
       }
     }
+    // add properties if required
+    if (factory instanceof ConfigurableWroManagerFactory) {
+      ((ConfigurableWroManagerFactory) factory).addConfigProperties(properties);
+    }
+    return factory;
   }
 
   /**
+   * @VisibleForTesting
    * @return the default {@link WroManagerFactory} to be used when {@link WroConfiguration} doesn't specify any factory.
+   *         Since 1.8.0, the default manager factory is {@link ConfigurableWroManagerFactory}.
    */
-  protected WroManagerFactory newManagerFactory() {
-    return new BaseWroManagerFactory();
+  WroManagerFactory newManagerFactory() {
+    return new ConfigurableWroManagerFactory();
   }
 
   /**

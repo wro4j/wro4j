@@ -79,4 +79,8 @@ public class DefaultStandaloneContextAwareManagerFactory
     locator.initialize(standaloneContext);
     return locator;
   }
+
+  protected final StandaloneContext getStandaloneContext() {
+    return standaloneContext;
+  }
 }

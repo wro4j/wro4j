@@ -849,6 +849,13 @@ public class TestWroFilter {
     });
   }
 
+  @Test
+  public void shouldDefaultWroManagerFactoryByDefault() throws Exception {
+    victim = new WroFilter();
+    victim.init(mockFilterConfig);
+    assertEquals(DefaultWroManagerFactory.class, victim.getWroManagerFactory().getClass());
+  }
+
   @After
   public void tearDown() {
     if (victim != null) {

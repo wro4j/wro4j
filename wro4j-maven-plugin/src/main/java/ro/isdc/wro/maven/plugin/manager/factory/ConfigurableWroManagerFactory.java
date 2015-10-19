@@ -38,14 +38,12 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 public class ConfigurableWroManagerFactory
     extends ConfigurableStandaloneContextAwareManagerFactory
     implements ExtraConfigFileAware {
-  private StandaloneContext standaloneContext;
   private File configProperties;
 
   @Override
   public void initialize(final StandaloneContext standaloneContext) {
-    super.initialize(standaloneContext);
     Context.get().setConfig(initConfiguration());
-    this.standaloneContext = standaloneContext;
+    super.initialize(standaloneContext);
   }
 
   private WroConfiguration initConfiguration() {
@@ -62,7 +60,7 @@ public class ConfigurableWroManagerFactory
 
       @Override
       protected WroModelFactory getDefaultStrategy() {
-        return SmartWroModelFactory.createFromStandaloneContext(standaloneContext);
+        return SmartWroModelFactory.createFromStandaloneContext(getStandaloneContext());
       }
     };
   }
@@ -95,7 +93,7 @@ public class ConfigurableWroManagerFactory
         final UriLocator locator = super.getInstance(uri);
         // ensure standalone context is provided to each locator requiring it for initialization.
         if (locator != null && locator instanceof StandaloneContextAware) {
-          ((StandaloneContextAware) locator).initialize(standaloneContext);
+          ((StandaloneContextAware) locator).initialize(getStandaloneContext());
         }
         return locator;
       }

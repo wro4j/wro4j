@@ -19,13 +19,15 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.classworlds.ClassRealm;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
 import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
+import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.maven.plugin.support.ExtraConfigFileAware;
 import ro.isdc.wro.maven.plugin.support.ResourceChangeHandler;
 import ro.isdc.wro.model.WroModel;
@@ -33,8 +35,6 @@ import ro.isdc.wro.model.WroModelInspector;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.util.concurrent.TaskExecutor;
-
-import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -149,7 +149,7 @@ public abstract class AbstractWro4jMojo
       if (buildDirectory == null) {
         buildDirectory = new File(mavenProject.getModel().getBuild().getDirectory());
       }
-      
+
       getLog().info(contextFolder);
       getLog().info("Executing the mojo: ");
       getLog().info("Wro4j Model path: " + wroFile.getPath());
@@ -216,49 +216,59 @@ public abstract class AbstractWro4jMojo
       throws Exception;
 
   /**
-   * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}. When
-   * overriding this method, ensure that creating managerFactory performs injection during manager creation, otherwise
-   * the manager won't be initialized properly.
+   * This method will ensure that you have a right and initialized instance of {@link StandaloneContextAware}.
    *
    * @return {@link WroManagerFactory} implementation.
    */
-  protected WroManagerFactory getManagerFactory() {
+  protected final WroManagerFactory getManagerFactory() {
     if (managerFactory == null) {
-      WroManagerFactory localManagerFactory = null;
       try {
-        localManagerFactory = newWroManagerFactory();
+        managerFactory = wroManagerFactory != null ? createCustomManagerFactory() : newWroManagerFactory();
+        onAfterCreate(managerFactory);
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
-      // initialize before process.
-      if (localManagerFactory instanceof StandaloneContextAware) {
-        ((StandaloneContextAware) localManagerFactory).initialize(createStandaloneContext());
-      }
-      managerFactory = decorateManagerFactory(localManagerFactory);
     }
     return managerFactory;
   }
 
   /**
-   * Allows the initialized manager factory to be decorated.
+   * Creates a custom instance of Manager factory. The wroManagerFactory parameter value is used to identify the manager class.
    */
-  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
-    return managerFactory;
+  private WroManagerFactory createCustomManagerFactory()
+      throws MojoExecutionException {
+    WroManagerFactory factory = null;
+    try {
+      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
+          wroManagerFactory.trim());
+      factory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
+    } catch (final Exception e) {
+      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
+    }
+    return factory;
   }
 
   /**
-   * {@inheritDoc}
+   * Allows explicitly to override the default implementation of the factory, assuming {@link #wroManagerFactory}
+   * configuration is not set. When overriding this method, make sure that {@link #onAfterCreate(WroManagerFactory)} is
+   * invoked on newly created factory for proper initialization.
    */
   protected WroManagerFactory newWroManagerFactory()
       throws MojoExecutionException {
     WroManagerFactory factory = null;
-    if (wroManagerFactory != null) {
-      factory = createCustomManagerFactory();
-    } else {
-      factory = new ExtensionsStandaloneManagerFactory();
+    if (wroManagerFactory == null) {
+      factory = new ConfigurableWroManagerFactory();
     }
     getLog().info("wroManagerFactory class: " + factory.getClass().getName());
+    return factory;
+  }
 
+  /**
+   * Initialize the created {@link WroManagerFactory} with additional configurations which are not available during
+   * creation. Make sure this method is invoked on a custom factory when {@link #newWroManagerFactory()} is overridden.
+   */
+  private void onAfterCreate(final WroManagerFactory factory)
+      throws MojoExecutionException {
     if (factory instanceof ExtraConfigFileAware) {
       if (extraConfigFile == null) {
         throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
@@ -266,23 +276,10 @@ public abstract class AbstractWro4jMojo
       getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
       ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
     }
-    return factory;
-  }
-
-  /**
-   * Creates an instance of Manager factory based on the value of the wroManagerFactory plugin parameter value.
-   */
-  private WroManagerFactory createCustomManagerFactory()
-      throws MojoExecutionException {
-    WroManagerFactory managerFactory;
-    try {
-      final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
-          wroManagerFactory.trim());
-      managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
-    } catch (final Exception e) {
-      throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
+    // initialize before process.
+    if (factory instanceof StandaloneContextAware) {
+      ((StandaloneContextAware) factory).initialize(createStandaloneContext());
     }
-    return managerFactory;
   }
 
   /**
@@ -620,7 +617,7 @@ public abstract class AbstractWro4jMojo
   void setBuildContext(final BuildContext buildContext) {
     this.buildContext = buildContext;
   }
-  
+
   /**
    * @VisibleForTesting
    */
