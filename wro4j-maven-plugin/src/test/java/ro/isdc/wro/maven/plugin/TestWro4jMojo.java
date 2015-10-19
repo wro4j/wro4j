@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
@@ -670,7 +671,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
+        return new WroManagerFactoryDecorator(new ExtensionsStandaloneManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);

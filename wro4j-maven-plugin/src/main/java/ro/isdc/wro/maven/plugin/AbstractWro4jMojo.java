@@ -222,17 +222,25 @@ public abstract class AbstractWro4jMojo
    */
   protected final WroManagerFactory getManagerFactory() {
     if (managerFactory == null) {
-      WroManagerFactory localManagerFactory = null;
+      WroManagerFactory factory = null;
       try {
-        localManagerFactory = newWroManagerFactory();
+        factory = wroManagerFactory != null ? createCustomManagerFactory() : newWroManagerFactory();
+
+        if (factory instanceof ExtraConfigFileAware) {
+          if (extraConfigFile == null) {
+            throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
+          }
+          getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
+          ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
+        }
+        // initialize before process.
+        if (factory instanceof StandaloneContextAware) {
+          ((StandaloneContextAware) factory).initialize(createStandaloneContext());
+        }
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
-      // initialize before process.
-      if (localManagerFactory instanceof StandaloneContextAware) {
-        ((StandaloneContextAware) localManagerFactory).initialize(createStandaloneContext());
-      }
-      managerFactory = localManagerFactory;
+      managerFactory = factory;
     }
     return managerFactory;
   }
@@ -240,20 +248,10 @@ public abstract class AbstractWro4jMojo
   protected WroManagerFactory newWroManagerFactory()
       throws MojoExecutionException {
     WroManagerFactory factory = null;
-    if (wroManagerFactory != null) {
-      factory = createCustomManagerFactory();
-    } else {
+    if (wroManagerFactory == null) {
       factory = new ConfigurableWroManagerFactory();
     }
     getLog().info("wroManagerFactory class: " + factory.getClass().getName());
-
-    if (factory instanceof ExtraConfigFileAware) {
-      if (extraConfigFile == null) {
-        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
-      }
-      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
-      ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
-    }
     return factory;
   }
 
