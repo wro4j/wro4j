@@ -23,9 +23,7 @@ public class ConfigurableModelFactory
    * Property name to specify alias.
    */
   public static final String KEY = "modelFactory";
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   protected WroModelFactory getDefaultStrategy() {
     try {
@@ -40,9 +38,6 @@ public class ConfigurableModelFactory
     return new XmlModelFactory();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Map<String, WroModelFactory> getStrategies(final ModelFactoryProvider provider) {
     return provider.provideModelFactories();

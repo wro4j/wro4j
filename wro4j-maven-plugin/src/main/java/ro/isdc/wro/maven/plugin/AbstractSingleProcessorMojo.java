@@ -11,6 +11,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
@@ -121,8 +122,9 @@ public abstract class AbstractSingleProcessorMojo
    * Initialize the manager factory with a processor factory using a single processor.
    */
   @Override
-  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
-    return new WroManagerFactoryDecorator(managerFactory) {
+  protected WroManagerFactory newWroManagerFactory()
+      throws MojoExecutionException {
+    return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
       @Override
       protected void onBeforeBuild(final Builder builder) {
         builder.setProcessorsFactory(createSingleProcessorsFactory());

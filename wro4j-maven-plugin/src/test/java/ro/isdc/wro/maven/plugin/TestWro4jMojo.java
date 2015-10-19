@@ -132,14 +132,14 @@ public class TestWro4jMojo {
     mojo.setBuildDirectory(destinationFolder);
     mojo.setExtraConfigFile(extraConfigFile);
     mojo.setDestinationFolder(destinationFolder);
-    
-    MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
-    Model mockMavenModel = Mockito.mock(Model.class);
-    Build mockBuild = Mockito.mock(Build.class);
+
+    final MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+    final Model mockMavenModel = Mockito.mock(Model.class);
+    final Build mockBuild = Mockito.mock(Build.class);
     Mockito.when(mockMavenProject.getModel()).thenReturn(mockMavenModel);
     Mockito.when(mockMavenModel.getBuild()).thenReturn(mockBuild);
     Mockito.when(mockBuild.getDirectory()).thenReturn(FileUtils.getTempDirectoryPath());
-    
+
     mojo.setMavenProject(mockMavenProject);
     mojo.setBuildContext(mockBuildContext);
   }
@@ -522,8 +522,9 @@ public class TestWro4jMojo {
       throws Exception {
     victim = new Wro4jMojo() {
       @Override
-      protected WroManagerFactory getManagerFactory() {
-        return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+      protected WroManagerFactory newWroManagerFactory()
+          throws MojoExecutionException {
+        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);
@@ -667,8 +668,9 @@ public class TestWro4jMojo {
       throws Exception {
     victim = new Wro4jMojo() {
       @Override
-      protected WroManagerFactory getManagerFactory() {
-        return new WroManagerFactoryDecorator(super.getManagerFactory()) {
+      protected WroManagerFactory newWroManagerFactory()
+          throws MojoExecutionException {
+        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);
@@ -736,10 +738,10 @@ public class TestWro4jMojo {
     victim.setSkip(true);
     victim.execute();
   }
-  
+
   @Test
   public void shouldRefreshParentFolderWhenBuildContextSet() throws Exception {
-    BuildContext buildContext = Mockito.mock(BuildContext.class);
+    final BuildContext buildContext = Mockito.mock(BuildContext.class);
     victim.setBuildContext(buildContext);
     testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
     verify(buildContext, Mockito.atLeastOnce()).refresh(Mockito.eq(destinationFolder));

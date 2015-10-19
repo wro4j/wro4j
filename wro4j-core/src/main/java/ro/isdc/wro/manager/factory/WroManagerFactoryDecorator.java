@@ -2,12 +2,17 @@ package ro.isdc.wro.manager.factory;
 
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
+import ro.isdc.wro.manager.factory.standalone.StandaloneContextAware;
 import ro.isdc.wro.util.AbstractDecorator;
 import ro.isdc.wro.util.DestroyableLazyInitializer;
 
 
 /**
  * Simple decorator for {@link WroManagerFactory}.
+ * <p/>
+ * This class implements als the {@link StandaloneContextAware} in order to allow decoration of factories used in
+ * standalone context (example: maven plugin).
  *
  * @author Alex Objelean
  * @created 23 Jun 2012
@@ -15,7 +20,8 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
  */
 public class WroManagerFactoryDecorator
     extends AbstractDecorator<WroManagerFactory>
-    implements WroManagerFactory {
+    implements WroManagerFactory, StandaloneContextAware {
+
   private final DestroyableLazyInitializer<WroManager> managerInitializer = new DestroyableLazyInitializer<WroManager>() {
     @Override
     protected WroManager initialize() {
@@ -28,8 +34,9 @@ public class WroManagerFactoryDecorator
     public void destroy() {
       getDecoratedObject().destroy();
       super.destroy();
-    };
+    }
   };
+
   public WroManagerFactoryDecorator(final WroManagerFactory managerFactory) {
     super(managerFactory);
   }
@@ -54,5 +61,11 @@ public class WroManagerFactoryDecorator
 
   public void destroy() {
     managerInitializer.destroy();
+  }
+
+  public void initialize(final StandaloneContext standaloneContext) {
+    if (getOriginalDecoratedObject() instanceof StandaloneContextAware) {
+      ((StandaloneContextAware) getOriginalDecoratedObject()).initialize(standaloneContext);
+    }
   }
 }
