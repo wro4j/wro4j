@@ -120,10 +120,7 @@ public abstract class AbstractSingleProcessorMojo
   @Override
   protected final WroManagerFactory newWroManagerFactory()
       throws MojoExecutionException {
-    final WroManagerFactory factory =
-        new ExtensionsStandaloneManagerFactory().setProcessorsFactory(createSingleProcessorsFactory());
-    onAfterCreate(factory);
-    return factory;
+    return new ExtensionsStandaloneManagerFactory().setProcessorsFactory(createSingleProcessorsFactory());
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {

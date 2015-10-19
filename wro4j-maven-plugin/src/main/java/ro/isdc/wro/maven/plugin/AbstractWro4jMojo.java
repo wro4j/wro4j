@@ -224,6 +224,7 @@ public abstract class AbstractWro4jMojo
     if (managerFactory == null) {
       try {
         managerFactory = wroManagerFactory != null ? createCustomManagerFactory() : newWroManagerFactory();
+        onAfterCreate(managerFactory);
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
@@ -244,7 +245,6 @@ public abstract class AbstractWro4jMojo
     } catch (final Exception e) {
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
-    onAfterCreate(factory);
     return factory;
   }
 
@@ -258,7 +258,6 @@ public abstract class AbstractWro4jMojo
     WroManagerFactory factory = null;
     if (wroManagerFactory == null) {
       factory = new ConfigurableWroManagerFactory();
-      onAfterCreate(factory);
     }
     getLog().info("wroManagerFactory class: " + factory.getClass().getName());
     return factory;
@@ -268,7 +267,7 @@ public abstract class AbstractWro4jMojo
    * Initialize the created {@link WroManagerFactory} with additional configurations which are not available during
    * creation. Make sure this method is invoked on a custom factory when {@link #newWroManagerFactory()} is overridden.
    */
-  protected final void onAfterCreate(final WroManagerFactory factory)
+  private void onAfterCreate(final WroManagerFactory factory)
       throws MojoExecutionException {
     if (factory instanceof ExtraConfigFileAware) {
       if (extraConfigFile == null) {

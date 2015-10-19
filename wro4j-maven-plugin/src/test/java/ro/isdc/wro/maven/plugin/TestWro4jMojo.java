@@ -48,9 +48,8 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.manager.WroManager.Builder;
+import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.manager.factory.standalone.DefaultStandaloneContextAwareManagerFactory;
 import ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.model.WroModel;
@@ -524,12 +523,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
-          @Override
-          protected void onBeforeBuild(final Builder builder) {
-            builder.setHashStrategy(mockHashStrategy);
-          }
-        };
+        return new ExtensionsStandaloneManagerFactory().setHashStrategy(mockHashStrategy);
       }
     };
     setUpMojo(victim);
@@ -627,7 +621,6 @@ public class TestWro4jMojo {
           managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(model));
           managerFactory.setNamingStrategy(new DefaultHashEncoderNamingStrategy());
 
-          onAfterCreate(managerFactory);
           return managerFactory;
         }
       };
@@ -672,12 +665,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
-          @Override
-          protected void onBeforeBuild(final Builder builder) {
-            builder.setHashStrategy(mockHashStrategy);
-          }
-        };
+        return new ExtensionsStandaloneManagerFactory().setHashStrategy(mockHashStrategy);
       }
     };
     final String constantHash = "hash";
