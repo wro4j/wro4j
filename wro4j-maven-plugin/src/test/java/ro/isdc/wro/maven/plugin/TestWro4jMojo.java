@@ -525,7 +525,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
+        return new WroManagerFactoryDecorator(new ExtensionsStandaloneManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);
