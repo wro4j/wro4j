@@ -222,37 +222,13 @@ public abstract class AbstractWro4jMojo
    */
   protected final WroManagerFactory getManagerFactory() {
     if (managerFactory == null) {
-      WroManagerFactory factory = null;
       try {
-        factory = wroManagerFactory != null ? createCustomManagerFactory() : newWroManagerFactory();
-
-        if (factory instanceof ExtraConfigFileAware) {
-          if (extraConfigFile == null) {
-            throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
-          }
-          getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
-          ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
-        }
-        // initialize before process.
-        if (factory instanceof StandaloneContextAware) {
-          ((StandaloneContextAware) factory).initialize(createStandaloneContext());
-        }
+        managerFactory = wroManagerFactory != null ? createCustomManagerFactory() : newWroManagerFactory();
       } catch (final MojoExecutionException e) {
         throw WroRuntimeException.wrap(e);
       }
-      managerFactory = factory;
     }
     return managerFactory;
-  }
-
-  protected WroManagerFactory newWroManagerFactory()
-      throws MojoExecutionException {
-    WroManagerFactory factory = null;
-    if (wroManagerFactory == null) {
-      factory = new ConfigurableWroManagerFactory();
-    }
-    getLog().info("wroManagerFactory class: " + factory.getClass().getName());
-    return factory;
   }
 
   /**
@@ -260,15 +236,51 @@ public abstract class AbstractWro4jMojo
    */
   private WroManagerFactory createCustomManagerFactory()
       throws MojoExecutionException {
-    WroManagerFactory managerFactory;
+    WroManagerFactory factory = null;
     try {
       final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
           wroManagerFactory.trim());
-      managerFactory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
+      factory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
     } catch (final Exception e) {
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
-    return managerFactory;
+    onAfterCreate(factory);
+    return factory;
+  }
+
+  /**
+   * Allows explicitly to override the default implementation of the factory, assuming {@link #wroManagerFactory}
+   * configuration is not set. When overriding this method, make sure that {@link #onAfterCreate(WroManagerFactory)} is
+   * invoked on newly created factory for proper initialization.
+   */
+  protected WroManagerFactory newWroManagerFactory()
+      throws MojoExecutionException {
+    WroManagerFactory factory = null;
+    if (wroManagerFactory == null) {
+      factory = new ConfigurableWroManagerFactory();
+      onAfterCreate(factory);
+    }
+    getLog().info("wroManagerFactory class: " + factory.getClass().getName());
+    return factory;
+  }
+
+  /**
+   * Initialize the created {@link WroManagerFactory} with additional configurations which are not available during
+   * creation. Make sure this method is invoked on a custom factory when {@link #newWroManagerFactory()} is overridden.
+   */
+  protected final void onAfterCreate(final WroManagerFactory factory)
+      throws MojoExecutionException {
+    if (factory instanceof ExtraConfigFileAware) {
+      if (extraConfigFile == null) {
+        throw new MojoExecutionException("The " + factory.getClass() + " requires a valid extraConfigFile!");
+      }
+      getLog().debug("Using extraConfigFile: " + extraConfigFile.getAbsolutePath());
+      ((ExtraConfigFileAware) factory).setExtraConfigFile(extraConfigFile);
+    }
+    // initialize before process.
+    if (factory instanceof StandaloneContextAware) {
+      ((StandaloneContextAware) factory).initialize(createStandaloneContext());
+    }
   }
 
   /**

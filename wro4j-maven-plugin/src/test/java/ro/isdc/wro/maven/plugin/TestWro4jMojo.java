@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -40,7 +41,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
@@ -97,7 +96,7 @@ public class TestWro4jMojo {
   @Before
   public void setUp()
       throws Exception {
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
     mockLocatorFactory = new UriLocatorFactory() {
       public InputStream locate(final String uri)
           throws IOException {
@@ -525,7 +524,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(new ExtensionsStandaloneManagerFactory()) {
+        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);
@@ -627,6 +626,8 @@ public class TestWro4jMojo {
           managerFactory.setUriLocatorFactory(WroTestUtils.createResourceMockingLocatorFactory());
           managerFactory.setModelFactory(WroTestUtils.simpleModelFactory(model));
           managerFactory.setNamingStrategy(new DefaultHashEncoderNamingStrategy());
+
+          onAfterCreate(managerFactory);
           return managerFactory;
         }
       };
@@ -671,7 +672,7 @@ public class TestWro4jMojo {
       @Override
       protected WroManagerFactory newWroManagerFactory()
           throws MojoExecutionException {
-        return new WroManagerFactoryDecorator(new ExtensionsStandaloneManagerFactory()) {
+        return new WroManagerFactoryDecorator(super.newWroManagerFactory()) {
           @Override
           protected void onBeforeBuild(final Builder builder) {
             builder.setHashStrategy(mockHashStrategy);

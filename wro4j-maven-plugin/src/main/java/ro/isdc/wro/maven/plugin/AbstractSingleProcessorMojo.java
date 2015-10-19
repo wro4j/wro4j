@@ -18,9 +18,7 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -120,14 +118,12 @@ public abstract class AbstractSingleProcessorMojo
    * Initialize the manager factory with a processor factory using a single processor.
    */
   @Override
-  protected WroManagerFactory newWroManagerFactory()
+  protected final WroManagerFactory newWroManagerFactory()
       throws MojoExecutionException {
-    return new WroManagerFactoryDecorator(new ExtensionsStandaloneManagerFactory()) {
-      @Override
-      protected void onBeforeBuild(final Builder builder) {
-        builder.setProcessorsFactory(createSingleProcessorsFactory());
-      }
-    };
+    final WroManagerFactory factory =
+        new ExtensionsStandaloneManagerFactory().setProcessorsFactory(createSingleProcessorsFactory());
+    onAfterCreate(factory);
+    return factory;
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {
