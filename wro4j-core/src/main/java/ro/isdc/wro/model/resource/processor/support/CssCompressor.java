@@ -266,7 +266,7 @@ public class CssCompressor {
         // Test if hex code can be smaller as a named colour
         final String hex = m.group(3) + m.group(4) + m.group(5) + m.group(6) + m.group(7) + m.group(8);
         if (colorMap.containsKey(hex)) {
-          m.appendReplacement(sb, m.group(1) + m.group(2) + "#" + colorMap.get(hex));
+          m.appendReplacement(sb, m.group(1) + m.group(2) + colorMap.get(hex));
         } else {
           m.appendReplacement(sb, m.group());
         }
