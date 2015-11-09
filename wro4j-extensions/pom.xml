@@ -65,8 +65,8 @@
             <artifactId>jruby-stdlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>me.n4u.sass</groupId>
-            <artifactId>sass-gems</artifactId>
+            <groupId>com.darrinholst</groupId>
+            <artifactId>sass-java-gems</artifactId>
         </dependency>
         <dependency>
             <groupId>nz.co.edmi</groupId>

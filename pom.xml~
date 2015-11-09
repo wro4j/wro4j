@@ -188,10 +188,8 @@
                 <artifactId>sass-java-gems</artifactId>
                 <version>3.4.4.3</version>
                 <exclusions>
-		    <exclusion>
 	                <groupId>org.jruby</groupId>
 	                <artifactId>jruby-complete</artifactId>
-		    </exclusion>
 		</exclusions>
             </dependency>
             <dependency>

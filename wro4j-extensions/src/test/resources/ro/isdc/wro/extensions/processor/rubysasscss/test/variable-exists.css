@@ -1,0 +1,5 @@
+@if variable-exists(testVar) {
+  .body {
+    background-color: $testVar;
+  }
+}
