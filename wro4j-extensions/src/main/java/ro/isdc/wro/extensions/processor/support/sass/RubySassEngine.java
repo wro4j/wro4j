@@ -1,4 +1,4 @@
-package com.ned.csstheme.web.framework;
+package ro.isdc.wro.extensions.processor.support.sass;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,8 +24,8 @@ import ro.isdc.wro.WroRuntimeException;
  * @created 12 Feb 2012
  * @since 1.4.4
  */
-public class PathAwareRubySassEngine {
-  private static final Logger LOG = LoggerFactory.getLogger(PathAwareRubySassEngine.class);
+public class RubySassEngine {
+  private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
@@ -33,7 +33,7 @@ public class PathAwareRubySassEngine {
   private final Set<String> requires;
   private final Set<String> loadPaths;
 
-  public PathAwareRubySassEngine() {
+  public RubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
@@ -118,7 +118,8 @@ public class PathAwareRubySassEngine {
 
     script.println("engine.options[:load_paths].tap do |load_paths|");
     for (final String loadPath : loadPaths) {
-        script.println("  load_paths << Sass::Importers::Filesystem.new('"+loadPath.replaceAll("'", "\\'").replaceAll("\\\\", "/")+"')");
+      script.println("  load_paths << Sass::Importers::Filesystem.new('"
+          + loadPath.replaceAll("'", "\\'").replaceAll("\\\\", "/") + "')");
     }
     script.println("end");
     //script.println("result = engine.options[:load_paths]");
