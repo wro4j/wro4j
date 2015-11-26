@@ -22,8 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,6 +36,7 @@ import org.junit.ComparisonFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import junit.framework.AssertionFailedError;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -287,7 +286,7 @@ public class WroTestUtils {
       final String srcExtension, final String targetExtension, final ResourcePostProcessor processor)
       throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
-        Transformers.extensionTransformer("css"), processor);
+        Transformers.extensionTransformer(targetExtension), processor);
   }
 
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
