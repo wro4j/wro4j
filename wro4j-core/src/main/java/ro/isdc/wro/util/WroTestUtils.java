@@ -283,7 +283,7 @@ public class WroTestUtils {
    * target files to have different extensions. TODO run tests in parallel
    */
   public static void compareFromDifferentFoldersByName(final File sourceFolder, final File targetFolder,
-      final String srcExtension, final String targetExtension, final ResourcePostProcessor processor)
+      final String srcExtension, final String targetExtension, final ResourcePreProcessor processor)
       throws IOException {
     compareFromDifferentFolders(sourceFolder, targetFolder, new WildcardFileFilter("*." + srcExtension),
         Transformers.extensionTransformer(targetExtension), processor);

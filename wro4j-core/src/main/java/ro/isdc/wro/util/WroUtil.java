@@ -118,7 +118,7 @@ public final class WroUtil {
     final String noSlash = location.substring(1);
     final int nextSlash = noSlash.indexOf('/');
     if (nextSlash == -1) {
-      return "";
+      return StringUtils.EMPTY;
     }
     final String pathInfo = noSlash.substring(nextSlash);
     return pathInfo;

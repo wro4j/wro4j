@@ -1,5 +1,7 @@
 package ro.isdc.wro.extensions.processor.support.sass;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashSet;
@@ -10,7 +12,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class RubySassEngine {
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
 
   private final Set<String> requires;
-  private final Set<String> loadPaths;
+  private final Set<String> loadPaths = new LinkedHashSet<String>();
 
   public RubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
@@ -39,7 +40,6 @@ public class RubySassEngine {
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);
     requires.add(SASS_ENGINE_REQUIRE);
-    loadPaths = new LinkedHashSet<String>();
   }
 
   /**
@@ -55,7 +55,7 @@ public class RubySassEngine {
   }
 
   public void addLoadPath(final String loadPath) {
-    if (loadPath != null && loadPath.trim().length() > 0) {
+    if (StringUtils.isNotBlank(loadPath)) {
     	loadPaths.add(loadPath.trim());
     }
   }
@@ -80,7 +80,7 @@ public class RubySassEngine {
   }
 
   private String buildUpdateScript(final String content) {
-    Validate.notNull(content);
+    notNull(content);
     final StringWriter raw = new StringWriter();
     final PrintWriter script = new PrintWriter(raw);
     final StringBuilder sb = new StringBuilder();
@@ -128,4 +128,10 @@ public class RubySassEngine {
     script.flush();
     return raw.toString();
   }
+
+  public Set<String> getLoadPaths() {
+    return loadPaths;
+  }
+
+
 }

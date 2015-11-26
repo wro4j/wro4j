@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,6 +54,12 @@ public class RubySassCssProcessor
     final String content = IOUtils.toString(reader);
     final RubySassEngine engine = enginePool.getObject();
     try {
+      if (resource != null) {
+        final String parentFolderPath = FilenameUtils.getFullPath(resource.getUri());
+        engine.addLoadPath(parentFolderPath);
+        //TODO clean loadPath before returning engine to the pool
+      }
+
       writer.write(engine.process(content));
     } catch (final WroRuntimeException e) {
       onException(e);
