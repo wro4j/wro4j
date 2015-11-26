@@ -1,4 +1,4 @@
-package ro.isdc.wro.extensions.processor.support.sass;
+package com.ned.csstheme.web.framework;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,20 +24,22 @@ import ro.isdc.wro.WroRuntimeException;
  * @created 12 Feb 2012
  * @since 1.4.4
  */
-public class RubySassEngine {
-  private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
+public class PathAwareRubySassEngine {
+  private static final Logger LOG = LoggerFactory.getLogger(PathAwareRubySassEngine.class);
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
 
   private final Set<String> requires;
+  private final Set<String> loadPaths;
 
-  public RubySassEngine() {
+  public PathAwareRubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);
     requires.add(SASS_ENGINE_REQUIRE);
+    loadPaths = new LinkedHashSet<String>();
   }
 
   /**
@@ -49,6 +51,12 @@ public class RubySassEngine {
   public void addRequire(final String require) {
     if (require != null && require.trim().length() > 0) {
       requires.add(require.trim());
+    }
+  }
+
+  public void addLoadPath(final String loadPath) {
+    if (loadPath != null && loadPath.trim().length() > 0) {
+    	loadPaths.add(loadPath.trim());
     }
   }
 
@@ -82,6 +90,7 @@ public class RubySassEngine {
     for (final String require : requires) {
       script.println("  require '" + require + "'                                   ");
     }
+
     final int BACKSLASH = 0x5c;
     for (int i = 0; i < content.length(); i++) {
       final int code = content.codePointAt(i);
@@ -101,11 +110,20 @@ public class RubySassEngine {
         cb.append(String.format("\\u%04x", code));
       }
     }
-    final String scriptAsString = String.format("result = Sass::Engine.new(\"%s\", {%s}).render",
+    final String scriptAsString = String.format("engine = Sass::Engine.new(\"%s\", {%s})",
         cb.toString().replace("\"", "\\\"").replace("#", "\\#"), // escape ", #
         sb.toString());
     LOG.debug("scriptAsString: {}", scriptAsString);
     script.println(scriptAsString);
+
+    script.println("engine.options[:load_paths].tap do |load_paths|");
+    for (final String loadPath : loadPaths) {
+        script.println("  load_paths << Sass::Importers::Filesystem.new('"+loadPath.replaceAll("'", "\\'").replaceAll("\\\\", "/")+"')");
+    }
+    script.println("end");
+    //script.println("result = engine.options[:load_paths]");
+
+    script.println("result = engine.render");
     script.flush();
     return raw.toString();
   }
