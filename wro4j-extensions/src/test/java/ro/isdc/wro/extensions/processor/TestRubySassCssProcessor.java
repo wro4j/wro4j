@@ -112,4 +112,25 @@ public class TestRubySassCssProcessor {
     processor.process(null, new StringReader(sass), new StringWriter());
   }
 
+  @Test
+  public void test()
+      throws Exception {
+//    final File testFolder = new File(url.getFile(), "test/foundation");
+//    final File testFile = new File(testFolder, "foundation.scss");
+//
+//    try {
+//      processor.process(Resource.create(testFile.getAbsolutePath(), ResourceType.CSS), new FileReader(testFile), new StringWriter());
+//
+//      fail("Should have failed");
+//    } catch (final Exception e) {
+//
+//    }
+
+    final File rootTestFolder = new File(url.getFile(), "test");
+    final File testFolder = new File(rootTestFolder, "foundation");
+    final File expectedFolder = new File(rootTestFolder, "foundation");
+    WroTestUtils.compareFromDifferentFoldersByName(testFolder, expectedFolder, "scss", "scss", processor);
+  }
+
+
 }
