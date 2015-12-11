@@ -70,7 +70,7 @@ public class JarWildcardStreamLocator
   private boolean isSupported(final File jarPath) {
     LOG.debug("jarPath: {}", jarPath);
     for (final String supportedExtension : SUPPORTED_EXTENSIONS) {
-      if (jarPath.getPath().endsWith(supportedExtension)) {
+      if (jarPath.getPath().endsWith(supportedExtension) && !jarPath.getPath().contains("!/")) {
         return true;
       }
     }

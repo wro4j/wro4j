@@ -1,17 +1,6 @@
 {
   "groups": [
     {
-      "name": "test",
-      "resources": [
-        {
-          "type": "JS",
-          "minimize": true,
-          "uri": "test.js",
-          "proxyUri": "/wro/?wroAPI=wroResources&id=test.js"
-        }
-      ]
-    },
-    {
       "name": "external",
       "resources": [
         {
@@ -25,6 +14,17 @@
           "minimize": true,
           "uri": "http://www.site.com/style.css",
           "proxyUri": "http://www.site.com/style.css"
+        }
+      ]
+    },
+    {
+      "name": "test",
+      "resources": [
+        {
+          "type": "JS",
+          "minimize": true,
+          "uri": "test.js",
+          "proxyUri": "/wro/?wroAPI=wroResources&id=test.js"
         }
       ]
     }
