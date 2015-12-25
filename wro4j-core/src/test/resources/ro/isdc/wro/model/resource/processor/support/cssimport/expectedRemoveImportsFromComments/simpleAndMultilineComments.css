@@ -1,3 +1,6 @@
+//** deleting the comment removes the problem
+@body-bg:               #fff;
+
 @import  "variables.less";
 @mainColor: blue;
 
