@@ -1,8 +1,13 @@
 package ro.isdc.wro.extensions.processor.support.sass;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.script.ScriptEngine;
@@ -29,6 +34,7 @@ public class RubySassEngine {
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
+  private static final String SASS_PROPERTIES = "sass.properties";
 
   private final Set<String> requires;
 
@@ -70,6 +76,26 @@ public class RubySassEngine {
       throw new WroRuntimeException(e.getMessage(), e);
     }
   }
+  
+  private void findLoadPaths(URL scssProperties, ArrayList<String> loadPaths) {
+	try {
+	  LOG.debug("Process sass.properties file: " + scssProperties);
+	  Properties props = new Properties();
+	  props.load(scssProperties.openStream());
+	  // add the location of the file
+	  String startPath = scssProperties.getPath().replace(SASS_PROPERTIES, ""); 
+	  loadPaths.add(startPath);
+	  String search = (String) props.get("loadPaths");
+	  if (search != null) {
+		String searchPaths[] = search.split(",");
+		for (String path : searchPaths) {
+		  loadPaths.add(startPath + path);
+		}
+	  }
+	} catch (Exception e) {
+	  LOG.warn("Could not open scss properties file " + scssProperties, e);
+	}
+  }
 
   private String buildUpdateScript(final String content) {
     Validate.notNull(content);
@@ -101,6 +127,32 @@ public class RubySassEngine {
         cb.append(String.format("\\u%04x", code));
       }
     }
+	try {
+		Enumeration<URL> scssProperties = ClassLoader.getSystemResources(SASS_PROPERTIES);
+		LOG.debug("sass.properties file located in classpath?" + scssProperties.hasMoreElements());
+		ArrayList<String> loadPaths = new ArrayList<String>();
+		while(scssProperties.hasMoreElements()){
+			findLoadPaths(scssProperties.nextElement(), loadPaths);
+		}
+		if (loadPaths.size() > 0) {
+			sb.append(", :load_paths => [");
+			boolean firstPath = true;
+			for (String path : loadPaths) {
+				if (!firstPath) {
+					sb.append(",");
+				}
+				else {
+					firstPath = false;
+				}
+				sb.append("'" + path + "'");
+			}
+			sb.append("]");
+		}
+		LOG.debug("options to be passed to Sass::Engine " + sb.toString());
+	} catch (IOException e) {
+		LOG.warn("Could not process sass.properties",e);
+	}
+	
     final String scriptAsString = String.format("result = Sass::Engine.new(\"%s\", {%s}).render",
         cb.toString().replace("\"", "\\\"").replace("#", "\\#"), // escape ", #
         sb.toString());
