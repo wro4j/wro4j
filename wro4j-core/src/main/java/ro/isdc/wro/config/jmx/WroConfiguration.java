@@ -35,7 +35,7 @@ public class WroConfiguration
   /**
    * Default value for connectionTimeout property.
    */
-  public static int DEFAULT_CONNECTION_TIMEOUT = 2000;
+  public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
   /**
    * How often to run a thread responsible for refreshing the cache.
    */
