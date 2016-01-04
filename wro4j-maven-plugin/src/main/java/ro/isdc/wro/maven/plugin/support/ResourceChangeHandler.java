@@ -200,13 +200,12 @@ public class ResourceChangeHandler {
         return CssImportPreProcessor.class.getSimpleName();
       }
     };
-    final ResourcePreProcessor processor = new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
+    return new ExceptionHandlingProcessorDecorator(cssImportProcessor) {
       @Override
       protected boolean isIgnoreFailingProcessor() {
         return true;
       }
     };
-    return processor;
   }
 
   private BuildContextHolder getBuildContextHolder() {

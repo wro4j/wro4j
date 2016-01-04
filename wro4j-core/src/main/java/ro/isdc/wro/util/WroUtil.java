@@ -120,8 +120,7 @@ public final class WroUtil {
     if (nextSlash == -1) {
       return "";
     }
-    final String pathInfo = noSlash.substring(nextSlash);
-    return pathInfo;
+    return noSlash.substring(nextSlash);
   }
 
   /**

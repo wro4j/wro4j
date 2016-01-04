@@ -95,7 +95,7 @@ public class TestCssDataUriPreProcessor {
    *         proxy resources from classpath. This is useful to make test pass without internet connection.
    */
   private UriLocatorFactory createLocatorFactory() {
-    final UriLocatorFactory locatorFactory = new SimpleUriLocatorFactory().addLocator(new ServletContextUriLocator() {
+    return new SimpleUriLocatorFactory().addLocator(new ServletContextUriLocator() {
       @Override
       public InputStream locate(final String uri)
           throws IOException {
@@ -116,7 +116,6 @@ public class TestCssDataUriPreProcessor {
         return super.locate(uri);
       }
     });
-    return locatorFactory;
   }
   
   @Test

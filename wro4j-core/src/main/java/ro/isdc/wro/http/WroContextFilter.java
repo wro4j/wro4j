@@ -76,8 +76,7 @@ public class WroContextFilter
    */
   private WroConfiguration getWroConfiguration() {
     final WroConfiguration configAttribute = getServletContextAttributeHelper().getWroConfiguration();
-    final WroConfiguration config = configAttribute != null ? configAttribute : new WroConfiguration();
-    return config;
+    return configAttribute != null ? configAttribute : new WroConfiguration();
   }
 
   /**

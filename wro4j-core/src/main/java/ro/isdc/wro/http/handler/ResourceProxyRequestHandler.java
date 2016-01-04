@@ -130,8 +130,7 @@ public class ResourceProxyRequestHandler
   }
 
   private String getResourceUri(final HttpServletRequest request) {
-    final String resourceUri = request.getParameter(PARAM_RESOURCE_ID);
-    return resourceUri;
+    return request.getParameter(PARAM_RESOURCE_ID);
   }
 
   private final ResponseHeadersConfigurer getHeadersConfigurer() {
