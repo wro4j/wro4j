@@ -520,9 +520,11 @@ public class Base64 {
         oos.close();
       } catch (final Exception e) {
       }
-      try {
-        gzos.close();
-      } catch (final Exception e) {
+      if (gzos != null) {
+        try {
+          gzos.close();
+        } catch (final Exception e) {
+        }
       }
       try {
         b64os.close();
