@@ -37,9 +37,6 @@ public class ChainedProcessor
     return new ChainedProcessor(processorsAsList);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     Reader tempReader = reader;

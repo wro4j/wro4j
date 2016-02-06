@@ -8,7 +8,7 @@
     <artifactId>wro4j-parent</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.isdc.wro4j</groupId>
-    <version>1.7.8</version>
+    <version>1.7.10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>wro4j parent</name>
     <inceptionYear>2008</inceptionYear>
@@ -34,7 +34,7 @@
         <connection>scm:git:git://github.com/wro4j/wro4j.git</connection>
         <developerConnection>scm:git:git://github.com/wro4j/wro4j.git</developerConnection>
         <url>http://github.com/wro4j/wro4j.git</url>
-        <tag>wro4j-parent-1.7.8</tag>
+        <tag>wro4j-parent-1.7.9</tag>
   </scm>
     <mailingLists>
         <mailingList>
@@ -57,8 +57,7 @@
             <timezone>+2</timezone>
         </developer>
     </developers>
-    <properties>
-        <wro4j.version>1.5.1-SNAPSHOT</wro4j.version>
+    <properties>        
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.4</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
@@ -192,7 +191,7 @@
             <dependency>
                 <groupId>com.github.sommeri</groupId>
                 <artifactId>less4j</artifactId>
-                <version>1.13.0</version>
+                <version>1.14.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -321,23 +320,23 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>2.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.3.7</version>
+                    <version>3.0.0</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.10</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.10.3</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -353,6 +352,24 @@
             </plugins>
         </pluginManagement>
         <plugins>
+   	    <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shortRevisionLength>8</shortRevisionLength>
+                    <doCheck>true</doCheck>
+                    <doUpdate>false</doUpdate>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -366,7 +383,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>2.4</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -380,12 +397,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>			
                         </manifest>
+			<manifestEntries>
+             		    <Implementation-Build>$\{buildNumber}</Implementation-Build>
+	                </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -393,23 +413,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <tagBase>http://github.com/alexo/wro4j/tree/</tagBase>
+                    <tagBase>http://github.com/wro4j/wro4j/tree/</tagBase>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>1.3.1</version>
+                <version>2.2</version>
                 <inherited>true</inherited>
             </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-2</version>
-            </extension>
-        </extensions>
     </build>
     <reporting>
         <outputDirectory>${basedir}/target/site</outputDirectory>

@@ -1,3 +1,11 @@
+---
+title: Introduction 
+tags: [getting-started]
+keywords: start, introduction, begin, install, build, hello world,
+last_updated: August 12, 2015
+summary: "A brief introduction and describes the purpose of the project"
+---
+
 # summary 
 A brief introduction and describes the purpose of the project
 

@@ -54,9 +54,6 @@ public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProce
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
         final String content = IOUtils.toString(reader);

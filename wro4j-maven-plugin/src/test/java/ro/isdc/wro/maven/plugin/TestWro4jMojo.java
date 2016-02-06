@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -734,6 +735,14 @@ public class TestWro4jMojo {
     }
     victim.setSkip(true);
     victim.execute();
+  }
+  
+  @Test
+  public void shouldRefreshParentFolderWhenBuildContextSet() throws Exception {
+    BuildContext buildContext = Mockito.mock(BuildContext.class);
+    victim.setBuildContext(buildContext);
+    testMojoWithConfigurableWroManagerFactoryWithValidConfigFileSet();
+    verify(buildContext, Mockito.atLeastOnce()).refresh(Mockito.eq(destinationFolder));
   }
 
   @After

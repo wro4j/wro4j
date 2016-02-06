@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.ByteArrayInputStream;
@@ -195,7 +196,7 @@ public final class WroUtil {
    * @return ServletPath string value.
    */
   public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
-    return location.replace(getPathInfoFromLocation(request, location), "");
+    return location.replace(getPathInfoFromLocation(request, location), StringUtils.EMPTY);
   }
 
   /**
@@ -318,12 +319,15 @@ public final class WroUtil {
    * @return regular expression value.
    */
   public static String loadRegexpWithKey(final String key) {
+    InputStream stream = null;
     try {
-      final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
+      stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
       return props.getProperty(key);
     } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
+    } finally {
+      closeQuietly(stream);
     }
   }
 
@@ -404,7 +408,7 @@ public final class WroUtil {
    * Removes the query string from the provided path (everything followed by '?' including the question mark).
    */
   public static final String removeQueryString(final String path) {
-    return path.replaceFirst("\\?.*", "");
+    return path.replaceFirst("\\?.*", StringUtils.EMPTY);
   }
 
   /**
