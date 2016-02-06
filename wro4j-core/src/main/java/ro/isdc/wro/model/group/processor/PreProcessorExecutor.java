@@ -209,7 +209,7 @@ public class PreProcessorExecutor {
         resourceContent = writer.toString();
       }
     }
-	// following block of code (if-block) provided by Umar Ali Khan 6-Feb-2016 12:40am PST
+	// following block of code (if-block) provided by Umar Ali Khan 6-Feb-2016 7:00pm PST
 	if (resourceContent.length() <= 2) { 
 	  resourceContent = "";
 	}
