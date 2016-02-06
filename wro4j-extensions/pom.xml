@@ -4,7 +4,7 @@
     <parent>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-parent</artifactId>
-        <version>1.7.8</version>
+        <version>1.7.10-SNAPSHOT</version>
     </parent>
     <artifactId>wro4j-extensions</artifactId>
     <packaging>jar</packaging>
@@ -108,7 +108,12 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>coffee-script</artifactId>
-            <version>1.9.3</version>
+            <version>1.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>envjs</artifactId>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>

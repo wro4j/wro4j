@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class TestCssImportInspector {
     return new ResourcePreProcessor() {
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
-        writer.write(createCssImportInspector("").removeImportsFromComments(IOUtils.toString(reader)));
+        writer.write(createCssImportInspector(StringUtils.EMPTY).removeImportsFromComments(IOUtils.toString(reader)));
       }
     };
   }

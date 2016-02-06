@@ -2,10 +2,11 @@
   var error;
 
   alert((function() {
+    var error1;
     try {
       return nonexistent / void 0;
-    } catch (_error) {
-      error = _error;
+    } catch (error1) {
+      error = error1;
       return "And the error is ... " + error;
     }
   })());

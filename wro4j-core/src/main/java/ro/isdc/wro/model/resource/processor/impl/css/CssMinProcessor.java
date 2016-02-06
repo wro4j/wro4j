@@ -35,18 +35,11 @@ public class CssMinProcessor
   private static final Logger LOG = LoggerFactory.getLogger(CssMinProcessor.class);
   public static final String ALIAS = "cssMin";
 
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Reader reader, final Writer writer)
     throws IOException {
     process(null, reader, writer);
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
     try {

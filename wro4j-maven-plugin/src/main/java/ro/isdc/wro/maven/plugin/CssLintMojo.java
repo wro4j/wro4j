@@ -50,9 +50,6 @@ public class CssLintMojo
    */
   private String reportFormat = FormatterType.LINT.getFormat();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
     final ResourcePreProcessor processor = new CssLintProcessor() {
@@ -77,8 +74,8 @@ public class CssLintMojo
                 + e.getErrors());
         // collect found errors
         addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
-        if (!isFailNever()) {
-          throw new WroRuntimeException("Errors found when validating resource: " + resource);
+        if (isFailAllowed()) {
+          throw e;
         }
       };
     }.setOptionsAsString(getOptions());
@@ -90,26 +87,16 @@ public class CssLintMojo
     return resourceType == ResourceType.CSS;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ReportXmlFormatter createXmlFormatter(final LintReport<CssLintError> lintReport, final FormatterType type) {
     return ReportXmlFormatter.createForCssLintError(lintReport, type);
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected File getReportFile() {
     return reportFile;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getReportFormat() {
     return reportFormat;
