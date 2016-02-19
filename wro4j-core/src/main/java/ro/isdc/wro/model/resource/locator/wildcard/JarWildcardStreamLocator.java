@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -52,8 +53,8 @@ public class JarWildcardStreamLocator
    * supports .jar extension.
    */
   private static final List<String> SUPPORTED_EXTENSIONS = asList(".jar");
-  private static final String EMBEDDED_JAR_PREFIX = "!/";
-  public static final String PREFIX_FILE = "file:";
+  private static final String EMBEDDED_JAR_PREFIX = "!" + File.separatorChar;
+  private static final String PREFIX_FILE = "file:";
 
   /**
    * Finds the specified URI pattern inside a JAR file. If the specified file isn't a valid JAR default strategy will be
