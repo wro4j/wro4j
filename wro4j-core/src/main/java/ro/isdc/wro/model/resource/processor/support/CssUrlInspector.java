@@ -100,8 +100,7 @@ public class CssUrlInspector {
      * }
      * </pre>
      */
-    final String originalUrl = groupA != null ? groupA : matcher.group(2);
-    return originalUrl;
+    return groupA != null ? groupA : matcher.group(2);
   }
 
   /**

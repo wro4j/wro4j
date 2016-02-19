@@ -189,13 +189,12 @@ public class TestJarWildcardStreamLocator {
         filenameListHolder.set(filenameList);
       }
     };
-    final UriLocator uriLocator = new ClasspathUriLocator() {
+    return new ClasspathUriLocator() {
       @Override
       public WildcardStreamLocator newWildcardStreamLocator() {
         return jarStreamLocator;
       }
     };
-    return uriLocator;
   }
   
   @Test

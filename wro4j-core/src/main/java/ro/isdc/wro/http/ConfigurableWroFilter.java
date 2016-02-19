@@ -71,8 +71,7 @@ public class ConfigurableWroFilter
         properties.setProperty(ConfigConstants.mbeanName.name(), mbeanName);
       }
     }
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(properties);
-    return factory;
+    return new PropertyWroConfigurationFactory(properties);
   }
 
   /**

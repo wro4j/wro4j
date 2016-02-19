@@ -51,7 +51,7 @@ public class JsHintMojo
 
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
-    final ResourcePreProcessor processor = new JsHintProcessor() {
+    return new JsHintProcessor() {
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -79,7 +79,6 @@ public class JsHintMojo
         }
       };
     }.setOptionsAsString(getOptions());
-    return processor;
   }
 
   @Override

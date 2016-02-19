@@ -554,8 +554,7 @@ public class TestWroFilter {
     final WroFilter theFilter = new WroFilter() {
       @Override
       protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
-        final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(props);
-        return factory;
+        return new PropertyWroConfigurationFactory(props);
       }
     };
     // initFilterWithValidConfig(theFilter);

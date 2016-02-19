@@ -77,7 +77,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
 
   @Override
   protected UriLocatorFactory newUriLocatorFactory() {
-    final ConfigurableLocatorFactory factory = new ConfigurableLocatorFactory() {
+    return new ConfigurableLocatorFactory() {
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
@@ -91,7 +91,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return map;
       }
     };
-    return factory;
   }
 
 
@@ -100,7 +99,7 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
    */
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
-    final ConfigurableProcessorsFactory factory = new ConfigurableProcessorsFactory() {
+    return new ConfigurableProcessorsFactory() {
       @Override
       protected Properties newProperties() {
         final Properties props = new Properties();
@@ -121,7 +120,6 @@ public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
         return map;
       }
     };
-    return factory;
   }
 
   @Override

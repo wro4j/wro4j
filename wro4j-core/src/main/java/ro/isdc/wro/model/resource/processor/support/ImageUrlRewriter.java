@@ -117,9 +117,8 @@ public class ImageUrlRewriter {
 
   private String prependContextPath(final String imageUrl) {
     //avoid double slash
-    final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
+    return context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
         : context.contextPath + imageUrl;
-    return contextRelativeUrl;
   }
 
   /**

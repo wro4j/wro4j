@@ -116,9 +116,8 @@ public class CssVariablesProcessor
     }
     m.appendTail(sb);
 
-    final String result = replaceVariables(sb.toString(), map);
     // LOG.debug("replaced variables: " + result);
-    return result;
+    return replaceVariables(sb.toString(), map);
   }
 
   /**

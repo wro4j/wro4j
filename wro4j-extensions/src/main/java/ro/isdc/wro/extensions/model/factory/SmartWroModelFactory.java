@@ -215,9 +215,8 @@ public class SmartWroModelFactory
    * @return string representation of the factory name.
    */
   protected String getClassName(final Class<? extends WroModelFactory> factoryClass) {
-    final String className = factoryClass.isAnonymousClass() ? factoryClass.getSuperclass().getSimpleName()
+    return factoryClass.isAnonymousClass() ? factoryClass.getSuperclass().getSimpleName()
         : factoryClass.getSimpleName();
-    return className;
   }
 
   /**

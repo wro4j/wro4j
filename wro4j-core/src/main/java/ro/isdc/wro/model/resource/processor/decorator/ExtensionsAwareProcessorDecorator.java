@@ -78,7 +78,7 @@ public class ExtensionsAwareProcessorDecorator
     // null resource also means that processor is applicable, since we cannot check the extension (postProcessor).
     final boolean isApplicable = resource == null || extensions.contains(resourceExtension);
     if (isApplicable) {
-      LOG.debug("[OK] Process resource {} with extension: {}", resource.getUri(), resourceExtension);
+      LOG.debug("[OK] Process resource {} with extension: {}", resource != null ? resource.getUri() : "null", resourceExtension);
     }
     return isApplicable;
   }

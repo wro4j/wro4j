@@ -133,8 +133,7 @@ public class ResourceWatcherRequestHandler
    */
   public static String createHandlerRequestPath(final CacheKey cacheKey, final HttpServletRequest request) {
     final String handlerQueryPath = getRequestHandlerPath(cacheKey.getGroupName(), cacheKey.getType());
-    final String location = request.getServletPath() + handlerQueryPath;
-    return location;
+    return request.getServletPath() + handlerQueryPath;
   }
 
   private static String getRequestHandlerPath() {

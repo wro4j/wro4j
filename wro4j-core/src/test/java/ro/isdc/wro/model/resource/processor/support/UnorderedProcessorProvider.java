@@ -18,8 +18,8 @@ import ro.isdc.wro.model.resource.processor.impl.js.JSMinProcessor;
  */
 public class UnorderedProcessorProvider
     implements ProcessorProvider {
-  public static ResourcePreProcessor CUSTOM = new ProcessorDecorator(new JSMinProcessor());
-  public static ResourcePreProcessor CONFORM_COLORS = new ProcessorDecorator(new ConformColorsCssProcessor());
+  public static final ResourcePreProcessor CUSTOM = new ProcessorDecorator(new JSMinProcessor());
+  public static final ResourcePreProcessor CONFORM_COLORS = new ProcessorDecorator(new ConformColorsCssProcessor());
 
   /**
    * {@inheritDoc}

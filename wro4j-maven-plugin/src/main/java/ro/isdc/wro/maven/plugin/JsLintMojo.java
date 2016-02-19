@@ -52,7 +52,7 @@ public class JsLintMojo
 
   @Override
   protected ResourcePreProcessor createResourceProcessor() {
-    final ResourcePreProcessor processor = new JsLintProcessor() {
+    return new JsLintProcessor() {
       @Override
       public void process(final Resource resource, final Reader reader, final Writer writer)
           throws IOException {
@@ -82,7 +82,6 @@ public class JsLintMojo
         }
       };
     }.setOptionsAsString(getOptions());
-    return processor;
   }
 
   @Override
