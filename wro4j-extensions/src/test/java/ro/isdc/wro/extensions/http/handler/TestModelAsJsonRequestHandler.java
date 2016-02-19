@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -61,7 +62,7 @@ public class TestModelAsJsonRequestHandler {
   @Before
   public void setUp()
       throws Exception {
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
     Context.set(Context.webContext(mockRequest, mockResponse, mock(FilterConfig.class)));
 
     victim = new ModelAsJsonRequestHandler();

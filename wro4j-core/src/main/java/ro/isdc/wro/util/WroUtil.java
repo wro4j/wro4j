@@ -176,7 +176,7 @@ public final class WroUtil {
    * @param prefix
    *          the prefix to find, may be null
    * @param ignoreCase
-   *          inidicates whether the compare should ignore case (case insensitive) or not.
+   *          indicates whether the compare should ignore case (case insensitive) or not.
    * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
    */
   private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
