@@ -1,0 +1,9 @@
+[submodule "wro4j-examples"]
+	path = wro4j-examples
+	url = https://github.com/wro4j/wro4j-examples.git
+[submodule "wro4j-grails-plugin"]
+	path = wro4j-grails-plugin
+	url = https://github.com/wro4j/wro4j-grails-plugin.git
+[submodule "wro4j-runner"]
+	path = wro4j-runner
+	url = https://github.com/wro4j/wro4j-runner.git
