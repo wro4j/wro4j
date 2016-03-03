@@ -68,7 +68,7 @@ public class ServletContextPropertyWroConfigurationFactory
       Validate.notNull(propertyStream);
       props.load(propertyStream);
     } catch (final Exception e) {
-      LOG.error("[FAIL] Cannot read properties file stream from default location: {}. Using default configuration.", getConfigPath());
+      LOG.warn("[WARN] Cannot read properties file stream from default location: {}. Using default configuration.", getConfigPath());
     } finally {
       IOUtils.closeQuietly(propertyStream);
     }
