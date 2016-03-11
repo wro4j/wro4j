@@ -29,6 +29,7 @@ public class RubySassEngine {
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
+  private static final Object GLOBAL_LOCK = new Object();
 
   private final Set<String> requires;
 
@@ -59,13 +60,15 @@ public class RubySassEngine {
    * @param content
    *          the Sass content to process.
    */
-  public synchronized String process(final String content) {
+  public String process(final String content) {
     if (StringUtils.isEmpty(content)) {
       return StringUtils.EMPTY;
     }
     try {
-      final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-      return rubyEngine.eval(buildUpdateScript(content)).toString();
+      synchronized(GLOBAL_LOCK) {
+        final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
+        return rubyEngine.eval(buildUpdateScript(content)).toString();
+      }
     } catch (final ScriptException e) {
       throw new WroRuntimeException(e.getMessage(), e);
     }
