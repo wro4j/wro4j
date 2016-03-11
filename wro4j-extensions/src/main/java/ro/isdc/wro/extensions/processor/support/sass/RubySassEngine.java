@@ -35,6 +35,8 @@ public class RubySassEngine {
 
   public RubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
+    System.setProperty("org.jruby.embed.compilemode", "jit");
+    System.setProperty("org.jruby.embed.sharing.variables", "false");
     requires = new LinkedHashSet<String>();
     requires.add(RUBY_GEM_REQUIRE);
     requires.add(SASS_PLUGIN_REQUIRE);
