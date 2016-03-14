@@ -29,19 +29,17 @@ import static org.apache.commons.lang3.Validate.notNull;
  */
 public class RubySassEngine {
   private static final Logger LOG = LoggerFactory.getLogger(RubySassEngine.class);
+  private static final Object GLOBAL_LOCK = new Object();
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
   private final Set<String> requires;
-  /**
-   * The lazy initializer is used to avoid the failure in multi-thread environment.
-   */
   private final LazyInitializer<ScriptEngine> engineInitializer = new LazyInitializer<ScriptEngine>() {
     @Override
     protected ScriptEngine initialize() {
       try {
         //use global initializer to avoid initialization failure in multi-threaded environment.
-        synchronized (RubySassEngine.class) {
+        synchronized (GLOBAL_LOCK) {
           final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
           rubyEngine.eval("0").toString();
           return rubyEngine;
