@@ -4,6 +4,7 @@
 package ro.isdc.wro.extensions.processor;
 
 import static org.junit.Assert.fail;
+import static ro.isdc.wro.util.WroTestUtils.runConcurrently;
 
 import java.io.File;
 import java.io.FileReader;
@@ -71,8 +72,35 @@ public class TestRubySassCssProcessor {
         return null;
       }
     };
-    WroTestUtils.runConcurrently(task);
+    runConcurrently(task);
   }
+
+  /**
+   * Test ruby sass css processor with multi-threads.
+   *
+   * @author Simon van der Sluis
+   * @created Created on Apr 21, 2010
+   */
+  @Test
+  public void shouldBeThreadSafeWhenInitializingProcessor()
+          throws Exception {
+    final RubySassCssProcessor processor = new RubySassCssProcessor();
+    final Callable<Void> task = new Callable<Void>() {
+      @Override
+      public Void call() {
+        try {
+          // This should be called first time in multi-thread.
+          processor.process(new StringReader(
+                  "$side: top;$radius: 10px;.rounded-#{$side} {border-#{$side}-radius: $radius;}"), new StringWriter());
+        } catch (final Exception e) {
+          throw new RuntimeException(e);
+        }
+        return null;
+      }
+    };
+    runConcurrently(task);
+  }
+
 
   /**
    * Test that processing invalid sass css produces exceptions.
