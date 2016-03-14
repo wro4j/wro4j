@@ -35,6 +35,9 @@ public class RubySassEngine {
 
   public RubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
+    // Below properties are just for performance improvement. Document is here:
+    // https://github.com/jruby/jruby/wiki/RedBridge#CompileMode
+    // https://github.com/jruby/jruby/wiki/RedBridge#Disabling_Sharing_Variables
     System.setProperty("org.jruby.embed.compilemode", "jit");
     System.setProperty("org.jruby.embed.sharing.variables", "false");
     requires = new LinkedHashSet<String>();
