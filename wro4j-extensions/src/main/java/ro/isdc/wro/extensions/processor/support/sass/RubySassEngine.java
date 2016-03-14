@@ -10,11 +10,14 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
+import ro.isdc.wro.util.LazyInitializer;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.Validate.notNull;
 
 
 /**
@@ -29,9 +32,25 @@ public class RubySassEngine {
   private static final String RUBY_GEM_REQUIRE = "rubygems";
   private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
   private static final String SASS_ENGINE_REQUIRE = "sass/engine";
-  private static final Object GLOBAL_LOCK = new Object();
-
   private final Set<String> requires;
+  /**
+   * The lazy initializer is used to avoid the failure in multi-thread environment.
+   */
+  private final LazyInitializer<ScriptEngine> engineInitializer = new LazyInitializer<ScriptEngine>() {
+    @Override
+    protected ScriptEngine initialize() {
+      try {
+        //use global initializer to avoid initialization failure in multi-threaded environment.
+        synchronized (RubySassEngine.class) {
+          final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
+          rubyEngine.eval("0").toString();
+          return rubyEngine;
+        }
+      } catch (final ScriptException e) {
+        throw new WroRuntimeException(e.getMessage(), e);
+      }
+    }
+  };
 
   public RubySassEngine() {
     System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
@@ -66,13 +85,12 @@ public class RubySassEngine {
    *          the Sass content to process.
    */
   public String process(final String content) {
-    if (StringUtils.isEmpty(content)) {
+    if (isEmpty(content)) {
       return StringUtils.EMPTY;
     }
     try {
-      synchronized(GLOBAL_LOCK) {
-        final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-        return rubyEngine.eval(buildUpdateScript(content)).toString();
+      synchronized(this) {
+        return engineInitializer.get().eval(buildUpdateScript(content)).toString();
       }
     } catch (final ScriptException e) {
       throw new WroRuntimeException(e.getMessage(), e);
@@ -80,7 +98,7 @@ public class RubySassEngine {
   }
 
   private String buildUpdateScript(final String content) {
-    Validate.notNull(content);
+    notNull(content);
     final StringWriter raw = new StringWriter();
     final PrintWriter script = new PrintWriter(raw);
     final StringBuilder sb = new StringBuilder();
