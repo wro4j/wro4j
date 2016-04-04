@@ -7,11 +7,21 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+
+import com.google.javascript.jscomp.CheckLevel;
+import com.google.javascript.jscomp.ClosureCodingConvention;
+import com.google.javascript.jscomp.CompilationLevel;
+import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.DiagnosticGroups;
+import com.google.javascript.jscomp.Result;
+import com.google.javascript.jscomp.SourceFile;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
@@ -27,15 +37,6 @@ import ro.isdc.wro.model.resource.processor.Destroyable;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.util.ObjectFactory;
-
-import com.google.javascript.jscomp.CheckLevel;
-import com.google.javascript.jscomp.ClosureCodingConvention;
-import com.google.javascript.jscomp.CompilationLevel;
-import com.google.javascript.jscomp.Compiler;
-import com.google.javascript.jscomp.CompilerOptions;
-import com.google.javascript.jscomp.DiagnosticGroups;
-import com.google.javascript.jscomp.Result;
-import com.google.javascript.jscomp.SourceFile;
 
 
 /**
@@ -197,7 +198,7 @@ public class GoogleClosureCompressorProcessor
      */
     options.setCodingConvention(new ClosureCodingConvention());
     // use the wro4j encoding by default
-    options.setOutputCharset(getEncoding());
+    options.setOutputCharset(Charset.forName(getEncoding()));
     // set it to warning, otherwise compiler will fail
     options.setWarningLevel(DiagnosticGroups.CHECK_VARIABLES, CheckLevel.WARNING);
     return options;
