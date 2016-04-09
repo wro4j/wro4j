@@ -63,7 +63,7 @@ public abstract class AbstractTestLinterMojo {
     Mockito.when(mockMavenProject.getModel()).thenReturn(mockMavenModel);
     Mockito.when(mockMavenModel.getBuild()).thenReturn(mockBuild);
     Mockito.when(mockBuild.getDirectory()).thenReturn(FileUtils.getTempDirectoryPath());
-	mojo.setMavenProject(mockMavenProject);
+    mojo.setMavenProject(mockMavenProject);
   }
 
   protected final AbstractLinterMojo<?> getMojo() {

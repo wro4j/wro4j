@@ -19,7 +19,7 @@ import ro.isdc.wro.util.Ordered;
 public class OrderedProcessorProvider
     implements ProcessorProvider, Ordered {
   public static final String ALIAS = "custom";
-  public static ResourcePreProcessor CUSTOM = new ProcessorDecorator(new CssMinProcessor());
+  public static final ResourcePreProcessor CUSTOM = new ProcessorDecorator(new CssMinProcessor());
 
   /**
    * {@inheritDoc}

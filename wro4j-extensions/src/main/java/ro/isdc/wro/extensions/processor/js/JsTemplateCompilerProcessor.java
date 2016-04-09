@@ -55,8 +55,7 @@ public abstract class JsTemplateCompilerProcessor implements ResourcePreProcesso
    * @return arguments consumed by the js compile script.
    */
   protected String getArgument(final Resource resource) {
-    final String name = resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
-    return name;
+    return resource == null ? "" : FilenameUtils.getBaseName(resource.getUri());
   }
 
   /**

@@ -39,9 +39,6 @@ public class CssImportPreProcessor
   @Inject
   private PreProcessorExecutor preProcessorExecutor;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String doTransform(final String cssContent, final List<Resource> foundImports)
       throws IOException {

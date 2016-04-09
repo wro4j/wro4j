@@ -177,7 +177,7 @@ public class WildcardExpanderModelTransformer
   public Function<Collection<File>, Void> createExpanderHandler(final Group group, final Resource resource,
       final String baseNameFolder) {
     LOG.debug("createExpanderHandler using baseNameFolder: {}\n for resource {}", baseNameFolder, resource);
-    final Function<Collection<File>, Void> handler = new Function<Collection<File>, Void>() {
+    return new Function<Collection<File>, Void>() {
       public Void apply(final Collection<File> files) {
         if (baseNameFolder == null) {
           // replacing group with empty list since the original uri has no associated resources.
@@ -209,8 +209,8 @@ public class WildcardExpanderModelTransformer
        * <p/>
        * Find more details <a href="https://github.com/alexo/wro4j/pull/44">here</a>.
        */
-      private String getFullPathNoEndSeparator(final Resource resource) {
-        final String result = FilenameUtils.getFullPathNoEndSeparator(resource.getUri());
+      private String getFullPathNoEndSeparator(final Resource resource1) {
+        final String result = FilenameUtils.getFullPathNoEndSeparator(resource1.getUri());
         if (result != null && 1 == result.length() && 0 == FilenameUtils.indexOfLastSeparator(result)) {
           return "";
         }
@@ -218,6 +218,5 @@ public class WildcardExpanderModelTransformer
         return result;
       }
     };
-    return handler;
   }
 }

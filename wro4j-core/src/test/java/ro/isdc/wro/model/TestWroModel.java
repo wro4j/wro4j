@@ -12,7 +12,6 @@ import java.util.Collections;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +20,6 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 import ro.isdc.wro.model.group.Group;
-import ro.isdc.wro.model.group.InvalidGroupNameException;
 import ro.isdc.wro.model.resource.Resource;
 
 
@@ -60,16 +58,17 @@ public class TestWroModel {
 
   @Test
   public void testGetExistingGroup() {
-    Assert.assertFalse(victim.getGroups().isEmpty());
-    final Group group = victim.getGroupByName("g1");
+    assertFalse(victim.getGroups().isEmpty());
+
+    final Group group = new WroModelInspector(victim).getGroupByName("g1");
     // create a copy of original list
     assertEquals(1, group.getResources().size());
   }
 
-  @Test(expected = InvalidGroupNameException.class)
-  public void testGetInvalidGroup() {
+  @Test
+  public void shouldHaveCorrectNumberOfGrops() {
     assertFalse(victim.getGroups().isEmpty());
-    victim.getGroupByName("INVALID_GROUP");
+    assertEquals(3, victim.getGroups().size());
   }
 
   /**
@@ -83,8 +82,7 @@ public class TestWroModel {
       }
     };
     // the uriLocator factory doesn't have any locators set...
-    final WroModel model = factory.create();
-    return model;
+    return factory.create();
   }
 
   @Test

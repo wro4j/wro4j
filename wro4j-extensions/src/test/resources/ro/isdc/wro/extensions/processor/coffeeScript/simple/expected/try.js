@@ -1,11 +1,11 @@
 (function() {
-  var error;
+  var error, error1;
 
   try {
     allHellBreaksLoose();
     catsAndDogsLivingTogether();
-  } catch (_error) {
-    error = _error;
+  } catch (error1) {
+    error = error1;
     print(error);
   } finally {
     cleanUp();

@@ -40,7 +40,6 @@ public class FallbackCssDataUriUrlInspector extends CssUrlInspector {
   @Override
   protected String getOriginalUrl(final Matcher matcher) {
     final String groupA = matcher.group(2);
-    final String originalUrl = groupA != null ? groupA : matcher.group(3);
-    return originalUrl;
+    return groupA != null ? groupA : matcher.group(3);
   }
 }

@@ -1,5 +1,9 @@
 package ro.isdc.wro.model.resource.locator.wildcard;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.io.FilenameUtils.wildcardMatch;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -23,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.util.WroUtil;
 
 
 /**
@@ -47,7 +52,9 @@ public class JarWildcardStreamLocator
    * A {@link List} of file extensions including the final dot. Valid examples are: .jar, .war. By default it only
    * supports .jar extension.
    */
-  private static final List<String> SUPPORTED_EXTENSIONS = Arrays.asList(".jar");
+  private static final List<String> SUPPORTED_EXTENSIONS = asList(".jar");
+  private static final String EMBEDDED_JAR_PREFIX = "!" + File.separatorChar;
+  private static final String PREFIX_FILE = "file:";
 
   /**
    * Finds the specified URI pattern inside a JAR file. If the specified file isn't a valid JAR default strategy will be
@@ -70,7 +77,7 @@ public class JarWildcardStreamLocator
   private boolean isSupported(final File jarPath) {
     LOG.debug("jarPath: {}", jarPath);
     for (final String supportedExtension : SUPPORTED_EXTENSIONS) {
-      if (jarPath.getPath().endsWith(supportedExtension)) {
+      if (jarPath.getPath().endsWith(supportedExtension) && !jarPath.getPath().contains(EMBEDDED_JAR_PREFIX)) {
         return true;
       }
     }
@@ -82,8 +89,7 @@ public class JarWildcardStreamLocator
    * @return the File corresponding to the folder from inside the jar.
    */
   File getJarFile(final File folder) {
-    return new File(StringUtils.substringAfter(StringUtils.substringBeforeLast(folder.getPath(), "!"),
-        "file:"));
+    return new File(substringAfter(substringBeforeLast(folder.getPath(), "!"), PREFIX_FILE));
   }
 
   /**
@@ -97,7 +103,7 @@ public class JarWildcardStreamLocator
    * @return <code>true</code> if the expression matches, <code>false</code> otherwise.
    */
   private boolean accept(final String entryName, final String wildcard) {
-    return FilenameUtils.wildcardMatch(entryName, wildcard);
+    return wildcardMatch(entryName, wildcard);
   }
 
   /**
@@ -136,7 +142,7 @@ public class JarWildcardStreamLocator
       String classPath = FilenameUtils.getPath(uri);
 
       if (classPath.startsWith(ClasspathUriLocator.PREFIX)) {
-        classPath = StringUtils.substringAfter(classPath, ClasspathUriLocator.PREFIX);
+        classPath = substringAfter(classPath, ClasspathUriLocator.PREFIX);
       }
 
       jarFile = open(jarPath);

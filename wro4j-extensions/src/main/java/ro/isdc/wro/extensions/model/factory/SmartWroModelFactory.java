@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.model.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,7 +65,7 @@ public class SmartWroModelFactory
    * The autoDetect flag is set to true if the wroFile path is the same as the default wro file name.
    */
   public static SmartWroModelFactory createFromStandaloneContext(final StandaloneContext context) {
-    Validate.notNull(context);
+    notNull(context);
     final boolean autoDetectWroFile = WroUtil.normalize(context.getWroFile().getPath()).contains(
         WroUtil.normalize(DEFAULT_WRO_FILE));
     if (!autoDetectWroFile) {
@@ -213,9 +215,8 @@ public class SmartWroModelFactory
    * @return string representation of the factory name.
    */
   protected String getClassName(final Class<? extends WroModelFactory> factoryClass) {
-    final String className = factoryClass.isAnonymousClass() ? factoryClass.getSuperclass().getSimpleName()
+    return factoryClass.isAnonymousClass() ? factoryClass.getSuperclass().getSimpleName()
         : factoryClass.getSimpleName();
-    return className;
   }
 
   /**

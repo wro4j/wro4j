@@ -416,7 +416,7 @@ public class TestWroFilter {
       }
 
       @Override
-      Injector getInjector() {
+      Injector createInjector() {
         return new InjectorBuilder(
             new BaseWroManagerFactory().setUriLocatorFactory(mockUriLocatorFactory).setResourceAuthorizationManager(
                 mockAuthorizationManager)).build();
@@ -554,8 +554,7 @@ public class TestWroFilter {
     final WroFilter theFilter = new WroFilter() {
       @Override
       protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
-        final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(props);
-        return factory;
+        return new PropertyWroConfigurationFactory(props);
       }
     };
     // initFilterWithValidConfig(theFilter);
@@ -847,6 +846,13 @@ public class TestWroFilter {
         return null;
       }
     });
+  }
+
+  @Test
+  public void shouldDefaultWroManagerFactoryByDefault() throws Exception {
+    victim = new WroFilter();
+    victim.init(mockFilterConfig);
+    assertEquals(DefaultWroManagerFactory.class, victim.getWroManagerFactory().getClass());
   }
 
   @After

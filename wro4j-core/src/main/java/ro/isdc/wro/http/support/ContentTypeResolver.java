@@ -9,6 +9,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.util.WroUtil;
+
 
 /**
  * Responseible for resolving a content based on file name.
@@ -37,6 +39,8 @@ public class ContentTypeResolver {
     defaultContentTypeMap.put("eot", "application/vnd.ms-fontobject");
     defaultContentTypeMap.put("otf", "application/x-font-opentype");
     defaultContentTypeMap.put("svg", "image/svg+xml");
+    defaultContentTypeMap.put("woff", "application/font-woff");
+    defaultContentTypeMap.put("woff2", "application/font-woff2");
 
     requiresCharset.add("text/css");
     requiresCharset.add("text/html");
@@ -59,7 +63,7 @@ public class ContentTypeResolver {
    * @return contentType
    */
   public static String get(final String fileName) {
-    final String extension = FilenameUtils.getExtension(fileName).toLowerCase();
+    final String extension = FilenameUtils.getExtension(WroUtil.removeQueryString(fileName.toLowerCase()));
     if (defaultContentTypeMap.containsKey(extension)) {
       return defaultContentTypeMap.get(extension);
     }

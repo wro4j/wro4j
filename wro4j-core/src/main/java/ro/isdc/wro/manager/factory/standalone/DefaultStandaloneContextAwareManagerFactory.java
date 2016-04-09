@@ -1,12 +1,13 @@
 package ro.isdc.wro.manager.factory.standalone;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +33,10 @@ public class DefaultStandaloneContextAwareManagerFactory
   /**
    * Context used by stand-alone process.
    */
-  StandaloneContext standaloneContext;
-  /**
-   * {@inheritDoc}
-   */
+  private StandaloneContext standaloneContext;
+
   public void initialize(final StandaloneContext standaloneContext) {
-    Validate.notNull(standaloneContext);
+    notNull(standaloneContext);
     this.standaloneContext = standaloneContext;
     //Override the ignoreMissingResources flag only when explicitly set
     if (standaloneContext.getIgnoreMissingResourcesAsString() != null) {
@@ -48,7 +47,6 @@ public class DefaultStandaloneContextAwareManagerFactory
     LOG.debug("config: {}", Context.get().getConfig());
   }
 
-
   @Override
   protected GroupExtractor newGroupExtractor() {
     return new GroupExtractorDecorator(super.newGroupExtractor()) {
@@ -58,7 +56,6 @@ public class DefaultStandaloneContextAwareManagerFactory
       }
     };
   }
-
 
   @Override
   protected WroModelFactory newModelFactory() {
@@ -78,6 +75,12 @@ public class DefaultStandaloneContextAwareManagerFactory
 
   @Override
   protected ServletContextUriLocator newServletContextUriLocator() {
-    return new StandaloneServletContextUriLocator(standaloneContext);
+    final StandaloneServletContextUriLocator locator = new StandaloneServletContextUriLocator();
+    locator.initialize(standaloneContext);
+    return locator;
+  }
+
+  protected final StandaloneContext getStandaloneContext() {
+    return standaloneContext;
   }
 }

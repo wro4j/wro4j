@@ -2,6 +2,7 @@ package ro.isdc.wro.util;
 
 import java.util.Comparator;
 
+
 /**
  * Classes implementing this interface signal to the classes that load them that order is significant.
  *
@@ -19,10 +20,10 @@ public interface Ordered {
    * The highest order, meaning that the value will be the first when ascending comparator is used.
    */
   public static final int LOWEST = Integer.MIN_VALUE;
-  public static final Comparator<Object> ASCENDING_COMPARATOR = new Comparator<Object>() {
-    /**
-     * {@inheritDoc}
-     */
+  /**
+   * Sort elements from {@link #HIGHEST} to {@link #LOWEST}
+   */
+  public static final Comparator<Object> DESCENDING_COMPARATOR = new Comparator<Object>() {
     public int compare(final Object left, final Object right) {
       int priorityLeft = MEDIUM;
       int priorityRight = MEDIUM;
@@ -39,7 +40,7 @@ public interface Ordered {
       if (priorityLeft == priorityRight) {
         return 0;
       }
-      return priorityLeft > priorityRight ? 1: -1;
+      return priorityLeft > priorityRight ? -1 : 1;
     }
   };
 

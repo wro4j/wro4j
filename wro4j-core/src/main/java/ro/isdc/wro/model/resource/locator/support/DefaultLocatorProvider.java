@@ -1,7 +1,7 @@
 package ro.isdc.wro.model.resource.locator.support;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
@@ -20,11 +20,10 @@ import ro.isdc.wro.util.Ordered;
  */
 public class DefaultLocatorProvider
     implements LocatorProvider, Ordered {
-  /**
-   * {@inheritDoc}
-   */
+
   public Map<String, UriLocator> provideLocators() {
-    final Map<String, UriLocator> map = new TreeMap<String, UriLocator>();
+    // use linkedHashMap to preserve the order of providers.
+    final Map<String, UriLocator> map = new LinkedHashMap<String, UriLocator>();
     map.put(ClasspathUriLocator.ALIAS, new ClasspathUriLocator());
     map.put(ServletContextUriLocator.ALIAS, new ServletContextUriLocator());
     map.put(ServletContextUriLocator.ALIAS_DISPATCHER_FIRST,

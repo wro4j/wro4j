@@ -1,5 +1,7 @@
 package ro.isdc.wro.model.resource.processor.support;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +41,7 @@ public class CssUrlInspector {
         LOG.debug("originalDeclaration: {}", originalDeclaration);
         LOG.debug("originalUrl: {}", originalUrl);
 
-        Validate.notNull(originalUrl);
+        notNull(originalUrl);
         matcher.appendReplacement(sb, handler.replace(originalDeclaration, originalUrl));
       }
     }
@@ -98,8 +100,7 @@ public class CssUrlInspector {
      * }
      * </pre>
      */
-    final String originalUrl = groupA != null ? groupA : matcher.group(2);
-    return originalUrl;
+    return groupA != null ? groupA : matcher.group(2);
   }
 
   /**

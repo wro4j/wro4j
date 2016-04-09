@@ -1,8 +1,12 @@
 package ro.isdc.wro.model.resource.locator.wildcard;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.io.IOUtils.readLines;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -24,7 +28,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +44,11 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  */
 public class TestJarWildcardStreamLocator {
   private static final Logger LOG = LoggerFactory.getLogger(TestJarWildcardStreamLocator.class);
-  
+  private static final String TEST_INFO = "var foo = 'Hello World';";
+  private static final String FILE_NAME_JAR = "file:///home/test/myJar.jar!";
+  private static final String FILE_NAME_WITH_EMBEDDED_JAR = "file:///home/test/myJar.jar!/com/embedded.jar!/file.txt";
+
   private JarWildcardStreamLocator jarStreamLocator;
-  
-  private final String testInfo = "var foo = 'Hello World';";
-  
-  private final String jarFileName = "file:///home/test/myJar.jar!";
   @Mock
   private JarFile jarFile;
   
@@ -61,7 +63,7 @@ public class TestJarWildcardStreamLocator {
   }
   
   public TestJarWildcardStreamLocator() {
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
   }
   
   @Before
@@ -72,7 +74,7 @@ public class TestJarWildcardStreamLocator {
     vector.add(new JarEntry("com/test/app/test-resource.js"));
     
     when(jarFile.entries()).thenReturn(vector.elements());
-    when(jarFile.getInputStream(vector.get(0))).thenReturn(new ByteArrayInputStream(testInfo.getBytes()));
+    when(jarFile.getInputStream(vector.get(0))).thenReturn(new ByteArrayInputStream(TEST_INFO.getBytes()));
     
     jarStreamLocator = new JarWildcardStreamLocator() {
       @Override
@@ -89,27 +91,34 @@ public class TestJarWildcardStreamLocator {
   }
   
   @Test
-  public void testLocateJarStream()
+  public void shouldLocateJarStream()
       throws IOException {
-    final InputStream is = jarStreamLocator.locateStream("com/test/app/*.js", new File(jarFileName));
-    final List<String> lines = IOUtils.readLines(is);
+    final InputStream is = jarStreamLocator.locateStream("com/test/app/*.js", new File(FILE_NAME_JAR));
+    final List<String> lines = readLines(is);
     LOG.debug("lines: " + lines);
-    assertEquals(testInfo, lines.get(0));
+    assertEquals(1, lines.size());
+    assertEquals(TEST_INFO, lines.get(0));
     
-    IOUtils.closeQuietly(is);
+    closeQuietly(is);
+  }
+
+  @Test(expected = IOException.class)
+  public void shouldNotLocateEmbeddedJarStream()
+          throws IOException {
+    jarStreamLocator.locateStream("com/test/app/*.js", new File(FILE_NAME_WITH_EMBEDDED_JAR));
   }
   
   @Test
   public void testLocateJarStreamDelegate()
       throws IOException {
     final InputStream is = jarStreamLocator.locateStream("classpath:com/test/app/*.js", new File("src/test/resources/"));
-    final String content = IOUtils.readLines(is).get(0);
+    final String content = readLines(is).get(0);
     assertTrue(content.contains("1.js"));
     assertTrue(content.contains("2.js"));
     assertTrue(content.contains("3.js"));
     assertTrue(!content.contains("1.css"));
     
-    IOUtils.closeQuietly(is);
+    closeQuietly(is);
   }
   
   @Test(expected = IOException.class)
@@ -126,7 +135,7 @@ public class TestJarWildcardStreamLocator {
     // there are no js resources in the jar
     uriLocator.locate("classpath:com/**.js");
     final Collection<String> filenameList = filenameListHolder.get();
-    Assert.assertNotNull(filenameList);
+    assertNotNull(filenameList);
     Assert.assertTrue(filenameList.isEmpty());
   }
   
@@ -137,9 +146,9 @@ public class TestJarWildcardStreamLocator {
     final UriLocator uriLocator = createJarLocator(filenameListHolder);
     uriLocator.locate("classpath:com/app/**.css");
     final Collection<String> filenameList = filenameListHolder.get();
-    Assert.assertNotNull(filenameList);
-    Assert.assertEquals(Arrays.toString(new String[] {
-      "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
+    assertNotNull(filenameList);
+    assertEquals(Arrays.toString(new String[]{
+            "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
     }), Arrays.toString(filenameList.toArray()));
   }
   
@@ -150,12 +159,12 @@ public class TestJarWildcardStreamLocator {
     final UriLocator uriLocator = createJarLocator(filenameListHolder);
     uriLocator.locate("classpath:com/app/**");
     final Collection<String> filenameList = filenameListHolder.get();
-    Assert.assertNotNull(filenameList);
-    Assert.assertEquals(
-        Arrays.toString(new String[] {
-          "com/app/level1", "com/app/level1/level2", "com/app/level1/level2/styles",
-          "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
-        }), Arrays.toString(filenameList.toArray()));
+    assertNotNull(filenameList);
+    assertEquals(
+            Arrays.toString(new String[]{
+                    "com/app/level1", "com/app/level1/level2", "com/app/level1/level2/styles",
+                    "com/app/level1/level2/styles/style.css", "com/app/level1/level2/level2.css", "com/app/level1/level1.css"
+            }), Arrays.toString(filenameList.toArray()));
   }
   
   /**
@@ -180,19 +189,18 @@ public class TestJarWildcardStreamLocator {
         filenameListHolder.set(filenameList);
       }
     };
-    final UriLocator uriLocator = new ClasspathUriLocator() {
+    return new ClasspathUriLocator() {
       @Override
       public WildcardStreamLocator newWildcardStreamLocator() {
         return jarStreamLocator;
       }
     };
-    return uriLocator;
   }
   
   @Test
   public void shouldGetJarFileFromFile() {
     final String actual = jarStreamLocator.getJarFile(new File("file:path/to/file!one/two/three.class")).getPath();
     final String expected = FilenameUtils.separatorsToSystem("path/to/file");
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
   }
 }

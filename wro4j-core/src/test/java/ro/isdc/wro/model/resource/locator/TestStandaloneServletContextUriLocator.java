@@ -22,12 +22,14 @@ public class TestStandaloneServletContextUriLocator {
     standaloneContext = new StandaloneContext();
     final String contextFolder = TestStandaloneServletContextUriLocator.class.getResource("").getFile();
     standaloneContext.setContextFoldersAsCSV(contextFolder);
-    victim = new StandaloneServletContextUriLocator(standaloneContext);
+    victim = new StandaloneServletContextUriLocator();
+    victim.initialize(standaloneContext);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void cannotAcceptNullStandaloneContext() {
-    new StandaloneServletContextUriLocator(null);
+  @Test(expected = IllegalStateException.class)
+  public void shouldFailWhenStandaloneContextIsNotInitialized() throws Exception {
+    victim = new StandaloneServletContextUriLocator();
+    victim.locate("");
   }
 
   @Test(expected = IOException.class)

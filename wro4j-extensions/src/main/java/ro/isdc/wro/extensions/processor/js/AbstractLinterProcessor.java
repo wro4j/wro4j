@@ -53,9 +53,6 @@ public abstract class AbstractLinterProcessor
     });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
@@ -87,9 +84,6 @@ public abstract class AbstractLinterProcessor
     throw e;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer) throws IOException {
     process(null, reader, writer);
@@ -120,7 +114,7 @@ public abstract class AbstractLinterProcessor
    * @return default options to use for linting.
    */
   protected String createDefaultOptions() {
-    return "";
+    return StringUtils.EMPTY;
   }
 
   /**
@@ -128,17 +122,6 @@ public abstract class AbstractLinterProcessor
    */
   public AbstractLinterProcessor setOptionsAsString(final String options) {
     this.options = options;
-    return this;
-  }
-
-  /**
-   * Sets an array of options.
-   * Use {@link #setOptionsAsString(String)} instead.
-   */
-  @Deprecated
-  public AbstractLinterProcessor setOptions(final String... options) {
-    this.options = StringUtils.join(options, ',');
-    LOG.debug("setOptions: {}", this.options);
     return this;
   }
 

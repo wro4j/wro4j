@@ -10,7 +10,6 @@ import javax.servlet.FilterConfig;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
-import ro.isdc.wro.manager.factory.ConfigurableWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -72,8 +71,7 @@ public class ConfigurableWroFilter
         properties.setProperty(ConfigConstants.mbeanName.name(), mbeanName);
       }
     }
-    final PropertyWroConfigurationFactory factory = new PropertyWroConfigurationFactory(properties);
-    return factory;
+    return new PropertyWroConfigurationFactory(properties);
   }
 
   /**
@@ -84,9 +82,6 @@ public class ConfigurableWroFilter
     this.disableCache = disableCache;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String newMBeanName() {
     if (mbeanName != null) {
@@ -101,17 +96,7 @@ public class ConfigurableWroFilter
    */
   @Override
   protected WroManagerFactory newWroManagerFactory() {
-    return new DefaultWroManagerFactory(properties) {
-      @Override
-      protected WroManagerFactory newManagerFactory() {
-        return new ConfigurableWroManagerFactory() {
-          @Override
-          protected Properties newConfigProperties() {
-            return properties;
-          }
-        };
-      }
-    };
+    return new DefaultWroManagerFactory(properties);
   }
 
   /**

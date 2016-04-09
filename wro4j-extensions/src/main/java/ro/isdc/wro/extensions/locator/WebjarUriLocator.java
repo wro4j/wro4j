@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.webjars.WebJarAssetLocator;
@@ -29,6 +30,7 @@ import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
  */
 public class WebjarUriLocator
     implements UriLocator {
+  private static final String PATTERN = ".*";
   private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
@@ -48,7 +50,7 @@ public class WebjarUriLocator
    */
   private WebJarAssetLocator newWebJarAssetLocator() {
     return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
-        Pattern.compile(".*"), Thread.currentThread().getContextClassLoader()));
+        Pattern.compile(PATTERN), Thread.currentThread().getContextClassLoader()));
   }
 
   /**
@@ -58,9 +60,7 @@ public class WebjarUriLocator
     notNull(path);
     return PREFIX + path;
   }
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public InputStream locate(final String uri)
       throws IOException {
@@ -77,12 +77,9 @@ public class WebjarUriLocator
    * Replaces the protocol specific prefix and removes the query path if it exist, since it should not be accepted.
    */
   private String extractPath(final String uri) {
-    return DefaultWildcardStreamLocator.stripQueryPath(uri.replace(PREFIX, ""));
+    return DefaultWildcardStreamLocator.stripQueryPath(uri.replace(PREFIX, StringUtils.EMPTY));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean accept(final String uri) {
     return uri.trim().startsWith(PREFIX);

@@ -4,12 +4,13 @@
  */
 package ro.isdc.wro.config.factory;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,6 @@ public class FilterConfigWroConfigurationFactory
    * Replace with a boolean used for debug Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is
    * assumed.
    */
-  // TODO deprecate and use a boolean value init-param
   @Deprecated
   public static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
   /**
@@ -48,28 +48,18 @@ public class FilterConfigWroConfigurationFactory
   private final FilterConfig filterConfig;
 
   public FilterConfigWroConfigurationFactory(final FilterConfig filterConfig) {
-    Validate.notNull(filterConfig);
+    notNull(filterConfig);
     this.filterConfig = filterConfig;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Properties createProperties() {
-    return initProperties();
   }
 
   /**
    * Prepares the {@link Properties} object before it is used by the {@link PropertyWroConfigurationFactory}.
    * @return {@link Properties} object used by {@link PropertyWroConfigurationFactory} to create
    *         {@link WroConfiguration}
-   * @deprecated use {@link FilterConfigWroConfigurationFactory#createProperties()}
    */
-  @Deprecated
-  protected Properties initProperties() {
+  public Properties createProperties() {
     return createPropertiesFromFilterConfig();
   }
-
 
   /**
    * @return initialized {@link Properties} object based init params found in {@link FilterConfig}.

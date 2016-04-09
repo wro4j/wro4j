@@ -100,11 +100,6 @@ public class ImageUrlRewriter {
       LOG.debug("newImageLocation: {}", newImageLocation);
       return newImageLocation;
     }
-    if (UrlUriLocator.isValid(cssUri)) {
-      final String computedCssUri = ServletContextUriLocator.isValid(imageUrl) ? computeCssUriForExternalServer(cssUri)
-          : cssUri;
-      return computeNewImageLocation(computedCssUri, imageUrl);
-    }
     if (ClasspathUriLocator.isValid(cssUri)) {
       final String proxyUrl = context.proxyPrefix + computeNewImageLocation(cssUri, imageUrl);
       final String contextRelativeUrl = prependContextPath(imageUrl);
@@ -112,14 +107,18 @@ public class ImageUrlRewriter {
       // leave imageUrl unchanged if it is a servlet context relative resource
       return (ServletContextUriLocator.isValid(imageUrl) ? contextRelativeUrl : proxyUrl);
     }
+    if (UrlUriLocator.isValid(cssUri)) {
+      final String computedCssUri = ServletContextUriLocator.isValid(imageUrl) ? computeCssUriForExternalServer(cssUri)
+          : cssUri;
+      return computeNewImageLocation(computedCssUri, imageUrl);
+    }
     throw new WroRuntimeException("Could not replace imageUrl: " + imageUrl + ", contained at location: " + cssUri);
   }
 
   private String prependContextPath(final String imageUrl) {
     //avoid double slash
-    final String contextRelativeUrl = context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
+    return context.contextPath.endsWith(ROOT_CONTEXT_PATH) ? imageUrl
         : context.contextPath + imageUrl;
-    return contextRelativeUrl;
   }
 
   /**
@@ -130,7 +129,7 @@ public class ImageUrlRewriter {
     LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
     String computedPrefix = StringUtils.EMPTY;
     if (aggregatedFolderPath != null) {
-      final StringBuffer result = new StringBuffer("");
+      final StringBuffer result = new StringBuffer(StringUtils.EMPTY);
       final String[] depthFolders = WroUtil.normalize(aggregatedFolderPath).split(ROOT_CONTEXT_PATH);
       LOG.debug("subfolders {}", Arrays.toString(depthFolders));
 
@@ -139,7 +138,7 @@ public class ImageUrlRewriter {
           result.append(FOLDER_PREFIX);
         }
       }
-      computedPrefix = result.toString().replaceFirst(ROOT_CONTEXT_PATH, "");
+      computedPrefix = result.toString().replaceFirst(ROOT_CONTEXT_PATH, StringUtils.EMPTY);
     }
     LOG.debug("computedPrefix: {}", computedPrefix);
     return computedPrefix;
@@ -153,7 +152,7 @@ public class ImageUrlRewriter {
     String exernalServerCssUri = cssUri;
     try {
       // compute the host of the external server (with protocol & port).
-      final String serverHost = cssUri.replace(new URL(cssUri).getPath(), "");
+      final String serverHost = cssUri.replace(new URL(cssUri).getPath(), StringUtils.EMPTY);
       // the uri should end mandatory with /
       exernalServerCssUri = serverHost + ServletContextUriLocator.PREFIX;
       LOG.debug("using {} host as cssUri", exernalServerCssUri);

@@ -47,9 +47,6 @@ public class RubySassCssProcessor
     });
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
@@ -77,24 +74,12 @@ public class RubySassCssProcessor
   }
 
   /**
-   * A getter used for lazy loading.
-   * @deprecated use {@link #newEngine()} instead.
-   */
-  @Deprecated
-  protected RubySassEngine getEngine() {
-      return newEngine();
-  }
-
-  /**
    * @return a fresh instance of {@link RubySassEngine}
    */
   protected RubySassEngine newEngine() {
     return new RubySassEngine();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {

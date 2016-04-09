@@ -37,17 +37,11 @@ public class ConfigurableLocatorFactory
 
   private final UriLocatorFactory locatorFactory = newLocatorFactory();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getStrategyKey() {
     return PARAM_URI_LOCATORS;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Map<String, UriLocator> getStrategies(final LocatorProvider provider) {
     return provider.provideLocators();
@@ -85,9 +79,6 @@ public class ConfigurableLocatorFactory
     return locatorFactory.getInstance(uri);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Class<LocatorProvider> getProviderClass() {
     return LocatorProvider.class;

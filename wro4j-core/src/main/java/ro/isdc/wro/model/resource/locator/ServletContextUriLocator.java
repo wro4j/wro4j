@@ -242,4 +242,9 @@ public class ServletContextUriLocator
   public LocatorStrategy getLocatorStrategy() {
     return locatorStrategy;
   }
+
+  @Override
+  public String toString() {
+    return super.toString() + "#" + locatorStrategy;
+  }
 }

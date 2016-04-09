@@ -3,6 +3,7 @@
  */
 package ro.isdc.wro.util;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +47,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
+  private static final String SEPARATOR_UNIX = "/";
   private static final String SEPARATOR_WINDOWS = "\\";
   /**
    * Empty line pattern.
@@ -118,8 +120,7 @@ public final class WroUtil {
     if (nextSlash == -1) {
       return "";
     }
-    final String pathInfo = noSlash.substring(nextSlash);
-    return pathInfo;
+    return noSlash.substring(nextSlash);
   }
 
   /**
@@ -174,7 +175,7 @@ public final class WroUtil {
    * @param prefix
    *          the prefix to find, may be null
    * @param ignoreCase
-   *          inidicates whether the compare should ignore case (case insensitive) or not.
+   *          indicates whether the compare should ignore case (case insensitive) or not.
    * @return <code>true</code> if the String starts with the prefix or both <code>null</code>
    */
   private static boolean startsWith(final String str, final String prefix, final boolean ignoreCase) {
@@ -195,7 +196,7 @@ public final class WroUtil {
    * @return ServletPath string value.
    */
   public static String getServletPathFromLocation(final HttpServletRequest request, final String location) {
-    return location.replace(getPathInfoFromLocation(request, location), "");
+    return location.replace(getPathInfoFromLocation(request, location), StringUtils.EMPTY);
   }
 
   /**
@@ -318,12 +319,15 @@ public final class WroUtil {
    * @return regular expression value.
    */
   public static String loadRegexpWithKey(final String key) {
+    InputStream stream = null;
     try {
-      final InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties");
+      stream = WroUtil.class.getResourceAsStream("regexp.properties");
       final Properties props = new RegexpProperties().load(stream);
       return props.getProperty(key);
     } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
+    } finally {
+      closeQuietly(stream);
     }
   }
 
@@ -389,6 +393,17 @@ public final class WroUtil {
   }
 
   /**
+   * Join two paths (using unix separator) and make sure to use exactly one separator (by adding or removing one if required).
+   */
+  public static String joinPath(final String left, final String right) {
+    String leftHand = left;
+    if (!left.endsWith(SEPARATOR_UNIX)) {
+      leftHand += SEPARATOR_UNIX;
+    }
+    return leftHand + right.replaceFirst("^/(.*)", "$1");
+  }
+
+  /**
    * Cleans the image url by trimming result and removing \' or \" characters if such exists.
    *
    * @param imageUrl
@@ -404,7 +419,7 @@ public final class WroUtil {
    * Removes the query string from the provided path (everything followed by '?' including the question mark).
    */
   public static final String removeQueryString(final String path) {
-    return path.replaceFirst("\\?.*", "");
+    return path.replaceFirst("\\?.*", StringUtils.EMPTY);
   }
 
   /**

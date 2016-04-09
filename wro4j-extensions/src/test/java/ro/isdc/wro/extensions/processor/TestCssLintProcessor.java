@@ -80,8 +80,7 @@ public class TestCssLintProcessor {
   @Test
   public void canSetNullOptions()
       throws Exception {
-    final String[] options = null;
-    victim.setOptions(options);
+    victim.setOptionsAsString(null);
     victim.process(null, new StringReader(createValidCss()), new StringWriter());
   }
 
@@ -94,7 +93,7 @@ public class TestCssLintProcessor {
         throw e;
       }
     };
-    victim.setOptions("import");
+    victim.setOptionsAsString("import");
     victim.process(null, new StringReader("@import url(more.css);"), new StringWriter());
   }
 

@@ -5,11 +5,12 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -71,12 +72,14 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
 
   /**
    * @return the map where the strategy alias will be searched. By default a {@link ProviderFinder} is used to build the
-   *         map.
+   *         map. If two providers have same alias, the one with higher order will override those with lower order.
    */
   private final Map<String, S> newStrategyMap() {
-    //use TreeMap to kep results sorted
-    final Map<String, S> map = new TreeMap<String, S>();
+    //preserve the order
+    final Map<String, S> map = new LinkedHashMap<String, S>();
     final List<P> providers = getProviderFinder().find();
+    //reverse before adding to map, to allow highest ordered override lowest one (assuming same alias is used).
+    Collections.reverse(providers);
     LOG.debug("providers: {}", providers);
     for (final P provider : providers) {
       try {

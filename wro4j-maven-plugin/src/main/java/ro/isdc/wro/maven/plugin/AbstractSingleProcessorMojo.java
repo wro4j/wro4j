@@ -11,14 +11,14 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
-import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
-import ro.isdc.wro.manager.factory.WroManagerFactoryDecorator;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
@@ -48,9 +48,6 @@ public abstract class AbstractSingleProcessorMojo
    */
   private boolean failNever;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public final void doExecute()
       throws Exception {
@@ -121,13 +118,9 @@ public abstract class AbstractSingleProcessorMojo
    * Initialize the manager factory with a processor factory using a single processor.
    */
   @Override
-  protected WroManagerFactory decorateManagerFactory(final WroManagerFactory managerFactory) {
-    return new WroManagerFactoryDecorator(managerFactory) {
-      @Override
-      protected void onBeforeBuild(final Builder builder) {
-        builder.setProcessorsFactory(createSingleProcessorsFactory());
-      }
-    };
+  protected final WroManagerFactory newWroManagerFactory()
+      throws MojoExecutionException {
+    return new ExtensionsStandaloneManagerFactory().setProcessorsFactory(createSingleProcessorsFactory());
   }
 
   private ProcessorsFactory createSingleProcessorsFactory() {

@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +86,8 @@ public class WroFilter
   /**
    * Used to create the collection of requestHandlers to apply
    */
-  private RequestHandlerFactory requestHandlerFactory;
+  private RequestHandlerFactory requestHandlerFactory = newRequestHandlerFactory();
+  private Collection<RequestHandler> requestHandlers;
 
   private ResponseHeadersConfigurer headersConfigurer;
   /**
@@ -112,18 +112,23 @@ public class WroFilter
     // invoke createConfiguration method only if the configuration was not set.
     this.wroConfiguration = createConfiguration();
     this.wroManagerFactory = createWroManagerFactory();
-    this.injector = InjectorBuilder.create(wroManagerFactory).build();
+    this.injector = createInjector();
     headersConfigurer = newResponseHeadersConfigurer();
-    requestHandlerFactory = DefaultRequestHandlerFactory.decorate(newRequestHandlerFactory(), new ObjectFactory<Injector>() {
-      public Injector create() {
-        return getInjector();
-      }
-    });
+    requestHandlers = createRequestHandlers();
+
     registerChangeListeners();
     registerMBean();
     doInit(config);
     LOG.info("wro4j version: {}", WroUtil.getImplementationVersion());
     LOG.info("wro4j configuration: {}", wroConfiguration);
+  }
+
+  private Collection<RequestHandler> createRequestHandlers() {
+    requestHandlers = requestHandlerFactory.create();
+    for (final RequestHandler requestHandler : requestHandlers) {
+      injector.inject(requestHandler);
+    }
+    return requestHandlers;
   }
 
   /**
@@ -261,7 +266,7 @@ public class WroFilter
   }
 
   private long valueAsLong(final Object value) {
-    Validate.notNull(value);
+    notNull(value);
     return Long.valueOf(String.valueOf(value)).longValue();
   }
 
@@ -305,10 +310,9 @@ public class WroFilter
 
   private boolean handledWithRequestHandler(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException {
-    final Collection<RequestHandler> handlers = requestHandlerFactory.create();
-    notNull(handlers, "requestHandlers cannot be null!");
+    notNull(requestHandlers, "requestHandlers cannot be null!");
     // create injector used for process injectable fields from each requestHandler.
-    for (final RequestHandler requestHandler : handlers) {
+    for (final RequestHandler requestHandler : requestHandlers) {
       if (requestHandler.isEnabled() && requestHandler.accept(request)) {
         requestHandler.handle(request, response);
         return true;
@@ -321,8 +325,8 @@ public class WroFilter
    * @return {@link Injector} used to inject {@link RequestHandler}'s.
    * @VisibleForTesting
    */
-  Injector getInjector() {
-    return injector;
+  Injector createInjector() {
+    return InjectorBuilder.create(wroManagerFactory).build();
   }
 
   /**
@@ -399,7 +403,7 @@ public class WroFilter
    *          to set
    */
   public void setRequestHandlerFactory(final RequestHandlerFactory requestHandlerFactory) {
-    Validate.notNull(requestHandlerFactory);
+    notNull(requestHandlerFactory);
     this.requestHandlerFactory = requestHandlerFactory;
   }
 
@@ -451,7 +455,7 @@ public class WroFilter
    *          a not null {@link WroConfiguration} to set.
    */
   public final void setConfiguration(final WroConfiguration config) {
-    Validate.notNull(config);
+    notNull(config);
     wroConfigurationFactory = new ObjectFactory<WroConfiguration>() {
       public WroConfiguration create() {
         return config;

@@ -119,7 +119,9 @@ public abstract class AbstractProcessorsFilter
           stopWatch.stop();
         }
         LOG.debug(stopWatch.prettyPrint());
-        writer.write(output.toString());
+        if (output != null) {
+          writer.write(output.toString());
+        }
       }
     } finally {
       reader.close();

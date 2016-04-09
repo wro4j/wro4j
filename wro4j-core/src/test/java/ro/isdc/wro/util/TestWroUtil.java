@@ -197,4 +197,12 @@ public class TestWroUtil {
     assertEquals("/a/b", WroUtil.removeQueryString("/a/b?p1=v1"));
     assertEquals("http://www.site.com/b/c", WroUtil.removeQueryString("http://www.site.com/b/c?a=b"));
   }
+
+  @Test
+  public void shouldJoinTwoPaths() {
+    assertEquals("/a/b/c/d", WroUtil.joinPath("/a/b", "c/d"));
+    assertEquals("/a/b/c/d", WroUtil.joinPath("/a/b", "/c/d"));
+    assertEquals("/a/b/c/d", WroUtil.joinPath("/a/b/", "c/d"));
+    assertEquals("/a/b/c/d", WroUtil.joinPath("/a/b/", "/c/d"));
+  }
 }

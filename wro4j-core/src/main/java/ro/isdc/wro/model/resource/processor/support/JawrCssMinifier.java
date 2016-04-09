@@ -151,8 +151,7 @@ public class JawrCssMinifier {
     compressed = new MatcherProcessorCallback() {
       @Override
       String matchCallback(final Matcher matcher) {
-        final String replacement = it.next();
-        return replacement;
+        return it.next();
       }
     }.processWithMatcher(restoreMatcher);
 

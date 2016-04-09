@@ -3,6 +3,8 @@
  */
 package ro.isdc.wro.extensions.manager.standalone;
 
+import com.google.javascript.jscomp.CompilationLevel;
+
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
@@ -11,8 +13,6 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssUrlRewritingProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.CssVariablesProcessor;
 import ro.isdc.wro.model.resource.processor.impl.css.JawrCssMinifierProcessor;
 import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcessor;
-
-import com.google.javascript.jscomp.CompilationLevel;
 
 
 /**
@@ -23,9 +23,6 @@ import com.google.javascript.jscomp.CompilationLevel;
  * @created 17 Jun 2011
  */
 public class GoogleAdvancedStandaloneManagerFactory extends ExtensionsStandaloneManagerFactory {
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected ProcessorsFactory newProcessorsFactory() {
     final SimpleProcessorsFactory factory = new SimpleProcessorsFactory();
