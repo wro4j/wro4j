@@ -26,7 +26,6 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -190,7 +189,7 @@ public abstract class AbstractCssImportPreProcessor
    * Build a {@link Resource} object from a found importedResource inside a given resource.
    */
   private Resource createImportedResource(final String resourceUri, final String importUrl) {
-    final String absoluteUrl = UrlUriLocator.isValid(importUrl) ? importUrl
+    final String absoluteUrl = uriLocatorFactory.getInstance(importUrl) != null ? importUrl
         : computeAbsoluteUrl(resourceUri, importUrl);
     return Resource.create(absoluteUrl, ResourceType.CSS);
   }
