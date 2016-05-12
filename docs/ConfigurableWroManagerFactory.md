@@ -1,12 +1,13 @@
-#summary This page describes how to use *ConfigurableWroManagerFactory* and why it is useful.
-#labels Phase-Implementation
-
+---
+summary: This page describes how to use ConfigurableWroManagerFactory and why it is useful.
+labels: Phase-Implementation
+---
 
 # Introduction
 _ConfigurableWroManagerFactory_ is very useful when you want easily add or remove resource pre/post processors. 
 
 _Related pages_ 
-[AvailableProcessors](AvailableProcessors) - a list of processors provided by wro4j and their alias.
+[AvailableProcessors](AvailableProcessors.md) - a list of processors provided by wro4j and their alias.
 
 ## Configuring with wro4j-1.4.0 
 Starting with version 1.4.0, the configuration become even more easier. 
@@ -164,7 +165,8 @@ And finally, update the filter configuration in web.xml:
 ```
 
 ### Available Locators
-| *Name* | *Class* | 
+| Name | Class | 
+|--------|---------|
 | servletContext | ServletContextUriLocator |
 | classpath | ClasspathUriLocator |
 | url | UrlUriLocator |
@@ -179,7 +181,8 @@ The ExtensionsConfigurableWroManagerFactory is an extension of ConfigurableWroMa
 * googleClosureAdvanced - GoogleClosureCompressorProcessor(CompilationLevel.ADVANCED_OPTIMIZATIONS)
 
 In order to use it, all you have to do is:
-# add wro4j-extensions to classpath, manually or by adding wro4j-extensions dependency to pom.xml:
+
+add wro4j-extensions to classpath, manually or by adding wro4j-extensions dependency to pom.xml:
 ```xml
 <dependency>
     <groupId>ro.isdc.wro4j</groupId>
@@ -188,6 +191,7 @@ In order to use it, all you have to do is:
 </dependency>
 ```
 where *wro4j.version* - is the latest version of wro4j.
+
 configure the filter this way:
 
 ```xml
