@@ -1,6 +1,7 @@
 # <img src="http://code.google.com/p/wro4j/logo"> Web Resource Optimizer for Java
 [![Join the chat at https://gitter.im/wro4j/wro4j](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wro4j/wro4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
+[![Coverage Status](https://codecov.io/github/wro4j/wro4j/coverage.png?branch=master)](https://codecov.io/github/wro4j/wro4j?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core)
 [![Stories in Ready](https://badge.waffle.io/wro4j/wro4j.png?label=ready&title=Ready)](http://waffle.io/wro4j/wro4j)
 
