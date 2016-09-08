@@ -183,6 +183,9 @@ public abstract class AbstractWro4jMojo
         } catch (final Exception e) {
           throw new MojoExecutionException("Exception in onAfterExecute", e);
         }
+        finally {
+            getWroManager().destroy();
+        }
       }
     }
   }
