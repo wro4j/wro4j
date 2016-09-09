@@ -1,4 +1,5 @@
 language: java
+sudo: false # faster builds
 jdk:
   - oraclejdk7
 script:  mvn clean test
