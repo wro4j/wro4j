@@ -1,6 +1,5 @@
 language: java
+jdk:
+  - oraclejdk7
 script:  mvn clean test
 env: MAVEN_OPTS=" -Xmx2048m -Xms768m -XX:MaxPermSize=512m"
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
