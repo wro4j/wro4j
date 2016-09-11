@@ -3,7 +3,4 @@ sudo: false # faster builds
 jdk:
   - oraclejdk7
 script:  mvn clean test
-test {
-    jvmArgs "-XX:MaxPermSize=512m"
-}
 env: MAVEN_OPTS=" -Xmx2048m -Xms768m -XX:MaxPermSize=512m"
