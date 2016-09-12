@@ -431,7 +431,10 @@
     		<plugin>
         	    <groupId>org.jacoco</groupId>
         		<artifactId>jacoco-maven-plugin</artifactId>
-        		<version>0.7.5.201505241946</version>
+        		<version>0.7.7.201606060606</version>
+        		<configuration>
+                          <argLine>-Xmx2048m -XX:MaxPermSize=512m</argLine>
+                        </configuration>
         		<executions>
         		    <execution>
         		        <goals>
