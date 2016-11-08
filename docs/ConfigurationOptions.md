@@ -2,7 +2,7 @@
 title: Configurations Options
 tags: [getting-started]
 keywords: start, introduction, begin, install, build, hello world,
-last_updated: August 12, 2015
+last_updated: November 8, 2016
 summary: ""
 ---
 
@@ -53,6 +53,6 @@ The following parameters are available:
 ### What are the differences between DEVELOPMENT & DEPLOYMENT? 
   There are a couple of differences between those two modes:
   
-	* In DEVELOPMENT - you can add "?minimize=false" in request url in 
-	  order to turn off minimization on static resources, while in DEPLOYMENT you can't. 
-	* In DEVELOPMENT mode any runtime exception is logged and thrown further, while in DEPLOYMENT it is logged and the response is redirected to 404. 
+  * In DEVELOPMENT - you can add `?minimize=false` in request url in order to turn off minimization on static resources, while in DEPLOYMENT you can't. 
+  * In DEVELOPMENT mode any runtime exception is logged and thrown further, while in DEPLOYMENT it is logged and the response is redirected to 404. 
+  * In DEVELOPMENT mode you can reset the in-memory cache. See the [FAQ](FAQ.md#how-to-update-the-cache-at-runtime) for details.
