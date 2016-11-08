@@ -43,6 +43,9 @@ Also, the project is split into several modules: core, extensions, maven-plugin 
 ## How can I change the Configuration Mode in the runtime
 > Since 1.2.0 version, you can use JMX to change several properties, including configuration mode. Read more: [RuntimeConfigurationsUsingJMX] 
 
+## What are available configuration options
+> See the respective chapter in the [documentation](ConfigurationOptions.md).
+
 ## How to add easily custom resource processors
 > The ConfigurableWroManagerFactory can help you. Read more [here](ConfigurableWroManagerFactory)
 
@@ -82,8 +85,8 @@ Also, the project is split into several modules: core, extensions, maven-plugin 
       ro.isdc.wro.http.WroFilter
     </filter-class>
     <init-param>
-      <param-name>configuration</param-name>
-      <param-value>DEPLOYMENT</param-value>
+      <param-name>debug</param-name>
+      <param-value>false</param-value>
     </init-param>
     <init-param>
       <param-name>jmxEnabled</param-name>
