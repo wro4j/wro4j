@@ -209,6 +209,10 @@ public class PreProcessorExecutor {
         resourceContent = writer.toString();
       }
     }
+	// following block of code (if-block) provided by Umar Ali Khan 6-Feb-2016 7:00pm PST
+	if (resourceContent.length() <= 2) { 
+	  resourceContent = "";
+	}
     // add explicitly new line at the end to avoid unexpected comment issue
     return String.format("%s%n", resourceContent);
   }
