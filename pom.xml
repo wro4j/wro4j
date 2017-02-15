@@ -64,7 +64,7 @@
         <closure.version>v20160315</closure.version>
         <slf4j.version>1.7.16</slf4j.version>
         <maven.version>3.0.4</maven.version>
-        <mockito.version>2.0.42-beta</mockito.version>
+        <mockito.version>2.7.6</mockito.version>
         <junit.version>4.12</junit.version>
 	    <jruby.version>9.0.5.0</jruby.version>
         <spring.version>3.1.1.RELEASE</spring.version>
