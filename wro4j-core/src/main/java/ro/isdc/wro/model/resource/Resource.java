@@ -72,8 +72,7 @@ public class Resource {
    * @return Resource with the provided uri and correct type.
    */
   public static Resource create(final String uri) {
-    final String resourceExtension = FilenameUtils.getExtension(uri);
-    final ResourceType type = ResourceType.get(resourceExtension);
+    final ResourceType type = ResourceType.get(uri);
     return new Resource(uri, type);
   }
 

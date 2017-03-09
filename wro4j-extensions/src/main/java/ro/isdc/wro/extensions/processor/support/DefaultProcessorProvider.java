@@ -20,6 +20,7 @@ import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
 import ro.isdc.wro.extensions.processor.js.EmberJsProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
+import ro.isdc.wro.extensions.processor.js.GoogleClosureSourceMapProcessor;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
 import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -310,6 +311,12 @@ public class DefaultProcessorProvider
         @Override
         protected ResourcePreProcessor initialize() {
           return new NgAnnotateProcessor();
+        }
+      }));
+    map.put(GoogleClosureSourceMapProcessor.ALIAS_SOURCEMAP, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
+        @Override
+        protected ResourcePreProcessor initialize() {
+          return new GoogleClosureSourceMapProcessor();
         }
       }));
     return map;

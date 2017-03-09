@@ -281,4 +281,9 @@ public class ConfigurableProcessorsFactory
   protected Map<String, ResourcePreProcessor> getPreProcessorStrategies(final ProcessorProvider provider) {
     return provider.providePreProcessors();
   }
+
+  @Override
+  public ResourcePostProcessor getPostProcessor(String alias) {
+    return getPostProcessorsMap().get(alias);
+  }
 }

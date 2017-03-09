@@ -128,7 +128,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
    */
   public final ResourceType[] getSupportedResourceTypes() {
     final SupportedResourceType supportedType = getSupportedResourceType();
-    return supportedType == null ? ResourceType.values() : new ResourceType[] {
+    return supportedType == null ? ResourceType.defaultSupported() : new ResourceType[] {
       supportedType.value()
     };
   }

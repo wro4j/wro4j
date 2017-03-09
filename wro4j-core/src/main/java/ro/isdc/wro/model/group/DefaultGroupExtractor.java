@@ -59,7 +59,7 @@ public class DefaultGroupExtractor
     Validate.notNull(uri);
     ResourceType type = null;
     try {
-      type = ResourceType.get(FilenameUtils.getExtension(stripSessionID(uri)));
+      type = ResourceType.get(stripSessionID(uri));
     } catch (final IllegalArgumentException e) {
       LOG.debug("[FAIL] Cannot identify resourceType for uri: {}", uri);
     }

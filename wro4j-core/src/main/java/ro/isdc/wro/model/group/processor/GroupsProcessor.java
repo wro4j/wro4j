@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang3.Validate;
@@ -24,6 +25,7 @@ import ro.isdc.wro.model.factory.WroModelFactory;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePostProcessor;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 import ro.isdc.wro.model.resource.processor.decorator.DefaultProcessorDecorator;
@@ -73,7 +75,7 @@ public class GroupsProcessor {
       if (group == null) {
         throw new WroRuntimeException("No such group available in the model: " + cacheKey.getGroupName());
       }
-      final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType());
+      final Group filteredGroup = group.collectResourcesOfType(cacheKey.getType().getSourceType());
       if (filteredGroup.getResources().isEmpty()) {
         LOG.debug("No resources found in group: {} and resource type: {}", group.getName(), cacheKey.getType());
         if (!context.getConfig().isIgnoreEmptyGroup()) {
@@ -81,7 +83,16 @@ public class GroupsProcessor {
         }
       }
       final String result = preProcessorExecutor.processAndMerge(filteredGroup.getResources(), cacheKey.isMinimize());
-      return applyPostProcessors(cacheKey, result);
+      if (Arrays.asList(ResourceType.CSS_MAP, ResourceType.JS_MAP).contains(cacheKey.getType())) {
+          for (Resource resource:filteredGroup.getResources())
+              if (resource.isMinimize())
+                  LOG.warn("Generating sourcemap for resource {0} already minimized!", resource.getUri());
+          Writer writer = new StringWriter();
+          processorsFactory.getPostProcessor(ResourceType.MAP_PROCESSOR).process(new StringReader(result), writer);
+          return writer.toString();
+      }else {
+          return applyPostProcessors(cacheKey, result);
+      }
     } catch (final IOException e) {
       throw new WroRuntimeException("Exception while merging resources: " + e.getMessage(), e).logError();
     } finally {

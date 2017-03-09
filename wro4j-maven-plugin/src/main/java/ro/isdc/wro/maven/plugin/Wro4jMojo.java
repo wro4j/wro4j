@@ -145,7 +145,7 @@ public class Wro4jMojo
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
 
     for (final String group : groupsAsList) {
-      for (final ResourceType resourceType : ResourceType.values()) {
+      for (final ResourceType resourceType : ResourceType.defaultSupported()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 

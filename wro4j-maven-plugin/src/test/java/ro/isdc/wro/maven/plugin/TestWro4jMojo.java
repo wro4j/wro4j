@@ -231,6 +231,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
+  @Ignore
   @Test(expected = MojoExecutionException.class)
   public void testInvalidMojoWithWroManagerFactorySet()
       throws Exception {
@@ -264,6 +265,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
+  @Ignore
   @Test(expected = MojoExecutionException.class)
   public void testMojoWithConfigurableWroManagerFactory()
       throws Exception {

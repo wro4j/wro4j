@@ -17,6 +17,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -103,7 +104,7 @@ public class TestGroupsProcessor {
     final CacheKey key = new CacheKey("group", ResourceType.JS, true);
     victim.process(key);
   }
-  
+
   @Test
   public void shouldLeaveContentUnchangedWhenAProcessorFails() {
     final CacheKey key = new CacheKey(groupName, ResourceType.JS, true);
@@ -145,7 +146,7 @@ public class TestGroupsProcessor {
     verify(cssMinProcessor, Mockito.never()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
-  
+
   @Test
   public void shouldApplyEligibleMinimizeAwareProcessors()
       throws Exception {

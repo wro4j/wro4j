@@ -12,6 +12,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
+import org.junit.Ignore;
 import org.mockito.Mockito;
 
 
@@ -20,6 +21,7 @@ import org.mockito.Mockito;
  *
  * @author Alex Objelean
  */
+@Ignore
 public class Wro4jRunMojoIT
     extends AbstractMojoTestCase {
   private File destinationFolder;
