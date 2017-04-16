@@ -71,18 +71,21 @@ public abstract class AbstractProcessorsFilter
       final ByteArrayOutputStream os = new ByteArrayOutputStream();
       final HttpServletResponse wrappedResponse = new RedirectedStreamServletResponseWrapper(os, response);
       chain.doFilter(request, wrappedResponse);
-      final Reader reader = new StringReader(new String(os.toByteArray(), Context.get().getConfig().getEncoding()));
+      String configEncoding = Context.get().getConfig().getEncoding();
+      final Reader reader = new StringReader(new String(os.toByteArray(), configEncoding));
 
       final StringWriter writer = new StringWriter();
       final String requestUri = request.getRequestURI().replaceFirst(request.getContextPath(), "");
       doProcess(requestUri, reader, writer);
       // it is important to update the contentLength to new value, otherwise the transfer can be closed without all
       // bytes being read. Some browsers (chrome) complains with the following message: ERR_CONNECTION_CLOSED
-      final int contentLength = writer.getBuffer().length();
+      String result = writer.toString();
+      final int contentLength = result.getBytes(configEncoding).length;
+      response.setCharacterEncoding(configEncoding);
       response.setContentLength(contentLength);
       // Content length can be 0 when the 30x (not modified) status code is returned.
       if (contentLength > 0) {
-        IOUtils.write(writer.toString(), response.getOutputStream());
+        IOUtils.write(result, response.getOutputStream(), configEncoding);
       }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);
