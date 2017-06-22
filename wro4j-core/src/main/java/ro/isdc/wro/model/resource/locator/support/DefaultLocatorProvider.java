@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
+import ro.isdc.wro.model.resource.locator.SaasUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator;
 import ro.isdc.wro.model.resource.locator.ServletContextUriLocator.LocatorStrategy;
 import ro.isdc.wro.model.resource.locator.UriLocator;
@@ -33,6 +34,7 @@ public class DefaultLocatorProvider
     map.put(ServletContextUriLocator.ALIAS_SERVLET_CONTEXT_ONLY,
         new ServletContextUriLocator().setLocatorStrategy(LocatorStrategy.SERVLET_CONTEXT_ONLY));
     map.put(UrlUriLocator.ALIAS, new UrlUriLocator());
+    map.put(SaasUriLocator.ALIAS, new SaasUriLocator());
     return map;
   }
 
