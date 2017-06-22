@@ -1,5 +1,6 @@
 package ro.isdc.wro.model.resource.locator;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -16,11 +17,12 @@ public class TestSaasUriLocator {
         
         assertTrue(saasUriLocator.accept(base + "_sassimport"));
         assertTrue(saasUriLocator.accept(base + "style.scss"));
-        assertTrue(saasUriLocator.accept(base + "style.css")); // not very clean :-/
+        assertFalse(saasUriLocator.accept(base + "style.css"));
         
         assertNotNull(saasUriLocator.locate(base + "_sassimport"));
         assertNotNull(saasUriLocator.locate(base + "style"));
         
         assertNotNull(saasUriLocator.locate("file:" + base + "style"));
+        assertEquals(new File(base + "style.scss"), saasUriLocator.getScssFile("file:/" + base + "style"));
     }
 }

@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +40,22 @@ public class SaasUriLocator implements UriLocator {
      * {@inheritDoc}
      */
     public boolean accept(final String url) {
-        return getScssFile(url) != null;
+        if (url == null) return false;
+        final String extension = FilenameUtils.getExtension(url);
+        // scss file have either no extension or scss
+        // maybe check for the "_"?
+        if ("".equals(extension) || "scss".equals(extension)) {
+            boolean result = getScssFile(url) != null;
+            if (!result) {
+                LOG.debug("Possible scss file not found {}", url);
+            }
+            return result;
+        } else {
+            return false;
+        }
     }
     
-    static File getScssFile(String url) {
+    File getScssFile(String url) {
         if (url == null) return null;
         File result;
         // remove any "file:" at start
@@ -63,7 +76,7 @@ public class SaasUriLocator implements UriLocator {
             result = new File(url);
         }
 
-        if (result.exists()) return result;
+        if (result.isFile()) return result;
         else return null;
     }
 
