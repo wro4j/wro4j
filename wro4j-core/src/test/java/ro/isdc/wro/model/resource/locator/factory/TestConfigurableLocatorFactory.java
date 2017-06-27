@@ -60,7 +60,7 @@ public class TestConfigurableLocatorFactory {
 
   @Test
   public void shouldHaveNonEmptyListOfAvailableStrategies() {
-    assertEquals(7, victim.getAvailableStrategies().size());
+    assertEquals(8, victim.getAvailableStrategies().size());
   }
 
   @Test(expected = WroRuntimeException.class)
