@@ -29,7 +29,7 @@ public class TestDefaultUriLocatorFactory {
 
   @Test
   public void shouldHaveSeveralDefaultLocators() {
-    assertEquals(8, victim.getUriLocators().size());
+    assertEquals(9, victim.getUriLocators().size());
   }
 
   @Test
