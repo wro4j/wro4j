@@ -95,6 +95,12 @@ public class Wro4jMojo
    */
   private String contextPath;
   /**
+   * Append group suffix to group names
+   * @parameter
+   * @optional
+   */
+  private String appendSuffix;
+  /**
    * Holds a mapping between original group name file & renamed one.
    */
   private final Properties groupNames = new Properties();
@@ -147,18 +153,25 @@ public class Wro4jMojo
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
         final File destinationFolder = computeDestinationFolder(resourceType);
+        String destinationNameTmp;
+        if (appendSuffix != null) {
+          destinationNameTmp = group + "-" +  appendSuffix + "." + resourceType.name().toLowerCase();
+        } else {
+          destinationNameTmp = group + "." + resourceType.name().toLowerCase();
+        }
+        final String destinationName = destinationNameTmp;
         final String groupWithExtension = group + "." + resourceType.name().toLowerCase();
 
         if (isParallelProcessing()) {
           callables.add(Context.decorate(new Callable<Void>() {
             public Void call()
                 throws Exception {
-              processGroup(groupWithExtension, destinationFolder);
+              processGroup(groupWithExtension, destinationName, destinationFolder);
               return null;
             }
           }));
         } else {
-          processGroup(groupWithExtension, destinationFolder);
+          processGroup(groupWithExtension, destinationName, destinationFolder);
         }
       }
     }
@@ -250,7 +263,7 @@ public class Wro4jMojo
   /**
    * Process a single group.
    */
-  private void processGroup(final String group, final File parentFoder)
+  private void processGroup(final String group, final String destinationName, final File parentFoder)
       throws Exception {
     ByteArrayOutputStream resultOutputStream = null;
     InputStream resultInputStream = null;
@@ -277,7 +290,7 @@ public class Wro4jMojo
       getManagerFactory().create().process();
       // encode version & write result to file
       resultInputStream = new UnclosableBufferedInputStream(resultOutputStream.toByteArray());
-      final File destinationFile = new File(parentFoder, rename(group, resultInputStream));
+      final File destinationFile = new File(parentFoder, rename(destinationName, resultInputStream));
       final File parentFolder = destinationFile.getParentFile();
       if (!parentFolder.exists()) {
         // make directories if required
