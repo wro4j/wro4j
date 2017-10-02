@@ -104,7 +104,7 @@ public class TestLazyProcessorDecorator {
     assertTrue(victim.isMinimize());
     assertFalse(victim.isSupported());
     assertEquals(expectedResourceType, victim.getSupportedResourceType().value());
-    verify(mockProcessorDecorator).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+    verify(mockProcessorDecorator).process((Resource)Mockito.isNull(), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
 }

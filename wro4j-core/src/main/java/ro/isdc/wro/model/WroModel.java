@@ -8,7 +8,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +51,7 @@ public final class WroModel {
     notNull(groups, "groups cannot be null!");
     LOG.debug("setGroups: {}", groups);
     identifyDuplicateGroupNames(groups);
-    this.groups = new HashSet<Group>(groups);
+    this.groups = new TreeSet<Group>(groups);
     return this;
   }
 

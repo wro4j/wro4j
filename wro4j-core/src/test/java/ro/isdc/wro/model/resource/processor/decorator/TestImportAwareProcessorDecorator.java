@@ -80,7 +80,7 @@ public class TestImportAwareProcessorDecorator {
     victim = new ImportAwareProcessorDecorator(processor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(mockReader, mockWriter);
-    Mockito.verify(processor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+    Mockito.verify(processor, Mockito.atLeastOnce()).process((Resource)Mockito.isNull(), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
 
@@ -124,7 +124,7 @@ public class TestImportAwareProcessorDecorator {
     victim = new ImportAwareProcessorDecorator(mockPreProcessor, ProcessingType.IMPORT_ONLY);
     initVictim();
     victim.process(null, mockReader, mockWriter);
-    Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process(Mockito.any(Resource.class), Mockito.any(Reader.class),
+    Mockito.verify(mockPreProcessor, Mockito.atLeastOnce()).process((Resource)Mockito.isNull(), Mockito.any(Reader.class),
         Mockito.any(Writer.class));
   }
 

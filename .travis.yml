@@ -1,6 +1,8 @@
 language: java
 sudo: false # faster builds
 jdk:
-  - oraclejdk7
+  - openjdk7
+  - oraclejdk8
+  - oraclejdk9
 script:  mvn clean test
 env: MAVEN_OPTS=" -Xmx2048m -Xms768m -XX:MaxPermSize=512m"
