@@ -483,7 +483,7 @@ public class WroTestUtils {
       final ResourceType... expectedResourceTypes) {
     final ResourceType[] actualResourceTypes = new ProcessorDecorator(processor).getSupportedResourceTypes();
     try {
-      Assert.assertTrue(Arrays.equals(expectedResourceTypes, actualResourceTypes));
+      Assert.assertArrayEquals(expectedResourceTypes, actualResourceTypes);
     } catch (final AssertionFailedError e) {
       final String message = "actual resourceTypes: " + Arrays.toString(actualResourceTypes) + ", expected are: "
           + Arrays.toString(expectedResourceTypes);

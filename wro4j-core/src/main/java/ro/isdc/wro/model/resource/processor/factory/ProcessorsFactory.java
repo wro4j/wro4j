@@ -23,4 +23,6 @@ public interface ProcessorsFactory {
    * @return a collection of post processors to apply.
    */
   Collection<ResourcePostProcessor> getPostProcessors();
+  
+  ResourcePostProcessor getPostProcessor(String alias);
 }

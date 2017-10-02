@@ -11,6 +11,7 @@ import java.net.URL;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
@@ -46,7 +47,6 @@ public class TestSingleLineCommentStripperProcessor {
     WroTestUtils.compareFromDifferentFoldersByExtension(testFolder, expectedFolder, "js",
       processor);
   }
-
 
   @Test
   public void shouldSupportCorrectResourceTypes() {

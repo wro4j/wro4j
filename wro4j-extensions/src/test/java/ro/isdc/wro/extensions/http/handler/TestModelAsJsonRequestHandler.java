@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -128,6 +129,7 @@ public class TestModelAsJsonRequestHandler {
     assertTrue(accept);
   }
 
+  @Ignore
   @Test
   public void shouldNotProvideProxyUriForExternalResources()
       throws IOException {
