@@ -90,7 +90,7 @@ public class ResourceBundleProcessor {
           response.setContentLength(cacheValue.getGzippedContent().length);
           // add gzip header and gzip response
           response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
-          response.setHeader("Vary", "Accept-Encoding");
+          response.addHeader("Vary", "Accept-Encoding");
           IOUtils.write(cacheValue.getGzippedContent(), os);
         } else {
           //using getRawContent().length() is not the same and can return 2Bytes smaller size.
