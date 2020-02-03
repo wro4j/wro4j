@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -231,7 +232,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
-  @Test(expected = MojoExecutionException.class)
+  @Test(expected = WroRuntimeException.class)
   public void testInvalidMojoWithWroManagerFactorySet()
       throws Exception {
     victim.setWroManagerFactory("INVALID_CLASS_NAME");
@@ -264,7 +265,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
-  @Test(expected = MojoExecutionException.class)
+  @Test(expected = WroRuntimeException.class)
   public void testMojoWithConfigurableWroManagerFactory()
       throws Exception {
     setWroWithValidResources();
