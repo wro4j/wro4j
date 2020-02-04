@@ -143,7 +143,7 @@ public class ServletContextUriLocator
           LOG.debug(message);
           throw new IOException(message);
         }
-        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, StandardCharsets.UTF_8)));
+        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, StandardCharsets.UTF_8.name())));
       }
     } catch (final IOException e) {
       /**

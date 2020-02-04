@@ -129,7 +129,7 @@ public class ClasspathUriLocator
       LOG.debug("Failed to locate stream for {} because URL is null", uri);
       throw new IOException("Cannot locate stream for null URL");
     }
-    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8)));
+    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
   }
 
   /**
