@@ -56,21 +56,18 @@ public class PackerJsProcessor
 	@Override
 	public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
 
-		synchronized (this) {
+		final String content = IOUtils.toString(reader);
+		final PackerJs packerJs = enginePool.getObject();
 
-			final String content = IOUtils.toString(reader);
-			final PackerJs packerJs = enginePool.getObject();
-
-			try (reader;writer) {
-				writer.write(packerJs.pack(content));
-			} catch (final WroRuntimeException e) {
-				onException(e);
-				final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-				LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-						+ " resource, no processing applied...", e);
-			} finally {
-				enginePool.returnObject(packerJs);
-			}
+		try (reader; writer) {
+			writer.write(packerJs.pack(content));
+		} catch (final WroRuntimeException e) {
+			onException(e);
+			final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+			LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+					+ " resource, no processing applied...", e);
+		} finally {
+			enginePool.returnObject(packerJs);
 		}
 	}
 
