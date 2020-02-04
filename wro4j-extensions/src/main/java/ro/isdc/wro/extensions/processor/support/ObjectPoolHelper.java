@@ -68,10 +68,10 @@ public class ObjectPoolHelper<T> {
     pool.setMaxIdle(MAX_IDLE);
     pool.setMaxWaitMillis(MAX_WAIT);
     /**
-     * Don't block when exhausted, otherwise the pool object retrieval can fail. More details here:
+     * Block when exhausted, otherwise the pool object retrieval can fail. More details here:
      * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
      */
-    pool.setBlockWhenExhausted(false);
+    pool.setBlockWhenExhausted(true);
     // make object eligible for eviction after a predefined amount of time.
     pool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
     pool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);

@@ -58,7 +58,7 @@ public abstract class AbstractLinterProcessor
     throws IOException {
     final String content = IOUtils.toString(reader);
     final AbstractLinter linter = enginePool.getObject();
-    try {
+    try (reader) {
       // TODO investigate why linter fails when trying to reuse the same instance twice
       linter.setOptions(getOptions()).validate(content);
     } catch (final LinterException e) {
@@ -71,7 +71,6 @@ public abstract class AbstractLinterProcessor
     } finally {
       // don't change the processed content no matter what happens.
       writer.write(content);
-      reader.close();
       writer.close();
       enginePool.returnObject(linter);
     }

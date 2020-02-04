@@ -61,7 +61,7 @@ public class PackerJsProcessor
 			final String content = IOUtils.toString(reader);
 			final PackerJs packerJs = enginePool.getObject();
 
-			try {
+			try (reader;writer) {
 				writer.write(packerJs.pack(content));
 			} catch (final WroRuntimeException e) {
 				onException(e);
@@ -69,8 +69,6 @@ public class PackerJsProcessor
 				LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
 						+ " resource, no processing applied...", e);
 			} finally {
-				reader.close();
-				writer.close();
 				enginePool.returnObject(packerJs);
 			}
 		}
