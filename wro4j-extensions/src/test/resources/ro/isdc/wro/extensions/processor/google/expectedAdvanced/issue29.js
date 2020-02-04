@@ -1,1 +1,1 @@
-result=1;
+'use strict';result=1;

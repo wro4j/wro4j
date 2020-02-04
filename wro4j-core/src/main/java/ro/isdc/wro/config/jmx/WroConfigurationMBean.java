@@ -129,10 +129,13 @@ public interface WroConfigurationMBean {
   boolean isIgnoreMissingResources();
   
   /**
-   * @return set the ignoreMissingResources flag.
+   * Set the ignoreMissingResources flag.
+   *
+   * @param ignore
+   * 			The new ignoreMissingResources flag.
    */
   void setIgnoreMissingResources(boolean ignore);
-  
+
   /**
    * @param ignore
    *          turns on/off failure on empty group (when there is nothing to process).

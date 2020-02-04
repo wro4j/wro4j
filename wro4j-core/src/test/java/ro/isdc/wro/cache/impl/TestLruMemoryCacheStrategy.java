@@ -1,9 +1,5 @@
 package ro.isdc.wro.cache.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -28,12 +24,12 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  */
 public class TestLruMemoryCacheStrategy {
   private LruMemoryCacheStrategy<CacheKey, CacheValue> cache;
-  
+
   @BeforeClass
   public static void onBeforeClass() {
-    assertEquals(0, Context.countActive());
+	  Assert.assertEquals(0, Context.countActive());
   }
-  
+
   @Before
   public void setUp() {
     Context.set(Context.standaloneContext());
@@ -54,13 +50,12 @@ public class TestLruMemoryCacheStrategy {
     cache.put(key1, CacheValue.valueOf(content, hash));
     cache.put(key2, CacheValue.valueOf(content, hash));
     cache.put(key3, CacheValue.valueOf(content, hash));
-    assertNotNull(cache.get(key1));
+    Assert.assertNotNull(cache.get(key1));
     // Removes the 2nd entry because the 1st one was used in the assertion
     // above.
     cache.put(key4, CacheValue.valueOf(content, hash));
-    assertNull(cache.get(key2));
+    Assert.assertNull(cache.get(key2));
   }
-
 
   @After
   public void tearDown() {

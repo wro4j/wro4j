@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.InjectorBuilder.InjectorObjectFactory;
 import ro.isdc.wro.util.ObjectDecorator;
@@ -81,7 +80,7 @@ public final class Injector {
             final String message = String.format(
                 "@Inject cannot be applied on object: %s to field of type: %s using injector %s", object,
                 field.getType(), this);
-            LOG.error(message + ". Supported types are: {}", map.keySet());
+            LOG.error("{}. Supported types are: {}", message, map.keySet());
             throw new WroRuntimeException(message);
           }
         }

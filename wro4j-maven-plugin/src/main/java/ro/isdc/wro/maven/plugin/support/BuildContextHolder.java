@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,15 +157,12 @@ public class BuildContextHolder {
    * it is relatively expensive. Not invoking it, would break the incremental build feature.
    */
   public void persist() {
-    OutputStream os = null;
-    try {
-      os = new FileOutputStream(fallbackStorageFile);
+
+    try (OutputStream os = new FileOutputStream(fallbackStorageFile)) {
       fallbackStorage.store(os, "Generated");
       LOG.debug("fallback storage written to {}", fallbackStorageFile);
     } catch (final IOException e) {
       LOG.warn("Cannot persist fallback storage: {}.", fallbackStorageFile, e);
-    } finally {
-      IOUtils.closeQuietly(os);
     }
   }
 }

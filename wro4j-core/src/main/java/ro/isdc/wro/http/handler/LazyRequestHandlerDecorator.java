@@ -1,7 +1,5 @@
 package ro.isdc.wro.http.handler;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +31,7 @@ public class LazyRequestHandlerDecorator
       private Injector injector;
       @Override
       protected RequestHandler initialize() {
-        notNull(injector, "This object was not initialized:" + this);
+    	Validate.notNull(injector, "This object was not initialized:" + this);
         final RequestHandler handler = super.initialize();
         injector.inject(handler);
         return handler;
@@ -41,20 +39,22 @@ public class LazyRequestHandlerDecorator
     };
   }
 
-
   public LazyRequestHandlerDecorator(final LazyInitializer<RequestHandler> initializer) {
     super(decorate(initializer));
   }
 
+  @Override
   public void handle(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     getRequestHandler().handle(request, response);
   }
 
+  @Override
   public boolean accept(final HttpServletRequest request) {
     return getRequestHandler().accept(request);
   }
 
+  @Override
   public boolean isEnabled() {
     return getRequestHandler().isEnabled();
   }

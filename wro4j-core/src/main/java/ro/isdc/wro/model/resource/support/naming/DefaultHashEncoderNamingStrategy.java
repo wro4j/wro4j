@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.model.group.Inject;
@@ -42,7 +41,7 @@ public class DefaultHashEncoderNamingStrategy
     throws IOException {
     notNull(originalName);
     notNull(inputStream);
-    try{
+    try (inputStream) {
       final String baseName = FilenameUtils.getBaseName(originalName);
       final String path = FilenameUtils.getPath(originalName);
       final String extension = FilenameUtils.getExtension(originalName);
@@ -52,8 +51,6 @@ public class DefaultHashEncoderNamingStrategy
         sb.append(".").append(extension);
       }
       return sb.toString();
-    }finally{
-      IOUtils.closeQuietly(inputStream);
     }
   }
 }

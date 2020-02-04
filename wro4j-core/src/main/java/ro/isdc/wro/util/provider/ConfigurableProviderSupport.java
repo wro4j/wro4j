@@ -27,56 +27,64 @@ public class ConfigurableProviderSupport
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, ResourcePreProcessor> providePreProcessors() {
-    return new HashMap<String, ResourcePreProcessor>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, ResourcePostProcessor> providePostProcessors() {
-    return new HashMap<String, ResourcePostProcessor>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, NamingStrategy> provideNamingStrategies() {
-    return new HashMap<String, NamingStrategy>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, HashStrategy> provideHashStrategies() {
-    return new HashMap<String, HashStrategy>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, UriLocator> provideLocators() {
-    return new HashMap<String, UriLocator>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, CacheStrategy<CacheKey, CacheValue>> provideCacheStrategies() {
-    return new HashMap<String, CacheStrategy<CacheKey, CacheValue>>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, RequestHandler> provideRequestHandlers() {
-    return new HashMap<String, RequestHandler>();
+    return new HashMap<>();
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public Map<String, WroModelFactory> provideModelFactories() {
-    return new HashMap<String, WroModelFactory>();
+    return new HashMap<>();
   }
 }

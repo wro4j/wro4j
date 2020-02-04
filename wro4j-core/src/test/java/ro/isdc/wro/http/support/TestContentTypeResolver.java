@@ -2,6 +2,8 @@ package ro.isdc.wro.http.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Test;
 
 
@@ -19,7 +21,7 @@ public class TestContentTypeResolver {
 
   @Test
    public void shouldResolveJPGExtenstionWithoutCharset() {
-    assertEquals("image/jpeg", ContentTypeResolver.get("s/bvews/omefile.jpg", "UTF-8"));
+    assertEquals("image/jpeg", ContentTypeResolver.get("s/bvews/omefile.jpg", StandardCharsets.UTF_8.name()));
    }
 
   @Test
@@ -29,7 +31,7 @@ public class TestContentTypeResolver {
 
   @Test
   public void shouldResolveHTMLExtenstionWitCharset() {
-    assertEquals("text/html; charset=UTF-8", ContentTypeResolver.get("mefile.html", "UTF-8"));
+    assertEquals("text/html; charset=UTF-8", ContentTypeResolver.get("mefile.html", StandardCharsets.UTF_8.name()));
   }
 
   @Test

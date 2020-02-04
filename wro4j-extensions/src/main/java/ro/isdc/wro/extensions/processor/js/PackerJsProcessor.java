@@ -36,10 +36,10 @@ import ro.isdc.wro.util.ObjectFactory;
 @SupportedResourceType(ResourceType.JS)
 public class PackerJsProcessor
   implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
+
   private static final Logger LOG = LoggerFactory.getLogger(PackerJsProcessor.class);
   public static final String ALIAS = "packerJs";
   private ObjectPoolHelper<PackerJs> enginePool;
-
 
   public PackerJsProcessor() {
     enginePool = new ObjectPoolHelper<PackerJs>(new ObjectFactory<PackerJs>() {
@@ -50,28 +50,26 @@ public class PackerJsProcessor
     });
   }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void process(final Resource resource, final Reader reader, final Writer writer)
-    throws IOException {
-    final String content = IOUtils.toString(reader);
-    final PackerJs packerJs = enginePool.getObject();
-    try {
-      writer.write(packerJs.pack(content));
-    } catch (final WroRuntimeException e) {
-      onException(e);
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
-    } finally {
-      reader.close();
-      writer.close();
-      enginePool.returnObject(packerJs);
-    }
-  }
+		final String content = IOUtils.toString(reader);
+		final PackerJs packerJs = enginePool.getObject();
+
+		try (reader; writer) {
+			writer.write(packerJs.pack(content));
+		} catch (final WroRuntimeException e) {
+			onException(e);
+			final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+			LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+					+ " resource, no processing applied...", e);
+		} finally {
+			enginePool.returnObject(packerJs);
+		}
+	}
 
   /**
    * Invoked when a processing exception occurs.
@@ -86,7 +84,6 @@ public class PackerJsProcessor
   protected PackerJs newPackerJs() {
     return new PackerJs();
   }
-
 
   /**
    * {@inheritDoc}

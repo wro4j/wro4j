@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +134,7 @@ public class TestLessCssProcessor {
     victim.process(null, new StringReader(noImports), actual);
 
     final String expected = IOUtils.toString(managerFactory.create().getUriLocatorFactory().locate(
-        String.format("classpath:%s/expected/import.cssx", baseFolder)));
+        String.format("classpath:%s/expected/import.cssx", baseFolder)), Charset.defaultCharset());
     assertEquals(expected, actual.toString());
   }
 

@@ -4,6 +4,5 @@ jdk:
   - openjdk9
   - openjdk10
   - openjdk11
-  - oraclejdk9
 script:  mvn clean test
 env: MAVEN_OPTS=" -Xmx2048m -Xms768m -XX:MaxPermSize=512m"

@@ -9,7 +9,6 @@ import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,19 +58,18 @@ public class ServletContextPropertyWroConfigurationFactory
    *         {@link ServletContextPropertyWroConfigurationFactory#getConfigPath()} method.
    */
   public Properties createProperties() {
+
     // Merge Properties file content with the filterConfig content.
     final Properties props = new Properties();
-    InputStream propertyStream = null;
-    try {
+
+    try (InputStream propertyStream = servletContext.getResourceAsStream(getConfigPath())) {
       LOG.debug("loading config resource from: {}", getConfigPath());
-      propertyStream = servletContext.getResourceAsStream(getConfigPath());
       Validate.notNull(propertyStream);
       props.load(propertyStream);
     } catch (final Exception e) {
       LOG.warn("[WARN] Cannot read properties file stream from default location: {}. Using default configuration.", getConfigPath());
-    } finally {
-      IOUtils.closeQuietly(propertyStream);
     }
+
     return props;
   }
 }

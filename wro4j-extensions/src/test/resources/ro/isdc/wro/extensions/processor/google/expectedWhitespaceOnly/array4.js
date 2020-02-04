@@ -1,1 +1,1 @@
-(function(){(function(){return new Array(1,2,3)})();function Array(){}})();
+'use strict';(function(){(function(){return new Array(1,2,3)})();function Array(){}})();

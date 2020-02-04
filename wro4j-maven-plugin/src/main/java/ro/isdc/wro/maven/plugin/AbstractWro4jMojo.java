@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.maven.plugin;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -12,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.classworlds.ClassRealm;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -183,9 +181,6 @@ public abstract class AbstractWro4jMojo
         } catch (final Exception e) {
           throw new MojoExecutionException("Exception in onAfterExecute", e);
         }
-        finally {
-            getWroManager().destroy();
-        }
       }
     }
   }
@@ -244,7 +239,7 @@ public abstract class AbstractWro4jMojo
     try {
       final Class<?> wroManagerFactoryClass = Thread.currentThread().getContextClassLoader().loadClass(
           wroManagerFactory.trim());
-      factory = (WroManagerFactory) wroManagerFactoryClass.newInstance();
+      factory = (WroManagerFactory) wroManagerFactoryClass.getDeclaredConstructor().newInstance();
     } catch (final Exception e) {
       throw new MojoExecutionException("Invalid wroManagerFactoryClass, called: " + wroManagerFactory, e);
     }
@@ -290,7 +285,7 @@ public abstract class AbstractWro4jMojo
    */
   protected final List<String> getTargetGroupsAsList()
       throws Exception {
-    List<String> result = null;
+    List<String> result;
     if (isIncrementalCheckRequired()) {
       result = getIncrementalGroupNames();
     } else if (getTargetGroups() == null) {
@@ -327,7 +322,7 @@ public abstract class AbstractWro4jMojo
    */
   private List<String> getIncrementalGroupNames()
       throws Exception {
-    final List<String> changedGroupNames = new ArrayList<String>();
+    final List<String> changedGroupNames = new ArrayList<>();
     for (final Group group : getModel().getGroups()) {
       // skip processing non target groups
       if (isTargetGroup(group)) {
@@ -349,7 +344,7 @@ public abstract class AbstractWro4jMojo
    * Check if the provided group is a target group.
    */
   private boolean isTargetGroup(final Group group) {
-    notNull(group);
+	Validate.notNull(group);
     final String targetGroups = getTargetGroups();
     // null, means all groups are target groups
     return targetGroups == null || targetGroups.contains(group.getName());
@@ -374,7 +369,7 @@ public abstract class AbstractWro4jMojo
   protected final void extendPluginClasspath()
       throws MojoExecutionException {
     // this code is inspired from http://teleal.org/weblog/Extending%20the%20Maven%20plugin%20classpath.html
-    final List<String> classpathElements = new ArrayList<String>();
+    final List<String> classpathElements = new ArrayList<>();
     try {
       classpathElements.addAll(mavenProject.getRuntimeClasspathElements());
     } catch (final DependencyResolutionRequiredException e) {
@@ -384,12 +379,9 @@ public abstract class AbstractWro4jMojo
     Thread.currentThread().setContextClassLoader(classLoader);
   }
 
-  /**
-   * @return {@link ClassRealm} based on project dependencies.
-   */
   private ClassLoader createClassLoader(final List<String> classpathElements) {
     getLog().debug("Classpath elements:");
-    final List<URL> urls = new ArrayList<URL>();
+    final List<URL> urls = new ArrayList<>();
     try {
       for (final String element : classpathElements) {
         final File elementFile = new File(element);

@@ -1,7 +1,5 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.resource.Resource;
 
@@ -17,7 +15,6 @@ import ro.isdc.wro.model.resource.Resource;
  */
 public class MinimizeAwareProcessorDecorator
     extends ProcessorDecorator {
-  private static final Logger LOG = LoggerFactory.getLogger(MinimizeAwareProcessorDecorator.class);
   /**
    * Flag indicating if minimize aware processing is allowed.
    */

@@ -1,1 +1,1 @@
-x=(y,z);
+'use strict';x=(y,z);

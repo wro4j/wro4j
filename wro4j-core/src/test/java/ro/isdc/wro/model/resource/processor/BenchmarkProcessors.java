@@ -2,6 +2,7 @@ package ro.isdc.wro.model.resource.processor;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,9 +55,9 @@ public class BenchmarkProcessors {
     LOG.debug(watch.prettyPrint());
 
     final String jsSample = IOUtils.toString(locator
-        .locate("http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"), "UTF-8");
+        .locate("http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"), StandardCharsets.UTF_8);
     final String cssSample = IOUtils.toString(locator
-        .locate("https://gist.github.com/raw/4525988/29e5791d999181a12ae700633acc7823ed17eadb/bootstrap"), "UTF-8");
+        .locate("https://gist.github.com/raw/4525988/29e5791d999181a12ae700633acc7823ed17eadb/bootstrap"), StandardCharsets.UTF_8);
     for (final ResourcePreProcessor processor : processors) {
       final ProcessorDecorator decorated = decorateProcessor(processor);
       injector.inject(decorated);

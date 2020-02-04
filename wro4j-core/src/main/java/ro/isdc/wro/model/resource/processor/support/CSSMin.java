@@ -138,7 +138,7 @@ class Selector {
 
 
 class Property
-  implements Comparable {
+  implements Comparable<Property> {
   private static final Logger LOG = LoggerFactory.getLogger(CSSMin.class);
   protected String property;
   protected Value[] values;
@@ -190,8 +190,8 @@ class Property
   }
 
 
-  public int compareTo(final Object other) {
-    return property.compareTo(((Property)other).property);
+  public int compareTo(final Property other) {
+    return property.compareTo(other.property);
   }
 
 

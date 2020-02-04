@@ -129,7 +129,7 @@ public class ImageUrlRewriter {
     LOG.debug("aggregatedFolderPath: {}", aggregatedFolderPath);
     String computedPrefix = StringUtils.EMPTY;
     if (aggregatedFolderPath != null) {
-      final StringBuffer result = new StringBuffer(StringUtils.EMPTY);
+      final StringBuilder result = new StringBuilder(StringUtils.EMPTY);
       final String[] depthFolders = WroUtil.normalize(aggregatedFolderPath).split(ROOT_CONTEXT_PATH);
       LOG.debug("subfolders {}", Arrays.toString(depthFolders));
 

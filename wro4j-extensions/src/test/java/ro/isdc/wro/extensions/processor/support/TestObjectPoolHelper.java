@@ -3,7 +3,7 @@
  */
 package ro.isdc.wro.extensions.processor.support;
 
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -60,6 +60,7 @@ public class TestObjectPoolHelper {
     pool.setObjectPool(null);
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void shouldUseCustomObjectPool()
       throws Exception {

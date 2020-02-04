@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
@@ -232,7 +233,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
-  @Test(expected = WroRuntimeException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testInvalidMojoWithWroManagerFactorySet()
       throws Exception {
     victim.setWroManagerFactory("INVALID_CLASS_NAME");
@@ -265,7 +266,7 @@ public class TestWro4jMojo {
     victim.execute();
   }
 
-  @Test(expected = WroRuntimeException.class)
+  @Test(expected = MojoExecutionException.class)
   public void testMojoWithConfigurableWroManagerFactory()
       throws Exception {
     setWroWithValidResources();
@@ -290,7 +291,7 @@ public class TestWro4jMojo {
       throws Exception {
     setWroWithValidResources();
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=cssMin";
-    FileUtils.write(extraConfigFile, preProcessors);
+    FileUtils.write(extraConfigFile, preProcessors, Charset.defaultCharset());
 
     victim.setIgnoreMissingResources(true);
     victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
@@ -376,7 +377,7 @@ public class TestWro4jMojo {
       throws Exception {
     setWroWithValidResources();
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=INVALID";
-    FileUtils.write(extraConfigFile, preProcessors);
+    FileUtils.write(extraConfigFile, preProcessors, Charset.defaultCharset());
 
     victim.setIgnoreMissingResources(true);
     victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());

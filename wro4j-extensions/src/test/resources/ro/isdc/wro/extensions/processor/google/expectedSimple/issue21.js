@@ -1,1 +1,1 @@
-var a=0;switch(a){case 0:a++};
+'use strict';var a=0;switch(a){case 0:a++};

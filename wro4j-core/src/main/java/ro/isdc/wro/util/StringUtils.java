@@ -8,7 +8,6 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -78,7 +77,7 @@ public final class StringUtils {
 
     final String[] pathArray = delimitedListToStringArray(pathToUse,
         FOLDER_SEPARATOR);
-    final List<String> pathElements = new LinkedList<String>();
+    final List<String> pathElements = new ArrayList<>();
     int tops = 0;
 
     for (int i = pathArray.length - 1; i >= 0; i--) {
@@ -123,8 +122,8 @@ public final class StringUtils {
     if (!hasLength(inString) || !hasLength(oldPattern) || newPattern == null) {
       return inString;
     }
-    final StringBuffer sbuf = new StringBuffer();
-    // output StringBuffer we'll build up
+    final StringBuilder sbuf = new StringBuilder();
+    // output StringBuilder we'll build up
     int pos = 0; // our position in the old string
     int index = inString.indexOf(oldPattern);
     // the index of an occurrence we've found, or -1
@@ -174,7 +173,7 @@ public final class StringUtils {
     if (coll == null || coll.isEmpty()) {
       return EMPTY;
     }
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     final Iterator<String> it = coll.iterator();
     while (it.hasNext()) {
       sb.append(prefix).append(it.next()).append(suffix);
@@ -283,7 +282,7 @@ public final class StringUtils {
     if (!hasLength(inString) || !hasLength(charsToDelete)) {
       return inString;
     }
-    final StringBuffer out = new StringBuffer();
+    final StringBuilder out = new StringBuilder();
     for (int i = 0; i < inString.length(); i++) {
       final char c = inString.charAt(i);
       if (charsToDelete.indexOf(c) == -1) {

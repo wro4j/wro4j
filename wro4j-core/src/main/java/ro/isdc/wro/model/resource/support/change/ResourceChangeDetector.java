@@ -8,8 +8,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.io.IOUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +33,10 @@ public class ResourceChangeDetector {
    * Map between a resource uri and a corresponding {@link ResourceChangeInfo} object. It is ensured that any get(key)
    * operation will return a not null object.
    */
-  private final Map<String, ResourceChangeInfo> changeInfoMap = new ConcurrentHashMap<String, ResourceChangeInfo>() {
-    @Override
+  private final Map<String, ResourceChangeInfo> changeInfoMap = new ConcurrentHashMap<>() {
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public ResourceChangeInfo get(final Object key) {
       ResourceChangeInfo result = super.get(key);
       if (result == null) {
@@ -72,11 +72,9 @@ public class ResourceChangeDetector {
     final ResourceChangeInfo resourceInfo = changeInfoMap.get(uri);
     if (resourceInfo.isCheckRequiredForGroup(groupName)) {
       final InputStream inputStream = locatorFactory.locate(uri);
-      try{
+      try (inputStream) {
         final String currentHash = hashStrategy.getHash(inputStream);
         resourceInfo.updateHashForGroup(currentHash, groupName);
-      }finally{
-        IOUtils.closeQuietly(inputStream);
       }
     }
     return resourceInfo.isChanged(groupName);

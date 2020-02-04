@@ -39,8 +39,8 @@ public class ProxyFactory<T> {
   /**
    * Creates a proxy for the provided object.
    *
-   * @param object
-   *          for which a proxy will be created.
+   * @param objectFactory
+   *          Object factory for which a proxy will be created.
    * @param genericType
    *          the Class of the generic object, required to create the proxy. This argument is required because of type
    *          erasure and generics info aren't available at runtime.
@@ -64,6 +64,7 @@ public class ProxyFactory<T> {
   @SuppressWarnings("unchecked")
   private T create() {
     final InvocationHandler handler = new InvocationHandler() {
+      @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args)
           throws Throwable {
         try {

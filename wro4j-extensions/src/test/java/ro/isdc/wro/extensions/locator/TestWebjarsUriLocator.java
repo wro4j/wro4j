@@ -40,7 +40,7 @@ public class TestWebjarsUriLocator {
 
   @Test
   public void shouldCreateValidUri() {
-    assertEquals("/webjars/path/to/resource.js", WebjarsUriLocator.createUri("/path/to/resource.js"));
+    assertEquals("webjars:/path/to/resource.js", WebjarsUriLocator.createUri("/path/to/resource.js"));
   }
 
   @Test(expected = NullPointerException.class)
@@ -61,21 +61,21 @@ public class TestWebjarsUriLocator {
   @Test
   public void shouldFindValidWebjar()
       throws Exception {
-    assertNotEmpty(victim.locate("/webjars/jquery.js"));
-    assertNotEmpty(victim.locate("/webjars/jquery/2.0.0/jquery.js"));
-    assertNotEmpty(victim.locate("/webjars//jquery/2.0.0/jquery.js"));
+    assertNotEmpty(victim.locate("webjars:jquery.js"));
+    assertNotEmpty(victim.locate("webjars:jquery/2.0.0/jquery.js"));
+    assertNotEmpty(victim.locate("webjars:/jquery/2.0.0/jquery.js"));
   }
 
   @Test(expected = IOException.class)
   public void cannotFindInvalidWebjar()
       throws Exception {
-    victim.locate("/webjars/invalid.js");
+    victim.locate("webjars:invalid.js");
   }
 
   @Test
   public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar()
       throws IOException {
-    assertNotEmpty(victim.locate("/webjars/webjarFail.js"));
+    assertNotEmpty(victim.locate("webjars:webjarFail.js"));
   }
 
   private void assertNotEmpty(final InputStream stream)
@@ -87,6 +87,6 @@ public class TestWebjarsUriLocator {
   @Test
   public void shouldLocateWebjarResourceContainingQuestionMarkInUri()
       throws Exception {
-    victim.locate("/webjars/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3");
+    victim.locate("webjars:font-awesome/5.12.0/webfonts/fa-regular-400.woff?v=5.12.0");
   }
 }

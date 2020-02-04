@@ -33,6 +33,7 @@ public class DefaultWroManagerFactory
    */
   public static DefaultWroManagerFactory create(final WroConfiguration configuration) {
     return create(new ObjectFactory<WroConfiguration>() {
+      @Override
       public WroConfiguration create() {
         return configuration;
       }
@@ -77,7 +78,7 @@ public class DefaultWroManagerFactory
       Class<?> factoryClass = null;
       try {
         factoryClass = Thread.currentThread().getContextClassLoader().loadClass(wroManagerClassName);
-        factory = (WroManagerFactory) factoryClass.newInstance();
+        factory = (WroManagerFactory) factoryClass.getDeclaredConstructor().newInstance();
       } catch (final Exception e) {
         throw new WroRuntimeException("Exception while loading WroManagerFactory class:" + wroManagerClassName, e);
       }

@@ -27,7 +27,7 @@ public class SchedulerHelper {
   private final LazyInitializer<ScheduledThreadPoolExecutor> poolInitializer = new LazyInitializer<ScheduledThreadPoolExecutor>() {
     @Override
     protected ScheduledThreadPoolExecutor initialize() {
-      return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(SchedulerHelper.this.name)) {
+      return new ScheduledThreadPoolExecutor(1, WroUtil.createDaemonThreadFactory(name)) {
         @Override
         public boolean getExecuteExistingDelayedTasksAfterShutdownPolicy() {
           return false;
@@ -86,6 +86,17 @@ public class SchedulerHelper {
   }
 
   /**
+   * Schedules with provided period using {@link TimeUnit#SECONDS} as a default time unit.
+   *
+   * @param period
+   *          new period for scheduling.
+   */
+  public SchedulerHelper scheduleWithPeriod(final long period) {
+    scheduleWithPeriod(period, TimeUnit.SECONDS);
+    return this;
+  }
+
+  /**
    * Run the scheduler with the provided period of time. If the scheduler is already started, it will be stopped (not
    * before the running job is complete).
    *
@@ -129,10 +140,7 @@ public class SchedulerHelper {
 
   /**
    * The following method shuts down an ExecutorService in two phases, first by calling shutdown to reject incoming
-   * tasks, and then calling shutdownNow, if necessary, to cancel any lingering tasks:
-   *
-   * @param destroyNow
-   *          - if true, any running operation will be stopped immediately, otherwise scheduler will await termination.
+   * tasks, and then calling shutdownNow, if necessary, to cancel any lingering tasks.
    */
   private synchronized void destroyScheduler() {
     if (!poolInitializer.get().isShutdown()) {
@@ -163,17 +171,6 @@ public class SchedulerHelper {
       future.cancel(false);
       LOG.debug("[STOP] Scheduler terminated successfully! {}", name);
     }
-  }
-
-  /**
-   * Schedules with provided period using {@link TimeUnit#SECONDS} as a default time unit.
-   *
-   * @param period
-   *          new period for scheduling.
-   */
-  public SchedulerHelper scheduleWithPeriod(final long period) {
-    scheduleWithPeriod(period, TimeUnit.SECONDS);
-    return this;
   }
 
   /**

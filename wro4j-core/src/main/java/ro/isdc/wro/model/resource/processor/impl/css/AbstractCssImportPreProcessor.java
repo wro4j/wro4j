@@ -53,6 +53,7 @@ public abstract class AbstractCssImportPreProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
+
   /**
    * A map useful for detecting deep recursion. The key (correlationId) - identifies a processing unit, while the value
    * contains a pair between the list o processed resources and a stack holding recursive calls (value contained on this
@@ -60,8 +61,9 @@ public abstract class AbstractCssImportPreProcessor
    * detect recursion when running in concurrent environment (when processor is invoked from within the processor for
    * child resources).
    */
-  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<String, Pair<List<String>, Stack<String>>>() {
-    /**
+  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<>() {
+	private static final long serialVersionUID = 1L;
+	/**
      * Make sure that the get call will always return a not null object. To avoid growth of this map, it is important to
      * call remove for each invoked get.
      */

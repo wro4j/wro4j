@@ -16,6 +16,9 @@ import ro.isdc.wro.WroRuntimeException;
  * @since 1.3.5
  */
 public class LinterException extends WroRuntimeException {
+
+  private static final long serialVersionUID = 8371254252272491231L;
+
   private Collection<LinterError> errors;
 
   public LinterException() {
@@ -26,7 +29,6 @@ public class LinterException extends WroRuntimeException {
     super(message, cause);
   }
 
-
   /**
    * @return the errors
    */
@@ -36,7 +38,6 @@ public class LinterException extends WroRuntimeException {
     }
     return this.errors;
   }
-
 
   /**
    * @param errors the errors to set

@@ -1,1 +1,1 @@
-function f(){var a;if(a="a")return a;else return a}f();
+'use strict';function f(){var a;if(a="a")return a;else return a}f();

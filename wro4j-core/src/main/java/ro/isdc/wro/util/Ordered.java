@@ -24,6 +24,7 @@ public interface Ordered {
    * Sort elements from {@link #HIGHEST} to {@link #LOWEST}
    */
   public static final Comparator<Object> DESCENDING_COMPARATOR = new Comparator<Object>() {
+	@Override
     public int compare(final Object left, final Object right) {
       int priorityLeft = MEDIUM;
       int priorityRight = MEDIUM;

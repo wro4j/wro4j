@@ -113,16 +113,15 @@ public class NodeTypeScriptProcessor
   }
 
   private String process(final String resourceUri, final String content) {
-    final InputStream shellIn = null;
-    OutputStream tempSourceStream = null;
     // the file holding the input file to process
     File tempSource = null;
     File tempDest = null;
-    try {
+
+    try (OutputStream tempSourceStream = new FileOutputStream(tempSource)) {
       tempSource = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       tempDest = WroUtil.createTempFile(TYPESCRIPT_EXTENSION);
       final String encoding = "UTF-8";
-      IOUtils.write(content, tempSourceStream = new FileOutputStream(tempSource), encoding);
+      IOUtils.write(content, tempSourceStream, encoding);
       LOG.debug("absolute path: {}", tempSource.getAbsolutePath());
 
       final Process process = createProcess(tempSource, tempDest);
@@ -141,9 +140,6 @@ public class NodeTypeScriptProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
-      // close input stream to allow file to be deleted (otherwise deletion fails).
-      IOUtils.closeQuietly(shellIn);
-      IOUtils.closeQuietly(tempSourceStream);
       // always cleanUp
       FileUtils.deleteQuietly(tempSource);
       FileUtils.deleteQuietly(tempDest);

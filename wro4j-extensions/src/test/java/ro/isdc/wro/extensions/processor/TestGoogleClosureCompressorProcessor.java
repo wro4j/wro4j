@@ -105,7 +105,7 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
 
     victim.process(null, new StringReader("function test( ) {}"), sw);
-    assertEquals("", sw.toString());
+    assertEquals("'use strict';", sw.toString());
   }
 
   @Test(expected = WroRuntimeException.class)
@@ -115,7 +115,7 @@ public class TestGoogleClosureCompressorProcessor {
       @Override
       protected SourceFile[] getExterns(final Resource resource) {
         return new SourceFile[] {
-          SourceFile.fromFile(new File("INVALID"))
+          SourceFile.fromFile("INVALID")
         };
       }
     };
@@ -157,6 +157,6 @@ public class TestGoogleClosureCompressorProcessor {
     WroTestUtils.createInjector().inject(victim);
     final StringWriter sw = new StringWriter();
     victim.process(null, new StringReader("alert(1);"), sw);
-    assertEquals("alert(1);", sw.toString());
+    assertEquals("'use strict';alert(1);", sw.toString());
   }
 }

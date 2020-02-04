@@ -8,9 +8,10 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
@@ -87,13 +88,12 @@ public class NodeLessCssProcessor
   }
 
   private String process(final String resourceUri, final String content) {
-    final InputStream shellIn = null;
-    // the file holding the input file to process
+
+	// the file holding the input file to process
     File temp = null;
     try {
       temp = WroUtil.createTempFile();
-      final String encoding = "UTF-8";
-      IOUtils.write(content, new FileOutputStream(temp), encoding);
+      IOUtils.write(content, new FileOutputStream(temp), StandardCharsets.UTF_8);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
 
       final Process process = createProcess(temp);
@@ -102,7 +102,7 @@ public class NodeLessCssProcessor
        * doesn't read the whole buffer. It hangs when processing large files. The lessc isn't closing till all STDOUT
        * flushed. This blocks io and Node does not exit because of that.
        */
-      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
+      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), StandardCharsets.UTF_8);
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
 
       if (exitStatus != 0) {
@@ -116,7 +116,6 @@ public class NodeLessCssProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
-      IOUtils.closeQuietly(shellIn);
       // always cleanUp
       FileUtils.deleteQuietly(temp);
     }
@@ -171,7 +170,7 @@ public class NodeLessCssProcessor
       temp = WroUtil.createTempFile();
       final Process process = createProcess(temp);
       final int exitValue = process.waitFor();
-      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream()));
+      LOG.debug("exitValue {}. ErrorMessage: {}", exitValue, IOUtils.toString(process.getInputStream(), Charset.defaultCharset()));
       if (exitValue != 0) {
         throw new UnsupportedOperationException("Lessc is not a supported operation on this platform");
       }

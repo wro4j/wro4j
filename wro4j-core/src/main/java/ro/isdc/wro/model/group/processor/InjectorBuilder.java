@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,6 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.WroManager;
@@ -71,6 +69,13 @@ public class InjectorBuilder {
    * @VisibleForTesting
    */
   public InjectorBuilder() {
+	  super();
+	  LOG.warn("The default constructor should only be used for testing purposes.");
+  }
+
+  public InjectorBuilder(final WroManagerFactory managerFactory) {
+    notNull(managerFactory);
+    this.managerFactory = managerFactory;
   }
 
   /**
@@ -82,11 +87,6 @@ public class InjectorBuilder {
 
   public static InjectorBuilder create(final WroManager manager) {
     return new InjectorBuilder(new SimpleWroManagerFactory(manager));
-  }
-
-  public InjectorBuilder(final WroManagerFactory managerFactory) {
-    notNull(managerFactory);
-    this.managerFactory = managerFactory;
   }
 
   private void initMap() {
@@ -114,6 +114,7 @@ public class InjectorBuilder {
 
   private Object createDispatcherLocatorProxy() {
     return new InjectorObjectFactory<DispatcherStreamLocator>() {
+      @Override
       public DispatcherStreamLocator create() {
         //Use the configured timeout.
         dispatcherLocator.setTimeout(Context.get().getConfig().getConnectionTimeout());
@@ -124,6 +125,7 @@ public class InjectorBuilder {
 
   private Object createResourceBundleProcessorProxy() {
     return new InjectorObjectFactory<ResourceBundleProcessor>() {
+      @Override
       public ResourceBundleProcessor create() {
         return bundleProcessor;
       }
@@ -132,6 +134,7 @@ public class InjectorBuilder {
 
   private Object createMetaDataFactoryProxy() {
     return new InjectorObjectFactory<MetaDataFactory>() {
+      @Override
       public MetaDataFactory create() {
         return managerFactory.create().getMetaDataFactory();
       }
@@ -140,6 +143,7 @@ public class InjectorBuilder {
 
   private InjectorObjectFactory<PreProcessorExecutor> createPreProcessorExecutorProxy() {
     return new InjectorObjectFactory<PreProcessorExecutor>() {
+      @Override
       public PreProcessorExecutor create() {
         return preProcessorExecutor;
       }
@@ -148,6 +152,7 @@ public class InjectorBuilder {
 
   private InjectorObjectFactory<GroupsProcessor> createGroupsProcessorProxy() {
     return new InjectorObjectFactory<GroupsProcessor>() {
+      @Override
       public GroupsProcessor create() {
         return groupsProcessor;
       }
@@ -156,6 +161,7 @@ public class InjectorBuilder {
 
   private InjectorObjectFactory<LifecycleCallbackRegistry> createCallbackRegistryProxy() {
     return new InjectorObjectFactory<LifecycleCallbackRegistry>() {
+      @Override
       public LifecycleCallbackRegistry create() {
         return managerFactory.create().getCallbackRegistry();
       }
@@ -164,6 +170,7 @@ public class InjectorBuilder {
 
   private InjectorObjectFactory<Injector> createInjectorProxy() {
     return new InjectorObjectFactory<Injector>() {
+      @Override
       public Injector create() {
         isTrue(injector != null);
         return injector;
@@ -173,6 +180,7 @@ public class InjectorBuilder {
 
   private Object createGroupExtractorProxy() {
     return new InjectorObjectFactory<GroupExtractor>() {
+      @Override
       public GroupExtractor create() {
         return managerFactory.create().getGroupExtractor();
       }
@@ -181,6 +189,7 @@ public class InjectorBuilder {
 
   private Object createProcessorFactoryProxy() {
     return new InjectorObjectFactory<ProcessorsFactory>() {
+      @Override
       public ProcessorsFactory create() {
         return managerFactory.create().getProcessorsFactory();
       }
@@ -189,6 +198,7 @@ public class InjectorBuilder {
 
   private Object createLocatorFactoryProxy() {
     return new InjectorObjectFactory<UriLocatorFactory>() {
+      @Override
       public UriLocatorFactory create() {
         return new InjectableUriLocatorFactoryDecorator(managerFactory.create().getUriLocatorFactory());
       }
@@ -197,6 +207,7 @@ public class InjectorBuilder {
 
   private Object createResourceAuthorizationManagerProxy() {
     return new InjectorObjectFactory<ResourceAuthorizationManager>() {
+      @Override
       public ResourceAuthorizationManager create() {
         return managerFactory.create().getResourceAuthorizationManager();
       }
@@ -205,6 +216,7 @@ public class InjectorBuilder {
 
   private Object createModelFactoryProxy() {
     return new InjectorObjectFactory<WroModelFactory>() {
+      @Override
       public WroModelFactory create() {
         return managerFactory.create().getModelFactory();
       }
@@ -213,6 +225,7 @@ public class InjectorBuilder {
 
   private Object createNamingStrategyProxy() {
     return new InjectorObjectFactory<NamingStrategy>() {
+      @Override
       public NamingStrategy create() {
         return managerFactory.create().getNamingStrategy();
       }
@@ -221,6 +234,7 @@ public class InjectorBuilder {
 
   private Object createHashStrategyProxy() {
     return new InjectorObjectFactory<HashStrategy>() {
+      @Override
       public HashStrategy create() {
         return managerFactory.create().getHashStrategy();
       }
@@ -230,6 +244,7 @@ public class InjectorBuilder {
   @SuppressWarnings("rawtypes")
   private Object createCacheStrategyProxy() {
     return new InjectorObjectFactory<CacheStrategy>() {
+      @Override
       public CacheStrategy create() {
         return managerFactory.create().getCacheStrategy();
       }
@@ -242,10 +257,12 @@ public class InjectorBuilder {
    */
   private Object createReadOnlyContextProxy() {
     return ProxyFactory.proxy(new TypedObjectFactory<ReadOnlyContext>() {
+      @Override
       public ReadOnlyContext create() {
         return Context.get();
       }
 
+      @Override
       public Class<? extends ReadOnlyContext> getObjectClass() {
         return Context.class;
       }
@@ -254,6 +271,7 @@ public class InjectorBuilder {
 
   private Object createCacheKeyFactoryProxy() {
     return new InjectorObjectFactory<CacheKeyFactory>() {
+      @Override
       public CacheKeyFactory create() {
         return managerFactory.create().getCacheKeyFactory();
       }
@@ -262,6 +280,7 @@ public class InjectorBuilder {
 
   private Object createResourceChangeDetectorProxy() {
     return new InjectorObjectFactory<ResourceChangeDetector>() {
+      @Override
       public ResourceChangeDetector create() {
         return resourceChangeDetector;
       }
@@ -270,12 +289,12 @@ public class InjectorBuilder {
 
   private Object createResourceWatcherProxy() {
     return new InjectorObjectFactory<ResourceWatcher>() {
+      @Override
       public ResourceWatcher create() {
         return resourceWatcher;
       }
     };
   }
-
 
   /**
    * @VisibleForTesting

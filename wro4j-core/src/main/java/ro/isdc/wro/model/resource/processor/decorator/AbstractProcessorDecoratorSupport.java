@@ -30,8 +30,8 @@ public abstract class AbstractProcessorDecoratorSupport<T>
     extends AbstractDecorator<T>
     implements ResourceProcessorAware {
   /**
-   * @param the
-   *          decorated processor. The type of the returned object is {@link Object} because we don't really care and we
+   * @param decorated
+   *          the decorated processor. The type of the returned object is {@link Object} because we don't really care and we
    *          need it only to check if the processor is minimize aware and get its supported type. This "hack" will e
    *          removed in 1.5.0.
    */
@@ -46,6 +46,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
    *
    * @return the {@link SupportedResourceType} annotation of the decorated processor if one exist.
    */
+  @Override
   public final SupportedResourceType getSupportedResourceType() {
     return getSupportedResourceTypeInternal();
   }
@@ -78,6 +79,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
    * override this behavior by implementing {@link AbstractProcessorDecoratorSupport#isMinimizeInternal()} on your own
    * risk.
    */
+  @Override
   public final boolean isMinimize() {
     return isMinimizeInternal();
   }
@@ -92,6 +94,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isSupported() {
     return getDecoratedObject() instanceof SupportAware ? ((SupportAware) getDecoratedObject()).isSupported() : true;
   }
@@ -99,6 +102,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isImportAware() {
     return getDecoratedObject() instanceof ImportAware ? ((ImportAware) getDecoratedObject()).isImportAware() : false;
   }
@@ -106,6 +110,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
   /**
    * {@inheritDoc}
    */
+  @Override
   public void destroy()
       throws Exception {
     if (getDecoratedObject() instanceof Destroyable) {
@@ -136,6 +141,7 @@ public abstract class AbstractProcessorDecoratorSupport<T>
   /**
    * {@inheritDoc}
    */
+  @Override
   public final void process(final Reader reader, final Writer writer)
       throws IOException {
     process(null, reader, writer);

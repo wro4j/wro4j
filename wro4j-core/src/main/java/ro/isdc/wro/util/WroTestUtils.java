@@ -204,44 +204,49 @@ public class WroTestUtils {
     return input.replaceAll("\\t", "  ").replaceAll("\\r", "");
   }
 
-  public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
-      final Transformer<String> toTargetFileName, final ResourcePreProcessor processor) {
-    final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
-    int processedNumber = 0;
-    for (final File file : files) {
-      LOG.debug("processing: {}", file.getName());
-      File targetFile = null;
-      InputStream targetFileStream = null;
-      InputStream sourceFileStream = null;
-      try {
-        targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
-        targetFileStream = new FileInputStream(targetFile);
-        LOG.debug("comparing with: {}", targetFile.getName());
-        try {
-          compare(sourceFileStream = new FileInputStream(file), targetFileStream, new ResourcePostProcessor() {
-            public void process(final Reader reader, final Writer writer)
-                throws IOException {
-              // ResourceType doesn't matter here
-              processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader, writer);
-            }
-          });
-        } catch (final ComparisonFailure e) {
-          LOG.error("Failed comparing: {}", file.getName());
-          throw e;
-        }
-        processedNumber++;
-      } catch (final IOException e) {
-        LOG.debug("Skip comparison because couldn't find the TARGET file {}. Original cause: {}", targetFile,
-            e.getCause());
-      } catch (final Exception e) {
-        throw WroRuntimeException.wrap(e);
-      } finally {
-        IOUtils.closeQuietly(targetFileStream);
-        IOUtils.closeQuietly(sourceFileStream);
-      }
-    }
-    logSuccess(processedNumber);
-  }
+	public static void compareFromSameFolder(final File sourceFolder, final IOFileFilter sourceFileFilter,
+			final Transformer<String> toTargetFileName, final ResourcePreProcessor processor) {
+
+		final Collection<File> files = FileUtils.listFiles(sourceFolder, sourceFileFilter, FalseFileFilter.INSTANCE);
+		int processedNumber = 0;
+
+		for (final File file : files) {
+			LOG.debug("processing: {}", file.getName());
+
+			File targetFile;
+			try {
+				targetFile = new File(sourceFolder, toTargetFileName.transform(file.getName()));
+			} catch (Exception e) {
+				throw WroRuntimeException.wrap(e);
+			}
+
+			try (InputStream sourceFileStream = new FileInputStream(file);
+					InputStream targetFileStream = new FileInputStream(targetFile)) {
+
+				LOG.debug("comparing with: {}", targetFile.getName());
+				try {
+					compare(sourceFileStream, targetFileStream, new ResourcePostProcessor() {
+						public void process(final Reader reader, final Writer writer) throws IOException {
+							// ResourceType doesn't matter here
+							processor.process(Resource.create("file:" + file.getPath(), ResourceType.CSS), reader,
+									writer);
+						}
+					});
+				} catch (final ComparisonFailure e) {
+					LOG.error("Failed comparing: {}", file.getName());
+					throw e;
+				}
+				processedNumber++;
+			} catch (final IOException e) {
+				LOG.debug("Skip comparison because couldn't find the TARGET file {}. Original cause: {}", targetFile,
+						e.getCause());
+			} catch (final Exception e) {
+				throw WroRuntimeException.wrap(e);
+			}
+		}
+
+		logSuccess(processedNumber);
+	}
 
   private static void logSuccess(final int size) {
     if (size == 0) {
@@ -411,6 +416,7 @@ public class WroTestUtils {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static void runConcurrently(final Callable<Void>... tasks) throws Exception {
     final ExecutorService service = Executors.newFixedThreadPool(5);
     final List<Future<?>> futures = new ArrayList<Future<?>>();

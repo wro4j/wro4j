@@ -87,6 +87,6 @@ public class TestWebjarUriLocator {
   @Test
   public void shouldLocateWebjarResourceContainingQuestionMarkInUri()
       throws Exception {
-    victim.locate("webjar:font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3");
+    victim.locate("webjar:font-awesome/5.12.0/webfonts/fa-regular-400.woff?v=5.12.0");
   }
 }

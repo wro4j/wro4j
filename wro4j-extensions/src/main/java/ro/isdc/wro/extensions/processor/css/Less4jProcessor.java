@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class Less4jProcessor
       try {
         final String relativeResourceUri = computeRelativeResourceUri(resource.getUri(), relativePath);
         final Resource relativeResource = Resource.create(relativeResourceUri, ResourceType.CSS);
-        final String relativeResourceContent = IOUtils.toString(locatorFactory.locate(relativeResourceUri), "UTF-8");
+        final String relativeResourceContent = IOUtils.toString(locatorFactory.locate(relativeResourceUri), StandardCharsets.UTF_8);
         return new RelativeAwareLessSource(relativeResource, relativeResourceContent, locatorFactory);
       } catch (final IOException e) {
         LOG.error("Failed to compute relative resource: " + resource, e);

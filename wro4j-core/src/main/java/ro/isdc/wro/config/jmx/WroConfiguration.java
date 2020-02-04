@@ -5,10 +5,10 @@ package ro.isdc.wro.config.jmx;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -31,7 +31,7 @@ public class WroConfiguration
   /**
    * Default encoding to use.
    */
-  public static final String DEFAULT_ENCODING = CharEncoding.UTF_8;
+  public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
   /**
    * Default value for connectionTimeout property.
    */
@@ -133,6 +133,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public long getCacheUpdatePeriod() {
     return this.cacheUpdatePeriod;
   }
@@ -140,6 +141,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}Async
    */
+  @Override
   public long getModelUpdatePeriod() {
     return modelUpdatePeriod;
   }
@@ -147,6 +149,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setCacheUpdatePeriod(final long period) {
     if (period != cacheUpdatePeriod) {
       reloadCacheWithNewValue(period);
@@ -157,6 +160,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setModelUpdatePeriod(final long period) {
     if (period != modelUpdatePeriod) {
       reloadModelWithNewValue(period);
@@ -167,6 +171,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isGzipEnabled() {
     return gzipEnabled;
   }
@@ -174,6 +179,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public void setGzipEnabled(final boolean enable) {
     gzipEnabled = enable;
   }
@@ -181,6 +187,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public void reloadCache() {
     reloadCacheWithNewValue(null);
   }
@@ -205,6 +212,7 @@ public class WroConfiguration
   /**
    * {@inheritDoc}
    */
+  @Override
   public void reloadModel() {
     LOG.debug("reloadModel");
     reloadModelWithNewValue(null);
@@ -250,6 +258,7 @@ public class WroConfiguration
   /**
    * @return the debug
    */
+  @Override
   public boolean isDebug() {
     return this.debug;
   }
@@ -258,6 +267,7 @@ public class WroConfiguration
    * @param debug
    *          the debug to set
    */
+  @Override
   public void setDebug(final boolean debug) {
     // Don't think that we really need to reload the cache here
     this.debug = debug;
@@ -266,6 +276,7 @@ public class WroConfiguration
   /**
    * @return the ignoreMissingResources
    */
+  @Override
   public boolean isIgnoreMissingResources() {
     return this.ignoreMissingResources;
   }
@@ -274,6 +285,7 @@ public class WroConfiguration
    * @param ignoreMissingResources
    *          the ignoreMissingResources to set
    */
+  @Override
   public void setIgnoreMissingResources(final boolean ignoreMissingResources) {
     this.ignoreMissingResources = ignoreMissingResources;
   }
@@ -296,6 +308,7 @@ public class WroConfiguration
   /**
    * @return the cacheGzippedContent
    */
+  @Override
   public boolean isCacheGzippedContent() {
     return this.cacheGzippedContent;
   }
@@ -304,6 +317,7 @@ public class WroConfiguration
    * @param cacheGzippedContent
    *          the cacheGzippedContent to set
    */
+  @Override
   public void setCacheGzippedContent(final boolean cacheGzippedContent) {
     this.cacheGzippedContent = cacheGzippedContent;
   }
@@ -319,6 +333,7 @@ public class WroConfiguration
   /**
    * @return the encoding
    */
+  @Override
   public String getEncoding() {
     return this.encoding;
   }
@@ -327,6 +342,7 @@ public class WroConfiguration
    * @param encoding
    *          the encoding to set
    */
+  @Override
   public void setEncoding(final String encoding) {
     this.encoding = encoding == null ? DEFAULT_ENCODING : encoding;
   }
@@ -379,6 +395,7 @@ public class WroConfiguration
   /**
    * @return the number of milliseconds before a connection is timed out.
    */
+  @Override
   public int getConnectionTimeout() {
     return this.connectionTimeout;
   }
@@ -390,6 +407,7 @@ public class WroConfiguration
    * @param connectionTimeout
    *          the connectionTimeout to set
    */
+  @Override
   public void setConnectionTimeout(final int connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
   }
@@ -412,6 +430,7 @@ public class WroConfiguration
   /**
    * @return value of the flag responsible for handling empty group behavior.
    */
+  @Override
   public boolean isIgnoreEmptyGroup() {
     return ignoreEmptyGroup;
   }
@@ -421,6 +440,7 @@ public class WroConfiguration
    *          flag for turning on/off failure when there is an empty group (nothing to process). This value is true by
    *          default, meaning that empty group will produce empty result (no exception).
    */
+  @Override
   public void setIgnoreEmptyGroup(final boolean ignoreEmptyGroup) {
     this.ignoreEmptyGroup = ignoreEmptyGroup;
   }
@@ -436,10 +456,12 @@ public class WroConfiguration
     this.ignoreFailingProcessor = ignoreFailingProcessor;
   }
 
+  @Override
   public final long getResourceWatcherUpdatePeriod() {
     return resourceWatcherUpdatePeriod;
   }
 
+  @Override
   public final void setResourceWatcherUpdatePeriod(final long resourceWatcherUpdatePeriod) {
     this.resourceWatcherUpdatePeriod = resourceWatcherUpdatePeriod;
   }
@@ -448,10 +470,12 @@ public class WroConfiguration
    * @return flag indicating if the minimization is enabled. When this flag is false, the minimization will be
    *         suppressed for all resources.
    */
+  @Override
   public boolean isMinimizeEnabled() {
     return minimizeEnabled;
   }
 
+  @Override
   public void setMinimizeEnabled(final boolean minimizeEnabled) {
     this.minimizeEnabled = minimizeEnabled;
   }

@@ -2,16 +2,13 @@ package ro.isdc.wro.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 
 /**
@@ -24,7 +21,6 @@ import org.slf4j.LoggerFactory;
  * @created 11 Jun 2012
  */
 public class RegexpProperties {
-  private static final Logger LOG = LoggerFactory.getLogger(RegexpProperties.class);
   private final Properties properties;
   private static final String REGEX_KEY_VALUE = "(?m)\\s*(.*?)\\s*=\\s*(.*)\\s*$";
   private static final String REGEX_COMMENTS = "#.*";
@@ -44,7 +40,7 @@ public class RegexpProperties {
    */
   public Properties load(final InputStream inputStream) throws IOException {
     Validate.notNull(inputStream);
-    final String rawContent = IOUtils.toString(inputStream, CharEncoding.UTF_8);
+    final String rawContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
     parseProperties(rawContent.replaceAll(REGEX_COMMENTS, ""));
     return this.properties;
   }
