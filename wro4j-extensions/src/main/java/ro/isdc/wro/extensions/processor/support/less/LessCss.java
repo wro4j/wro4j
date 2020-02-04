@@ -29,7 +29,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  public static final String DEFAULT_LESS_JS = "less-1.3.3.min.js";
+  public static final String DEFAULT_LESS_JS = "less.min.js";
   private static final String SCRIPT_INIT = "init.js";
   private WebjarUriLocator webjarLocator;
   private ScriptableObject scope;
@@ -50,7 +50,7 @@ public class LessCss {
       }
       return builder;
     } catch (final IOException ex) {
-      throw new IllegalStateException("Failed reading javascript less.js", ex);
+      throw new IllegalStateException("Failed reading javascript " + DEFAULT_LESS_JS, ex);
     } catch (final Exception e) {
       LOG.error("Processing error:" + e.getMessage(), e);
       throw new WroRuntimeException("Processing error", e);
@@ -61,7 +61,7 @@ public class LessCss {
    * @return stream of the less.js script.
    */
   protected InputStream getScriptAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("less.min.js"));
+    return getWebjarLocator().locate(WebjarUriLocator.createUri(DEFAULT_LESS_JS));
   }
 
   /**

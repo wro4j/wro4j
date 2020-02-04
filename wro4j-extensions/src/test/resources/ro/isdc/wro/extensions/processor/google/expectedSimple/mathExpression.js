@@ -1,1 +1,1 @@
-Math.round(4/3);
+'use strict';Math.round(4/3);

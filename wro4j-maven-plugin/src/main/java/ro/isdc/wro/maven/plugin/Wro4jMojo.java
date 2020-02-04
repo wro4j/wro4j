@@ -25,7 +25,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mockito.Mockito;
-import org.sonatype.plexus.build.incremental.BuildContext;
 
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
@@ -142,7 +141,7 @@ public class Wro4jMojo
     final StopWatch watch = new StopWatch();
     watch.start("processGroups: " + groupsAsList);
 
-    final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+    final Collection<Callable<Void>> callables = new ArrayList<>();
 
     for (final String group : groupsAsList) {
       for (final ResourceType resourceType : ResourceType.values()) {
@@ -178,17 +177,15 @@ public class Wro4jMojo
   private void writeGroupNameMap()
       throws Exception {
     if (groupNameMappingFile != null) {
-      FileOutputStream outputStream = null;
-      try {
-        final File mappingFileParent = new File(groupNameMappingFile.getParent());
-        // create missing folders if needed
-        mappingFileParent.mkdirs();
-        outputStream = new FileOutputStream(groupNameMappingFile);
+
+      final File mappingFileParent = new File(groupNameMappingFile.getParent());
+      // create missing folders if needed
+      mappingFileParent.mkdirs();
+
+      try (FileOutputStream outputStream = new FileOutputStream(groupNameMappingFile)) {
         groupNames.store(outputStream, "Mapping of defined group name to renamed group name");
       } catch (final FileNotFoundException ex) {
         throw new MojoExecutionException("Unable to save group name mapping file", ex);
-      } finally {
-        IOUtils.closeQuietly(outputStream);
       }
     }
   }

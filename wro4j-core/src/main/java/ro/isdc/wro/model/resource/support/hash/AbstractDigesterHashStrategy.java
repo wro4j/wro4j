@@ -31,7 +31,7 @@ public abstract class AbstractDigesterHashStrategy
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");
     }
-    try {
+    try (input) {
       final MessageDigest messageDigest = newMessageDigest();
       final byte[] digest = messageDigest.digest(IOUtils.toByteArray(input));
       final String hash = new BigInteger(1, digest).toString(16);
@@ -40,8 +40,6 @@ public abstract class AbstractDigesterHashStrategy
       return hash;
     } catch (final NoSuchAlgorithmException e) {
       throw new WroRuntimeException("Exception occured while computing hash", e);
-    }finally{
-      IOUtils.closeQuietly(input);
     }
   }
 

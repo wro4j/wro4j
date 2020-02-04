@@ -150,12 +150,11 @@ public final class Group implements Comparable<Group> {
    *         name.
    */
   public final Group collectResourcesOfType(final ResourceType type) {
+
     notNull(type);
-    final List<Resource> allResources = new ArrayList<Resource>();
-    allResources.addAll(getResources());
 
     // retain only resources of needed type
-    final List<Resource> filteredResources = new ArrayList<Resource>();
+    final List<Resource> filteredResources = new ArrayList<>();
     for (final Resource resource : getResources()) {
       if (type == resource.getType()) {
         if (filteredResources.contains(resource)) {
@@ -225,6 +224,7 @@ public final class Group implements Comparable<Group> {
     return name;
   }
 
+  @Override
   public int compareTo(final Group o) {
     return getName().compareTo(o.getName());
   }

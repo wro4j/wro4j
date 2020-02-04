@@ -1,0 +1,1 @@
+'use strict';new function(){}(1,2,3);

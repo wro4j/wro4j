@@ -19,6 +19,6 @@ public class TestClasspathUriLocator {
   public void shouldLocateClasspathResourceContainingQuestionMarkInUri()
       throws Exception {
     victim = new ClasspathUriLocator();
-    victim.locate("classpath:META-INF/resources/webjars/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3");
+    victim.locate("classpath:META-INF/resources/webjars/font-awesome/5.12.0/webfonts/fa-regular-400.woff?v=5.12.0");
   }
 }

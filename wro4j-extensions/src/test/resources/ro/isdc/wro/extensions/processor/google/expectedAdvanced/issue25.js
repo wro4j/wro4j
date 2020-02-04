@@ -1,1 +1,1 @@
-console.a(1);
+'use strict';console.a(1);

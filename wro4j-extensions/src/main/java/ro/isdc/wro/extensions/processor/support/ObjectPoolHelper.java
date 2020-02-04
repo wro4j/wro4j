@@ -5,8 +5,10 @@ package ro.isdc.wro.extensions.processor.support;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,21 +53,25 @@ public class ObjectPoolHelper<T> {
    */
   protected GenericObjectPool<T> newObjectPool(final ObjectFactory<T> objectFactory) {
     final int maxActive = Math.max(2, Runtime.getRuntime().availableProcessors());
-    final GenericObjectPool<T> pool = new GenericObjectPool<T>(new BasePoolableObjectFactory<T>() {
-      @Override
-      public T makeObject()
-        throws Exception {
-        return objectFactory.create();
-      }
+    final GenericObjectPool<T> pool = new GenericObjectPool<T>(new BasePooledObjectFactory<T>() {
+        @Override
+        public T create() throws Exception {
+		    return objectFactory.create();
+	    }
+
+        @Override
+        public PooledObject<T> wrap(T obj) {
+		    return new DefaultPooledObject<T>(obj);
+	    }
     });
-    pool.setMaxActive(maxActive);
+    pool.setMaxTotal(maxActive);
     pool.setMaxIdle(MAX_IDLE);
-    pool.setMaxWait(MAX_WAIT);
+    pool.setMaxWaitMillis(MAX_WAIT);
     /**
-     * Use WHEN_EXHAUSTED_GROW strategy, otherwise the pool object retrieval can fail. More details here:
+     * Don't block when exhausted, otherwise the pool object retrieval can fail. More details here:
      * <a>http://code.google.com/p/wro4j/issues/detail?id=364</a>
      */
-    pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
+    pool.setBlockWhenExhausted(false);
     // make object eligible for eviction after a predefined amount of time.
     pool.setSoftMinEvictableIdleTimeMillis(EVICTABLE_IDLE_TIME);
     pool.setTimeBetweenEvictionRunsMillis(EVICTABLE_IDLE_TIME);

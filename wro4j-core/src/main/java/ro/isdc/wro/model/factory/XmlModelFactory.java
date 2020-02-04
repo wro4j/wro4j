@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.factory;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -153,7 +151,7 @@ public class XmlModelFactory
    * Allow aggregate processed imports during recursive model creation.
    */
   private XmlModelFactory(final Set<String> processedImports) {
-    notNull(processedImports);
+	Validate.notNull(processedImports);
     this.processedImports.addAll(processedImports);
   }
 
@@ -239,7 +237,7 @@ public class XmlModelFactory
       final Element element = (Element) importsList.item(i);
       final String name = element.getTextContent();
       LOG.debug("processing import: {}", name);
-      notNull(locatorFactory, "The Locator cannot be null!");
+      Validate.notNull(locatorFactory, "The Locator cannot be null!");
       if (processedImports.contains(name)) {
         final String message = "Recursive import detected: " + name;
         LOG.error(message);

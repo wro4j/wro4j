@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
 
@@ -142,7 +143,7 @@ public class ServletContextUriLocator
           LOG.debug(message);
           throw new IOException(message);
         }
-        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, "UTF-8")));
+        return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(realPath, StandardCharsets.UTF_8)));
       }
     } catch (final IOException e) {
       /**

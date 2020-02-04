@@ -85,16 +85,12 @@ public class ResourceProxyRequestHandler
     if (isResourceChanged(request)) {
       // set expiry headers
       getHeadersConfigurer().setHeaders(response);
-      InputStream is = null;
-      try {
-        is = new AutoCloseInputStream(locatorFactory.locate(resourceUri));
+
+      try (InputStream is = new AutoCloseInputStream(locatorFactory.locate(resourceUri)); outputStream) {
         final int length = IOUtils.copy(is, outputStream);
         // servlet engine may ignore this if content body is flushed to client
         response.setContentLength(length);
         response.setStatus(HttpServletResponse.SC_OK);
-      } finally {
-        IOUtils.closeQuietly(is);
-        IOUtils.closeQuietly(outputStream);
       }
     } else {
       response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);

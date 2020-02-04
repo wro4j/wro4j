@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,29 +46,29 @@ public abstract class AbstractCssUrlRewritingProcessor
   @Inject
   private ReadOnlyContext context;
 
+  @Override
   public void process(final Reader reader, final Writer writer)
       throws IOException {
     throw new WroRuntimeException("This processor: " + getClass().getSimpleName() + " cannot work as a postProcessor!");
   }
 
+  @Override
   public final void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
     LOG.debug("Applying {} processor", getClass().getSimpleName());
-    try {
-      final String cssUri = resource != null ? resource.getUri() : "";
+    try (reader;writer) {
+      final String cssUri = resource != null ? resource.getUri() : StringUtils.EMPTY;
       LOG.debug("cssUri: {}", cssUri);
       final String css = IOUtils.toString(reader);
       final String result = newCssUrlInspector().findAndReplace(css, createUrlItemHandler(cssUri));
       writer.write(result);
       onProcessCompleted();
-    } finally {
-      reader.close();
-      writer.close();
     }
   }
 
   private ItemHandler createUrlItemHandler(final String cssUri) {
     return new ItemHandler() {
+      @Override
       public String replace(final String originalDeclaration, final String originalUrl) {
         Validate.notNull(originalUrl);
         String replacement = originalDeclaration;
@@ -165,6 +166,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   /**
    * {@inheritDoc}
    */
+  @Override
   public boolean isImportAware() {
     // We want this processor to be applied when processing resources referred with @import directive
     return true;

@@ -1,1 +1,1 @@
-(a?b:c)?d:e;
+'use strict';(a?b:c)?d:e;

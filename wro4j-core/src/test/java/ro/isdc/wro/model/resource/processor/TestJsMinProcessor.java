@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
@@ -183,9 +184,9 @@ public class TestJsMinProcessor {
   private String jsmin(final String inputScript)
       throws Exception {
     final StringReader reader = new StringReader(inputScript);
-    final InputStream is = new ReaderInputStream(reader, "UTF-8");
+    final InputStream is = new ReaderInputStream(reader, StandardCharsets.UTF_8);
     final StringWriter writer = new StringWriter();
-    final OutputStream os = new WriterOutputStream(writer, "UTF-8");
+    final OutputStream os = new WriterOutputStream(writer, StandardCharsets.UTF_8);
     new JSMin(is, os).jsmin();
     return writer.toString();
   }

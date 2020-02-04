@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Injector;
 import ro.isdc.wro.model.resource.Resource;
@@ -28,7 +25,6 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
  */
 public abstract class AbstractNodeWithFallbackProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeWithFallbackProcessor.class);
   @Inject
   private Injector injector;
   private final DestroyableLazyInitializer<ResourcePreProcessor> processorInitializer = new DestroyableLazyInitializer<ResourcePreProcessor>() {

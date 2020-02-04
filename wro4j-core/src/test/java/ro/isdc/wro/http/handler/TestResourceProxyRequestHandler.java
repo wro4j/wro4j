@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 import javax.servlet.FilterConfig;
@@ -156,7 +157,7 @@ public class TestResourceProxyRequestHandler {
     victim.handle(request, response);
 
     final String body = outputStream.toString();
-    final String expectedBody = IOUtils.toString(getInputStream("test.css"));
+    final String expectedBody = IOUtils.toString(getInputStream("test.css"), Charset.defaultCharset());
 
     assertEquals(expectedBody, body);
   }
@@ -185,7 +186,7 @@ public class TestResourceProxyRequestHandler {
     // Perform Action
     victim.handle(request, response);
     final String body = outputStream.toString();
-    final String expectedBody = IOUtils.toString(getInputStream("test.css"));
+    final String expectedBody = IOUtils.toString(getInputStream("test.css"), Charset.defaultCharset());
 
     verify(mockUriLocator, times(1)).locate(resourceUri);
     assertEquals(expectedBody, body);
@@ -200,7 +201,7 @@ public class TestResourceProxyRequestHandler {
     when(mockUriLocator.locate(anyString())).thenReturn(new ClasspathUriLocator().locate(resourceUri));
 
     victim.handle(request, response);
-    final int expectedLength = IOUtils.toString(getInputStream("test.css")).length();
+    final int expectedLength = IOUtils.toString(getInputStream("test.css"), Charset.defaultCharset()).length();
 
     verify(response, times(1)).setContentLength(expectedLength);
   }

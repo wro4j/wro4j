@@ -1,1 +1,1 @@
-[(a,b)];
+'use strict';[(a,b)];

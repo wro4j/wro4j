@@ -104,7 +104,7 @@ public class GoogleClosureCompressorProcessor
     final String content = IOUtils.toString(reader);
     final CompilerOptions compilerOptions = optionsPool.getObject();
     final Compiler compiler = newCompiler(compilerOptions);
-    try {
+    try (reader; writer) {
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final SourceFile[] input = new SourceFile[] {
         SourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
@@ -124,8 +124,6 @@ public class GoogleClosureCompressorProcessor
     } catch (final Exception e) {
       onException(e);
     } finally {
-      reader.close();
-      writer.close();
       optionsPool.returnObject(compilerOptions);
     }
   }

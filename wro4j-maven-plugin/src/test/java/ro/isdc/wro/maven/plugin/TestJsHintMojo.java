@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
@@ -29,7 +30,7 @@ import ro.isdc.wro.util.WroUtil;
 public class TestJsHintMojo
     extends AbstractTestLinterMojo {
   @Override
-  protected AbstractLinterMojo newLinterMojo() {
+  protected AbstractLinterMojo<?> newLinterMojo() {
     return new JsHintMojo() {
       @Override
       void onException(final Exception e) {
@@ -37,7 +38,7 @@ public class TestJsHintMojo
       }
     };
   }
-  
+
   @Test
   public void usePredefOptions()
       throws Exception {
@@ -226,8 +227,8 @@ public class TestJsHintMojo
       FileUtils.deleteQuietly(reportFile);
     }
   }
-  
-  @Test(expected = LinterException.class)
+
+  @Test(expected = WroRuntimeException.class)
   public void shouldFailWhenThereAreLinterErrorsEvenWhenIncrementBuildIsEnabled()
       throws Throwable {
     getMojo().setParallelProcessing(true);

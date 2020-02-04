@@ -163,7 +163,9 @@ public abstract class AbstractTestLinterMojo {
 
   private static class CustomException
       extends WroRuntimeException {
-    public CustomException(final String message) {
+	private static final long serialVersionUID = 1L;
+
+	public CustomException(final String message) {
       super(message);
     }
   }

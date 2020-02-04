@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.http.support.ContentTypeResolver;
 import ro.isdc.wro.util.Base64;
@@ -41,7 +43,7 @@ public class DataUriGenerator {
   }
 
   private String getMimeType(final String fileName) {
-    return ContentTypeResolver.get(fileName, "UTF-8").replaceAll(" ", "");
+    return ContentTypeResolver.get(fileName, StandardCharsets.UTF_8.name()).replaceAll(" ", StringUtils.EMPTY);
   }
 
   /**

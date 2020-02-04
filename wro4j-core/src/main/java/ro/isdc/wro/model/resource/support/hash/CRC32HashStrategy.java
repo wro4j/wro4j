@@ -6,8 +6,6 @@ import java.math.BigInteger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import org.apache.commons.io.IOUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +26,13 @@ public class CRC32HashStrategy
   /**
    * {@inheritDoc}
    */
+  @Override
   public String getHash(final InputStream input)
     throws IOException {
     if (input == null) {
       throw new IllegalArgumentException("Content cannot be null!");
     }
-    try{
+    try (input) {
       LOG.debug("creating hash using CRC32 algorithm");
       final Checksum checksum = new CRC32();
       final byte[] bytes = new byte[1024];
@@ -45,8 +44,6 @@ public class CRC32HashStrategy
       final String hash = new BigInteger(Long.toString(checksum.getValue())).toString(16);
       LOG.debug("CRC32 hash: {}", hash);
       return hash;
-    }finally{
-      IOUtils.closeQuietly(input);
     }
   }
 }

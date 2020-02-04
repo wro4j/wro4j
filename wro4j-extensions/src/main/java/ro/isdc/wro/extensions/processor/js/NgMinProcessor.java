@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -90,13 +91,14 @@ public class NgMinProcessor
   @Override
   public boolean isSupported() {
     boolean supported = true;
-    try {
-      final InputStream input = new ByteArrayInputStream("".getBytes("UTF-8"));
+
+    try (InputStream input = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))) {
       doProcess(input, null);
     } catch (final Exception e) {
       LOG.debug("The {} processor is not supported. Because: {}", getClass().getName(), e.getMessage());
       supported = false;
     }
+
     return supported;
   }
 

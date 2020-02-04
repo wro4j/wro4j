@@ -8,9 +8,9 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
@@ -89,17 +89,16 @@ public class NodeCoffeeScriptProcessor
   }
 
   private String process(final String resourceUri, final String content) {
-    final InputStream shellIn = null;
-    // the file holding the input file to process
+
+	// the file holding the input file to process
     File temp = null;
     try {
       temp = WroUtil.createTempFile();
-      final String encoding = "UTF-8";
-      IOUtils.write(content, new FileOutputStream(temp), encoding);
+      IOUtils.write(content, new FileOutputStream(temp), StandardCharsets.UTF_8);
       LOG.debug("absolute path: {}", temp.getAbsolutePath());
 
       final Process process = createProcess(temp);
-      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), encoding);
+      final String result = IOUtils.toString(new AutoCloseInputStream(process.getInputStream()), StandardCharsets.UTF_8);
       final int exitStatus = process.waitFor();// this won't return till `out' stream being flushed!
       if (exitStatus != 0) {
         final String compileError = result;
@@ -114,7 +113,6 @@ public class NodeCoffeeScriptProcessor
     } catch (final Exception e) {
       throw WroRuntimeException.wrap(e);
     } finally {
-      IOUtils.closeQuietly(shellIn);
       // always cleanUp
       FileUtils.deleteQuietly(temp);
     }

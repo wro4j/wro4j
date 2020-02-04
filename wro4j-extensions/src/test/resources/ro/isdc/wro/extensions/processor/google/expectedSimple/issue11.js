@@ -1,1 +1,1 @@
-new (A,B);new (A||B);new (X?A:B);
+'use strict';new (A,B);new (A||B);new (X?A:B);

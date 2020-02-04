@@ -7,17 +7,14 @@ import static ro.isdc.wro.util.WroUtil.cleanImageUrl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.http.handler.ResourceProxyRequestHandler;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
@@ -86,9 +83,8 @@ public class CssDataUriPreProcessor
       fullPath = WroUtil.getFullPath(cssUri) + cleanImageUrl;
     }
     String result = imageUrl;
-    InputStream is = null;
-    try {
-      is = uriLocatorFactory.locate(fullPath);
+
+    try (InputStream is = uriLocatorFactory.locate(fullPath)) {
       final String dataUri = getDataUriGenerator().generateDataURI(is, fileName);
       if (isReplaceAccepted(dataUri)) {
         result = dataUri;
@@ -97,8 +93,6 @@ public class CssDataUriPreProcessor
     } catch (final IOException e) {
       LOG.warn("[FAIL] extract dataUri from: {}, because: {}. "
           + "A possible cause: using CssUrlRewritingProcessor before CssDataUriPreProcessor.", fullPath, e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(is);
     }
     return result;
   }
@@ -122,14 +116,10 @@ public class CssDataUriPreProcessor
    * @return true if dataUri should replace original image url.
    */
   protected boolean isReplaceAccepted(final String dataUri) {
-    try {
-      final byte[] bytes = dataUri.getBytes(CharEncoding.UTF_8);
-      final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
-      LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
-      return !exceedLimit;
-    } catch (final UnsupportedEncodingException e) {
-      throw new WroRuntimeException("Should never happen", e);
-    }
+    final byte[] bytes = dataUri.getBytes(StandardCharsets.UTF_8);
+    final boolean exceedLimit = bytes.length >= SIZE_LIMIT;
+    LOG.debug("dataUri size: {}KB, limit exceeded: {}", bytes.length / 1024, exceedLimit);
+    return !exceedLimit;
   }
 
   /**

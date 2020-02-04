@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -82,7 +83,7 @@ public abstract class AbstractProcessorsFilter
       response.setContentLength(contentLength);
       // Content length can be 0 when the 30x (not modified) status code is returned.
       if (contentLength > 0) {
-        IOUtils.write(writer.toString(), response.getOutputStream());
+        IOUtils.write(writer.toString(), response.getOutputStream(), Charset.defaultCharset());
       }
     } catch (final RuntimeException e) {
       onRuntimeException(e, response, chain);

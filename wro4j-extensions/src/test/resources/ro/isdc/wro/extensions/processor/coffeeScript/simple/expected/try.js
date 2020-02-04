@@ -1,5 +1,5 @@
 (function() {
-  var error, error1;
+  var error;
 
   try {
     allHellBreaksLoose();

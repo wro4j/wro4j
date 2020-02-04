@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.resource.processor.impl;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -28,17 +26,14 @@ public class CommentStripperProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {
   public void process(final Resource resource, final Reader reader, final Writer writer)
     throws IOException {
-    try {
+    try (reader; writer) {
       final String content = IOUtils.toString(reader);
       // apply single line comment stripper processor first
-      String result = SingleLineCommentStripperProcessor.PATTERN.matcher(content).replaceAll(EMPTY);
+      String result = SingleLineCommentStripperProcessor.PATTERN.matcher(content).replaceAll(StringUtils.EMPTY);
       // apply multi line comment stripper processor after
-      result = MultiLineCommentStripperProcessor.PATTERN.matcher(result).replaceAll(EMPTY);
-      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll(EMPTY);
+      result = MultiLineCommentStripperProcessor.PATTERN.matcher(result).replaceAll(StringUtils.EMPTY);
+      result = WroUtil.EMTPY_LINE_PATTERN.matcher(result).replaceAll(StringUtils.EMPTY);
       writer.write(result);
-    } finally {
-      reader.close();
-      writer.close();
     }
   }
 

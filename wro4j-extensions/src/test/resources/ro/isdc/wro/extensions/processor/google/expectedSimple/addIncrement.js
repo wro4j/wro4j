@@ -1,1 +1,1 @@
-var idCounter=0,id=""+ ++idCounter;
+'use strict';var idCounter=0,id=""+ ++idCounter;

@@ -279,7 +279,7 @@ public class BaseWroManagerFactory
       LOG.debug("Trying to use SmartWroModelFactory as default model factory");
       final Class<? extends WroModelFactory> smartFactoryClass = Class.forName(
           "ro.isdc.wro.extensions.model.factory.SmartWroModelFactory").asSubclass(WroModelFactory.class);
-      return smartFactoryClass.newInstance();
+      return smartFactoryClass.getDeclaredConstructor().newInstance();
     } catch (final Exception e) {
       LOG.debug("SmartWroModelFactory is not available. Using default model factory.");
       LOG.debug("Reason: {}", e.getMessage());

@@ -54,7 +54,7 @@ public class RhinoUtils {
    * @return detailed string message.
    */
   public static String createExceptionMessage(final RhinoException e) {
-    StringBuffer message = new StringBuffer("Could not execute the script because: \n");
+    StringBuilder message = new StringBuilder("Could not execute the script because: \n");
     if (e instanceof JavaScriptException) {
       message.append(toJson(((JavaScriptException) e).getValue()));
     } else if (e instanceof EcmaError) {

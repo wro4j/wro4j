@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.support.lint.LintReport;
@@ -91,19 +90,18 @@ public abstract class AbstractLinterMojo<T>
 
   private void generateReport() {
     if (shouldGenerateReport()) {
-      OutputStream reportFileStream = null;
       try {
         getReportFile().getParentFile().mkdirs();
         getReportFile().createNewFile();
         getLog().debug("creating report at location: " + getReportFile());
         final FormatterType type = FormatterType.getByFormat(getReportFormat());
         if (type != null) {
-          createXmlFormatter(lintReport, type).write(reportFileStream = new FileOutputStream(getReportFile()));
+          try (OutputStream reportFileStream = new FileOutputStream(getReportFile())) {
+            createXmlFormatter(lintReport, type).write(reportFileStream);
+          }
         }
       } catch (final IOException e) {
         getLog().error("Could not create report file: " + getReportFile(), e);
-      } finally {
-        IOUtils.closeQuietly(reportFileStream);
       }
     }
   }
