@@ -18,6 +18,7 @@ import java.util.Date;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -84,42 +85,52 @@ public class TestResourceProxyRequestHandler {
     assertEquals(0, Context.countActive());
   }
 
-  @Before
-  public void setup()
-      throws IOException {
-    MockitoAnnotations.initMocks(this);
-    victim = new ResourceProxyRequestHandler();
+	@Before
+	public void setup() throws IOException {
 
-    Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
-    Context.set(Context.webContext(request, response, filterConfig));
-    // a more elaborate way to build injector, used to instruct it use a different instance of authorizationManager
-    final Injector injector = new InjectorBuilder(new BaseWroManagerFactory().setUriLocatorFactory(
-        mockUriLocatorFactory).setResourceAuthorizationManager(mockAuthorizationManager)).build();
-    injector.inject(victim);
+		MockitoAnnotations.initMocks(this);
+		victim = new ResourceProxyRequestHandler();
 
-    when(mockUriLocatorFactory.getInstance(anyString())).thenReturn(mockUriLocator);
-    when(mockUriLocatorFactory.locate(anyString())).then(new Answer<InputStream>() {
-      public InputStream answer(final InvocationOnMock invocation)
-          throws Throwable {
-        final String uri = (String) invocation.getArguments()[0];
-        return mockUriLocator.locate(uri);
-      }
-    });
-    when(mockUriLocator.locate(anyString())).thenReturn(WroUtil.EMPTY_STREAM);
+		Mockito.when(filterConfig.getServletContext()).thenReturn(servletContext);
+		Context.set(Context.webContext(request, response, filterConfig));
+		// a more elaborate way to build injector, used to instruct it use a different
+		// instance of authorizationManager
+		final Injector injector = new InjectorBuilder(new BaseWroManagerFactory()
+				.setUriLocatorFactory(mockUriLocatorFactory).setResourceAuthorizationManager(mockAuthorizationManager))
+						.build();
+		injector.inject(victim);
 
-    packagePath = WroUtil.toPackageAsFolder(this.getClass());
+		when(mockUriLocatorFactory.getInstance(anyString())).thenReturn(mockUriLocator);
+		when(mockUriLocatorFactory.locate(anyString())).then(new Answer<InputStream>() {
+			public InputStream answer(final InvocationOnMock invocation) throws Throwable {
+				final String uri = (String) invocation.getArguments()[0];
+				return mockUriLocator.locate(uri);
+			}
+		});
+		when(mockUriLocator.locate(anyString())).thenReturn(WroUtil.EMPTY_STREAM);
 
-    // Setup response writer
-    outputStream = new ByteArrayOutputStream();
-    servletOutputStream = new ServletOutputStream() {
-      @Override
-      public void write(final int i)
-          throws IOException {
-        outputStream.write(i);
-      }
-    };
-    when(response.getOutputStream()).thenReturn(servletOutputStream);
-  }
+		packagePath = WroUtil.toPackageAsFolder(this.getClass());
+
+		// Setup response writer
+		outputStream = new ByteArrayOutputStream();
+		servletOutputStream = new ServletOutputStream() {
+			@Override
+			public void write(final int i) throws IOException {
+				outputStream.write(i);
+			}
+
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+
+			@Override
+			public void setWriteListener(WriteListener writeListener) {
+				// Nothing to do.
+			}
+		};
+		when(response.getOutputStream()).thenReturn(servletOutputStream);
+	}
 
   @After
   public void tearDown() {

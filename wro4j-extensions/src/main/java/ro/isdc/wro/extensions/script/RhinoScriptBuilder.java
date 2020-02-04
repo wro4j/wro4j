@@ -108,7 +108,7 @@ public final class RhinoScriptBuilder {
   public RhinoScriptBuilder addJSON() {
     try {
       final InputStream script = new AutoCloseInputStream(
-          new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js")));
+          new WebjarUriLocator().locate(WebjarUriLocator.createUri("20140204/json2.js")));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);
