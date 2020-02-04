@@ -5,6 +5,7 @@ package ro.isdc.wro.extensions.processor.support;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
@@ -25,13 +26,15 @@ import ro.isdc.wro.util.ObjectFactory;
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {
+
   private static final Logger LOG = LoggerFactory.getLogger(ObjectPoolHelper.class);
-  private static final int MAX_IDLE = 2;
-  private static final long MAX_WAIT = 5L * 1000L;
-  private static final long EVICTABLE_IDLE_TIME = 30 * 1000L;
+
+  private static final int MAX_IDLE = 5;
+  private static final long MAX_WAIT = 10L * DateUtils.MILLIS_PER_SECOND;
+  private static final long EVICTABLE_IDLE_TIME = 30L * DateUtils.MILLIS_PER_SECOND;
+
   // Allows using the objects from the pool in a thread-safe fashion.
   private GenericObjectPool<T> objectPool;
-
 
   public ObjectPoolHelper(final ObjectFactory<T> objectFactory) {
     notNull(objectFactory);
