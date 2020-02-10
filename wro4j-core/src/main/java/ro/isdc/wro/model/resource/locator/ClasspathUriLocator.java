@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
@@ -128,7 +129,7 @@ public class ClasspathUriLocator
       LOG.debug("Failed to locate stream for {} because URL is null", uri);
       throw new IOException("Cannot locate stream for null URL");
     }
-    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
+    return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
   }
 
   /**

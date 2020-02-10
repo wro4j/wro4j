@@ -45,7 +45,8 @@ public class TestBeautifyJsProcessor {
         throw e;
       }
     };
-    final Callable<Void> task = new Callable<Void>() {
+    final Callable<Void> task = new Callable<>() {
+      @Override
       public Void call() {
         try {
           processor.process(new StringReader("alert(1);"), new StringWriter());

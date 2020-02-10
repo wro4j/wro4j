@@ -1,7 +1,10 @@
 # <img src="http://code.google.com/p/wro4j/logo"> Web Resource Optimizer for Java
 [![Join the chat at https://gitter.im/wro4j/wro4j](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wro4j/wro4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
+[![Coverage Status](https://codecov.io/github/wro4j/wro4j/coverage.png?branch=master)](https://codecov.io/github/wro4j/wro4j?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ro.isdc.wro4j/wro4j-core)
+[![Stories in Ready](https://badge.waffle.io/wro4j/wro4j.png?label=ready&title=Ready)](http://waffle.io/wro4j/wro4j)
+
 
 
 wro4j is a free and Open Source Java project which will help you to [easily improve](http://wro4j.github.com/wro4j) your web application page loading time. It can help you to keep your static resources (js & css) [well organized](http://wro4j.readthedocs.org/en/stable/WroFileFormat), merge & minify them at [run-time](http://wro4j.readthedocs.org/en/stable/Installation) (using a simple filter) or [build-time](http://wro4j.readthedocs.org/en/stable/MavenPlugin) (using maven plugin) and has a [dozen of features](http://wro4j.readthedocs.org/en/stable/Features) you may find useful when dealing with web resources.

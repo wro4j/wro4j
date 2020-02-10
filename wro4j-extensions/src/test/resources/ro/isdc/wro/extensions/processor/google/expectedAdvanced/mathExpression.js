@@ -1,1 +1,1 @@
-Math.a(4/3);
+'use strict';Math.a(4/3);

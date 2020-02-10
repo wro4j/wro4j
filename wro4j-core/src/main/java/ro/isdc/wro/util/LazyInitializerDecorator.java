@@ -25,10 +25,12 @@ public class LazyInitializerDecorator<T>
     return decorator.getDecoratedObject().initialize();
   }
 
+  @Override
   public LazyInitializer<T> getDecoratedObject() {
     return decorator.getDecoratedObject();
   }
 
+  @Override
   public LazyInitializer<T> getOriginalDecoratedObject() {
     return decorator.getOriginalDecoratedObject();
   }

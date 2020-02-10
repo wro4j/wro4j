@@ -1,0 +1,3 @@
+@import url(https://raw.githubusercontent.com/alexo/wro4j/gh-pages/asset/test/external.css);
+@import 'custom:/ro/isdc/wro/model/resource/processor/cssImport/test/dataUri.css';
+@import 'absoluteUrl.css';

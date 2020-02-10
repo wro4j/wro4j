@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +42,8 @@ public class YuiCssCompressor {
         int endIndex = 0;
         int i = 0;
         int max = 0;
-        ArrayList preservedTokens = new ArrayList(0);
-        ArrayList comments = new ArrayList(0);
+        List<String> preservedTokens = new ArrayList<>(0);
+        List<String> comments = new ArrayList<>(0);
         String token;
         int totallen = css.length();
         String placeholder;

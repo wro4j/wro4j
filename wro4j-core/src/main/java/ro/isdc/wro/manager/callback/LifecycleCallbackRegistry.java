@@ -67,8 +67,10 @@ public class LifecycleCallbackRegistry
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onBeforeModelCreated() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onBeforeModelCreated();
@@ -77,12 +79,13 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onAfterModelCreated() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onAfterModelCreated();
@@ -91,12 +94,13 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onBeforePreProcess() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onBeforePreProcess();
@@ -105,12 +109,13 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onAfterPreProcess() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onAfterPreProcess();
@@ -119,12 +124,13 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onBeforePostProcess() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onBeforePostProcess();
@@ -133,12 +139,13 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onAfterPostProcess() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onAfterPostProcess();
@@ -150,8 +157,10 @@ public class LifecycleCallbackRegistry
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onBeforeMerge() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onBeforeMerge();
@@ -160,8 +169,10 @@ public class LifecycleCallbackRegistry
     });
   }
 
+  @Override
   public void onAfterMerge() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onAfterMerge();
@@ -173,8 +184,10 @@ public class LifecycleCallbackRegistry
   /**
    * {@inheritDoc}
    */
+  @Override
   public void onProcessingComplete() {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onProcessingComplete();
@@ -183,9 +196,10 @@ public class LifecycleCallbackRegistry
     });
   }
 
-
+  @Override
   public void onResourceChanged(final Resource resource) {
     forEachCallbackDo(new Function<LifecycleCallback, Void>() {
+      @Override
       public Void apply(final LifecycleCallback input)
           throws Exception {
         input.onResourceChanged(resource);

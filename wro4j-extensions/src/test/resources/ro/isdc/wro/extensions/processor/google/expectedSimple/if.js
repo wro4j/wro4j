@@ -1,1 +1,1 @@
-var a=1,a=1==a?2:17;
+'use strict';var a=1;a=1==a?2:17;

@@ -20,7 +20,7 @@ public final class LintReport<T> {
   private final List<ResourceLintReport<T>> reports;
 
   public LintReport() {
-    reports = new ArrayList<ResourceLintReport<T>>() {};
+    reports = new ArrayList<>();
   }
 
   /**

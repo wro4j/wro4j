@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 
+import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 import ro.isdc.wro.extensions.support.lint.ReportXmlFormatter.FormatterType;
 import ro.isdc.wro.util.WroTestUtils;
 import ro.isdc.wro.util.WroUtil;
@@ -25,7 +26,7 @@ import ro.isdc.wro.util.WroUtil;
 public class TestJsLintMojo
     extends AbstractTestLinterMojo {
   @Override
-  protected AbstractLinterMojo newLinterMojo() {
+  protected AbstractLinterMojo<LinterError> newLinterMojo() {
     return new JsLintMojo() {
       @Override
       void onException(final Exception e) {

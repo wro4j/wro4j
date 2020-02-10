@@ -3,7 +3,6 @@
  */
 package ro.isdc.wro.util;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.ByteArrayInputStream;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Properties;
@@ -47,6 +47,7 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
+
   private static final String SEPARATOR_UNIX = "/";
   private static final String SEPARATOR_WINDOWS = "\\";
   /**
@@ -66,7 +67,14 @@ public final class WroUtil {
   private static final Pattern PATTERN_GZIP = Pattern.compile(loadRegexpWithKey("requestHeader.gzip"));
 
   private static final AtomicInteger threadFactoryNumber = new AtomicInteger(1);
-  public static final InputStream EMPTY_STREAM = new ByteArrayInputStream("".getBytes());
+  public static final InputStream EMPTY_STREAM = new ByteArrayInputStream(StringUtils.EMPTY.getBytes(StandardCharsets.UTF_8));
+
+  /**
+   * Default private constructor to avoid instantiating this class.
+   */
+  private WroUtil() {
+	  super();
+  }
 
   /**
    * @return {@link ThreadFactory} with daemon threads.
@@ -76,6 +84,7 @@ public final class WroUtil {
       private final String prefix = "wro4j-" + name + "-" + threadFactoryNumber.getAndIncrement() + "-thread-";
       private final AtomicInteger threadNumber = new AtomicInteger(1);
 
+      @Override
       public Thread newThread(final Runnable runnable) {
         final Thread thread = new Thread(runnable, prefix + threadNumber.getAndIncrement());
         thread.setDaemon(true);
@@ -233,7 +242,7 @@ public final class WroUtil {
    * @return a string which being evaluated on the client-side will be treated as a correct multi-line string.
    */
   public static String toJSMultiLineString(final String data) {
-    final StringBuffer result = new StringBuffer("[");
+    final StringBuilder result = new StringBuilder("[");
     if (data != null) {
       final String[] lines = data.split("\n");
       if (lines.length == 0) {
@@ -279,6 +288,7 @@ public final class WroUtil {
   public static ResourcePostProcessor newResourceProcessor(final Resource resource,
       final ResourcePreProcessor preProcessor) {
     return new ResourcePostProcessor() {
+      @Override
       public void process(final Reader reader, final Writer writer)
           throws IOException {
         preProcessor.process(resource, reader, writer);
@@ -294,10 +304,12 @@ public final class WroUtil {
    */
   public static WroModelFactory factoryFor(final WroModel model) {
     return new WroModelFactory() {
+      @Override
       public WroModel create() {
         return model;
       }
 
+      @Override
       public void destroy() {
       }
     };
@@ -305,6 +317,7 @@ public final class WroUtil {
 
   public static <T> ObjectFactory<T> simpleObjectFactory(final T object) {
     return new ObjectFactory<T>() {
+      @Override
       public T create() {
         return object;
       }
@@ -319,15 +332,12 @@ public final class WroUtil {
    * @return regular expression value.
    */
   public static String loadRegexpWithKey(final String key) {
-    InputStream stream = null;
-    try {
-      stream = WroUtil.class.getResourceAsStream("regexp.properties");
+
+	try (InputStream stream = WroUtil.class.getResourceAsStream("regexp.properties")) {
       final Properties props = new RegexpProperties().load(stream);
       return props.getProperty(key);
     } catch (final IOException e) {
       throw new WroRuntimeException("Could not load pattern with key: " + key + " from property file", e);
-    } finally {
-      closeQuietly(stream);
     }
   }
 
@@ -350,11 +360,8 @@ public final class WroUtil {
    */
   public static void safeCopy(final Reader reader, final Writer writer)
       throws IOException {
-    try {
+    try (reader;writer) {
       IOUtils.copy(reader, writer);
-    } finally {
-      IOUtils.closeQuietly(reader);
-      IOUtils.closeQuietly(writer);
     }
   }
 
@@ -363,16 +370,6 @@ public final class WroUtil {
    */
   public static File createTempFile() {
     return createTempFile("temp");
-  }
-
-  /**
-   * @return a folder with unique name..
-   */
-  public static File createTempDirectory() {
-    final String fileName = String.format("wro4j-%s", UUID.randomUUID().toString());
-    final File file = new File(FileUtils.getTempDirectory(), fileName);
-    file.mkdir();
-    return file;
   }
 
   /**
@@ -390,6 +387,16 @@ public final class WroUtil {
     } catch (final IOException e) {
       throw WroRuntimeException.wrap(e);
     }
+  }
+
+  /**
+   * @return a folder with unique name..
+   */
+  public static File createTempDirectory() {
+    final String fileName = String.format("wro4j-%s", UUID.randomUUID().toString());
+    final File file = new File(FileUtils.getTempDirectory(), fileName);
+    file.mkdir();
+    return file;
   }
 
   /**

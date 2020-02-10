@@ -57,7 +57,7 @@ public class TaskExecutor<T> {
    */
   protected ExecutorService newExecutor() {
     try {
-      final ExecutorService executor = (ExecutorService) Class.forName("java.util.concurrent.ForkJoinPool").newInstance();
+      final ExecutorService executor = (ExecutorService) Class.forName("java.util.concurrent.ForkJoinPool").getDeclaredConstructor().newInstance();
       LOG.debug("Using ForkJoinPool as task executor.");
       return executor;
     } catch (final Exception e) {

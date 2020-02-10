@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
+
 import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompiler;
 
@@ -29,7 +31,7 @@ public class EmberJs
    */
   @Override
   public String compile(final String content, final String name) {
-    final String precompiledFunction = super.compile(content, "");
+    final String precompiledFunction = super.compile(content, StringUtils.EMPTY);
     return String.format("(function() {Ember.TEMPLATES[%s] = Ember.Handlebars.template(%s)})();", name, precompiledFunction);
   }
 

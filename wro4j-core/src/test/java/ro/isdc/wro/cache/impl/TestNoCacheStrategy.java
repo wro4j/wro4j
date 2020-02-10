@@ -1,8 +1,5 @@
 package ro.isdc.wro.cache.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.io.ByteArrayInputStream;
 
 import org.junit.After;
@@ -30,12 +27,12 @@ public class TestNoCacheStrategy {
   
   @BeforeClass
   public static void onBeforeClass() {
-    assertEquals(0, Context.countActive());
+	  Assert.assertEquals(0, Context.countActive());
   }
   
   @AfterClass
   public static void onAfterClass() {
-    assertEquals(0, Context.countActive());
+	  Assert.assertEquals(0, Context.countActive());
   }
   
   @Before
@@ -53,9 +50,9 @@ public class TestNoCacheStrategy {
     String content = "var foo = 'Hello World';";
     String hash = builder.getHash(new ByteArrayInputStream(content.getBytes()));
     
-    assertNull(cache.get(key));
+    Assert.assertNull(cache.get(key));
     cache.put(key, CacheValue.valueOf(content, hash));
-    assertNull(cache.get(key));
+    Assert.assertNull(cache.get(key));
     
     cache.clear();
     cache.destroy();

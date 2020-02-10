@@ -94,7 +94,7 @@ public class PreProcessorExecutor {
     try {
       notNull(resources);
       LOG.debug("process and merge resources: {}", resources);
-      final StringBuffer result = new StringBuffer();
+      final StringBuilder result = new StringBuilder();
       if (shouldRunInParallel(resources)) {
         result.append(runInParallel(resources, criteria));
       } else {
@@ -123,10 +123,11 @@ public class PreProcessorExecutor {
   private String runInParallel(final List<Resource> resources, final ProcessingCriteria criteria)
       throws IOException {
     LOG.debug("Running preProcessing in Parallel");
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
     final List<Callable<String>> callables = new ArrayList<Callable<String>>();
     for (final Resource resource : resources) {
       callables.add(new Callable<String>() {
+    	@Override
         public String call()
             throws Exception {
           LOG.debug("Callable started for resource: {} ...", resource);
@@ -176,8 +177,8 @@ public class PreProcessorExecutor {
    *
    * @param resource
    *          the {@link Resource} on which processors will be applied
-   * @param processors
-   *          the list of processor to apply on the resource.
+   * @param criteria
+   *          the criteria to apply on the resource.
    */
   private String applyPreProcessors(final Resource resource, final ProcessingCriteria criteria)
       throws IOException {
@@ -239,21 +240,17 @@ public class PreProcessorExecutor {
    * @return a Reader for the provided resource.
    * @param resource
    *          {@link Resource} which content to return.
-   * @param resources
-   *          the list of all resources processed in this context, used for duplicate resource detection.
    */
   private String getResourceContent(final Resource resource)
       throws IOException {
-    InputStream is = null;
-    try {
-      is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()));
+
+	try (InputStream is = new BOMInputStream(uriLocatorFactory.locate(resource.getUri()))) {
+
       final String result = IOUtils.toString(is, context.getConfig().getEncoding());
       if (StringUtils.isEmpty(result)) {
         LOG.debug("Empty resource detected: {}", resource.getUri());
       }
       return result;
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 

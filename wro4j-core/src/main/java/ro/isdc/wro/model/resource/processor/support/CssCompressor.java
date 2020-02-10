@@ -72,7 +72,7 @@ public class CssCompressor {
 
   protected String mergeRules(final String inputCss) {
 
-    final Map ruleMap = new LinkedHashMap();
+    final Map<String,String> ruleMap = new LinkedHashMap<>();
     final StringBuffer mergedCss = new StringBuffer();
 
     final Pattern p = Pattern.compile("([^\\{]*)\\{(.*?)\\}");
@@ -92,9 +92,9 @@ public class CssCompressor {
     }
 
     String rule;
-    for (final Iterator i = ruleMap.keySet().iterator(); i.hasNext();) {
-      rule = (String)i.next();
-      mergedCss.append(ruleMap.get(rule) + "{" + rule + "}");
+    for (final Iterator<String> i = ruleMap.keySet().iterator(); i.hasNext();) {
+      rule = i.next();
+      mergedCss.append(ruleMap.get(rule)).append("{").append(rule).append("}");
     }
 
     return mergedCss.toString();
@@ -105,10 +105,10 @@ public class CssCompressor {
 
     final StringBuffer cssRule = new StringBuffer();
 
-    final Set ruleSet = new LinkedHashSet(Arrays.asList(inputCssRule.split(";")));
+    final Set<String> ruleSet = new LinkedHashSet<>(Arrays.asList(inputCssRule.split(";")));
 
-    for (final Iterator i = ruleSet.iterator(); i.hasNext();) {
-      cssRule.append((String)i.next() + ";");
+    for (final Iterator<String> i = ruleSet.iterator(); i.hasNext();) {
+      cssRule.append(i.next()).append(";");
     }
 
     return cssRule.toString();
@@ -248,7 +248,7 @@ public class CssCompressor {
     m = p.matcher(css);
     sb = new StringBuffer();
 
-    final Map colorMap = new LinkedHashMap();
+    final Map<String,String> colorMap = new LinkedHashMap<>();
     colorMap.put("C0C0C0", "silver");
     colorMap.put("800000", "maroon");
     colorMap.put("800080", "purple");

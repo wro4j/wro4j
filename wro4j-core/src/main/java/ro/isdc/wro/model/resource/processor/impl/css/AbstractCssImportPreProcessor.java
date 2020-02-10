@@ -26,7 +26,6 @@ import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
-import ro.isdc.wro.model.resource.locator.UrlUriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.processor.ImportAware;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
@@ -54,6 +53,7 @@ public abstract class AbstractCssImportPreProcessor
    */
   @Inject
   private UriLocatorFactory uriLocatorFactory;
+
   /**
    * A map useful for detecting deep recursion. The key (correlationId) - identifies a processing unit, while the value
    * contains a pair between the list o processed resources and a stack holding recursive calls (value contained on this
@@ -61,8 +61,9 @@ public abstract class AbstractCssImportPreProcessor
    * detect recursion when running in concurrent environment (when processor is invoked from within the processor for
    * child resources).
    */
-  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<String, Pair<List<String>, Stack<String>>>() {
-    /**
+  private final Map<String, Pair<List<String>, Stack<String>>> contextMap = new ConcurrentHashMap<>() {
+	private static final long serialVersionUID = 1L;
+	/**
      * Make sure that the get call will always return a not null object. To avoid growth of this map, it is important to
      * call remove for each invoked get.
      */
@@ -190,7 +191,7 @@ public abstract class AbstractCssImportPreProcessor
    * Build a {@link Resource} object from a found importedResource inside a given resource.
    */
   private Resource createImportedResource(final String resourceUri, final String importUrl) {
-    final String absoluteUrl = UrlUriLocator.isValid(importUrl) ? importUrl
+    final String absoluteUrl = uriLocatorFactory.getInstance(importUrl) != null ? importUrl
         : computeAbsoluteUrl(resourceUri, importUrl);
     return Resource.create(absoluteUrl, ResourceType.CSS);
   }

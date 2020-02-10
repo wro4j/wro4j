@@ -133,7 +133,7 @@ public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProce
      * @return default options to use for linting.
      */
     protected String createDefaultOptions() {
-        return "";
+        return StringUtils.EMPTY;
     }
 
     @Override

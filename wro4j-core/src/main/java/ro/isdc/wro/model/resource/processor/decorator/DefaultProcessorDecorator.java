@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.commons.io.IOUtils;
-
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
 
@@ -38,11 +36,8 @@ public class DefaultProcessorDecorator
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    try {
+    try (reader;writer) {
       super.process(resource, reader, writer);
-    } finally {
-      IOUtils.closeQuietly(reader);
-      IOUtils.closeQuietly(writer);
     }
   }
 

@@ -1,12 +1,11 @@
 package ro.isdc.wro.model.resource.support.change;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.SocketTimeoutException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -17,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,9 +88,11 @@ public class ResourceWatcher
    */
   public static class CallbackSupport
       implements Callback {
+	@Override
     public void onGroupChanged(final CacheKey key) {
     }
 
+	@Override
     public void onResourceChanged(final Resource resource) {
     };
   }
@@ -134,6 +136,32 @@ public class ResourceWatcher
    */
   public void check(final CacheKey cacheKey) {
     check(cacheKey, new CallbackSupport());
+  }
+
+  /**
+   * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
+   *
+   * @param cacheKey
+   *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
+   */
+  public void check(final CacheKey cacheKey, final Callback callback) {
+	Validate.notNull(cacheKey);
+    LOG.debug("started");
+    final StopWatch watch = new StopWatch();
+    watch.start("detect changes");
+    try {
+      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
+      if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
+        callback.onGroupChanged(cacheKey);
+        cacheStrategy.put(cacheKey, null);
+      }
+      resourceChangeDetector.reset();
+    } catch (final Exception e) {
+      onException(e);
+    } finally {
+      watch.stop();
+      LOG.debug("resource watcher info: {}", watch.prettyPrint());
+    }
   }
 
   /**
@@ -183,32 +211,6 @@ public class ResourceWatcher
   }
 
   /**
-   * Check if resources from a group were changed. If a change is detected, the changeListener will be invoked.
-   *
-   * @param cacheKey
-   *          the cache key which was requested. The key contains the groupName which has to be checked for changes.
-   */
-  public void check(final CacheKey cacheKey, final Callback callback) {
-    notNull(cacheKey);
-    LOG.debug("started");
-    final StopWatch watch = new StopWatch();
-    watch.start("detect changes");
-    try {
-      final Group group = new WroModelInspector(modelFactory.create()).getGroupByName(cacheKey.getGroupName());
-      if (isGroupChanged(group.collectResourcesOfType(cacheKey.getType()), callback)) {
-        callback.onGroupChanged(cacheKey);
-        cacheStrategy.put(cacheKey, null);
-      }
-      resourceChangeDetector.reset();
-    } catch (final Exception e) {
-      onException(e);
-    } finally {
-      watch.stop();
-      LOG.debug("resource watcher info: {}", watch.prettyPrint());
-    }
-  }
-
-  /**
    * Invoked when exception occurs.
    */
   protected void onException(final Exception e) {
@@ -226,6 +228,7 @@ public class ResourceWatcher
       for (final Resource resource : resources) {
         if (isAsync) {
           futures.add(executorServiceRef.get().submit(ContextPropagatingCallable.decorate(new Callable<Void>() {
+        	@Override
             public Void call()
                 throws Exception {
               checkResourceChange(resource, group, callback, isChanged);
@@ -278,7 +281,7 @@ public class ResourceWatcher
       // using AtomicBoolean because we need to mutate this variable inside an anonymous class.
       final AtomicBoolean changeDetected = new AtomicBoolean(resourceChangeDetector.checkChangeForGroup(uri, groupName));
       if (!changeDetected.get() && resource.getType() == ResourceType.CSS) {
-        final Reader reader = new InputStreamReader(locatorFactory.locate(uri));
+        final Reader reader = new InputStreamReader(locatorFactory.locate(uri), Charset.defaultCharset());
         LOG.debug("\tCheck @import directive from {}", resource);
         createCssImportProcessor(changeDetected, groupName).process(resource, reader, new StringWriter());
       }
@@ -345,6 +348,7 @@ public class ResourceWatcher
         originalRequest.getRequestURI(), originalRequest.getServletPath());
     final HttpServletRequest request = new PreserveDetailsRequestWrapper(originalRequest);
     return ContextPropagatingCallable.decorate(new Callable<Void>() {
+      @Override
       public Void call()
           throws Exception {
         final String location = ResourceWatcherRequestHandler.createHandlerRequestPath(cacheKey, request);
@@ -352,7 +356,7 @@ public class ResourceWatcher
           dispatcherLocator.locateExternal(request, location);
           return null;
         } catch (final IOException e) {
-          final StringBuffer message = new StringBuffer("Could not check the following cacheKey: " + cacheKey);
+          final StringBuilder message = new StringBuilder("Could not check the following cacheKey: ").append(cacheKey);
           if (e instanceof SocketTimeoutException) {
             message.append(". The invocation of ").append(location).append(
                 " timed out. Consider increasing the connectionTimeout configuration.");
@@ -373,6 +377,7 @@ public class ResourceWatcher
     return resourceChangeDetector;
   }
 
+  @Override
   public void destroy()
       throws Exception {
     executorServiceRef.destroy();

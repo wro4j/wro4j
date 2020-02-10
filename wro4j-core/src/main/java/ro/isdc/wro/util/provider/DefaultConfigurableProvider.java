@@ -111,6 +111,7 @@ public class DefaultConfigurableProvider
   /**
    * {@inheritDoc}
    */
+  @Override
   public int getOrder() {
     //The lowest order is used to allow custom provider to override providers with the same name.
     return Ordered.LOWEST;

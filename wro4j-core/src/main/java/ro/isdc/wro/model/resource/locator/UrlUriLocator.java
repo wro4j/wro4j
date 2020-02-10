@@ -3,8 +3,6 @@
  */
 package ro.isdc.wro.model.resource.locator;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,11 +11,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -66,11 +64,11 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    */
   public InputStream locate(final String uri)
     throws IOException {
-    notNull(uri, "uri cannot be NULL!");
+	Validate.notNull(uri, "uri cannot be NULL!");
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
-      return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), "UTF-8")));
+      return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
     }
     final URL url = new URL(uri);
     final URLConnection connection = url.openConnection();

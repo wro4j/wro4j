@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
@@ -47,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.extensions.manager.standalone.ExtensionsStandaloneManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
@@ -289,7 +291,7 @@ public class TestWro4jMojo {
       throws Exception {
     setWroWithValidResources();
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=cssMin";
-    FileUtils.write(extraConfigFile, preProcessors);
+    FileUtils.write(extraConfigFile, preProcessors, Charset.defaultCharset());
 
     victim.setIgnoreMissingResources(true);
     victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());
@@ -375,7 +377,7 @@ public class TestWro4jMojo {
       throws Exception {
     setWroWithValidResources();
     final String preProcessors = ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS + "=INVALID";
-    FileUtils.write(extraConfigFile, preProcessors);
+    FileUtils.write(extraConfigFile, preProcessors, Charset.defaultCharset());
 
     victim.setIgnoreMissingResources(true);
     victim.setWroManagerFactory(ConfigurableWroManagerFactory.class.getName());

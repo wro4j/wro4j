@@ -1,1 +1,1 @@
-var a={};a["this"]=1;a["that"]=2;
+'use strict';var a={};a["this"]=1;a["that"]=2;

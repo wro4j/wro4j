@@ -1,1 +1,1 @@
-var a=1+2*6;var b=1/3;
+'use strict';var a=1+2*6;var b=1/3;

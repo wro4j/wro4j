@@ -1,11 +1,9 @@
 package ro.isdc.wro.extensions.locator;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,10 +26,10 @@ import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
  * @created 6 Jan 2013
  * @since 1.6.2
  */
-public class WebjarUriLocator
-    implements UriLocator {
-  private static final String PATTERN = ".*";
+public class WebjarUriLocator implements UriLocator {
+
   private static final Logger LOG = LoggerFactory.getLogger(WebjarUriLocator.class);
+
   /**
    * Alias used to register this locator with {@link LocatorProvider}.
    */
@@ -39,19 +37,15 @@ public class WebjarUriLocator
   /**
    * Prefix of the resource uri used to check if the resource can be read by this {@link UriLocator} implementation.
    */
-  public static final String PREFIX = format("%s:", ALIAS);
-  private final UriLocator classpathLocator = new ClasspathUriLocator();
-  private final WebJarAssetLocator webjarAssetLocator = newWebJarAssetLocator();
+  public static final String PREFIX = ALIAS + ":";
 
+  private final UriLocator classpathLocator = new ClasspathUriLocator();
 
   /**
-   * @return an instance of {@link WebJarAssetLocator} to be used for identifying the fully qualified name of resources
+   * An instance of {@link WebJarAssetLocator} to be used for identifying the fully qualified name of resources
    *         based on provided partial path.
    */
-  private WebJarAssetLocator newWebJarAssetLocator() {
-    return new WebJarAssetLocator(WebJarAssetLocator.getFullPathIndex(
-        Pattern.compile(PATTERN), Thread.currentThread().getContextClassLoader()));
-  }
+  private final WebJarAssetLocator webjarAssetLocator = new WebJarAssetLocator();
 
   /**
    * @return the uri which is acceptable by this locator.
@@ -64,7 +58,7 @@ public class WebjarUriLocator
   @Override
   public InputStream locate(final String uri)
       throws IOException {
-    LOG.debug("locating: {}", uri);
+    LOG.debug("Locating: {}", uri);
     try {
       final String fullpath = webjarAssetLocator.getFullPath(extractPath(uri));
       return classpathLocator.locate(ClasspathUriLocator.createUri(fullpath));
@@ -77,7 +71,10 @@ public class WebjarUriLocator
    * Replaces the protocol specific prefix and removes the query path if it exist, since it should not be accepted.
    */
   private String extractPath(final String uri) {
-    return DefaultWildcardStreamLocator.stripQueryPath(uri.replace(PREFIX, StringUtils.EMPTY));
+
+	  String uriWithUpdatedPrefix = uri.trim().replace(PREFIX, StringUtils.EMPTY);
+
+	  return DefaultWildcardStreamLocator.stripQueryPath(uriWithUpdatedPrefix);
   }
 
   @Override

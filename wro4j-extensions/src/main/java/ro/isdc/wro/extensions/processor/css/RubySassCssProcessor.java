@@ -50,20 +50,24 @@ public class RubySassCssProcessor
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    final String content = IOUtils.toString(reader);
-    final RubySassEngine engine = enginePool.getObject();
-    try {
-      writer.write(engine.process(content));
-    } catch (final WroRuntimeException e) {
-      onException(e);
-      final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
-      LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...", e);
-    } finally {
-      reader.close();
-      writer.close();
-      enginePool.returnObject(engine);
-    }
+
+		synchronized (this) {
+
+			final String content = IOUtils.toString(reader);
+			final RubySassEngine engine = enginePool.getObject();
+
+			try (reader; writer) {
+				writer.write(engine.process(content));
+			} catch (final WroRuntimeException e) {
+
+				onException(e);
+				final String resourceUri = resource == null ? StringUtils.EMPTY : "[" + resource.getUri() + "]";
+				LOG.warn("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
+						+ " resource, no processing applied...", e);
+			} finally {
+				enginePool.returnObject(engine);
+			}
+		}
   }
 
   /**

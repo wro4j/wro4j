@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>ro.isdc.wro4j</groupId>
 		<artifactId>wro4j-parent</artifactId>
-		<version>1.8.0</version>
+		<version>1.9.0</version>
 	</parent>
 
 	<artifactId>wro4j-core</artifactId>
@@ -23,12 +24,13 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
 		</dependency>
+
 		<!-- This dependency has provided scope to allow WroTestUtils use Assert -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -36,4 +38,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
 </project>

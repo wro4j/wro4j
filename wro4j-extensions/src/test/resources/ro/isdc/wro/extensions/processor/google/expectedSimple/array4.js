@@ -1,1 +1,1 @@
-(function(){})();
+'use strict';(function(){new function(){}(1,2,3)})();

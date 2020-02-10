@@ -30,8 +30,11 @@ import ro.isdc.wro.extensions.locator.WebjarUriLocator;
  * @author Alex Objelean
  */
 public final class RhinoScriptBuilder {
+
   private static final Logger LOG = LoggerFactory.getLogger(RhinoScriptBuilder.class);
-  private static final String SCRIPT_ENV = "env.rhino.min.js";
+
+  private static final String SCRIPT_COMMONS = "commons.js";
+  private static final String SCRIPT_ENV = "env.rhino.js";
   private static final String SCRIPT_JSON = "json2.min.js";
   private static final String SCRIPT_CYCLE = "cycle.js";
   private final ScriptableObject scope;
@@ -62,21 +65,20 @@ public final class RhinoScriptBuilder {
    * Initialize the context.
    */
   private ScriptableObject createContext(final ScriptableObject initialScope) {
+
     final Context context = getContext();
     context.setOptimizationLevel(-1);
     // TODO redirect errors from System.err to LOG.error()
     context.setErrorReporter(new ToolErrorReporter(false));
-    context.setLanguageVersion(Context.VERSION_1_8);
-    InputStream script = null;
+    context.setLanguageVersion(Context.VERSION_ES6);
     final ScriptableObject scriptCommon = (ScriptableObject) context.initStandardObjects(initialScope);
-    try {
-      script = new AutoCloseInputStream(getClass().getResourceAsStream("commons.js"));
-      context.evaluateReader(scriptCommon, new InputStreamReader(script), "commons.js", 1, null);
+
+    try (InputStream script = new AutoCloseInputStream(getClass().getResourceAsStream(SCRIPT_COMMONS))) {
+      context.evaluateReader(scriptCommon, new InputStreamReader(script), SCRIPT_COMMONS, 1, null);
     } catch (final IOException e) {
       throw new RuntimeException("Problem while evaluationg commons script.", e);
-    } finally {
-      IOUtils.closeQuietly(script);
     }
+
     return scriptCommon;
   }
 
@@ -89,7 +91,7 @@ public final class RhinoScriptBuilder {
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
       //final InputStream scriptEnv = getClass().getResourceAsStream(SCRIPT_ENV);
-      final InputStream scriptEnv = new WebjarUriLocator().locate("env.rhino.js");
+      final InputStream scriptEnv = new WebjarUriLocator().locate(SCRIPT_ENV);
       evaluateChain(scriptEnv, SCRIPT_ENV);
       return this;
     } catch (final IOException e) {
@@ -106,14 +108,14 @@ public final class RhinoScriptBuilder {
   public RhinoScriptBuilder addJSON() {
     try {
       final InputStream script = new AutoCloseInputStream(
-          new WebjarUriLocator().locate(WebjarUriLocator.createUri("20110223/json2.js")));
+          new WebjarUriLocator().locate(WebjarUriLocator.createUri("20140204/json2.js")));
       final InputStream scriptCycle = getClass().getResourceAsStream(SCRIPT_CYCLE);
 
       evaluateChain(script, SCRIPT_JSON);
       evaluateChain(scriptCycle, SCRIPT_CYCLE);
       return this;
     } catch (final IOException e) {
-      throw new RuntimeException("Couldn't initialize json2.min.js script", e);
+      throw new RuntimeException("Couldn't initialize " + SCRIPT_JSON + " script", e);
     }
   }
 
@@ -128,19 +130,15 @@ public final class RhinoScriptBuilder {
   public RhinoScriptBuilder evaluateChain(final InputStream stream, final String sourceName)
     throws IOException {
     notNull(stream);
-    try {
+    try (stream) {
       getContext().evaluateReader(scope, new InputStreamReader(stream), sourceName, 1, null);
       return this;
     } catch(final RhinoException e) {
-      if (e instanceof RhinoException) {
-        LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage(e));
-      }
+      LOG.error("RhinoException: {}", RhinoUtils.createExceptionMessage(e));
       throw e;
     } catch (final RuntimeException e) {
       LOG.error("Exception caught", e);
       throw e;
-    } finally {
-      stream.close();
     }
   }
 
@@ -187,7 +185,6 @@ public final class RhinoScriptBuilder {
     }
   }
 
-
   /**
    * Evaluates a script.
    *
@@ -220,11 +217,9 @@ public final class RhinoScriptBuilder {
     return new RhinoScriptBuilder();
   }
 
-
   public static RhinoScriptBuilder newChain(final ScriptableObject scope) {
     return new RhinoScriptBuilder(scope);
   }
-
 
   /**
    * @return default {@link RhinoScriptBuilder} for script evaluation chaining.

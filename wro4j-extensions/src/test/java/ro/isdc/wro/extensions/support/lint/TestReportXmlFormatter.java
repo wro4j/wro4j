@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class TestReportXmlFormatter {
     final LintReport<LinterError> lintReport = new LintReport<LinterError>();
     lintReport.addReport(new ResourceLintReport<LinterError>());
     final StringWriter writer = new StringWriter();
-    ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.LINT).write(new WriterOutputStream(writer));
+    ReportXmlFormatter.createForLinterError(lintReport, ReportXmlFormatter.FormatterType.LINT).write(new WriterOutputStream(writer, Charset.defaultCharset()));
     assertNotNull(writer.toString());
   }
 
@@ -86,7 +87,7 @@ public class TestReportXmlFormatter {
         final Type type = new TypeToken<LintReport<LinterError>>() {}.getType();
         final LintReport<LinterError> errors = new Gson().fromJson(reader, type);
         ReportXmlFormatter.createForLinterError(errors, formatterType).write(
-            new WriterOutputStream(writer));
+            new WriterOutputStream(writer, Charset.defaultCharset()));
       }
     });
   }

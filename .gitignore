@@ -1,8 +1,11 @@
-target
-.classpath
-.settings
-.project
-.idea
-*.iml
-.sass-cache
+.settings/
+target/
 
+*.iml
+*.releaseBackup
+.classpath
+.DS_Store
+.idea
+.project
+.sass-cache
+release.properties

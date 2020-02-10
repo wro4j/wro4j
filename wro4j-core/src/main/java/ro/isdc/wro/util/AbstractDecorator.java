@@ -22,6 +22,7 @@ public abstract class AbstractDecorator<T>
   /**
    * @return the decorated object.
    */
+  @Override
   public final T getDecoratedObject() {
     return decorated;
   }
@@ -29,6 +30,7 @@ public abstract class AbstractDecorator<T>
   /**
    * @return the object which is was originally decorated and is not a decorator itself.
    */
+  @Override
   public final T getOriginalDecoratedObject() {
     return getOriginalDecoratedObject(decorated);
   }

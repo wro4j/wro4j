@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.zip.GZIPInputStream;
@@ -110,7 +111,7 @@ public class TestGzipFilter {
     
     final InputStream ungzippedStream = new GZIPInputStream(new ByteArrayInputStream(targetStream.toByteArray()));
     
-    assertEquals(content, IOUtils.toString(ungzippedStream));
+    assertEquals(content, IOUtils.toString(ungzippedStream, Charset.defaultCharset()));
   }
   
   private void markGzipAsAllowed() {

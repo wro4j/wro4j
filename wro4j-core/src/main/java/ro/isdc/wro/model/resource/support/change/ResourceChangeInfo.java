@@ -56,10 +56,16 @@ public final class ResourceChangeInfo {
    * current hash to null. This operation should be invoked after a change cycle completes and a new one is prepared.
    */
   public void reset() {
+
     // This is important to avoid false positives when reset is called concurrently.
     if (currentHash != null) {
-      this.prevHash = currentHash;
+      synchronized (this) {
+    	if (currentHash != null) {
+    	  this.prevHash = currentHash;
+    	}
+      }
     }
+
     this.currentHash = null;
   }
 

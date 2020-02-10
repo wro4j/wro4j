@@ -22,12 +22,16 @@ import ro.isdc.wro.util.WroUtil;
  * @since 1.3.0
  */
 public class PackerJs {
+
   private static final Logger LOG = LoggerFactory.getLogger(PackerJs.class);
-  
+
   /**
    * Initialize script builder for evaluation.
    */
   private RhinoScriptBuilder initScriptBuilder() {
+
+	LOG.debug("Initialising a new script builder");
+
     try {
       return RhinoScriptBuilder.newChain().evaluateChain(getStreamForBase2(), "base2.min.js").evaluateChain(
           getStreamForPacker(), "packer.min.js");

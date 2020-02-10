@@ -1,9 +1,6 @@
 package ro.isdc.wro.model.resource.processor.decorator;
 
-import static org.apache.commons.lang3.Validate.notNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.processor.support.ProcessingType;
@@ -18,11 +15,11 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingType;
  */
 public class ImportAwareProcessorDecorator
     extends ProcessorDecorator {
-  private static final Logger LOG = LoggerFactory.getLogger(ImportAwareProcessorDecorator.class);
+
   private final ProcessingType processingType;
   public ImportAwareProcessorDecorator(final Object processor, final ProcessingType processingType) {
     super(processor);
-    notNull(processingType);
+    Validate.notNull(processingType);
     this.processingType = processingType;
   }
 

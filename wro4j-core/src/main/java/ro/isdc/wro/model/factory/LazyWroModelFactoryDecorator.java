@@ -24,6 +24,7 @@ public class LazyWroModelFactoryDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public WroModel create() {
     return getDecoratedObject().get().create();
   }
@@ -31,6 +32,7 @@ public class LazyWroModelFactoryDecorator
   /**
    * {@inheritDoc}
    */
+  @Override
   public void destroy() {
     getDecoratedObject().get().destroy();
   }

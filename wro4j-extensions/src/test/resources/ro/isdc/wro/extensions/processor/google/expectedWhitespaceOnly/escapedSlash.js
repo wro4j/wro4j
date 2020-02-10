@@ -1,1 +1,1 @@
-if(1!=="\\")alert(1);
+'use strict';if(1!=="\\")alert(1);
