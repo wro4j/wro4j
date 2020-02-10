@@ -8,4 +8,5 @@ target/
 .idea
 .project
 .sass-cache
+pom.xml.versionsBackup
 release.properties
