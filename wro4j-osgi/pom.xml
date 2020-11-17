@@ -62,5 +62,7 @@
             <Embed-Dependency>*;scope=compile;inline=false</Embed-Dependency>
           </instructions>
         </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
