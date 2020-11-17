@@ -10,7 +10,7 @@
 
 	<artifactId>wro4j-parent</artifactId>
 	<groupId>ro.isdc.wro4j</groupId>
-	<version>1.9.0</version>
+	<version>1.9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>wro4j parent</name>
