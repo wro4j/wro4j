@@ -176,21 +176,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		<plugin>
-                <groupId>edu.illinois.cs</groupId>
-                <artifactId>testrunner-maven-plugin</artifactId>
-                <version>1.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>edu.illinois.cs</groupId>
-                        <artifactId>idflakies</artifactId>
-                        <version>1.0.1</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <className>edu.illinois.cs.dt.tools.detection.DetectorPlugin</className>
-                </configuration>
-            </plugin>
         </plugins>
 
 		<pluginManagement>
