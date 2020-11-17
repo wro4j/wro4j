@@ -63,7 +63,6 @@ public class TestResourceChangeInfo {
   public void cannotIfCheckRequiredForNullGroup() {
       victim = new ResourceChangeInfo();
       victim.isCheckRequiredForGroup(null);
-    
   }
 
   @Test
