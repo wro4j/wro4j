@@ -33,6 +33,7 @@ public class TestResourceChangeInfo {
 
   @Test(expected = NullPointerException.class)
   public void cannotCheckChangeForNullGroupName() {
+    victim = new ResourceChangeInfo();
     victim.isChanged(null);
   }
 
@@ -60,7 +61,10 @@ public class TestResourceChangeInfo {
 
   @Test(expected = NullPointerException.class)
   public void cannotIfCheckRequiredForNullGroup() {
-    victim.isCheckRequiredForGroup(null);
+  
+      victim = new ResourceChangeInfo();
+      victim.isCheckRequiredForGroup(null);
+    
   }
 
   @Test

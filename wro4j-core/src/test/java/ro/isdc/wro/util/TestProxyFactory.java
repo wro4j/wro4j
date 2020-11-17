@@ -47,7 +47,7 @@ public class TestProxyFactory {
 
   @Test(expected = NullPointerException.class)
   public void cannotCreateProxyFromNullObjectFactory() {
-    ProxyFactory.proxy(null, Object.class);
+    ProxyFactory.proxy(null, Object.class); 
   }
 
   @Test

@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -647,7 +644,22 @@
 					<argLine>-Xmx2048m -XX:MaxPermSize=512m</argLine>
 				</configuration>
 			</plugin>
-		</plugins>
+		<plugin>
+                <groupId>edu.illinois.cs</groupId>
+                <artifactId>testrunner-maven-plugin</artifactId>
+                <version>1.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>edu.illinois.cs</groupId>
+                        <artifactId>idflakies</artifactId>
+                        <version>1.0.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <className>edu.illinois.cs.dt.tools.detection.DetectorPlugin</className>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 	<reporting>
 		<outputDirectory>${basedir}/target/site</outputDirectory>
@@ -686,3 +698,4 @@
 	</profiles>
 
 </project>
+
