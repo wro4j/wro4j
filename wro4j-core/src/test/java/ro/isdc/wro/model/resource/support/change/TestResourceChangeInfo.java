@@ -61,7 +61,6 @@ public class TestResourceChangeInfo {
 
   @Test(expected = NullPointerException.class)
   public void cannotIfCheckRequiredForNullGroup() {
-  
       victim = new ResourceChangeInfo();
       victim.isCheckRequiredForGroup(null);
     
