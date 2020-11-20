@@ -1,4 +1,6 @@
-(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template({"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template({"1":function(container,depth0,helpers,partials,data) {
+    return "s";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -13,6 +15,4 @@
     + "</strong> completed item"
     + ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"oneFinished") : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":4,"column":97},"end":{"line":5,"column":29}}})) != null ? stack1 : "")
     + "\n  </button>\n</div>";
-},"1":function(container,depth0,helpers,partials,data) {
-    return "s";
 },"useData":true} ); })();

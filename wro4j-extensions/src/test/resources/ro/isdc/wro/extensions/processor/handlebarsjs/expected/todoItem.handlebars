@@ -1,4 +1,6 @@
-(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoItem'] = template({"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoItem'] = template({"1":function(container,depth0,helpers,partials,data) {
+    return "checked=\"checked\"";
+},"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -14,6 +16,4 @@
     + "</label>\n  <i class=\"icon-remove-sign remove\" title=\"Remove\"></i>\n</div>\n<div class=\"edit row-fluid\">\n  <input type=\"text\" class=\"todo-edit span4\" value=\""
     + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"content") || (depth0 != null ? lookupProperty(depth0,"content") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"content","hash":{},"data":data,"loc":{"start":{"line":7,"column":52},"end":{"line":7,"column":63}}}) : helper)))
     + "\" />\n</div>";
-},"1":function(container,depth0,helpers,partials,data) {
-    return "checked=\"checked\"";
 },"useData":true} ); })();

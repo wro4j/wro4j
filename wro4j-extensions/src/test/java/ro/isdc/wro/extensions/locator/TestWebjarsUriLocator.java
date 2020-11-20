@@ -62,8 +62,8 @@ public class TestWebjarsUriLocator {
   public void shouldFindValidWebjar()
       throws Exception {
     assertNotEmpty(victim.locate("webjars:jquery.js"));
-    assertNotEmpty(victim.locate("webjars:jquery/2.0.0/jquery.js"));
-    assertNotEmpty(victim.locate("webjars:/jquery/2.0.0/jquery.js"));
+    assertNotEmpty(victim.locate("webjars:jquery/3.5.1/jquery.js"));
+    assertNotEmpty(victim.locate("webjars:/jquery/3.5.1/jquery.js"));
   }
 
   @Test(expected = IOException.class)
@@ -87,6 +87,6 @@ public class TestWebjarsUriLocator {
   @Test
   public void shouldLocateWebjarResourceContainingQuestionMarkInUri()
       throws Exception {
-    victim.locate("webjars:font-awesome/5.12.0/webfonts/fa-regular-400.woff?v=5.12.0");
+    victim.locate("webjars:font-awesome/5.15.1/webfonts/fa-regular-400.woff?v=5.15.1");
   }
 }

@@ -25,7 +25,7 @@ public class JsHint extends AbstractLinter {
    */
   @Override
   protected InputStream getScriptAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("jshint.js"));
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("dist/jshint.js"));
   }
 
   /**

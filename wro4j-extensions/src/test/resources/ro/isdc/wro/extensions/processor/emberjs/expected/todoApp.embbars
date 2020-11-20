@@ -1,3 +1,3 @@
-(function() {Ember.TEMPLATES['todoApp'] = Ember.Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+(function() {Ember.TEMPLATES['todoApp'] = Ember.Handlebars.template({"compiler":[8,">= 4.3.0"],"main":function(depth0,helpers,partials,data) {
     data.buffer.push("<h1>Todos</h1>\n\n<div class=\"row-fluid\">\n  <input type=\"text\" id=\"add-todo\" placeholder=\"What do you need to do?\" />\n</div>\n<div class=\"row-fluid\">\n  <div class=\"row-fluid span5\">\n    <input type=\"checkbox\" id=\"mark-all\" /><label for=\"mark-all\"\n      class=\"span4\"><strong>Mark all as complete</strong></label>\n  </div>\n\n  <ul id=\"todo-list\"></ul>\n\n  <div id=\"todo-status\" class=\"row-fluid\"></div>\n</div>");
 },"useData":true})})();
