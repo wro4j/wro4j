@@ -16,8 +16,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
+import ro.isdc.wro.config.support.DeploymentMode;
 
 
 /**
@@ -54,7 +55,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
 
   @Test
   public void testConfigureCacheUpdatePeriod() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.getPropertyKey())).thenReturn("10");
     final WroConfiguration config = factory.create();
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(true, config.isDebug());
@@ -66,12 +67,12 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       @Override
       protected Properties newDefaultProperties(){
         final Properties props = new Properties();
-        props.put(ConfigConstants.cacheUpdatePeriod.name(), "15");
-        props.put(ConfigConstants.modelUpdatePeriod.name(), "30");
+        props.put(ConfigConstants.cacheUpdatePeriod.getPropertyKey(), "15");
+        props.put(ConfigConstants.modelUpdatePeriod.getPropertyKey(), "30");
         return props;
       }
     };
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.getPropertyKey())).thenReturn("10");
     final WroConfiguration config = factory.create();
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
     Assert.assertEquals(true, config.isDebug());
@@ -83,7 +84,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
 
   @Test
   public void testConfigureDebug() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn("false");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.getPropertyKey())).thenReturn("false");
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
@@ -94,11 +95,11 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       @Override
       protected Properties newDefaultProperties(){
         final Properties props = new Properties();
-        props.put(ConfigConstants.debug.name(), Boolean.TRUE.toString());
+        props.put(ConfigConstants.debug.getPropertyKey(), Boolean.TRUE.toString());
         return props;
       }
     };
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn(Boolean.FALSE.toString());
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.getPropertyKey())).thenReturn(Boolean.FALSE.toString());
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
@@ -109,7 +110,7 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       @Override
       protected Properties newDefaultProperties(){
         final Properties props = new Properties();
-        props.put(ConfigConstants.debug.name(), Boolean.TRUE.toString());
+        props.put(ConfigConstants.debug.getPropertyKey(), Boolean.TRUE.toString());
         return props;
       }
     };
@@ -123,9 +124,9 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
    */
   @Test
   public void testConfigurationTypeBackwardCompatibility() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn("true");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.getPropertyKey())).thenReturn("true");
     Mockito.when(filterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(
-        FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    		DeploymentMode.DEPLOYMENT.toString());
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }
@@ -136,12 +137,12 @@ public class TestPropertiesAndFilterConfigWroConfigurationFactory {
       @Override
       protected Properties newDefaultProperties(){
         final Properties props = new Properties();
-        props.put(ConfigConstants.debug.name(), Boolean.TRUE.toString());
+        props.put(ConfigConstants.debug.getPropertyKey(), Boolean.TRUE.toString());
         return props;
       }
     };
     Mockito.when(filterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(
-        FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    		DeploymentMode.DEPLOYMENT.toString());
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
   }

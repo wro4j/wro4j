@@ -55,8 +55,8 @@ public class TestXmlModelFactory {
   public void setUp() {
     final Context context = Context.standaloneContext();
     Context.set(context);
-    context.getConfig().setCacheUpdatePeriod(0);
-    context.getConfig().setModelUpdatePeriod(0);
+    context.getConfig().setCacheUpdatePeriod(0L);
+    context.getConfig().setModelUpdatePeriod(0L);
   }
 
   @After
@@ -77,8 +77,8 @@ public class TestXmlModelFactory {
 
   @Test
   public void testWithUpdatePeriodSet() {
-    Context.get().getConfig().setCacheUpdatePeriod(1);
-    Context.get().getConfig().setModelUpdatePeriod(1);
+    Context.get().getConfig().setCacheUpdatePeriod(1L);
+    Context.get().getConfig().setModelUpdatePeriod(1L);
     testSuccessfulCreation();
   }
 

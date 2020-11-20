@@ -7,8 +7,8 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.WroRuntimeException;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.config.support.PropertiesFactory;
 import ro.isdc.wro.manager.WroManager;
 import ro.isdc.wro.util.ObjectFactory;
@@ -46,7 +46,7 @@ public class DefaultWroManagerFactory
         ? ((PropertiesFactory) configurationFactory).createProperties() : new Properties();
     final String wroManagerClassName = configurationFactory.create().getWroManagerClassName();
     if (wroManagerClassName != null) {
-      properties.setProperty(ConfigConstants.managerFactoryClassName.name(), wroManagerClassName);
+      properties.setProperty(ConfigConstants.managerFactoryClassName.getPropertyKey(), wroManagerClassName);
     }
     return new DefaultWroManagerFactory(properties);
   }
@@ -69,7 +69,7 @@ public class DefaultWroManagerFactory
    */
   private WroManagerFactory initFactory(final Properties properties) {
     WroManagerFactory factory = null;
-    final String wroManagerClassName = properties.getProperty(ConfigConstants.managerFactoryClassName.name());
+    final String wroManagerClassName = properties.getProperty(ConfigConstants.managerFactoryClassName.getPropertyKey());
     if (StringUtils.isEmpty(wroManagerClassName)) {
       // If no context param was specified we return the default factory
       factory = newManagerFactory();

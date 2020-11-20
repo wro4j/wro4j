@@ -29,8 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.ConfigConstants;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.manager.WroManager.Builder;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.NoProcessorsWroManagerFactory;
@@ -93,7 +92,7 @@ public class TestConfigurableWroFilter {
       }
     };
     final Properties properties = new Properties();
-    properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
+    properties.setProperty(ConfigConstants.cacheUpdatePeriod.getPropertyKey(), "10");
     filter.setProperties(properties);
     filter.init(mockFilterConfig);
     filter.doFilter(mockRequest, mockResponse, mockFilterChain);
@@ -120,7 +119,7 @@ public class TestConfigurableWroFilter {
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {
-        assertEquals(WroConfiguration.DEFAULT_ENCODING, Context.get().getConfig().getEncoding());
+        assertEquals(ConfigConstants.encoding.getDefaultPropertyValue(), Context.get().getConfig().getEncoding());
       }
     };
     filter.setEncoding(null);
@@ -251,7 +250,7 @@ public class TestConfigurableWroFilter {
   public void shouldUseCorrectWroManagerFactoryWhenPropertiesAreLoadedFromCustomLocation()
       throws Exception {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.managerFactoryClassName.name(), NoProcessorsWroManagerFactory.class.getName());
+    props.setProperty(ConfigConstants.managerFactoryClassName.getPropertyKey(), NoProcessorsWroManagerFactory.class.getName());
     victim.setProperties(props);
     victim.init(mockFilterConfig);
     final WroManagerFactory actual = ((DefaultWroManagerFactory) victim.getWroManagerFactory()).getFactory();
@@ -262,7 +261,7 @@ public class TestConfigurableWroFilter {
   public void shouldFailWhenAnInvalidWroManagerClassNameIsLoadedFromCustomLocation()
       throws Exception {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.managerFactoryClassName.name(), "invalid");
+    props.setProperty(ConfigConstants.managerFactoryClassName.getPropertyKey(), "invalid");
     victim.setProperties(props);
     victim.init(mockFilterConfig);
   }

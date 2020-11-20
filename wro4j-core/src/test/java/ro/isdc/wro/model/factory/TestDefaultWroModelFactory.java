@@ -122,7 +122,7 @@ public class TestDefaultWroModelFactory {
       public void destroy() {
       }
     };
-    victim = DefaultWroModelFactoryDecorator.decorate(decorated, Collections.EMPTY_LIST);
+    victim = DefaultWroModelFactoryDecorator.decorate(decorated, Collections.emptyList());
     injector.inject(victim);
     victim.create();
   }

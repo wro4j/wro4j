@@ -8,8 +8,8 @@ import java.util.Properties;
 import javax.servlet.FilterConfig;
 
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 import ro.isdc.wro.util.ObjectFactory;
@@ -58,17 +58,17 @@ public class ConfigurableWroFilter
     if (properties == null) {
       // when no
       properties = new Properties();
-      properties.setProperty(ConfigConstants.debug.name(), String.valueOf(debug));
-      properties.setProperty(ConfigConstants.gzipResources.name(), String.valueOf(gzipEnabled));
-      properties.setProperty(ConfigConstants.jmxEnabled.name(), String.valueOf(jmxEnabled));
-      properties.setProperty(ConfigConstants.cacheUpdatePeriod.name(), String.valueOf(cacheUpdatePeriod));
-      properties.setProperty(ConfigConstants.modelUpdatePeriod.name(), String.valueOf(modelUpdatePeriod));
-      properties.setProperty(ConfigConstants.disableCache.name(), String.valueOf(disableCache));
+      properties.setProperty(ConfigConstants.debug.getPropertyKey(), String.valueOf(debug));
+      properties.setProperty(ConfigConstants.gzipResources.getPropertyKey(), String.valueOf(gzipEnabled));
+      properties.setProperty(ConfigConstants.jmxEnabled.getPropertyKey(), String.valueOf(jmxEnabled));
+      properties.setProperty(ConfigConstants.cacheUpdatePeriod.getPropertyKey(), String.valueOf(cacheUpdatePeriod));
+      properties.setProperty(ConfigConstants.modelUpdatePeriod.getPropertyKey(), String.valueOf(modelUpdatePeriod));
+      properties.setProperty(ConfigConstants.disableCache.getPropertyKey(), String.valueOf(disableCache));
       if (encoding != null) {
-        properties.setProperty(ConfigConstants.encoding.name(), encoding);
+        properties.setProperty(ConfigConstants.encoding.getPropertyKey(), encoding);
       }
       if (mbeanName != null) {
-        properties.setProperty(ConfigConstants.mbeanName.name(), mbeanName);
+        properties.setProperty(ConfigConstants.mbeanName.getPropertyKey(), mbeanName);
       }
     }
     return new PropertyWroConfigurationFactory(properties);

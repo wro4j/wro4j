@@ -22,8 +22,8 @@ import org.mockito.stubbing.Answer;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.model.factory.ConfigurableModelFactory;
 import ro.isdc.wro.model.factory.XmlModelFactory;
 
@@ -141,7 +141,7 @@ public class TestDefaultWroManagerFactory {
 
   private Properties propsForWroManagerClassName(final String className) {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.managerFactoryClassName.name(), className);
+    props.setProperty(ConfigConstants.managerFactoryClassName.getPropertyKey(), className);
     return props;
   }
 

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.servlet.FilterConfig;
@@ -157,7 +158,7 @@ public class TestWroManager {
       final HttpServletResponse response = Context.get().getResponse();
 
       Mockito.when(response.getOutputStream()).thenReturn(
-          new DelegatingServletOutputStream(new WriterOutputStream(writer)));
+          new DelegatingServletOutputStream(new WriterOutputStream(writer, StandardCharsets.UTF_8)));
       Mockito.when(request.getRequestURI()).thenReturn("");
 
       final WroConfiguration config = new WroConfiguration();
@@ -405,8 +406,8 @@ public class TestWroManager {
         Mockito.mock(HttpServletResponse.class, Mockito.RETURNS_DEEP_STUBS), Mockito.mock(FilterConfig.class));
     final WroConfiguration config = new WroConfiguration();
     // make it run each 1 second
-    config.setModelUpdatePeriod(1);
-    config.setCacheUpdatePeriod(1);
+    config.setModelUpdatePeriod(1L);
+    config.setCacheUpdatePeriod(1L);
     Context.unset();
     Context.set(context, config);
 

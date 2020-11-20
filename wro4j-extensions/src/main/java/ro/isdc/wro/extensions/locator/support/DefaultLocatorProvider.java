@@ -9,9 +9,9 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.util.Ordered;
 
-
 /**
- * Default implementation of {@link LocatorProvider} providing all {@link UriLocator} implementations from core module.
+ * Default implementation of {@link LocatorProvider} providing all
+ * {@link UriLocator} implementations from core module.
  *
  * @author Alex Objelean
  * @created 16 Jun 2012

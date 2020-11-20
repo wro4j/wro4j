@@ -13,8 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
+import ro.isdc.wro.config.support.DeploymentMode;
 
 /**
  * @author Alex Objelean
@@ -36,7 +37,7 @@ public class TestFilterConfigWroConfigurationFactory {
 
   @Test
   public void testConfigureCacheUpdatePeriod() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.getPropertyKey())).thenReturn("10");
     factory = new FilterConfigWroConfigurationFactory(filterConfig);
     final WroConfiguration config = factory.create();
     Assert.assertEquals(10, config.getCacheUpdatePeriod());
@@ -45,7 +46,7 @@ public class TestFilterConfigWroConfigurationFactory {
 
   @Test
   public void testConfigureDebug() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn("false");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.getPropertyKey())).thenReturn("false");
     factory = new FilterConfigWroConfigurationFactory(filterConfig);
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
@@ -57,9 +58,9 @@ public class TestFilterConfigWroConfigurationFactory {
    */
   @Test
   public void testConfigurationTypeBackwardCompatibility() {
-    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.name())).thenReturn("true");
+    Mockito.when(filterConfig.getInitParameter(ConfigConstants.debug.getPropertyKey())).thenReturn("true");
     Mockito.when(filterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(
-        FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    		DeploymentMode.DEPLOYMENT.toString());
     factory = new FilterConfigWroConfigurationFactory(filterConfig);
     final WroConfiguration config = factory.create();
     Assert.assertEquals(false, config.isDebug());
