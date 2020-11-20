@@ -51,6 +51,6 @@ public class HandlebarsJs extends AbstractJsTemplateCompiler {
    */
   @Override
   protected InputStream getCompilerAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("handlebars.js"));
+    return getWebjarLocator().locate(WebjarUriLocator.createUri("dist/handlebars.min.js"));
   }
 }

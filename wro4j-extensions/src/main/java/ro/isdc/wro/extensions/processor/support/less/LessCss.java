@@ -29,7 +29,7 @@ public class LessCss {
   /**
    * The name of the sass script to be used by default.
    */
-  public static final String DEFAULT_LESS_JS = "less.min.js";
+  public static final String DEFAULT_LESS_JS = "less.js";
   private static final String SCRIPT_INIT = "init.js";
   private WebjarUriLocator webjarLocator;
   private ScriptableObject scope;

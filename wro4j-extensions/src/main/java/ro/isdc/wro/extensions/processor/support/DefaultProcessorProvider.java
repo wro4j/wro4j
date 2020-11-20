@@ -18,7 +18,6 @@ import ro.isdc.wro.extensions.processor.js.CJsonProcessor;
 import ro.isdc.wro.extensions.processor.js.CoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.DojoShrinksafeCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.DustJsProcessor;
-import ro.isdc.wro.extensions.processor.js.EmberJsProcessor;
 import ro.isdc.wro.extensions.processor.js.GoogleClosureCompressorProcessor;
 import ro.isdc.wro.extensions.processor.js.HandlebarsJsProcessor;
 import ro.isdc.wro.extensions.processor.js.HoganJsProcessor;
@@ -31,7 +30,6 @@ import ro.isdc.wro.extensions.processor.js.NgMinProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeLiterateCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.NodeTypeScriptProcessor;
-import ro.isdc.wro.extensions.processor.js.PackerJsProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoLiterateCoffeeScriptProcessor;
 import ro.isdc.wro.extensions.processor.js.RhinoTypeScriptProcessor;
@@ -109,12 +107,6 @@ public class DefaultProcessorProvider
       @Override
       protected ResourcePreProcessor initialize() {
         return new BeautifyJsProcessor();
-      }
-    }));
-    map.put(PackerJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
-      @Override
-      protected ResourcePreProcessor initialize() {
-        return new PackerJsProcessor();
       }
     }));
     map.put(RhinoLessCssProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
@@ -292,12 +284,6 @@ public class DefaultProcessorProvider
       @Override
       protected ResourcePreProcessor initialize() {
         return new NodeTypeScriptProcessor();
-      }
-    }));
-    map.put(EmberJsProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {
-      @Override
-      protected ResourcePreProcessor initialize() {
-        return new EmberJsProcessor();
       }
     }));
     map.put(NgMinProcessor.ALIAS, new LazyProcessorDecorator(new LazyInitializer<ResourcePreProcessor>() {

@@ -1,4 +1,4 @@
-(function() {Ember.TEMPLATES['todoStatus'] = Ember.Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+(function() {Ember.TEMPLATES['todoStatus'] = Ember.Handlebars.template({"compiler":[8,">= 4.3.0"],"main":function(depth0,helpers,partials,data) {
     var stack1, helper, buffer = '';
 
   data.buffer.push("<div class=\"row-fluid span5\">\n  <strong>");

@@ -1,4 +1,5 @@
 .settings/
+bin/
 target/
 
 *.iml
@@ -8,5 +9,6 @@ target/
 .idea
 .project
 .sass-cache
+pom.xml.releaseBackup
 pom.xml.versionsBackup
 release.properties

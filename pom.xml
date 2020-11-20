@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
@@ -82,45 +81,47 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<!-- Dependencies -->
-		<ant.version>1.10.8</ant.version>
+		<ant.version>1.10.9</ant.version>
 		<bourbon-gem-jar.version>2.1.0</bourbon-gem-jar.version>
-		<closure.version>v20200112</closure.version>
+		<closure.version>v20201102</closure.version>
 		<commons-exec.version>1.3</commons-exec.version>
-		<commons-io.version>2.6</commons-io.version>
-		<commons-lang.version>3.9</commons-lang.version>
-		<commons-pool.version>2.8.0</commons-pool.version>
+		<commons-io.version>2.8.0</commons-io.version>
+		<commons-lang.version>3.11</commons-lang.version>
+		<commons-pool.version>2.9.0</commons-pool.version>
 		<dojo-shrinksafe.version>1.7.2</dojo-shrinksafe.version>
-		<groovy.version>2.5.9</groovy.version>
+		<groovy.version>3.0.6</groovy.version>
 		<gson.version>2.8.6</gson.version>
 		<hamcrest-core.version>2.2</hamcrest-core.version>
 		<jsp-api.version>2.3.3</jsp-api.version>
 		<less4j.version>1.17.2</less4j.version>
 		<maven.version>3.6.3</maven.version>
 		<maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
-		<mockito.version>3.2.4</mockito.version>
-		<jruby.version>9.2.9.0</jruby.version>
+		<mockito.version>3.6.0</mockito.version>
+		<jruby.version>9.2.13.0</jruby.version>
 		<junit.version>4.13.1</junit.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
-		<rhino.version>1.7.7.1</rhino.version>
+		<rhino.version>1.7.13</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
 		<servlet-api.version>4.0.1</servlet-api.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<spring.version>5.2.3.RELEASE</spring.version>
+		<spring.version>5.3.1</spring.version>
 		<webjars-coffee-script.version>1.11.0</webjars-coffee-script.version>
-		<webjars-emberjs.version>1.9.0-1</webjars-emberjs.version>
+		<webjars-domelementtype.version>2.0.1</webjars-domelementtype.version>
+		<webjars-entities.version>2.1.0</webjars-entities.version>
 		<webjars-envjs.version>1.2</webjars-envjs.version>
-		<webjars-font-awesome.version>5.12.0</webjars-font-awesome.version>
-		<webjars-handlebars.version>3.0.3</webjars-handlebars.version>
-		<webjars-jquery.version>2.0.0</webjars-jquery.version>
-		<webjars-jshint.version>2.6.3-2</webjars-jshint.version>
+		<webjars-font-awesome.version>5.15.1</webjars-font-awesome.version>
+		<webjars-handlebars.version>4.7.6</webjars-handlebars.version>
+		<webjars-jquery.version>3.5.1</webjars-jquery.version>
+		<webjars-jshint.version>2.11.0</webjars-jshint.version>
 		<webjars-jslint.version>20140708-394bf29</webjars-jslint.version>
 		<webjars-json2.version>20140204</webjars-json2.version>
 		<webjars-less.version>1.3.3</webjars-less.version>
-		<webjars-locator.version>0.38</webjars-locator.version>
+		<webjars-locator.version>0.40</webjars-locator.version>
 
 		<!-- Maven plugins -->
 		<buildnumber-maven-plugin.version>1.4</buildnumber-maven-plugin.version>
 		<error_prone_core.version>2.3.4</error_prone_core.version>
+		<gmavenplus-plugin.version>1.11.0</gmavenplus-plugin.version>
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<maven-bundle-plugin.version>4.2.1</maven-bundle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -326,6 +327,75 @@
 				<artifactId>rhino</artifactId>
 				<version>${rhino.version}</version>
 			</dependency>
+
+			<!-- Webjars -->
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>coffee-script</artifactId>
+				<version>${webjars-coffee-script.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>domelementtype</artifactId>
+				<version>${webjars-domelementtype.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>entities</artifactId>
+				<version>${webjars-entities.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>envjs</artifactId>
+				<version>${webjars-envjs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>font-awesome</artifactId>
+				<version>${webjars-font-awesome.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>handlebars</artifactId>
+				<version>${webjars-handlebars.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>jquery</artifactId>
+				<version>${webjars-jquery.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>jshint</artifactId>
+				<version>${webjars-jshint.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.webjars.npm</groupId>
+						<artifactId>domelementtype</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.webjars.npm</groupId>
+						<artifactId>entities</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>jslint</artifactId>
+				<version>${webjars-jslint.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>json2</artifactId>
+				<version>${webjars-json2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>less</artifactId>
+				<version>${webjars-less.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>webjars-locator</artifactId>
@@ -410,18 +480,22 @@
 								-Xep:AssistedInjectAndInjectOnSameConstructor:WARN
 								-Xep:AutoFactoryAtInject:WARN -Xep:ClassName:WARN
 								-Xep:ComparisonContractViolated:WARN -Xep:DepAnn:WARN
-								-Xep:DivZero:WARN -Xep:EmptyIf:WARN
+								-Xep:DivZero:WARN
+								-Xep:EmptyIf:WARN
 								-Xep:FuzzyEqualsShouldNotBeUsedInEqualsMethod:WARN
 								-Xep:InjectInvalidTargetingOnScopingAnnotation:WARN
 								-Xep:InjectMoreThanOneQualifier:WARN
 								-Xep:InjectScopeAnnotationOnInterfaceOrAbstractClass:WARN
 								-Xep:InjectScopeOrQualifierAnnotationRetention:WARN
 								-Xep:InjectedConstructorAnnotations:WARN
-								-Xep:InsecureCryptoUsage:WARN -Xep:IterablePathParameter:WARN
+								-Xep:InsecureCryptoUsage:WARN
+								-Xep:IterablePathParameter:WARN
 								-Xep:JMockTestWithoutRunWithOrRuleAnnotation:WARN
-								-Xep:Java7ApiChecker:WARN -Xep:JavaxInjectOnFinalField:WARN
+								-Xep:Java7ApiChecker:WARN
+								-Xep:JavaxInjectOnFinalField:WARN
 								-Xep:LockMethodChecker:WARN -Xep:LongLiteralLowerCaseSuffix:WARN
-								-Xep:NoAllocation:WARN -Xep:NumericEquality:WARN
+								-Xep:NoAllocation:WARN
+								-Xep:NumericEquality:WARN
 								-Xep:ParameterPackage:WARN
 								-Xep:StaticOrDefaultInterfaceMethod:WARN -Xep:UnlockMethod:WARN
 								-Xep:AnnotateFormatMethod:WARN -Xep:AnnotationPosition:WARN
@@ -469,7 +543,8 @@
 								-Xep:ScopeOnModule:WARN -Xep:SwitchDefault:WARN
 								-Xep:TestExceptionRefactoring:WARN
 								-Xep:ThrowsUncheckedException:WARN -Xep:TryFailRefactoring:WARN
-								-Xep:TypeParameterNaming:WARN -Xep:UngroupedOverloads:WARN
+								-Xep:TypeParameterNaming:WARN
+								-Xep:UngroupedOverloads:WARN
 								-Xep:UnnecessarySetDefault:WARN
 								-Xep:UnnecessaryStaticImport:WARN -Xep:UseBinds:WARN
 								-Xep:WildcardImport:WARN</arg>
@@ -542,6 +617,11 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>buildnumber-maven-plugin</artifactId>
 					<version>${buildnumber-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.gmavenplus</groupId>
+					<artifactId>gmavenplus-plugin</artifactId>
+					<version>${gmavenplus-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
