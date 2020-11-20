@@ -47,8 +47,9 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.factory.FilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertiesAndFilterConfigWroConfigurationFactory;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
+import ro.isdc.wro.config.support.DeploymentMode;
 import ro.isdc.wro.http.handler.ReloadCacheRequestHandler;
 import ro.isdc.wro.http.handler.ReloadModelRequestHandler;
 import ro.isdc.wro.http.handler.RequestHandler;
@@ -173,8 +174,8 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testFilterInitParamsAreWrong()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("InvalidNumber");
-    when(mockFilterConfig.getInitParameter(ConfigConstants.modelUpdatePeriod.name())).thenReturn("100");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.getPropertyKey())).thenReturn("InvalidNumber");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.modelUpdatePeriod.getPropertyKey())).thenReturn("100");
     victim.init(mockFilterConfig);
   }
 
@@ -182,14 +183,14 @@ public class TestWroFilter {
   public void cannotAcceptInvalidAppFactoryClassNameIsSet()
       throws Exception {
     victim = new WroFilter();
-    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.getPropertyKey())).thenReturn("Invalid value");
     victim.init(mockFilterConfig);
   }
 
   @Test
   public void shouldUseInitiallySetManagerEvenIfAnInvalidAppFactoryClassNameIsSet()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn("Invalid value");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.getPropertyKey())).thenReturn("Invalid value");
     victim.init(mockFilterConfig);
 
     Assert.assertSame(mockManagerFactory, AbstractDecorator.getOriginalDecoratedObject(victim.getWroManagerFactory()));
@@ -228,7 +229,7 @@ public class TestWroFilter {
   @Test
   public void testValidAppFactoryClassNameIsSet()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
+    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.getPropertyKey())).thenReturn(
         BaseWroManagerFactory.class.getName());
     victim.init(mockFilterConfig);
   }
@@ -242,7 +243,7 @@ public class TestWroFilter {
       throws Exception {
     final Class<?> managerClass = TestWroManagerFactory.class;
     victim.setWroManagerFactory(null);
-    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.name())).thenReturn(
+    when(mockFilterConfig.getInitParameter(ConfigConstants.managerFactoryClassName.getPropertyKey())).thenReturn(
         managerClass.getName());
 
     victim.init(mockFilterConfig);
@@ -257,7 +258,7 @@ public class TestWroFilter {
   @Test
   public void testJmxDisabled()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.jmxEnabled.name())).thenReturn("false");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.jmxEnabled.getPropertyKey())).thenReturn("false");
     victim.init(mockFilterConfig);
   }
 
@@ -267,10 +268,10 @@ public class TestWroFilter {
   @Test
   public void testFilterInitParamsAreSetProperly()
       throws Exception {
-    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
-    when(mockFilterConfig.getInitParameter(ConfigConstants.gzipResources.name())).thenReturn("false");
-    when(mockFilterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.name())).thenReturn("10");
-    when(mockFilterConfig.getInitParameter(ConfigConstants.modelUpdatePeriod.name())).thenReturn("100");
+    setConfigurationMode(DeploymentMode.DEPLOYMENT);
+    when(mockFilterConfig.getInitParameter(ConfigConstants.gzipResources.getPropertyKey())).thenReturn("false");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.cacheUpdatePeriod.getPropertyKey())).thenReturn("10");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.modelUpdatePeriod.getPropertyKey())).thenReturn("100");
     victim.init(mockFilterConfig);
     final WroConfiguration config = victim.getConfiguration();
     assertEquals(false, config.isDebug());
@@ -282,14 +283,14 @@ public class TestWroFilter {
   @Test
   public void testValidHeaderParamIsSet()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag: 998989");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.header.getPropertyKey())).thenReturn("ETag: 998989");
     victim.init(mockFilterConfig);
   }
 
   @Test
   public void testValidHeaderParamsAreSet()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.header.name())).thenReturn(
+    when(mockFilterConfig.getInitParameter(ConfigConstants.header.getPropertyKey())).thenReturn(
         "ETag: 998989 | Expires: Thu, 15 Apr 2010 20:00:00 GMT");
     victim.init(mockFilterConfig);
   }
@@ -297,8 +298,7 @@ public class TestWroFilter {
   @Test(expected = WroRuntimeException.class)
   public void testInvalidHeaderParamIsSet()
       throws Exception {
-    // this test fails only when debug is turned off.
-    when(mockFilterConfig.getInitParameter(ConfigConstants.header.name())).thenReturn("ETag 998989 expires 1");
+	when(mockFilterConfig.getInitParameter(ConfigConstants.header.getPropertyKey())).thenReturn("ETag 998989 expires 1");
     victim.init(mockFilterConfig);
   }
 
@@ -318,8 +318,8 @@ public class TestWroFilter {
   public void testDisableCacheInitParamInDeploymentMode()
       throws Exception {
     when(mockFilterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(
-        FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
-    when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
+    		DeploymentMode.DEPLOYMENT.toString());
+    when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.getPropertyKey())).thenReturn("true");
     victim.init(mockFilterConfig);
     assertEquals(false, victim.getConfiguration().isDebug());
   }
@@ -327,7 +327,7 @@ public class TestWroFilter {
   @Test
   public void testDisableCacheInitParamInDevelopmentMode()
       throws Exception {
-    when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.name())).thenReturn("true");
+    when(mockFilterConfig.getInitParameter(ConfigConstants.disableCache.getPropertyKey())).thenReturn("true");
     victim.init(mockFilterConfig);
     assertEquals(true, victim.getConfiguration().isDebug());
   }
@@ -459,7 +459,7 @@ public class TestWroFilter {
       throws Exception {
     when(mockRequest.getRequestURI()).thenReturn("/g2.js");
     victim.setWroManagerFactory(createValidManagerFactory());
-    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(DeploymentMode.DEPLOYMENT);
     victim.init(mockFilterConfig);
 
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
@@ -498,7 +498,7 @@ public class TestWroFilter {
       throws Exception {
     initChainOnErrorFilter();
     when(mockRequest.getRequestURI()).thenReturn(ReloadCacheRequestHandler.PATH_API + "/someMethod");
-    setConfigurationMode(FilterConfigWroConfigurationFactory.PARAM_VALUE_DEPLOYMENT);
+    setConfigurationMode(DeploymentMode.DEPLOYMENT);
     victim.doFilter(mockRequest, mockResponse, mockFilterChain);
     // No api method exposed -> proceed with chain
     verifyChainIsCalled(mockFilterChain);
@@ -550,7 +550,7 @@ public class TestWroFilter {
       throws Exception {
     final Properties props = new Properties();
     // init WroConfig properties
-    props.setProperty(ConfigConstants.debug.name(), Boolean.FALSE.toString());
+    props.setProperty(ConfigConstants.debug.getPropertyKey(), Boolean.FALSE.toString());
     final WroFilter theFilter = new WroFilter() {
       @Override
       protected ObjectFactory<WroConfiguration> newWroConfigurationFactory(final FilterConfig filterConfig) {
@@ -662,8 +662,8 @@ public class TestWroFilter {
   /**
    * Mocks the WroFilter.PARAM_CONFIGURATION init param with passed value.
    */
-  private void setConfigurationMode(final String value) {
-    when(mockFilterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(value);
+  private void setConfigurationMode(final DeploymentMode value) {
+    when(mockFilterConfig.getInitParameter(FilterConfigWroConfigurationFactory.PARAM_CONFIGURATION)).thenReturn(value.toString());
   }
 
   class RequestBuilder {
@@ -818,7 +818,7 @@ public class TestWroFilter {
       @Override
       public Properties createProperties() {
         final Properties props = new Properties();
-        props.setProperty(ConfigConstants.managerFactoryClassName.name(), ConfigurableWroManagerFactory.class.getName());
+        props.setProperty(ConfigConstants.managerFactoryClassName.getPropertyKey(), ConfigurableWroManagerFactory.class.getName());
         props.setProperty(ConfigurableProcessorsFactory.PARAM_PRE_PROCESSORS, CssMinProcessor.ALIAS);
         return props;
       }

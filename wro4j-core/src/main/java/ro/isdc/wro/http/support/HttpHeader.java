@@ -9,19 +9,23 @@ package ro.isdc.wro.http.support;
  * @author Alex Objelean
  */
 public enum HttpHeader {
+
+  ACCEPT_ENCODING("Accept-Encoding"),
   CACHE_CONTROL("Cache-Control"),
-  LAST_MODIFIED("Last-Modified"),
+  CONTENT_ENCODING("Content-Encoding"),
   ETAG("ETag"),
   EXPIRES("Expires"),
   IF_MODIFIED_SINCE("If-Modified-Since"),
   IF_NONE_MATCH("If-None-Match"),
-  CONTENT_ENCODING("Content-Encoding"),
-  PRAGMA("Pragma");
+  LAST_MODIFIED("Last-Modified"),
+  PRAGMA("Pragma"),
+  VARY("Vary");
+
   /**
    * HTTP header as string.
    */
   private String name;
-  
+
   /**
    * @param name
    *          string representation of the header.
@@ -29,14 +33,14 @@ public enum HttpHeader {
   private HttpHeader(final String name) {
     this.name = name;
   }
-  
+
   /**
    * @return lower-case string representation of the header.
    */
   public String getHeaderName() {
     return this.name.toLowerCase();
   }
-  
+
   /**
    * Use this method instead of name() to get the header name.
    * 
@@ -46,4 +50,5 @@ public enum HttpHeader {
   public String toString() {
     return name;
   }
+
 }

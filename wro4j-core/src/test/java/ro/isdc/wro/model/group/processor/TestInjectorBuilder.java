@@ -31,8 +31,8 @@ import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.factory.CacheKeyFactory;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.metadata.MetaDataFactory;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.manager.ResourceBundleProcessor;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
@@ -202,7 +202,7 @@ public class TestInjectorBuilder {
     final DispatcherStreamLocator dispatcherLocator = new DispatcherStreamLocator();
     sample.dispatcherLocator = dispatcherLocator;
 
-    assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, sample.dispatcherLocator.getTimeout());
+    assertEquals(ConfigConstants.connectionTimeout.getDefaultPropertyValue(), sample.dispatcherLocator.getTimeout());
 
     final int timeout = 5000;
     Context.get().getConfig().setConnectionTimeout(timeout);

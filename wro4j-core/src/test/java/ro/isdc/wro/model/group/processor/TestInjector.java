@@ -19,7 +19,6 @@ import org.junit.Test;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ContextPropagatingCallable;
 import ro.isdc.wro.manager.callback.LifecycleCallbackRegistry;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;

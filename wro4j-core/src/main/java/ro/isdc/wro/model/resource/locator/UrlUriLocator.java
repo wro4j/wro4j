@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 
@@ -33,7 +34,17 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
    * Alias used to register this locator with {@link LocatorProvider}.
    */
   public static final String ALIAS = "uri";
-  private int timeout = WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+  private int timeout;
+
+  public UrlUriLocator() {
+    this((Integer) ConfigConstants.connectionTimeout.getDefaultPropertyValue());
+  }
+
+  public UrlUriLocator(int timeout) {
+    super();
+    this.timeout = timeout;
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -44,7 +55,8 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
   /**
    * Check if a uri is a URL resource.
    *
-   * @param uri to check.
+   * @param uri
+   *          to check.
    * @return true if the uri is a URL resource.
    */
   public static boolean isValid(final String uri) {
@@ -58,23 +70,23 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
     return true;
   }
 
-
   /**
    * {@inheritDoc}
    */
-  public InputStream locate(final String uri)
-    throws IOException {
-	Validate.notNull(uri, "uri cannot be NULL!");
+  public InputStream locate(final String uri) throws IOException {
+    Validate.notNull(uri, "uri cannot be NULL!");
     if (getWildcardStreamLocator().hasWildcard(uri)) {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
-      return getWildcardStreamLocator().locateStream(uri, new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
+      return getWildcardStreamLocator().locateStream(uri,
+          new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
     }
     final URL url = new URL(uri);
     final URLConnection connection = url.openConnection();
     // avoid jar file locking on Windows.
     connection.setUseCaches(false);
-    //add explicit user agent header. This is required by some cdn resources which otherwise would return 403 status code.
+    // add explicit user agent header. This is required by some cdn resources which
+    // otherwise would return 403 status code.
     connection.setRequestProperty("User-Agent", "java");
     // setting these timeouts ensures the client does not deadlock indefinitely
     // when the server has problems.

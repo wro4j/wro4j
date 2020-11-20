@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,9 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  */
 public class RedirectedStreamServletResponseWrapper
     extends HttpServletResponseWrapper {
+
   private static final Logger LOG = LoggerFactory.getLogger(RedirectedStreamServletResponseWrapper.class);
+
   /**
    * PrintWrapper of wrapped response.
    */
@@ -59,8 +62,8 @@ public class RedirectedStreamServletResponseWrapper
   public RedirectedStreamServletResponseWrapper(final OutputStream outputStream, final HttpServletResponse response) {
     super(response);
     notNull(outputStream);
-    // Both servletOutputStream and PrintWriter must be overridden in order to be sure that dispatched servlet will write
-    // to the pipe.
+    // Both servletOutputStream and PrintWriter must be overridden in order to be
+    // sure that dispatched servlet will write to the pipe.
     printWriter = new PrintWriter(outputStream);
     servletOutputStream = new DelegatingServletOutputStream(outputStream);
   }
@@ -68,7 +71,7 @@ public class RedirectedStreamServletResponseWrapper
   @Override
   public void sendError(final int sc)
       throws IOException {
-    onError(sc, "");
+    onError(sc, StringUtils.EMPTY);
     super.sendError(sc);
   }
 

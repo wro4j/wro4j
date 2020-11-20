@@ -96,7 +96,7 @@ public class TestWroContextFilter {
   @Test
   public void shouldUseWroConfigurationFoundInServletContext() throws Exception {
     final WroConfiguration config = new WroConfiguration();
-    config.setCacheUpdatePeriod(1000);
+    config.setCacheUpdatePeriod(1000L);
     
     when(mockServletContextAttributeHelper.getWroConfiguration()).thenReturn(config);
     doAnswer(new Answer<Void>() {

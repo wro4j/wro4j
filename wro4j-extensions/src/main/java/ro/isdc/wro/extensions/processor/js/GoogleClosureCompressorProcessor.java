@@ -26,7 +26,7 @@ import com.google.javascript.jscomp.SourceFile;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.ReadOnlyContext;
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.extensions.processor.support.ObjectPoolHelper;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.group.processor.Minimize;
@@ -142,7 +142,7 @@ public class GoogleClosureCompressorProcessor
   private String getEncoding() {
     if (encoding == null) {
       // use config is available to get encoding
-      this.encoding = Context.isContextSet() ? context.getConfig().getEncoding() : WroConfiguration.DEFAULT_ENCODING;
+      this.encoding = Context.isContextSet() ? context.getConfig().getEncoding() : (String) ConfigConstants.encoding.getDefaultPropertyValue();
     }
     return encoding;
   }

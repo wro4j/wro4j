@@ -27,10 +27,7 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class ResponseHeadersConfigurer {
   private static final Logger LOG = LoggerFactory.getLogger(ResponseHeadersConfigurer.class);
-  /**
-   * Default value used by Cache-control header.
-   */
-  private static final String DEFAULT_CACHE_CONTROL_VALUE = "public, max-age=315360000";
+
   /**
    * String representation of headers to set. Each header is separated by a | character.
    */
@@ -82,17 +79,20 @@ public class ResponseHeadersConfigurer {
     return new ResponseHeadersConfigurer(config.getHeader()) {
       @Override
       public void configureDefaultHeaders(final Map<String, String> map) {
-        if (config.isDebug()) {
-          // prevent caching when in development mode
-          addNoCacheHeaders(map);
-        } else {
-          final Calendar cal = Calendar.getInstance();
-          cal.roll(Calendar.YEAR, 1);
-          map.put(HttpHeader.CACHE_CONTROL.toString(), DEFAULT_CACHE_CONTROL_VALUE);
-          map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
-          // TODO probably this is not a good idea to set this field which will have a different value when there will be
-          // more than one instance of wro4j.
-          map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
+        if (config.isCacheHttpEnabled()) {
+          if (config.isDebug()) {
+            // prevent caching when in development mode
+            addNoCacheHeaders(map);
+          } else {
+            final Calendar cal = Calendar.getInstance();
+            cal.roll(Calendar.YEAR, 1);
+            map.put(HttpHeader.CACHE_CONTROL.toString(), config.getCacheHttpValue());
+            map.put(HttpHeader.EXPIRES.toString(), WroUtil.toDateAsString(cal.getTimeInMillis()));
+            // TODO probably this is not a good idea to set this field which will have a
+            // different value when there will be
+            // more than one instance of wro4j.
+            map.put(HttpHeader.LAST_MODIFIED.toString(), WroUtil.toDateAsString(getLastModifiedTimestamp()));
+          }
         }
       };
     };
@@ -144,7 +144,7 @@ public class ResponseHeadersConfigurer {
         throw new WroRuntimeException("Invalid header init-param value: " + headersAsString
             + ". A correct value should have the following format: "
             + "<HEADER_NAME1>: <VALUE1> | <HEADER_NAME2>: <VALUE2>. " + "Ex: <look like this: "
-            + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | cache-control: public", e);
+            + "Expires: Thu, 15 Apr 2010 20:00:00 GMT | Cache-Control: public", e);
       }
     }
   }

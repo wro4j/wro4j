@@ -14,8 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
+import ro.isdc.wro.config.support.DeploymentMode;
 import ro.isdc.wro.config.support.PropertiesFactory;
 import ro.isdc.wro.util.ObjectFactory;
 
@@ -36,12 +37,7 @@ public class FilterConfigWroConfigurationFactory
    * Configuration Mode (DEVELOPMENT or DEPLOYMENT) By default DEVELOPMENT mode is used.
    */
   public static final String PARAM_CONFIGURATION = "configuration";
-  /**
-   * Replace with a boolean used for debug Deployment configuration option. If false, the DEVELOPMENT (or DEBUG) is
-   * assumed.
-   */
-  @Deprecated
-  public static final String PARAM_VALUE_DEPLOYMENT = "DEPLOYMENT";
+
   /**
    * Filter configuration from where init-params will be read in order to create {@link WroConfiguration} object.
    */
@@ -67,28 +63,26 @@ public class FilterConfigWroConfigurationFactory
   protected final Properties createPropertiesFromFilterConfig() {
     final Properties props = new Properties();
     for (final ConfigConstants config : ConfigConstants.values()) {
-      final String value = filterConfig.getInitParameter(config.name());
+      final String value = filterConfig.getInitParameter(config.getPropertyKey());
       if (value != null) {
-        LOG.debug("filterConfig initParam ({}), with value ({})", config.name(), value);
-        props.setProperty(config.name(), value);
+        LOG.debug("filterConfig initParam ({}), with value ({})", config.getPropertyKey(), value);
+        props.setProperty(config.getPropertyKey(), value);
       }
     }
     // add support for "configuration" init-param for backward compatibility.
     final String configurationType = filterConfig.getInitParameter(PARAM_CONFIGURATION);
-    if (!StringUtils.isEmpty(configurationType)) {
-      props.setProperty(ConfigConstants.debug.name(), String.valueOf(isDebug(configurationType)));
+    if (StringUtils.isNotEmpty(configurationType)) {
+      props.setProperty(ConfigConstants.debug.getPropertyKey(), String.valueOf(isDebug(configurationType)));
     }
     return props;
   }
-
 
   /**
    * @return true if the "configuration" init-param is not "DEPLOYMENT"
    */
   private boolean isDebug(final String configurationType) {
-    return !PARAM_VALUE_DEPLOYMENT.equalsIgnoreCase(configurationType);
+    return !DeploymentMode.DEPLOYMENT.toString().equalsIgnoreCase(configurationType);
   }
-
 
   /**
    * {@inheritDoc}

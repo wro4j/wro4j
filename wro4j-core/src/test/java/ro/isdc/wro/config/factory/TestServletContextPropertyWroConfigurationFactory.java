@@ -19,7 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.ConfigConstants;
+import ro.isdc.wro.config.support.ConfigConstants;
 
 
 /**
@@ -88,7 +88,7 @@ public class TestServletContextPropertyWroConfigurationFactory {
       throws Exception {
     final long connectionTimeout = 10000;
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.connectionTimeout.name(), String.valueOf(connectionTimeout));
+    props.setProperty(ConfigConstants.connectionTimeout.getPropertyKey(), String.valueOf(connectionTimeout));
     final StringWriter propertiesWriter = new StringWriter();
     props.store(new WriterOutputStream(propertiesWriter), "");
     Mockito.when(mockServletContext.getResourceAsStream(Mockito.anyString())).thenReturn(

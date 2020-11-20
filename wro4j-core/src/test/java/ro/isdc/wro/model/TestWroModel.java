@@ -120,7 +120,7 @@ public class TestWroModel {
 
   @Test
   public void shouldSetValidGroups() {
-    victim.setGroups(Collections.EMPTY_LIST);
+    victim.setGroups(Collections.emptyList());
     assertEquals(0, victim.getGroups().size());
   }
 }

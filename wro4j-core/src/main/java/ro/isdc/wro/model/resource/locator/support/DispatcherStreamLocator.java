@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.http.support.RedirectedStreamServletResponseWrapper;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.UrlUriLocator;
@@ -34,16 +34,28 @@ import ro.isdc.wro.util.WroUtil;
  * @author Alex Objelean
  */
 public class DispatcherStreamLocator {
+
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherStreamLocator.class);
+
   /**
    * Attribute indicating that the request is included from within a wro request cycle. This is required to prevent
    * {@link StackOverflowError}.
    *
    * @VisibleForTesting
    */
-  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName()
-      + ".included_with_dispatcher";
-  private int timeout = WroConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+  public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER =
+      DispatcherStreamLocator.class.getName() + ".included_with_dispatcher";
+
+  private int timeout;
+
+  public DispatcherStreamLocator() {
+    this((Integer) ConfigConstants.connectionTimeout.getDefaultPropertyValue());
+  }
+
+  public DispatcherStreamLocator(int timeout) {
+    super();
+    this.timeout = timeout;
+  }
 
   /**
    * /** When using JBoss Portal and it has some funny quirks...actually a portal application have several small web
@@ -85,9 +97,10 @@ public class DispatcherStreamLocator {
       }
     } catch (final Exception e) {
       LOG.debug("Could not dispatch request for location {}", location);
-      // Not only servletException can be thrown, also dispatch.include can throw NPE when the scheduler runs outside
-      // of the request cycle, thus connection is unavailable. This is caused mostly when invalid resources are
-      // included.
+      // Not only servletException can be thrown, also dispatch.include can throw NPE
+      // when the scheduler runs outside
+      // of the request cycle, thus connection is unavailable. This is caused mostly
+      // when invalid resources are included.
       return locateExternal(request, location);
     }
     try {
@@ -117,9 +130,8 @@ public class DispatcherStreamLocator {
    * @VisibleForTesting
    */
   UriLocator createExternalResourceLocator() {
-    final UrlUriLocator locator = new UrlUriLocator();
+    final UrlUriLocator locator = new UrlUriLocator(timeout);
     locator.setEnableWildcards(false);
-    locator.setTimeout(timeout);
     return locator;
   }
 
@@ -170,4 +182,5 @@ public class DispatcherStreamLocator {
   public int getTimeout() {
     return timeout;
   }
+
 }

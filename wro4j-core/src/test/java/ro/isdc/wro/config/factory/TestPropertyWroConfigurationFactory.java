@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
-import ro.isdc.wro.config.jmx.ConfigConstants;
 import ro.isdc.wro.config.jmx.WroConfiguration;
+import ro.isdc.wro.config.support.ConfigConstants;
 
 
 /**
@@ -61,15 +61,15 @@ public class TestPropertyWroConfigurationFactory {
     assertEquals(false, config.isCacheGzippedContent());
     assertEquals(false, config.isParallelPreprocessing());
     assertEquals(true, config.isMinimizeEnabled());
-    assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
-    assertEquals(WroConfiguration.DEFAULT_ENCODING, config.getEncoding());
-    assertEquals(WroConfiguration.DEFAULT_CONNECTION_TIMEOUT, config.getConnectionTimeout());
+    assertEquals(ConfigConstants.connectionTimeout.getDefaultPropertyValue(), config.getConnectionTimeout());
+    assertEquals(ConfigConstants.encoding.getDefaultPropertyValue(), config.getEncoding());
+    assertEquals(ConfigConstants.connectionTimeout.getDefaultPropertyValue(), config.getConnectionTimeout());
   }
 
   @Test
   public void invalidBooleanFallbacksToFalse() {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.cacheGzippedContent.name(), "INVALID_BOOLEAN");
+    props.setProperty(ConfigConstants.cacheGzippedContent.getPropertyKey(), "INVALID_BOOLEAN");
 
     factory = new PropertyWroConfigurationFactory(props);
     final WroConfiguration config = factory.create();
@@ -80,17 +80,17 @@ public class TestPropertyWroConfigurationFactory {
   @Test
   public void configWithProperties() {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "10");
-    props.setProperty(ConfigConstants.modelUpdatePeriod.name(), "20");
-    props.setProperty(ConfigConstants.resourceWatcherUpdatePeriod.name(), "30");
-    props.setProperty(ConfigConstants.disableCache.name(), "true");
-    props.setProperty(ConfigConstants.gzipResources.name(), "false");
-    props.setProperty(ConfigConstants.cacheGzippedContent.name(), "true");
-    props.setProperty(ConfigConstants.parallelPreprocessing.name(), "true");
-    props.setProperty(ConfigConstants.ignoreEmptyGroup.name(), "false");
-    props.setProperty(ConfigConstants.ignoreFailingProcessor.name(), "true");
-    props.setProperty(ConfigConstants.connectionTimeout.name(), "5000");
-    props.setProperty(ConfigConstants.minimizeEnabled.name(), "false");
+    props.setProperty(ConfigConstants.cacheUpdatePeriod.getPropertyKey(), "10");
+    props.setProperty(ConfigConstants.modelUpdatePeriod.getPropertyKey(), "20");
+    props.setProperty(ConfigConstants.resourceWatcherUpdatePeriod.getPropertyKey(), "30");
+    props.setProperty(ConfigConstants.disableCache.getPropertyKey(), "true");
+    props.setProperty(ConfigConstants.gzipResources.getPropertyKey(), "false");
+    props.setProperty(ConfigConstants.cacheGzippedContent.getPropertyKey(), "true");
+    props.setProperty(ConfigConstants.parallelPreprocessing.getPropertyKey(), "true");
+    props.setProperty(ConfigConstants.ignoreEmptyGroup.getPropertyKey(), "false");
+    props.setProperty(ConfigConstants.ignoreFailingProcessor.getPropertyKey(), "true");
+    props.setProperty(ConfigConstants.connectionTimeout.getPropertyKey(), "5000");
+    props.setProperty(ConfigConstants.minimizeEnabled.getPropertyKey(), "false");
 
     factory = new PropertyWroConfigurationFactory(props);
 
@@ -111,7 +111,7 @@ public class TestPropertyWroConfigurationFactory {
   @Test(expected = WroRuntimeException.class)
   public void cannotAcceptInvalidLong() {
     final Properties props = new Properties();
-    props.setProperty(ConfigConstants.cacheUpdatePeriod.name(), "INVALID_LONG");
+    props.setProperty(ConfigConstants.cacheUpdatePeriod.getPropertyKey(), "INVALID_LONG");
 
     factory = new PropertyWroConfigurationFactory(props);
 
@@ -122,7 +122,7 @@ public class TestPropertyWroConfigurationFactory {
   public void cannotSetInvalidConnectionTimeout() {
     final Properties props = new Properties();
     // The value is not a valid integer
-    props.setProperty(ConfigConstants.connectionTimeout.name(), "9999999999999999999");
+    props.setProperty(ConfigConstants.connectionTimeout.getPropertyKey(), "9999999999999999999");
 
     factory = new PropertyWroConfigurationFactory(props);
 
