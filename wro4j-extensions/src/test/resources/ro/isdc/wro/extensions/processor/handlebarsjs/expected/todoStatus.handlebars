@@ -1,13 +1,18 @@
-(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-    var stack1, helper;
+(function() { var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};templates['todoStatus'] = template({"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
 
   return "<div class=\"row-fluid span5\">\n  <strong>"
-    + this.escapeExpression(((helper = (helper = helpers.remaining || (depth0 != null ? depth0.remaining : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"remaining","hash":{},"data":data}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"remaining") || (depth0 != null ? lookupProperty(depth0,"remaining") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"remaining","hash":{},"data":data,"loc":{"start":{"line":2,"column":10},"end":{"line":2,"column":23}}}) : helper)))
     + "</strong> items left.\n  <button id=\"remove-finished\" class=\"btn btn-inverse\">\n    <i class=\"icon-ban-circle icon-white\"></i> Clear <strong>"
-    + this.escapeExpression(((helper = (helper = helpers.finished || (depth0 != null ? depth0.finished : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0,{"name":"finished","hash":{},"data":data}) : helper)))
+    + container.escapeExpression(((helper = (helper = lookupProperty(helpers,"finished") || (depth0 != null ? lookupProperty(depth0,"finished") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"finished","hash":{},"data":data,"loc":{"start":{"line":4,"column":61},"end":{"line":4,"column":73}}}) : helper)))
     + "</strong> completed item"
-    + ((stack1 = helpers.unless.call(depth0,(depth0 != null ? depth0.oneFinished : depth0),{"name":"unless","hash":{},"fn":this.program(1, data, 0),"inverse":this.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"unless").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"oneFinished") : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":4,"column":97},"end":{"line":5,"column":29}}})) != null ? stack1 : "")
     + "\n  </button>\n</div>";
-},"1":function(depth0,helpers,partials,data) {
+},"1":function(container,depth0,helpers,partials,data) {
     return "s";
 },"useData":true} ); })();
