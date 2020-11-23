@@ -65,7 +65,7 @@ public class GzipFilter
    */
   private void doGzipResponse(final HttpServletRequest req, final HttpServletResponse response, final FilterChain chain)
       throws IOException, ServletException {
-    LOG.debug("Applying gzip on resource: " + req.getRequestURI());
+    LOG.debug("Applying gzip on resource: {}", req.getRequestURI());
     response.setHeader(HttpHeader.CONTENT_ENCODING.toString(), "gzip");
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final CountingOutputStream countingStream = new CountingOutputStream(new GZIPOutputStream(new BufferedOutputStream(

@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import javax.servlet.FilterConfig;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ConfigConstants;
@@ -29,21 +31,21 @@ public class ConfigurableWroFilter
    * field instead.
    */
   @Deprecated
-  private boolean debug = true;
+  private boolean debug = BooleanUtils.isTrue((Boolean) ConfigConstants.debug.getDefaultPropertyValue());
   @Deprecated
-  private boolean gzipEnabled = true;
+  private boolean gzipEnabled = BooleanUtils.isTrue((Boolean) ConfigConstants.gzipResources.getDefaultPropertyValue());
   @Deprecated
-  private boolean jmxEnabled = true;
+  private boolean jmxEnabled = BooleanUtils.isTrue((Boolean) ConfigConstants.jmxEnabled.getDefaultPropertyValue());
   @Deprecated
-  private String mbeanName;
+  private String mbeanName = (String) ConfigConstants.mbeanName.getDefaultPropertyValue();
   @Deprecated
-  private long cacheUpdatePeriod = 0;
+  private long cacheUpdatePeriod  = (Long) ConfigConstants.cacheUpdatePeriod.getDefaultPropertyValue();
   @Deprecated
-  private long modelUpdatePeriod = 0;
+  private long modelUpdatePeriod  = (Long) ConfigConstants.modelUpdatePeriod.getDefaultPropertyValue();
   @Deprecated
-  private boolean disableCache;
+  private boolean disableCache = BooleanUtils.isTrue((Boolean) ConfigConstants.disableCache.getDefaultPropertyValue());
   @Deprecated
-  private String encoding;
+  private String encoding = (String) ConfigConstants.encoding.getDefaultPropertyValue();
 
   /**
    * This {@link Properties} object will hold the configurations and it will replace all other fields.
