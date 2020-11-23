@@ -36,7 +36,7 @@ public class TestResource {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void cannotCreateResourceWithUnkownExtension() {
+  public void cannotCreateResourceWithUnknownExtension() {
     Assert.assertNotNull(Resource.create("resource.coffee"));
   }
 

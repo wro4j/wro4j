@@ -349,8 +349,8 @@ public class WroTestUtils {
   private static void compareFromDifferentFolders(final File sourceFolder, final File targetFolder,
       final IOFileFilter fileFilter, final Transformer<String> toTargetFileName, final ResourcePreProcessor preProcessor)
       throws IOException {
-    LOG.debug("sourceFolder: {}", sourceFolder);
-    LOG.debug("targetFolder: {}", targetFolder);
+    LOG.debug("Source folder: {}", sourceFolder);
+    LOG.debug("Target folder: {}", targetFolder);
     final Collection<File> files = FileUtils.listFiles(sourceFolder, fileFilter, FalseFileFilter.INSTANCE);
     int processedNumber = 0;
     // TODO use WroUtil#runInParallel for running tests faster
@@ -370,19 +370,19 @@ public class WroTestUtils {
               try {
                 resourceType = ResourceType.get(FilenameUtils.getExtension(file.getPath()));
               } catch (final IllegalArgumentException e) {
-                LOG.warn("unkown resource type for file: {}, assuming resource type is: {}", file.getPath(),
+                LOG.warn("Unknown resource type for file: {}, assuming resource type is: {}", file.getPath(),
                     resourceType);
               }
               try {
                 preProcessor.process(Resource.create("file:" + file.getPath(), resourceType), reader, writer);
               } catch (final Exception e) {
-                LOG.error("processing failed...", e);
+                LOG.error("Processing failed...", e);
                 throw WroRuntimeException.wrap(e, "Processing failed...");
               }
             }
           });
         } catch (final ComparisonFailure e) {
-          LOG.error("failed comparing: {}", file.getName());
+          LOG.error("Failed comparing: {}", file.getName());
           throw e;
         }
         processedNumber++;
