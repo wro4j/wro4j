@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.javascript.jscomp.jarjar.com.google.common.base.Predicate;
-import com.google.javascript.jscomp.jarjar.com.google.common.base.Predicates;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.locator.WebjarsUriLocator;

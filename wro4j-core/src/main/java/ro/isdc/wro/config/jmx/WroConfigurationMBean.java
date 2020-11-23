@@ -21,7 +21,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param period number of seconds. Zero or less, means never.
 	 */
-	void setModelUpdatePeriod(Long period);
+	void setModelUpdatePeriod(long period);
 
 	/**
 	 * @return period in seconds when the cache containing merged resources by group
@@ -35,7 +35,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param period number of seconds. Zero or less, means never.
 	 */
-	void setCacheUpdatePeriod(Long period);
+	void setCacheUpdatePeriod(long period);
 
 	/**
 	 * @return period in seconds indicating how often resource changes are checked.
@@ -47,7 +47,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param period number of seconds. Zero or less, means never.
 	 */
-	void setResourceWatcherUpdatePeriod(Long period);
+	void setResourceWatcherUpdatePeriod(long period);
 
 	/**
 	 * @return true if Gzip is Enabled.
@@ -57,7 +57,7 @@ public interface WroConfigurationMBean {
 	/**
 	 * @param enabled if true, gzip will be enabled, otherwise will be disabled.
 	 */
-	void setGzipEnabled(Boolean enabled);
+	void setGzipEnabled(boolean enabled);
 
 	/**
 	 * @return the state of debug flag.
@@ -69,7 +69,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param debug if true, the wro4j will run in DEVELOPMENT MODE.
 	 */
-	void setDebug(Boolean debug);
+	void setDebug(boolean debug);
 
 	/**
 	 * Force reload of the cache.
@@ -88,7 +88,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param seconds value in seconds.
 	 */
-	void setConnectionTimeout(Integer seconds);
+	void setConnectionTimeout(int seconds);
 
 	/**
 	 * @return the number of seconds to wait until connection will timeout.
@@ -101,7 +101,7 @@ public interface WroConfigurationMBean {
 	 * 
 	 * @param cache boolean flag.
 	 */
-	void setCacheGzippedContent(Boolean cache);
+	void setCacheGzippedContent(boolean cache);
 
 	/**
 	 * @return true if the cacheGzippedContent flag is enabled.
@@ -130,13 +130,13 @@ public interface WroConfigurationMBean {
 	 *
 	 * @param ignore The new ignoreMissingResources flag.
 	 */
-	void setIgnoreMissingResources(Boolean ignore);
+	void setIgnoreMissingResources(boolean ignore);
 
 	/**
 	 * @param ignore turns on/off failure on empty group (when there is nothing to
 	 *               process).
 	 */
-	void setIgnoreEmptyGroup(Boolean ignore);
+	void setIgnoreEmptyGroup(boolean ignore);
 
 	/**
 	 * @return value of the flag responsible for handling empty group behavior.
@@ -147,7 +147,7 @@ public interface WroConfigurationMBean {
 	 * @param minifyResources set to false to override minification settings on all
 	 *                        resources
 	 */
-	void setMinimizeEnabled(Boolean minifyResources);
+	void setMinimizeEnabled(boolean minifyResources);
 
 	/**
 	 * @return value of flag that controls override of resource minification

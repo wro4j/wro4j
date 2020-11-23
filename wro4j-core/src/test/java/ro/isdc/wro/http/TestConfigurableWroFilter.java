@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import javax.servlet.FilterChain;
@@ -131,7 +132,7 @@ public class TestConfigurableWroFilter {
   @Test
   public void shouldUseConfiguredEncodingWhenSet()
       throws Exception {
-    final String encoding = "UTF-16";
+    final String encoding = StandardCharsets.UTF_16.name();
     final ConfigurableWroFilter filter = new SampleConfigurableWroFilter() {
       @Override
       protected void onRequestProcessed() {

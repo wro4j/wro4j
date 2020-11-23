@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.javascript.jscomp.jarjar.com.google.common.annotations.VisibleForTesting;
 
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.handler.RequestHandler;
