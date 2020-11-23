@@ -216,15 +216,14 @@ public class WroFilter
           filterConfig.getServletContext(), new Object[] {});
     } catch (final Exception e) {
       contextPath = "DEFAULT";
-      LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using "
-          + contextPath + " contextPath.");
+      LOG.warn("Couldn't identify contextPath because you are using older version of servlet-api (<2.5). Using {} contextPath.", contextPath);
     }
 
     if(contextPath == null) {
       return null;
     }
     else {
-      return contextPath.replaceFirst(ServletContextUriLocator.PREFIX, "");
+      return contextPath.replaceFirst(ServletContextUriLocator.PREFIX, StringUtils.EMPTY);
     }
   }
 
