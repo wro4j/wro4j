@@ -116,13 +116,31 @@ public class DispatcherStreamLocator {
     return new ByteArrayInputStream(os.toByteArray());
   }
 
-  public InputStream locateExternal(final HttpServletRequest request, final String location)
-      throws IOException {
-    final String servletContextPath = request.getRequestURL().toString().replace(request.getServletPath(), "");
-    final String absolutePath = servletContextPath + location;
-    LOG.debug("locateExternalUri: {}", absolutePath);
-    return createExternalResourceLocator().locate(absolutePath);
-  }
+  /**
+	 * Create a new request to locate the resource.<br/>
+	 * The new request use the same protocole as the original request.<br/>
+	 * When original request was made through a proxy server, use "X-Forwarded-Proto" if present
+	 *
+	 * @param request
+	 *     User request
+	 * @param location
+	 *     Resource location
+	 * @return Resource content
+	 *
+	 * @throws IOException
+	 */
+	public InputStream locateExternal(final HttpServletRequest request, final String location)
+			throws IOException {
+		String requestProtocol = request.getScheme();
+		if (request.getHeader("X-Forwarded-Proto") != null) {
+			requestProtocol = request.getHeader("X-Forwarded-Proto");
+		}
+		final String requestServerName = request.getServerName();
+
+		final String absolutePath = requestProtocol + "://" + requestServerName + location;
+		LOG.debug("locateExternalUri: {}", absolutePath);
+		return createExternalResourceLocator().locate(absolutePath);
+	}
 
   /**
    * @return the {@link UriLocator} responsible for locating resources when dispatcher fails. No wildcard handling is
