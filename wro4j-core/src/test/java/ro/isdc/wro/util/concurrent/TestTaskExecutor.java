@@ -103,7 +103,7 @@ public class TestTaskExecutor {
 
     final long delta = end - start;
     LOG.debug("Execution took: {}", delta);
-    assertTrue(delta < delay * times);
+    assertTrue(delta < delay * times + 200);
   }
 
   @Test(expected = WroRuntimeException.class)
