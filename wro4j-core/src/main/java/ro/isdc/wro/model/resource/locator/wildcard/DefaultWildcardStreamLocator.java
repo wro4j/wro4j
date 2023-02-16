@@ -16,16 +16,15 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
+import org.apache.commons.io.filefilter.FileEqualsFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ro.isdc.wro.util.Function;
 
 
@@ -33,20 +32,22 @@ import ro.isdc.wro.util.Function;
  * Default implementation of {@link WildcardStreamLocator}.
  *
  * @author Alex Objelean
+ * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
     implements WildcardStreamLocator, WildcardExpanderHandlerAware {
+
   private static final Logger LOG = LoggerFactory.getLogger(DefaultWildcardStreamLocator.class);
   /**
    * Character to distinguish wildcard inside the uri.
    */
   public static final String RECURSIVE_WILDCARD = "**";
   /**
-   * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?' character, it is considered
-   * a wildcard.
+   * Character to distinguish wildcard inside the uri. If the file name contains '*' or '?'
+   * character, it is considered a wildcard.
    * <p>
-   * A string is considered to contain wildcard if it doesn't start with http(s) and contains at least one of the
-   * following characters: [?*].
+   * A string is considered to contain wildcard if it doesn't start with http(s) and contains at
+   * least one of the following characters: [?*].
    */
   private static final String WILDCARD_REGEX = "^(?:(?!http))(.)*[\\*\\?]+(.)*";
   /**
@@ -63,8 +64,8 @@ public class DefaultWildcardStreamLocator
   };
 
   /**
-   * Removes the query path from the path which potentially could be treated as a path containing wildcard special
-   * characters.
+   * Removes the query path from the path which potentially could be treated as a path containing
+   * wildcard special characters.
    *
    * @param path to strip the query path from.
    * @return a path with the query path removed.
@@ -74,7 +75,8 @@ public class DefaultWildcardStreamLocator
   }
 
   /**
-   * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of associated files.
+   * Responsible for expanding wildcards, in other words for replacing one wildcard with a set of
+   * associated files.
    */
   private Function<Collection<File>, Void> wildcardExpanderHandler;
 
@@ -104,42 +106,27 @@ public class DefaultWildcardStreamLocator
     return new BufferedInputStream(new ByteArrayInputStream(out.toByteArray()));
   }
 
-
   /**
-   * Creates a {@link IOFileFilter} which collects found files into a collection and also populates a map with found
-   * resources and corresponding files.
-   *
-   * @param wildcardContext
-   * @param allFiles - where all found files and folders are collected.
-   */
-  @SuppressWarnings("serial")
-  private IOFileFilter createWildcardCollectorFileFilter(final WildcardContext wildcardContext, final Collection<File> allFiles) {
-    notNull(wildcardContext);
-    notNull(allFiles);
-    return new WildcardFileFilter(wildcardContext.getWildcard()) {
-      @Override
-      public boolean accept(final File file) {
-        final boolean accept = super.accept(file);
-        if (accept) {
-          LOG.debug("\tfound resource: {}", file.getPath());
-          allFiles.add(file);
-        }
-        return accept;
-      }
-    };
-  }
-
-  /**
-   * @return a collection of files found inside a given folder for a search uri which contains a wildcard.
+   * @return a collection of files found inside a given folder for a search uri which contains a
+   * wildcard.
    */
   private Collection<File> findMatchedFiles(final WildcardContext wildcardContext)
       throws IOException {
     validate(wildcardContext);
 
+    Collection<File> files = FileUtils.listFilesAndDirs(wildcardContext.getFolder(),
+        new WildcardFileFilter(wildcardContext.getWildcard()),
+        getFolderFilter(wildcardContext.getWildcard()));
+
     // Holds a set of all files (also folders, not only resources). This is useful for wildcard expander processing.
-    final Set<File> allFiles = new TreeSet<File>(ALPHABETIC_FILE_COMPARATOR);
-    final IOFileFilter fileFilter = createWildcardCollectorFileFilter(wildcardContext, allFiles);
-    FileUtils.listFiles(wildcardContext.getFolder(), fileFilter, getFolderFilter(wildcardContext.getWildcard()));
+    final FileEqualsFileFilter isRootFolder = new FileEqualsFileFilter(wildcardContext.getFolder());
+    final IOFileFilter isNotSelectedByWildcard = new WildcardFileFilter(
+        wildcardContext.getWildcard()).negate();
+    final Set<File> allFiles = new TreeSet<>(ALPHABETIC_FILE_COMPARATOR);
+    allFiles.addAll(files);
+    // Note: since commons-io 3.11.0 the traversed folders are also selected, even if files are selected on a wildcard like "**.js"
+    allFiles.removeIf(isRootFolder::accept);
+    allFiles.removeIf(isNotSelectedByWildcard::accept);
 
     triggerWildcardExpander(allFiles, wildcardContext);
 
@@ -148,12 +135,13 @@ public class DefaultWildcardStreamLocator
 
 
   /**
-   * Validates arguments used by {@link DefaultWildcardStreamLocator#findMatchedFiles(String, File)} method.
+   * Validates arguments used by
+   * {@link DefaultWildcardStreamLocator#findMatchedFiles(WildcardContext)} method.
    *
    * @throws IOException if supplied arguments are invalid or cannot be handled by this locator.
    */
   private void validate(final WildcardContext wildcardContext)
-    throws IOException {
+      throws IOException {
     notNull(wildcardContext);
     final String uri = wildcardContext.getUri();
     final File folder = wildcardContext.getFolder();
@@ -177,22 +165,23 @@ public class DefaultWildcardStreamLocator
   /**
    * Uses the wildcardExpanderHandler to process all found files and directories.
    *
-   * @param files
-   *          a collection of all files and folders found during wildcard matching.
+   * @param allFiles a collection of all files and folders found during wildcard matching.
    * @VisibleForTestOnly
    */
-  void triggerWildcardExpander(final Collection<File> allFiles, final WildcardContext wildcardContext)
+  void triggerWildcardExpander(final Collection<File> allFiles,
+      final WildcardContext wildcardContext)
       throws IOException {
     LOG.debug("wildcard resources: {}", allFiles);
     if (allFiles.isEmpty()) {
-      final String message = String.format("No resource found for wildcard: %s", wildcardContext.getWildcard());
+      final String message = String.format("No resource found for wildcard: %s",
+          wildcardContext.getWildcard());
       LOG.warn(message);
       throw new IOException(message);
     }
     if (wildcardExpanderHandler != null) {
       try {
         wildcardExpanderHandler.apply(allFiles);
-      } catch(final IOException e) {
+      } catch (final IOException e) {
         // preserve exception type if the exception is already an IOException
         throw e;
       } catch (final Exception e) {
@@ -203,11 +192,10 @@ public class DefaultWildcardStreamLocator
   }
 
   /**
-   * @param wildcard
-   *          to use to determine if the folder filter should be recursive or not.
+   * @param wildcard to use to determine if the folder filter should be recursive or not.
    * @return filter to be used for folders.
    */
-  private IOFileFilter getFolderFilter(final String wildcard) {
+  private static IOFileFilter getFolderFilter(final String wildcard) {
     final boolean recursive = wildcard.contains(RECURSIVE_WILDCARD);
     return recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE;
   }
