@@ -11,7 +11,6 @@ import ro.isdc.wro.model.factory.XmlModelFactory;
  * Default provider of {@link WroModelFactory} for the core module.
  *
  * @author Alex Objelean
- * @created 4 Apr 2013
  * @since 1.6.3
  */
 public class DefaultModelFactoryProvider

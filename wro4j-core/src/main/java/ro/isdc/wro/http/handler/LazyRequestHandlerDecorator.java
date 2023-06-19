@@ -17,7 +17,6 @@ import ro.isdc.wro.util.LazyInitializerDecorator;
  * A decorator which allows lazy instantiation of {@link RequestHandler} object.
  *
  * @author Alex Objelean
- * @created 10 Feb 2013
  * @since 1.6.3
  */
 public class LazyRequestHandlerDecorator

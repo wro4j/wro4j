@@ -9,7 +9,6 @@ import ro.isdc.wro.model.resource.processor.support.LessCssImportInspector;
  * A processor capable of handling <a href="http://lesscss.org/#-importing">LessCss imports</a>
  *
  * @author Alex Objelean
- * @created 4 Mar 2013
  * @since 1.6.3
  */
 public class LessCssImportPreProcessor

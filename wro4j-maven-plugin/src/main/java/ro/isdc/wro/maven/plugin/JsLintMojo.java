@@ -9,6 +9,9 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.output.NullWriter;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsLintProcessor;
@@ -26,13 +29,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Maven plugin used to validate js scripts defined in wro model using <a href="http://jslint.com/">jsLint</a>.
  *
- * @goal jslint
- * @phase compile
- * @requiresDependencyResolution runtime
  * @author Alex Objelean
- * @created 19 Sept 2011
  * @since 1.4.2
  */
+@Mojo(name = "jslint", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class JsLintMojo
     extends AbstractLinterMojo<LinterError> {
   /**
@@ -104,9 +104,6 @@ public class JsLintMojo
     return reportFormat;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
   }
@@ -114,7 +111,6 @@ public class JsLintMojo
   /**
    * @param reportFormat
    *          the preferred report format.
-   * @VisibleForTesting
    */
   void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;

@@ -52,7 +52,6 @@ public class StandaloneContext
   /**
    * @return string representation of context folders. The value can be a single value or a comma separated list of
    *         folders. Use {@link #getContextFolders()} to get the array of folders.
-   * @VisibleForTesting
    */
   public String getContextFoldersAsCSV() {
     return contextFoldersAsCSV;

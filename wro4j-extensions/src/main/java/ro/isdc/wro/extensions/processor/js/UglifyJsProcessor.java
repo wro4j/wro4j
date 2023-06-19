@@ -9,14 +9,11 @@ import ro.isdc.wro.model.group.processor.Minimize;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.SupportedResourceType;
 
-
-
 /**
  * Compress js using uglifyJs utility.
  *
  * @author Alex Objelean
  * @since 1.3.1
- * @created 7 Nov 2010
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)

@@ -13,13 +13,13 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 
 /**
- * Encapsulates the details of storing/retrieving attributes from {@link ServletContext}. <br/>
- * This class know how to handle multiple {@link WroFilter} & {@link WroServletContextListener} configurations, by
+ * <p>Encapsulates the details of storing/retrieving attributes from {@link ServletContext}. <br/>
+ * This class know how to handle multiple {@link WroFilter} and {@link WroServletContextListener} configurations, by
  * setting the attributes with a unique key computed based on provided name (using
  * {@link ServletContextAttributeHelper#getName()}. Use this class to retrieve wro4j related attributes, instead of
- * hard-coding the name of the attribute to retrieve.
- * <p/>
- * Usage scenario:
+ * hard-coding the name of the attribute to retrieve.</p>
+ *
+ * <p>Usage scenario:</p>
  * <ul>
  * <li>This is the most common use-case, when there is a single {@link WroFilter} and a
  * {@link WroServletContextListener} configured in web.xml. In order to retrieve/store attributes in servlet context
@@ -56,7 +56,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
  * </ul>
  * 
  * @author Alex Objelean
- * @created 7 May 2012
  * @since 1.4.6
  */
 public class ServletContextAttributeHelper {

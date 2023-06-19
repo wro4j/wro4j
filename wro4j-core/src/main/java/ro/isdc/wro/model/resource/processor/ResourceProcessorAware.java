@@ -5,7 +5,6 @@ package ro.isdc.wro.model.resource.processor;
  *
  * @author Alex Objelean
  * @since 1.7.1
- * @created 23 Aug 2013
  */
 public interface ResourceProcessorAware
     extends ResourcePreProcessor, ResourcePostProcessor, SupportedResourceTypeAware, MinimizeAware, SupportAware,

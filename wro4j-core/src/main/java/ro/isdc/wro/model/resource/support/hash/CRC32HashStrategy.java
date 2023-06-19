@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Alex Objelean
  * @since 1.4.7
- * @created 17 Jun 2012
  */
 public class CRC32HashStrategy
     implements HashStrategy {

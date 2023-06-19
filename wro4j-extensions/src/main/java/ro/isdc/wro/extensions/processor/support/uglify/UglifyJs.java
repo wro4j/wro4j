@@ -21,11 +21,11 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use untagged version (commited on 2012-09-08 14:15:12).
- * <p/>
- * {@link https://github.com/mishoo/UglifyJS}.
- * <p/>
- * The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js.
+ * <p>The underlying implementation use untagged version (commited on 2012-09-08 14:15:12).</p>
+ *
+ * <p>See <a href="https://github.com/mishoo/UglifyJS">the project on GitHub</a>.</p>
+ *
+ * <p>The uglify script is resulted from merging of the following two scripts: parse-js.js, process.js.</p>
  *
  * @author Alex Objelean
  * @since 1.3.1
@@ -67,8 +67,8 @@ public class UglifyJs {
   }
 
   /**
-   * @param uglify
-   *          if true the code will be uglified (compressed and minimized), otherwise it will be beautified (nice
+   * @param uglifyType
+   *          Depending on the type, the code will either be uglified (compressed and minimized), or it will be beautified (nice
    *          formatted).
    */
   public UglifyJs(final Type uglifyType) {
@@ -137,7 +137,7 @@ public class UglifyJs {
   }
 
   /**
-   * @param data
+   * @param filename
    *          js content to process.
    * @return packed js content.
    */

@@ -14,7 +14,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 19 Jun 2011
  */
 @SuppressWarnings("serial")
 public class CssRule

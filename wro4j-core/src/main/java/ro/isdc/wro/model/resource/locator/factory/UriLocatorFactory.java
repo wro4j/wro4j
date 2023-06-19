@@ -12,7 +12,6 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * Centralize information about UriLocators to be used.
  *
  * @author Alex Objelean
- * @created 21 Nov 2010
  */
 public interface UriLocatorFactory {
   /**

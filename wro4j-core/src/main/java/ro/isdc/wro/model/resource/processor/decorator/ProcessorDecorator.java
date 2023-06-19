@@ -26,7 +26,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * it is not abstract (for backward compatibility reasons). It will be renamed to ProcessorDecorator.
  *
  * @author Alex Objelean
- * @created 16 Sep 2011
  * @since 1.4.1
  */
 public class ProcessorDecorator
@@ -34,7 +33,7 @@ public class ProcessorDecorator
   private static final Logger LOG = LoggerFactory.getLogger(ProcessorDecorator.class);
 
   /**
-   * Hides the postProcessor adaptation logic. This exist due to differences between pre & post processor interface.
+   * Hides the postProcessor adaptation logic. This exist due to differences between pre and post processor interface.
    * This will be removed in 1.5.0 when all processors will have an unified interface.
    */
   public ProcessorDecorator(final Object processor) {

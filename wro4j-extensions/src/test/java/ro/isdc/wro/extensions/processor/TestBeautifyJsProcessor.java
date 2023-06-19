@@ -23,7 +23,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * TestBeautifyJsProcessor.
  *
  * @author Alex Objelean
- * @created Created on Apr 21, 2010
  */
 public class TestBeautifyJsProcessor {
   @Test

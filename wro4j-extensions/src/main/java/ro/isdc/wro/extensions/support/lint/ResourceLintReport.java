@@ -10,17 +10,14 @@ import org.apache.commons.lang3.Validate;
 
 
 /**
- * Encapsulates lint reports of type <T> found for a resource. This class is generic, because there are different
+ * Encapsulates lint reports of type {@code <T>} found for a resource. This class is generic, because there are different
  * types of errors.
  *
  * @author Alex Objelean
- * @created 15 Sep 2012
  * @since 1.5.0
  */
 public class ResourceLintReport<T> {
-  /**
-   * @VisibleForTesting
-   */
+
   static final String UNKNOWN_PATH = "UnknownFile";
   private Collection<T> lints = new ArrayList<T>();
   private String resourcePath = UNKNOWN_PATH;

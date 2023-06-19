@@ -24,7 +24,6 @@ import com.google.gson.JsonSerializer;
  * }
  *
  * @author Ivar Conradi Østhus
- * @created 15 Jun 2012
  * @since 1.4.7
  */
 public class ResourceSerializer implements JsonSerializer<Resource> {

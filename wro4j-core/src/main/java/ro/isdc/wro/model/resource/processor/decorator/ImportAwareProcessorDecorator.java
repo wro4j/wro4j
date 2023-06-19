@@ -10,7 +10,6 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingType;
  * Check if the decorated processor is considered import aware.
  *
  * @author Alex Objelean
- * @created 16 Oct 2012
  * @since 1.6.0
  */
 public class ImportAwareProcessorDecorator

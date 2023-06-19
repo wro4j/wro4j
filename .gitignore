@@ -3,7 +3,6 @@ bin/
 target/
 
 *.iml
-*.releaseBackup
 .classpath
 .DS_Store
 .idea

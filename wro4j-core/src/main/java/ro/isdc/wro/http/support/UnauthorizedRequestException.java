@@ -10,7 +10,6 @@ import ro.isdc.wro.WroRuntimeException;
  * This exception is thrown when an invalid group is requested..
  *
  * @author Alex Objelean
- * @created Created on Jan 6, 2010
  */
 public class UnauthorizedRequestException extends WroRuntimeException {
   /**

@@ -52,7 +52,6 @@ import ro.isdc.wro.util.WroUtil;
  * way it is configured.
  *
  * @author Alex Objelean
- * @created Created on Oct 31, 2008
  */
 public class WroFilter
     implements Filter {
@@ -65,8 +64,6 @@ public class WroFilter
    * Attribute indicating that the request was passed through {@link WroFilter}. This is required to allow identify
    * requests for wro resources (example: async resourceWatcher which cannot be executed asynchronously unless a wro
    * resource was requested).
-   *
-   * @VisibleForTesting
    */
   public static final String ATTRIBUTE_PASSED_THROUGH_FILTER = WroFilter.class.getName()
       + ".passed_through_filter";
@@ -278,7 +275,7 @@ public class WroFilter
   /**
    * Custom filter initialization - can be used for extended classes.
    *
-   * @see Filter#init(FilterConfig).
+   * See {@link Filter#init(FilterConfig)}.
    */
   protected void doInit(final FilterConfig config)
       throws ServletException {
@@ -382,10 +379,10 @@ public class WroFilter
   }
 
   /**
-   * Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
-   * default {@link WroManagerFactory} initialization won't work anymore.
-   * <p/>
-   * Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.
+   * <p>Allows external configuration of {@link WroManagerFactory} (ex: using spring IoC). When this value is set, the
+   * default {@link WroManagerFactory} initialization won't work anymore.</p>
+   * 
+   * <p>Note: call this method before {@link WroFilter#init(FilterConfig)} is invoked.</p>
    *
    * @param wroManagerFactory
    *          the wroManagerFactory to set
@@ -413,13 +410,13 @@ public class WroFilter
   }
 
   /**
-   * Factory method for {@link WroManagerFactory}.
-   * <p/>
-   * Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
-   * is found a default implementation is used.
-   * </p>
-   * Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
-   * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.
+   * <p>Factory method for {@link WroManagerFactory}.</p>
+   *
+   * <p>Creates a {@link WroManagerFactory} configured in {@link WroConfiguration} using reflection. When no configuration
+   * is found a default implementation is used.</p>
+   *
+   * <p>Note: this method is not invoked during initialization if a {@link WroManagerFactory} is set using
+   * {@link WroFilter#setWroManagerFactory(WroManagerFactory)}.</p>
    *
    * @return {@link WroManagerFactory} instance.
    */
@@ -447,7 +444,6 @@ public class WroFilter
 
   /**
    * @return the {@link WroConfiguration} associated with this filter instance.
-   * @VisibleForTesting
    */
   public final WroConfiguration getConfiguration() {
     return this.wroConfiguration;

@@ -19,7 +19,6 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  *    renamed:        a912810be321/group.js
  *
  * @author Alex Objelean
- * @created 15 Aug 2012
  * @since 1.4.9
  */
 public class FolderHashEncoderNamingStrategy

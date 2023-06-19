@@ -12,7 +12,6 @@ import ro.isdc.wro.util.StopWatch;
  * Default implementation of {@link LifecycleCallback} interface with empty implementations.
  *
  * @author Alex Objelean
- * @created 26 Oct 2011
  * @since 1.4.3
  */
 public class PerformanceLoggerCallback

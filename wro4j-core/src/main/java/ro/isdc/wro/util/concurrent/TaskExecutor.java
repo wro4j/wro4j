@@ -21,7 +21,6 @@ import ro.isdc.wro.util.StopWatch;
  *
  * @author Alex Objelean
  * @since 1.7.1
- * @date 26 Aug 2013
  */
 public class TaskExecutor<T> {
   private static final Logger LOG = LoggerFactory.getLogger(TaskExecutor.class);
@@ -67,10 +66,10 @@ public class TaskExecutor<T> {
   }
 
   /**
-   * TODO rename to submitAll.
-   * <p/>
-   * Submits a chunk of jobs for parallel execution. This is a blocking operation - it will end execution when all
-   * submitted tasks are finished.
+   * <p>TODO rename to submitAll.</p>
+   *
+   * <p>Submits a chunk of jobs for parallel execution. This is a blocking operation - it will end execution when all
+   * submitted tasks are finished.</p>
    * 
    * @param callables
    *          a {@link Collection} of {@link Callable} to execute. When the provided collection contains only one item,

@@ -33,7 +33,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * correctly (using reflection) when extension module is available.
  *
  * @author Simon van der Sluis
- * @created Created on May 14, 2012
  */
 public class TestConfigurableWroFilterWithExtensions {
   @Mock

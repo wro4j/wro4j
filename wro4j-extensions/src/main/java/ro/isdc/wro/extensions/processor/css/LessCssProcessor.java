@@ -17,7 +17,6 @@ import ro.isdc.wro.util.LazyInitializer;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 11 Sep 2012
  */
 @SupportedResourceType(ResourceType.CSS)
 public class LessCssProcessor

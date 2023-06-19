@@ -10,12 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.model.factory.WroModelFactory;
 
-
 /**
  * A {@link Runnable} executed by scheduler to clear the model cache.
  *
  * @author Alex Objelean
- * @created 24 Oct 2011
  * @since 1.4.2
  */
 public final class ReloadModelRunnable

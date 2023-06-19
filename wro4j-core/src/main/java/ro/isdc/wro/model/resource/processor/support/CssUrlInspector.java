@@ -14,7 +14,6 @@ import ro.isdc.wro.util.WroUtil;
  * Encapsulates the matcher creation for css backround url's detection. Useful to isolate unit tests.
  *
  * @author Alex Objelean
- * @created 20 Feb 2013
  * @since 1.6.3
  */
 public class CssUrlInspector {

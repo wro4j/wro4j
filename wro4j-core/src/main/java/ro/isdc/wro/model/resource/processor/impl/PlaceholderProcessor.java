@@ -29,7 +29,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 15 Jun 2011
  */
 public class PlaceholderProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {

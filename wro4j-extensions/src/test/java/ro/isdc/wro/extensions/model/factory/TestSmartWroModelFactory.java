@@ -33,7 +33,6 @@ import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 
 /**
  * @author Alex Objelean
- * @created 6 Aug 2011
  */
 public class TestSmartWroModelFactory {
   private SmartWroModelFactory factory;

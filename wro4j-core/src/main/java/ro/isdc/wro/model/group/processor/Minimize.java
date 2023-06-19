@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
  * annotation, will also inherit the minimize aware characteristic.
  *
  * @author Alex Objelean
- * @created Created on March 20, 2010
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

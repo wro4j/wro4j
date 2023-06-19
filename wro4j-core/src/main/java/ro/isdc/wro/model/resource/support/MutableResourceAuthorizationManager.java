@@ -1,9 +1,7 @@
 package ro.isdc.wro.model.resource.support;
 
-
-
 /**
- * A specialized {@link IResourceAuthorizationManager} which is capable of changing the authorized resource in the
+ * A specialized {@link ResourceAuthorizationManager} which is capable of changing the authorized resource in the
  * runtime.
  * 
  * @author Alex Objelean

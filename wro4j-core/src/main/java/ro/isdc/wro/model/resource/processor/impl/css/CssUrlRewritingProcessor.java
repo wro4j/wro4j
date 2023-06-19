@@ -17,13 +17,14 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
 
 
 /**
- * Note: When used together with {@link CssImportPreProcessor}, the {@link CssUrlRewritingProcessor} should come first,
- * otherwise it will produce wrong results.
- * <p>
- * Rewrites background images url of the provided css content. This implementation takes care of most common cases such
- * as those described bellow:
- * <p>
- * <table border="1" cellpadding="5">
+ * <p>Note: When used together with {@link CssImportPreProcessor}, the {@link CssUrlRewritingProcessor} should come first,
+ * otherwise it will produce wrong results.</p>
+ *
+ * <p>Rewrites background images url of the provided css content. This implementation takes care of most common cases such
+ * as those described below:</p>
+ *
+ * <table border="1">
+ * <caption>URL rewrite common use cases</caption>
  * <thead>
  * <tr>
  * <th>Css resource URI</th>
@@ -93,12 +94,11 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * </tr>
  * </tbody>
  * </table>
- * <p/>
- * The algorithm requires two types of {@link UriLocator} objects, one for resolving url resources & one for classpath
- * resources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor} class.
+ *
+ * <p>The algorithm requires two types of {@link UriLocator} objects, one for resolving URL resources and one for classpath
+ * resources. Both need to be injected using IoC when creating the instance of {@link CssUrlRewritingProcessor} class.</p>
  *
  * @author Alex Objelean
- * @created Nov 19, 2008
  */
 public class CssUrlRewritingProcessor
     extends AbstractCssUrlRewritingProcessor {
@@ -142,7 +142,6 @@ public class CssUrlRewritingProcessor
    * @param uri
    *          to check if is allowed.
    * @return true if passed argument is contained in allowed list.
-   * @VisibleFortesting
    */
   public final boolean isUriAllowed(final String uri) {
     return authorizationManager.isAuthorized(uri);

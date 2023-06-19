@@ -15,7 +15,6 @@ import ro.isdc.wro.WroRuntimeException;
  * are configured as a CSV of aliases.
  * 
  * @author Alex Objelean
- * @created 26 Jun 2012
  * @since 1.4.7
  */
 public abstract class AbstractConfigurableMultipleStrategy<S, P>
@@ -25,11 +24,12 @@ public abstract class AbstractConfigurableMultipleStrategy<S, P>
    * Delimit tokens containing a list of locators, preProcessors & postProcessors.
    */
   private static final String TOKEN_DELIMITER = ",";
-  
+
   /**
    * Creates a comma separated list of items.
    * 
-   * @VisibleForTesting
+   * @param items The items which should be combined into a string.
+   * @return The string containing the concatenation of items.
    */
   public static String createItemsAsString(final String... items) {
     final StringBuffer sb = new StringBuffer();
@@ -45,7 +45,6 @@ public abstract class AbstractConfigurableMultipleStrategy<S, P>
   /**
    * @return the strategy S whose alias is found configured in the properties. This method will never return null. If an
    *         invalid alias is provided - a runtime exception will be thrown.
-   * @VisibleForTesting
    */
   public final List<S> getConfiguredStrategies() {
     final List<S> strategies = new ArrayList<S>();

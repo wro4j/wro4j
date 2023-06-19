@@ -16,7 +16,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Eivind Barstad Waaler
  * @since 1.4.7
- * @created 11 May 2012
  */
 public abstract class AbstractJsTemplateCompiler {
   private ScriptableObject scope;

@@ -28,7 +28,6 @@ import com.github.lltyk.rhino17r1.Context;
  * Compresses javascript code using compressor implemented by Dojo Shrinksafe utility.
  *
  * @author Alex Objelean
- * @created Created on Dec 4, 2008
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)

@@ -31,7 +31,6 @@ import ro.isdc.wro.util.StringUtils;
  * Implementation of the {@link UriLocator} that is able to read a resource from a classpath.
  *
  * @author Alex Objelean
- * @created Created on Nov 6, 2008
  */
 public class ClasspathUriLocator
     extends WildcardUriLocatorSupport {

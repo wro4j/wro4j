@@ -78,7 +78,7 @@ public final class CacheKey implements Serializable {
   /**
    * Add a custom key-value pair attribute. Each pair is added to an internal map. The custom attributes can be used to
    * make the key more fine grained (Ex: based on browser version or a request parameter). Both elements of the
-   * attribute (key & value) should be not null. If any of these are null, the attribute won't be added.
+   * attribute (key and value) should be not null. If any of these are null, the attribute won't be added.
    *
    * @param key
    *          string representing the key of the attribute.

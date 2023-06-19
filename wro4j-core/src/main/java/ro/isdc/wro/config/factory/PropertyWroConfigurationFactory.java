@@ -22,7 +22,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Alex Objelean
  * @author Paul Podgorsek
- * @created 10 May 2011
  * @since 1.3.7
  */
 public class PropertyWroConfigurationFactory

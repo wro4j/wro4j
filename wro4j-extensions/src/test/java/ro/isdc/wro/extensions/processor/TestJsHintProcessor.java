@@ -24,7 +24,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test {@link JsHintProcessor}.
  *
  * @author Alex Objelean
- * @created Created on Feb 27, 2011
  */
 public class TestJsHintProcessor
     extends AbstractTestLinterProcessor {

@@ -9,7 +9,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 19 Oct 2012
  */
 public class CacheKeyFactoryDecorator
     extends AbstractDecorator<CacheKeyFactory>

@@ -8,11 +8,10 @@ import ro.isdc.wro.model.resource.support.naming.DefaultHashEncoderNamingStrateg
 
 
 /**
- * An implementation of {@link WroModelFactory} which uses {@link HashEncoderNamingStrategy} for encoding the result
+ * An implementation of {@link WroModelFactory} which uses {@link DefaultHashEncoderNamingStrategy} for encoding the result
  * file name.
  *
  * @author Alex Objelean
- * @created 15 Aug 2010
  */
 public class FingerprintAwareStandaloneManagerFactory extends ExtensionsStandaloneManagerFactory {
   public FingerprintAwareStandaloneManagerFactory() {

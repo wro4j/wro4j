@@ -19,7 +19,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Eivind Barstad Waaler
  * @since 1.4.7
- * @created 11 May 2012
  */
 public abstract class JsTemplateCompilerProcessor implements ResourcePreProcessor, Destroyable {
   private final ObjectPoolHelper<AbstractJsTemplateCompiler> enginePool;

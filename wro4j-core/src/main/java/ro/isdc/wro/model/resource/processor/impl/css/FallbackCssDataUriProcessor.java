@@ -9,10 +9,10 @@ import ro.isdc.wro.model.resource.processor.support.FallbackCssDataUriUrlInspect
 
 
 /**
- * Preserves the original css uri along with the new one. This should work also with browsers which do not support
- * dataURI's.
- * <p/>
- * Sample Input:
+ * <p>Preserves the original css uri along with the new one. This should work also with browsers which do not support
+ * dataURI's.</p>
+ *
+ * <p>Sample Input:</p>
  *
  * <pre>
  * div {
@@ -20,7 +20,7 @@ import ro.isdc.wro.model.resource.processor.support.FallbackCssDataUriUrlInspect
  * }
  * </pre>
  *
- * Sample output:
+ * <p>Sample output:</p>
  *
  * <pre>
  *  div {
@@ -29,10 +29,9 @@ import ro.isdc.wro.model.resource.processor.support.FallbackCssDataUriUrlInspect
  * }
  * </pre>
  *
- * Applies the graceful degradation technique. For example, if browser can't parse second rule, it'll use first one.
+ * <p>Applies the graceful degradation technique. For example, if browser can't parse second rule, it'll use first one.</p>
  *
  * @author Alex Objelean
- * @created 4 Jun 2012
  * @since 1.4.7
  */
 public class FallbackCssDataUriProcessor

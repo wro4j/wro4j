@@ -8,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
  * 
  * @author Alex Objelean
  * @since 1.4.7
- * @created 17 Jun 2012
  */
 public class SHA1HashStrategy
     extends AbstractDigesterHashStrategy {

@@ -16,7 +16,6 @@ import ro.isdc.wro.util.LazyInitializer;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 11 Sep 2012
  */
 @SupportedResourceType(ResourceType.JS)
 public class CoffeeScriptProcessor

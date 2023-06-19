@@ -10,10 +10,9 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 
 /**
- * Delegating implementation of {@link javax.servlet.ServletOutputStream}.
+ * Delegating implementation of {@link jakarta.servlet.ServletOutputStream}.
  *
  * @author Alex Objelean
- * @created Created on Nov 14, 2008
  */
 public class DelegatingServletOutputStream extends ServletOutputStream {
 

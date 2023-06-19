@@ -33,10 +33,9 @@ import ro.isdc.wro.model.resource.processor.support.DataUriGenerator;
 
 
 /**
- * A processor responsible for rewriting url's from inside the css resources.
+ * A processor responsible for rewriting URLs from inside the css resources.
  *
  * @author Alex Objelean
- * @created Created on 9 May, 2010
  */
 @SupportedResourceType(ResourceType.CSS)
 public abstract class AbstractCssUrlRewritingProcessor
@@ -101,9 +100,7 @@ public abstract class AbstractCssUrlRewritingProcessor
   }
 
   /**
-   * Invoked to replace the entire css declaration.
-   * <p/>
-   * An example of css declaration:
+   * Invoked to replace the entire css declaration. An example of css declaration:
    *
    * <pre>
    * background: url(/image.png);
@@ -157,7 +154,6 @@ public abstract class AbstractCssUrlRewritingProcessor
    * This method has protected modifier in order to be accessed by unit test class.
    *
    * @return urlPrefix value.
-   * @VisibleForTesting
    */
   protected String getUrlPrefix() {
     return ResourceProxyRequestHandler.createProxyPath(context.getRequest().getRequestURI(), "");

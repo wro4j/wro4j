@@ -21,7 +21,6 @@ import ro.isdc.wro.util.Transformer;
  * Applies transformation using supplied transformers to the decorated model.
  *
  * @author Alex Objelean
- * @created 23 Aug 2011
  * @since 1.4.0
  */
 public class ModelTransformerFactory

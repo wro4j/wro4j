@@ -16,7 +16,6 @@ import ro.isdc.wro.util.LazyInitializer;
  * configured strategy is found, a default one is used.
  *
  * @author Alex Objelean
- * @created 17 Jun 2012
  * @since 1.4.7
  */
 public abstract class AbstractConfigurableSingleStrategy<S, P>

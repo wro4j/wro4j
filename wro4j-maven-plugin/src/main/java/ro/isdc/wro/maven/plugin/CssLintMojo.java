@@ -9,6 +9,9 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.output.NullWriter;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.css.CssLintProcessor;
@@ -26,13 +29,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Maven plugin used to validate css code defined in wro model.
  *
- * @goal csslint
- * @phase compile
- * @requiresDependencyResolution runtime
  * @author Alex Objelean
  * @since 1.3.8
- * @created 20 Jun 2011
  */
+@Mojo(name = "csslint", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class CssLintMojo
     extends AbstractLinterMojo<CssLintError> {
   /**
@@ -101,9 +101,6 @@ public class CssLintMojo
     return reportFormat;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
   }
@@ -111,7 +108,6 @@ public class CssLintMojo
   /**
    * @param reportFormat
    *          the preferred report format.
-   * @VisibleForTesting
    */
   void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;

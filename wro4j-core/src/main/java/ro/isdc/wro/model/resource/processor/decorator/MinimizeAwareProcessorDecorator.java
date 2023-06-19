@@ -11,7 +11,6 @@ import ro.isdc.wro.model.resource.Resource;
  *
  * @author Alex Objelean
  * @since 1.4.7
- * @created 20 May 2012
  */
 public class MinimizeAwareProcessorDecorator
     extends ProcessorDecorator {

@@ -8,7 +8,6 @@ import static org.apache.commons.lang3.Validate.notNull;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 17 Oct 2012
  */
 public final class ProcessingCriteria {
   private ProcessingType processingType = ProcessingType.ALL;

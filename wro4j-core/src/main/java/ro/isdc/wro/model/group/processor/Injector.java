@@ -27,7 +27,6 @@ import ro.isdc.wro.util.ObjectDecorator;
  * fields.
  *
  * @author Alex Objelean
- * @created 20 Nov 2010
  */
 public final class Injector {
   private static final Logger LOG = LoggerFactory.getLogger(Injector.class);

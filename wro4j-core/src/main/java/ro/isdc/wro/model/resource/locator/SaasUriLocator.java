@@ -27,7 +27,6 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
  * </pre>
  * 
  * @author Paul Sterl
- * @created Created on Jun 22 2017
  */
 public class SaasUriLocator implements UriLocator {
     private static final Logger LOG = LoggerFactory.getLogger(SaasUriLocator.class);

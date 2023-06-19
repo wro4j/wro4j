@@ -51,12 +51,12 @@ public class ContentTypeResolver {
   }
 
   /**
-   * Returns a valid HTTP contentType's for a given filename. It first relies on the custom defaultContentTypeMap and if
+   * <p>Returns a valid HTTP contentType's for a given filename. It first relies on the custom defaultContentTypeMap and if
    * not found it will fall back to defaultFileTypeMap from javax.activation.FileTypeMap. Examples: - "somefile.css"
-   * resolves to "text/css". - "somefile.js.png" resolves to "image/png" - "/blah/index.html resolves to "text/html".
-   * <p/>
-   * The implementation uses reflection to load <code>javax.activation.FileTypeMap</code> class (available in jdk6) in
-   * order to be compatible with jdk5. If this class is not available, the default content type is returned.
+   * resolves to "text/css". - "somefile.js.png" resolves to "image/png" - "/blah/index.html resolves to "text/html".</p>
+   *
+   * <p>The implementation uses reflection to load <code>javax.activation.FileTypeMap</code> class (available in jdk6) in
+   * order to be compatible with jdk5. If this class is not available, the default content type is returned.</p>
    *
    * @param fileName
    *          with an filename extension

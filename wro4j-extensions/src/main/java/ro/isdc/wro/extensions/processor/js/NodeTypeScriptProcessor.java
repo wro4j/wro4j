@@ -35,9 +35,9 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Important node: this processor is not cross platform and has some pre-requesites in order to work.
- * <p/>
- * Installation instructions: Install the typescript node package module (Unix OS)
+ * <p>Important node: this processor is not cross platform and has some pre-requesites in order to work.</p>
+ *
+ * <p>Installation instructions: Install the typescript node package module (Unix OS)</p>
  *
  * <pre>
  *    npm install -g typescript
@@ -47,7 +47,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 10 Sep 2012
  */
 @SupportedResourceType(ResourceType.JS)
 public class NodeTypeScriptProcessor

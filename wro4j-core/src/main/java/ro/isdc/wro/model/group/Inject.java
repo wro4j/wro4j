@@ -11,10 +11,9 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to inject configuration specific objects into pre&post processors implementations.
+ * Used to inject configuration specific objects into pre- and post-processors implementations.
  *
  * @author Alex Objelean
- * @created Created on Jan 10, 2010
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

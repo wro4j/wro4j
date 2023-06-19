@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 
 /**
- * JsMin.java.
- * <p>
  * Copyright (c) 2006 John Reilly (www.inconspicuous.org) This work is a
  * translation from C to Java of jsmin.c published by Douglas Crockford.
  * Permission is hereby granted to use the Java version under the same
@@ -19,7 +17,6 @@ import java.io.PushbackInputStream;
  * http://www.crockford.com/javascript/jsmin.html
  *
  * @author Alex Objelean
- * @created Created on Dec 5, 2008
  */
 @SuppressWarnings("serial")
 public class JSMin {

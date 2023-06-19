@@ -26,7 +26,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * creates the {@link WroConfiguration} using {@link PropertyWroConfigurationFactory}.
  *
  * @author Alex Objelean
- * @created 13 May 2011
  * @since 1.3.7
  */
 public class FilterConfigWroConfigurationFactory

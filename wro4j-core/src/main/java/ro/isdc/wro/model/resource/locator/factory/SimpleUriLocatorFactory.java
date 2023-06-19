@@ -16,7 +16,6 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * uriLocator from the supplied list which will accept the url.
  *
  * @author Alex Objelean
- * @created 4 Nov 2008
  */
 public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
   private final List<UriLocator> uriLocators = new ArrayList<UriLocator>();
@@ -57,7 +56,6 @@ public class SimpleUriLocatorFactory extends AbstractUriLocatorFactory {
 
   /**
    * @return the list of currently configured locators.
-   * @VisibleForTesting
    */
   public List<UriLocator> getUriLocators() {
     return Collections.unmodifiableList(this.uriLocators);

@@ -21,7 +21,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * <code>/WEB-INF/wro.properties</code>) location.
  * 
  * @author Alex Objelean
- * @created 7 May 2012
  * @since 1.4.6
  */
 public class ServletContextPropertyWroConfigurationFactory

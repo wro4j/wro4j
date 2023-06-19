@@ -24,7 +24,6 @@ import ro.isdc.wro.model.resource.Resource;
  * </ul>
  *
  * @author Alex Objelean
- * @created 23 May 2012
  * @since 1.4.7
  */
 public class ExceptionHandlingProcessorDecorator

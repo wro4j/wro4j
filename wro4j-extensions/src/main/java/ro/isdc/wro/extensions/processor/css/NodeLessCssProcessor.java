@@ -32,22 +32,20 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Important node: this processor is not cross platform and has some pre-requesites in order to work.
- * <p/>
- * Same as {@link RhinoLessCssProcessor} but uses <code>lessc</code> shell utility to process the less.
- * <p/>
- * Installation instructions: Install the libnode-less package (Unix OS)
+ * <p>Important node: this processor is not cross platform and has some pre-requesites in order to work.</p>
+ *
+ * <p>Same as {@link RhinoLessCssProcessor} but uses <code>lessc</code> shell utility to process the less.</p>
+ *
+ * <p>Installation instructions: Install the libnode-less package (Unix OS)</p>
  *
  * <pre>
  *   sudo apt-get install node-less
  * </pre>
  *
  * It is possible to test whether the lessc utility is available using {@link NodeLessCssProcessor#isSupported()}
- * <p/>
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 10 Sep 2012
  */
 @SupportedResourceType(ResourceType.CSS)
 public class NodeLessCssProcessor

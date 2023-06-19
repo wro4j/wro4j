@@ -6,10 +6,9 @@ package ro.isdc.wro.model.group;
 import ro.isdc.wro.WroRuntimeException;
 
 /**
- * This exception is thrown when an invalid group is requested..
+ * This exception is thrown when an invalid group is requested.
  *
  * @author Alex Objelean
- * @created Created on Jan 6, 2010
  */
 public class InvalidGroupNameException extends WroRuntimeException {
   /**

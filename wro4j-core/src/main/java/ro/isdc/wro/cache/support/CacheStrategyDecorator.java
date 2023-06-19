@@ -7,7 +7,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  * A decorator of {@link CacheStrategy}.
  * 
  * @author Alex Objelean
- * @created 30 Apr 2012
  * @since 1.4.6
  */
 public class CacheStrategyDecorator<K, V> extends AbstractDecorator<CacheStrategy<K, V>>

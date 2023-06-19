@@ -20,6 +20,9 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.mockito.Mockito;
 
 import jakarta.servlet.FilterConfig;
@@ -40,11 +43,9 @@ import ro.isdc.wro.util.io.UnclosableBufferedInputStream;
  * run-time solution. Additionally, allows you to change the processors used by changing the wroManagerFactory
  * implementation used by the plugin.
  *
- * @goal run
- * @phase compile
- * @requiresDependencyResolution runtime
  * @author Alex Objelean
  */
+@Mojo(name = "run", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class Wro4jMojo
     extends AbstractWro4jMojo {
   /**
@@ -335,7 +336,6 @@ public class Wro4jMojo
   /**
    * @param destinationFolder
    *          the destinationFolder to set
-   * @VisibleForTesting
    */
   void setDestinationFolder(final File destinationFolder) {
     this.destinationFolder = destinationFolder;
@@ -344,7 +344,6 @@ public class Wro4jMojo
   /**
    * @param cssDestinationFolder
    *          the cssDestinationFolder to set
-   * @VisibleForTesting
    */
   void setCssDestinationFolder(final File cssDestinationFolder) {
     this.cssDestinationFolder = cssDestinationFolder;
@@ -353,7 +352,6 @@ public class Wro4jMojo
   /**
    * @param jsDestinationFolder
    *          the jsDestinationFolder to set
-   * @VisibleForTesting
    */
   void setJsDestinationFolder(final File jsDestinationFolder) {
     this.jsDestinationFolder = jsDestinationFolder;
@@ -364,7 +362,6 @@ public class Wro4jMojo
    *
    * @param buildDirectory
    *          the buildDirectory to set
-   * @VisibleForTesting
    */
   void setBuildDirectory(final File buildDirectory) {
     this.buildDirectory = buildDirectory;
@@ -381,15 +378,11 @@ public class Wro4jMojo
   /**
    * @param groupNameMappingFile
    *          the groupNameMappingFile to set
-   * @VisibleForTesting
    */
   void setGroupNameMappingFile(final File groupNameMappingFile) {
     this.groupNameMappingFile = groupNameMappingFile;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setContextPath(final String contextPath) {
     this.contextPath = contextPath;
   }

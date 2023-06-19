@@ -22,7 +22,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test cjson processor.
  *
  * @author Alex Objelean
- * @created Created on June 07, 2011
  */
 public class TestCJsonProcessor {
 

@@ -45,13 +45,12 @@ import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
- * groups.
- * <p/>
- * This class is thread-safe (the create method is synchronized).
+ * <p>Model factory implementation. Creates a WroModel object, based on an xml. This xml contains the description of all
+ * groups.</p>
+ *
+ * <p>This class is thread-safe (the create method is synchronized).</p>
  *
  * @author Alex Objelean
- * @created Created on Nov 3, 2008
  */
 public class XmlModelFactory
     extends AbstractWroModelFactory {

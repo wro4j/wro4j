@@ -14,7 +14,6 @@ import ro.isdc.wro.cache.CacheStrategy;
  * A {@link Runnable} executed by scheduler to clear the cache.
  * 
  * @author Alex Objelean
- * @created 24 Oct 2011
  * @since 1.4.2
  */
 public final class ReloadCacheRunnable

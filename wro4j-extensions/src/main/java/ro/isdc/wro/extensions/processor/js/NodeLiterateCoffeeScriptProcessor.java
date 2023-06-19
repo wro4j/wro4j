@@ -30,7 +30,6 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
  * </pre>
  *
  * It is possible to test whether the utility is available using {@link NodeLiterateCoffeeScriptProcessor#isSupported()}
- * <p/>
  *
  * @author Thilo Planz
  * @since 1.7.9

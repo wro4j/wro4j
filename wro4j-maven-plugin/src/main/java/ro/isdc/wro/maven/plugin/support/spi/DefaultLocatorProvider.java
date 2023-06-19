@@ -13,7 +13,6 @@ import ro.isdc.wro.util.Ordered;
  * Responsible for custom providing custom locators from maven plugin module.
  *
  * @author Alex Objelean
- * @created 6 Oct 2015
  * @since 1.7.10
  */
 public class DefaultLocatorProvider

@@ -43,7 +43,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * Utility class.
  *
  * @author Alex Objelean
- * @created Created on Nov 13, 2008
  */
 public final class WroUtil {
 
@@ -232,8 +231,8 @@ public final class WroUtil {
   }
 
   /**
-   * Transforms a java multi-line string into javascript multi-line string. This technique was found at {@link http
-   * ://stackoverflow.com/questions/805107/multiline-strings-in-javascript/}
+   * Transforms a java multi-line string into javascript multi-line string. This technique was found at
+   * <a href="http://stackoverflow.com/questions/805107/multiline-strings-in-javascript/">http://stackoverflow.com/questions/805107/multiline-strings-in-javascript/</a>
    *
    * @param data
    *          a string containing new lines.
@@ -277,11 +276,11 @@ public final class WroUtil {
   }
 
   /**
-   * A factory method for creating a {@link ResourceProcessor} based on provided {@link ResourcePreProcessor}.
+   * A factory method for creating a {@link ResourcePostProcessor} based on provided {@link ResourcePreProcessor}.
    *
    * @param preProcessor
-   *          {@link ResourcePreProcessor} to use as a {@link ResourceProcessor}.
-   * @return instance of {@link ResourceProcessor}.
+   *          {@link ResourcePreProcessor} to use.
+   * @return instance of {@link ResourcePostProcessor}.
    */
   public static ResourcePostProcessor newResourceProcessor(final Resource resource,
       final ResourcePreProcessor preProcessor) {

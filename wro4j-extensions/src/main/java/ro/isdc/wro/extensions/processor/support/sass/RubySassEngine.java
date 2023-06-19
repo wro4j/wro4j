@@ -24,7 +24,6 @@ import static org.apache.commons.lang3.Validate.notNull;
  * A Sass processor using ruby gems.
  *
  * @author Dmitry Erman
- * @created 12 Feb 2012
  * @since 1.4.4
  */
 public class RubySassEngine {

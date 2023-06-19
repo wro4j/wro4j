@@ -32,7 +32,6 @@ import ro.isdc.wro.util.WroTestUtils;
  *
  * @author Alex Objelean
  * @since 1.3.6
- * @created Created on Mar 26, 2011
  */
 public class TestRhinoCoffeeScriptProcessor {
   private ResourcePreProcessor processor;

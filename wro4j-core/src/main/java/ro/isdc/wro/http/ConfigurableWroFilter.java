@@ -92,7 +92,7 @@ public class ConfigurableWroFilter
   }
 
   /**
-   * The default implementation of ConfigurableWroFilter should allow setting of pre & post processors in configuration
+   * The default implementation of ConfigurableWroFilter should allow setting of pre and post processors in configuration
    * properties. This will work only if no custom {@link WroManagerFactory} is configured.
    */
   @Override

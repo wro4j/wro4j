@@ -11,7 +11,6 @@ import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
  * {@link RuntimeException} which will be handled properly by {@link LifecycleCallbackRegistry}.
  *
  * @author Alex Objelean
- * @created 26 Oct 2011
  * @since 1.4.3
  */
 public interface LifecycleCallback {

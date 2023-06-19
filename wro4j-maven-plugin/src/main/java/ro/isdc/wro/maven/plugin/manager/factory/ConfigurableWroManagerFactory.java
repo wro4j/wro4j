@@ -29,10 +29,9 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**
- * Default implementation which use a property file to read the pre & post processors to be used during processing.
+ * Default implementation which use a property file to read the pre and post processors to be used during processing.
  *
  * @author Alex Objelean
- * @created 2 Aug 2011
  * @since 1.4.0
  */
 public class ConfigurableWroManagerFactory

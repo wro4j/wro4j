@@ -28,7 +28,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test YUI css compressor processor.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
  */
 public class TestYUICssCompressorProcessor {
   private ResourcePreProcessor victim;

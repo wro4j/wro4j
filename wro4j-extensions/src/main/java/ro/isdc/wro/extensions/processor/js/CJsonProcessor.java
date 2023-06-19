@@ -26,11 +26,10 @@ import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
- * A processor using cjson compression algorithm: {@link http://stevehanov.ca/blog/index.php?id=104}.
+ * A processor using <a href="http://stevehanov.ca/blog/index.php?id=104">cjson compression algorithm</a>.
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 7 Jun 2011
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)

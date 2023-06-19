@@ -34,7 +34,6 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 5 Oct 2012
  */
 @SupportedResourceType(ResourceType.CSS)
 public class Less4jProcessor

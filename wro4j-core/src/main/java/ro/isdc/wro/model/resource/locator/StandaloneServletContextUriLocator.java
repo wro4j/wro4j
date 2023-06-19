@@ -24,7 +24,6 @@ import ro.isdc.wro.util.WroUtil;
  * existed initially as an anonymous class, but was extracted since it is complex enough to exist on its own.
  *
  * @author Alex Objelean
- * @created 28 Sep 2013
  * @since 1.7.2
  */
 public final class StandaloneServletContextUriLocator

@@ -23,7 +23,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  * Hides details common to all processors decorators, like ability to identify if a processor is minimize aware
  *
  * @author Alex Objelean
- * @created 11 Apr 2012
  * @since 1.4.6
  */
 public abstract class AbstractProcessorDecoratorSupport<T>

@@ -17,8 +17,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.manager.WroManager;
@@ -462,7 +460,6 @@ public abstract class AbstractWro4jMojo
     return resourceChangeHandler;
   }
 
-  @VisibleForTesting
   void setTaskExecutor(final TaskExecutor<Void> taskExecutor) {
     this.taskExecutor = taskExecutor;
   }
@@ -470,7 +467,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param contextFolder
    *          the servletContextFolder to set
-   * @VisibleForTesting
    */
   String getContextFoldersAsCSV() {
     return contextFolder;
@@ -479,7 +475,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param contextFolders
    *          a CSV representing contextFolders to use.
-   * @VisibleForTesting
    */
   void setContextFolder(final String contextFolder) {
     this.contextFolder = contextFolder;
@@ -488,7 +483,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param wroFile
    *          the wroFile to set
-   * @VisibleForTesting
    */
   void setWroFile(final File wroFile) {
     this.wroFile = wroFile;
@@ -496,7 +490,6 @@ public abstract class AbstractWro4jMojo
 
   /**
    * @return the wroFile
-   * @VisibleForTesting
    */
   File getWroFile() {
     return this.wroFile;
@@ -505,7 +498,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param minimize
    *          flag for minimization.
-   * @VisibleForTesting
    */
   void setMinimize(final boolean minimize) {
     this.minimize = minimize;
@@ -514,7 +506,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param ignoreMissingResourcesAsString
    *          the ignoreMissingResources to set
-   * @VisibleForTesting
    */
   void setIgnoreMissingResources(final String ignoreMissingResourcesAsString) {
     this.ignoreMissingResources = ignoreMissingResourcesAsString;
@@ -524,30 +515,20 @@ public abstract class AbstractWro4jMojo
     setIgnoreMissingResources(Boolean.toString(ignoreMissingResources));
   }
 
-  /**
-   * @VisibleForTesting
-   */
   protected final boolean isParallelProcessing() {
     return parallelProcessing;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   final void setParallelProcessing(final boolean parallelProcessing) {
     this.parallelProcessing = parallelProcessing;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setIncrementalBuildEnabled(final boolean incrementalBuildEnabled) {
     this.incrementalBuildEnabled = incrementalBuildEnabled;
   }
 
   /**
    * @return the minimize
-   * @VisibleForTesting
    */
   boolean isMinimize() {
     return this.minimize;
@@ -555,7 +536,6 @@ public abstract class AbstractWro4jMojo
 
   /**
    * @return the ignoreMissingResources
-   * @VisibleForTesting
    */
   String isIgnoreMissingResources() {
     return this.ignoreMissingResources;
@@ -573,7 +553,6 @@ public abstract class AbstractWro4jMojo
 
   /**
    * @return the targetGroups
-   * @VisibleForTesting
    */
   String getTargetGroups() {
     return this.targetGroups;
@@ -582,7 +561,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param versionEncoder
    *          (targetGroups) comma separated group names.
-   * @VisibleForTesting
    */
   void setTargetGroups(final String targetGroups) {
     this.targetGroups = targetGroups;
@@ -591,7 +569,6 @@ public abstract class AbstractWro4jMojo
   /**
    * @param wroManagerFactory
    *          fully qualified name of the {@link WroManagerFactory} class.
-   * @VisibleForTesting
    */
   void setWroManagerFactory(final String wroManagerFactory) {
     this.wroManagerFactory = wroManagerFactory;
@@ -600,37 +577,25 @@ public abstract class AbstractWro4jMojo
   /**
    * @param extraConfigFile
    *          the extraConfigFile to set
-   * @VisibleForTesting
    */
   void setExtraConfigFile(final File extraConfigFile) {
     this.extraConfigFile = extraConfigFile;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setBuildContext(final BuildContext buildContext) {
     this.buildContext = buildContext;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   BuildContext getBuildContext() {
     return buildContext;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setSkip(final boolean skip) {
     this.skip = skip;
   }
 
   /**
    * Removes any persisted data creating during the build.
-   *
-   * @VisibleForTesting
    */
   void clean() {
     try {

@@ -23,7 +23,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test {@link JsHintProcessor}.
  *
  * @author Alex Objelean
- * @created Created on Feb 27, 2011
  */
 public abstract class AbstractTestLinterProcessor {
   private final ResourcePreProcessor processor = newLinterProcessor();

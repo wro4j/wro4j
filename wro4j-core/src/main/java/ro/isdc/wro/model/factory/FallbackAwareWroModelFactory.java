@@ -17,7 +17,6 @@ import ro.isdc.wro.model.WroModel;
  * instance of model is available.
  *
  * @author Alex Objelean
- * @created 13 Mar 2011
  */
 public class FallbackAwareWroModelFactory extends WroModelFactoryDecorator {
   /**

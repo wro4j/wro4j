@@ -12,7 +12,6 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 22 Sep 2012
  */
 public interface CacheStrategyProvider {
   /**

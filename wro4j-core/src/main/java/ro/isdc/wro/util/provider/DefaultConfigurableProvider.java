@@ -32,7 +32,6 @@ import ro.isdc.wro.util.Ordered;
  * Default implementation of {@link ConfigurableProviderSupport} which contributes with components from core module.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class DefaultConfigurableProvider

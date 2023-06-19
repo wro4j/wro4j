@@ -26,12 +26,10 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @author Ivar Conradi Østhus
- * @created 31 May 2012
  * @since 1.4.7
  */
 public class ModelAsJsonRequestHandler
     extends RequestHandlerSupport {
-  @VisibleForTesting
   static final String CONTENT_TYPE = "application/json";
   /**
    * API - reload cache method call

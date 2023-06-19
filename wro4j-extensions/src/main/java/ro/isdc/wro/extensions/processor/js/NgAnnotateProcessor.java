@@ -34,7 +34,6 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
  *
  * @author Manuel S. (adapted from Janek L.B's NgMinProcessor)
  * @since 1.7.8
- * @created 30 Mar 2015
  */
 @SupportedResourceType(ResourceType.JS)
 public class NgAnnotateProcessor
@@ -70,9 +69,6 @@ public class NgAnnotateProcessor
     process(null, reader, writer);
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void doProcess(final InputStream in, final OutputStream out)
       throws IOException {
     final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();

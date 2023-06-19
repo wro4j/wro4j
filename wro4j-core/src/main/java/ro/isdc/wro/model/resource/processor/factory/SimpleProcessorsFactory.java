@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * adding single processors or a collection of processors.
  *
  * @author Alex Objelean
- * @created 20 Nov 2010
  */
 public class SimpleProcessorsFactory
   implements ProcessorsFactory {

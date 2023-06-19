@@ -12,7 +12,6 @@ import java.io.InputStream;
  * corresponding InputStream.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public interface UriLocator {
   /**

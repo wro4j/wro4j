@@ -16,7 +16,6 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  * Default {@link ProcessorsFactory} which provides most commons processors.
  *
  * @author Alex Objelean
- * @created 15 May 2011
  * @since 1.3.7
  */
 public final class DefaultProcessorsFactory

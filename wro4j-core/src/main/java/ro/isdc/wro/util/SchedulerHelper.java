@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
  * Encapsulates the logic which handles scheduler creation and destroy. This class is thread-safe.
  *
  * @author Alex Objelean
- * @created 14 Oct 2011
  * @since 1.4.2
  */
 public class SchedulerHelper {
@@ -79,7 +78,11 @@ public class SchedulerHelper {
   }
 
   /**
-   * @see SchedulerHelper#create(ObjectFactory, String)
+   * Factory method. Creates a {@link SchedulerHelper} which consumes a factory providing a runnable. This approach
+   * allows lazy runnable initialization.
+   *
+   * @param runnableFactory
+   *          a factory creating the runnable to schedule.
    */
   public static SchedulerHelper create(final LazyInitializer<Runnable> runnableFactory) {
     return new SchedulerHelper(runnableFactory);

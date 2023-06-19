@@ -29,7 +29,6 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
  * A {@link ProcessorsFactory} implementation which is easy to configure using a {@link Properties} object.
  *
  * @author Alex Objelean
- * @created 30 Jul 2011
  * @since 1.4.0
  */
 public class ConfigurableProcessorsFactory
@@ -152,7 +151,7 @@ public class ConfigurableProcessorsFactory
 
 
   /**
-   * @return default implementation of {@link Properties} containing the list of pre & post processors.
+   * @return default implementation of {@link Properties} containing the list of pre and post processors.
    */
   protected Properties newProperties() {
     return new Properties();

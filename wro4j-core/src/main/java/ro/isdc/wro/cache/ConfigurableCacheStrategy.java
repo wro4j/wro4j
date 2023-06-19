@@ -11,7 +11,6 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
  * Uses the {@link CacheStrategy} implementation associated with an alias read from properties file.
  *
  * @author Alex Objelean
- * @created 22 Sep 2012
  * @since 1.5.0
  */
 public class ConfigurableCacheStrategy

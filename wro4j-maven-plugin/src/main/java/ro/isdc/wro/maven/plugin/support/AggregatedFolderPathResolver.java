@@ -14,7 +14,6 @@ import ro.isdc.wro.manager.factory.standalone.StandaloneContext;
  * Encapsulates the details about computation of aggregated folderPath in maven plugin.
  *
  * @author Alex Objelean
- * @created 28 Sep 2013
  * @since 1.7.2
  */
 public class AggregatedFolderPathResolver {

@@ -9,6 +9,9 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.commons.io.output.NullWriter;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.extensions.processor.js.JsHintProcessor;
@@ -26,12 +29,10 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 /**
  * Maven plugin used to validate js scripts defined in wro model using <a href="http://jshint.com/">jsLint</a>.
  *
- * @goal jshint
- * @phase compile
- * @requiresDependencyResolution runtime
  * @author Alex Objelean
  * @since 1.3.5
  */
+@Mojo(name = "jshint", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class JsHintMojo
     extends AbstractLinterMojo<LinterError> {
   /**
@@ -101,9 +102,6 @@ public class JsHintMojo
     return reportFormat;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void setReportFile(final File reportFile) {
     this.reportFile = reportFile;
   }
@@ -111,7 +109,6 @@ public class JsHintMojo
   /**
    * @param reportFormat
    *          the preferred report format.
-   * @VisibleForTesting
    */
   void setReportFormat(final String reportFormat) {
     this.reportFormat = reportFormat;
@@ -119,8 +116,6 @@ public class JsHintMojo
 
   /**
    * Used by unit test to check if mojo doesn't fail.
-   *
-   * @VisibleForTesting
    */
   @Override
   void onException(final Exception e) {

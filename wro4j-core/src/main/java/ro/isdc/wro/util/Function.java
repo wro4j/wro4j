@@ -6,7 +6,6 @@ package ro.isdc.wro.util;
  * 
  * @author Alex Objelean
  * @since 1.4.4
- * @created 12 Jan 2012
  */
 public interface Function<F, T> {
   /**

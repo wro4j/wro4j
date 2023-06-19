@@ -21,12 +21,11 @@ import ro.isdc.wro.util.WroUtil;
  * Removes multi line comments from processed resource.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
  */
 public class MultiLineCommentStripperProcessor
   implements ResourcePreProcessor, ResourcePostProcessor {
   /**
-   * Pattern containing a regex matching multiline comments & empty new lines.
+   * Pattern containing a regex matching multiline comments and empty new lines.
    */
   public static final Pattern PATTERN = Pattern.compile(WroUtil.loadRegexpWithKey("comment.multiline"));
   public static final String ALIAS = "multilineStripper";

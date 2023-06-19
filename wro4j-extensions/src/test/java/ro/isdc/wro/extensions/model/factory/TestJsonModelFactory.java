@@ -33,7 +33,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test {@link JsonModelFactory}
  *
  * @author Alex Objelean
- * @created 13 Mar 2011
  * @since 1.3.6
  */
 public class TestJsonModelFactory {

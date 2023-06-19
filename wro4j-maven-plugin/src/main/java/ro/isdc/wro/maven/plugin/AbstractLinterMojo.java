@@ -20,12 +20,11 @@ import ro.isdc.wro.model.resource.Resource;
 
 
 /**
- * Contains common behavior for mojos responsible for static code analysis, example: csslint, jslint, jshint.
- * <p/>
- * Type <T> indicates the type of lint errors reported by this mojo.
+ * <p>Contains common behavior for mojos responsible for static code analysis, example: csslint, jslint, jshint.</p>
+ *
+ * <p>Type {@code <T>} indicates the type of lint errors reported by this mojo.</p>
  *
  * @author Alex Objelean
- * @created 25 Jan 2013
  * @since 1.6.3
  */
 public abstract class AbstractLinterMojo<T>
@@ -170,8 +169,6 @@ public abstract class AbstractLinterMojo<T>
 
   /**
    * Used by unit test to check if mojo doesn't fail.
-   *
-   * @VisibleForTesting
    */
   void onException(final Exception e) {
   }
@@ -191,7 +188,6 @@ public abstract class AbstractLinterMojo<T>
 
   /**
    * @return the failNever flag.
-   * @VisibleForTesting
    */
   @Override
   public boolean isFailNever() {
@@ -200,15 +196,11 @@ public abstract class AbstractLinterMojo<T>
 
   /**
    * @return the failFast flag.
-   * @VisibleForTesting
    */
   boolean isFailFast() {
     return failFast;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   LintReport<T> getLintReport() {
     return lintReport;
   }

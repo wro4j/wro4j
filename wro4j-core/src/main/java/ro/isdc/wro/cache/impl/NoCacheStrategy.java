@@ -8,7 +8,6 @@ import ro.isdc.wro.cache.CacheStrategy;
  *
  * @author Philippe Da Costa &lt;pdacosta@gmail.com&gt;
  * @since 1.7.9
- * @created 28 Sep 2015
  */
 public class NoCacheStrategy<CacheKey, CacheValue>
     implements CacheStrategy<CacheKey, CacheValue> {

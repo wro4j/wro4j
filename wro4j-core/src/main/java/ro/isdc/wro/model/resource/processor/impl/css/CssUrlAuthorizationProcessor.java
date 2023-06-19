@@ -39,7 +39,6 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * Adapted from {@link CssUrlRewritingProcessor} and {@link AbstractCssUrlRewritingProcessor}
  *
  * @author Greg Pendlebury
- * @created June 10, 2014
  * @since 1.7.6
  */
 public class CssUrlAuthorizationProcessor

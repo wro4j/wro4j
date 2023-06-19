@@ -11,7 +11,6 @@ import java.io.Writer;
  * A processor which is applied after the merge. Examples are: JSCompressor.
  *
  * @author Alex Objelean
- * @created Created on Oct 31, 2008
  */
 public interface ResourcePostProcessor {
   /**
@@ -23,6 +22,7 @@ public interface ResourcePostProcessor {
    *          source stream.
    * @param writer
    *          destination stream.
+   * @throws IOException when the resource cannot be processed.
    */
   void process(final Reader reader, final Writer writer)
       throws IOException;

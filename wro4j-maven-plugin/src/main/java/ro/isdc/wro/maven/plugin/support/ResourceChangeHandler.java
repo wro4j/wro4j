@@ -28,14 +28,11 @@ import ro.isdc.wro.model.resource.processor.impl.css.CssImportPreProcessor;
 import ro.isdc.wro.model.resource.support.hash.HashStrategy;
 import ro.isdc.wro.util.Function;
 
-import com.google.common.annotations.VisibleForTesting;
-
 
 /**
  * Encapsulates the details about resource change detection and persist the change information in build context.
  *
  * @author Alex Objelean
- * @created 2 Oct 2013
  * @since 1.7.2
  */
 public class ResourceChangeHandler {
@@ -216,7 +213,6 @@ public class ResourceChangeHandler {
     return buildContextHolder;
   }
 
-  @VisibleForTesting
   void setBuildContextHolder(final BuildContextHolder buildContextHolder) {
     this.buildContextHolder = buildContextHolder;
   }
@@ -270,8 +266,8 @@ public class ResourceChangeHandler {
    * After invoking this method on a resource, the next invocation of {@link #isResourceChanged(Resource)} will return
    * true.
    *
-   * @param resourceUri
-   *          uri of the resource to clear from persisted storage.
+   * @param resource
+   *          The resource to clear from persisted storage.
    */
   public void forget(final Resource resource) {
     if (resource != null) {

@@ -9,7 +9,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  * The provider interface for {@link WroModelFactory} implementations.
  *
  * @author Alex Objelean
- * @created 4 Apr 2013
  * @since 1.6.3
  */
 public interface ModelFactoryProvider {

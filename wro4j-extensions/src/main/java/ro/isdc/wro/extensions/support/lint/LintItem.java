@@ -9,7 +9,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * Contains fields for a single lint error item.  
  * 
  * @author Alex Objelean
- * @created 17 Sep 2012
  * @since 1.5.0
  */
 @SuppressWarnings("serial")

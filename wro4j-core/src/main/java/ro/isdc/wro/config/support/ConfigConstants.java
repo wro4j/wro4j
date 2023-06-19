@@ -14,7 +14,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
  *
  * @author Alex Objelean
  * @author Paul Podgorsek
- * @created 11 May 2011
  * @since 1.3.7
  */
 public enum ConfigConstants {

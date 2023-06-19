@@ -9,7 +9,6 @@ import ro.isdc.wro.http.handler.RequestHandler;
  * 
  * @author Alex Objelean
  * @since 1.5.0
- * @created 23 Sep 2012
  */
 public interface RequestHandlerProvider {
   /**

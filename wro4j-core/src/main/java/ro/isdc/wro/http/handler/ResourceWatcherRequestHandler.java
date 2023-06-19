@@ -22,7 +22,6 @@ import ro.isdc.wro.model.resource.support.change.ResourceWatcher;
  * which allows only server-side handling.
  *
  * @author Alex Objelean
- * @created 9 Jan 2014
  * @since 1.7.3
  */
 public class ResourceWatcherRequestHandler

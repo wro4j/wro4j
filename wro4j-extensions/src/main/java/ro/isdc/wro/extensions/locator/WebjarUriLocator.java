@@ -16,14 +16,13 @@ import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
 
 /**
- * Locator responsible for locating webjar resources. A webjar resource is a classpath resource respecting a certain
- * standard. <a href="http://www.webjars.org/">Read more</a> about webjars.
- * <p/>
- * This locator uses the following prefix to identify a locator capable of handling webjar resources:
+ * <p>Locator responsible for locating webjar resources. A webjar resource is a classpath resource respecting a certain
+ * standard. <a href="http://www.webjars.org/">Read more</a> about webjars.</p>
+ *
+ * <p>This locator uses the following prefix to identify a locator capable of handling webjar resources:</p>
  * <code>webjar:</code>
  *
  * @author Alex Objelean
- * @created 6 Jan 2013
  * @since 1.6.2
  */
 public class WebjarUriLocator implements UriLocator {
