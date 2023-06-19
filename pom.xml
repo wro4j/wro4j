@@ -87,8 +87,8 @@
 		<closure.version>v20230502</closure.version>
 		<commons-exec.version>1.3</commons-exec.version>
 		<commons-io.version>2.8.0</commons-io.version>
-		<commons-lang.version>3.11</commons-lang.version>
-		<commons-pool.version>2.9.0</commons-pool.version>
+		<commons-lang.version>3.12.0</commons-lang.version>
+		<commons-pool.version>2.11.1</commons-pool.version>
 		<dojo-shrinksafe.version>1.7.2</dojo-shrinksafe.version>
 		<groovy.version>4.0.12</groovy.version>
 		<gson.version>2.8.9</gson.version>
@@ -98,9 +98,9 @@
 		<less4j.version>1.17.2</less4j.version>
 		<maven.version>3.8.6</maven.version>
 		<maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
-		<mockito.version>3.6.0</mockito.version>
-		<jruby.version>9.2.13.0</jruby.version>
-		<junit.version>4.13.1</junit.version>
+		<mockito.version>5.3.1</mockito.version>
+		<jruby.version>9.4.3.0</jruby.version>
+		<junit.version>4.13.2</junit.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<rhino.version>1.7.13</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
