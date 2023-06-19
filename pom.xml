@@ -99,7 +99,7 @@
 		<maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 		<mockito.version>5.3.1</mockito.version>
 		<jruby.version>9.4.3.0</jruby.version>
-		<junit.version>4.13.1</junit.version>
+		<junit.version>4.13.2</junit.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<rhino.version>1.7.13</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
