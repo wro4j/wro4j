@@ -97,7 +97,7 @@
 		<less4j.version>1.17.2</less4j.version>
 		<maven.version>3.6.3</maven.version>
 		<maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
-		<mockito.version>3.6.0</mockito.version>
+		<mockito.version>5.3.1</mockito.version>
 		<jruby.version>9.2.13.0</jruby.version>
 		<junit.version>4.13.1</junit.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>

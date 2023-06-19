@@ -13,6 +13,7 @@ import javax.servlet.ServletContextEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -57,7 +58,7 @@ public class TestWroServletContextListener {
         final Object value = invocation.getArguments()[1];
         return map.put(key, value);
       }
-    }).when(mockServletContext).setAttribute(Mockito.anyString(), Mockito.anyObject());
+    }).when(mockServletContext).setAttribute(Mockito.anyString(), ArgumentMatchers.any());
     Mockito.doAnswer(new Answer<Object>() {
       public Object answer(final InvocationOnMock invocation)
           throws Throwable {
