@@ -11,6 +11,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ro.isdc.wro.extensions.ExternalLibrary;
 import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 import ro.isdc.wro.extensions.processor.support.linter.LinterException;
 import ro.isdc.wro.extensions.script.RhinoScriptBuilder;
@@ -29,7 +30,6 @@ import ro.isdc.wro.util.WroUtil;
  */
 public class CoffeeScript {
   private static final Logger LOG = LoggerFactory.getLogger(CoffeeScript.class);
-  private static final String DEFAULT_COFFE_SCRIPT = "coffee-script.min.js";
   private String[] options;
   private ScriptableObject scope;
   private WebjarUriLocator webjarLocator;
@@ -41,7 +41,7 @@ public class CoffeeScript {
     try {
       RhinoScriptBuilder builder = null;
       if (scope == null) {
-        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), DEFAULT_COFFE_SCRIPT);
+        builder = RhinoScriptBuilder.newChain().evaluateChain(getCoffeeScriptAsStream(), ExternalLibrary.COFFEE_SCRIPT.name());
         scope = builder.getScope();
       } else {
         builder = RhinoScriptBuilder.newChain(scope);
@@ -52,7 +52,6 @@ public class CoffeeScript {
     }
   }
 
-
   /**
    * Override this method to use a different version of CoffeeScript. This method is useful for upgrading coffeeScript
    * processor independently of wro4j.
@@ -60,7 +59,7 @@ public class CoffeeScript {
    * @return The stream of the CoffeeScript.
    */
   protected InputStream getCoffeeScriptAsStream() throws IOException {
-    return getWebjarLocator().locate(WebjarUriLocator.createUri("coffee-script.min.js"));
+    return getWebjarLocator().locate(WebjarUriLocator.createUri(ExternalLibrary.COFFEE_SCRIPT.name()));
   }
 
   /**

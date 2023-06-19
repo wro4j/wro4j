@@ -3,14 +3,13 @@
  */
 package ro.isdc.wro.model.group;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.resource.ResourceType;
 

@@ -6,8 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -18,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.support.ConfigConstants;
 

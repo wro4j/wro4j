@@ -5,10 +5,9 @@ package ro.isdc.wro.http;
 
 import java.util.Properties;
 
-import javax.servlet.FilterConfig;
-
 import org.apache.commons.lang3.BooleanUtils;
 
+import jakarta.servlet.FilterConfig;
 import ro.isdc.wro.config.factory.PropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ConfigConstants;

@@ -6,8 +6,8 @@ package ro.isdc.wro.http.support;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 /**
  * Delegating implementation of {@link javax.servlet.ServletOutputStream}.

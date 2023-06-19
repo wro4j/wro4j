@@ -33,6 +33,7 @@ public class TypeScriptCompiler {
   private ScriptableObject scope;
 
   public String compile(final String typeScript) {
+
     final StopWatch stopWatch = new StopWatch();
     stopWatch.start("initContext");
     final RhinoScriptBuilder builder = initScriptBuilder();
@@ -42,11 +43,11 @@ public class TypeScriptCompiler {
     try {
       final String execute = getCompilationCommand(typeScript);
       final NativeObject compilationResult = (NativeObject) builder.evaluate(execute, "compile");
-      final NativeArray errors = (NativeArray) compilationResult.get(PARAM_ERRORS);
-      if (errors.size() > 0) {
+      final NativeArray errors = (NativeArray) compilationResult.get(PARAM_ERRORS, scope);
+      if (errors.getLength() > 0) {
         throwCompilationError(errors);
       }
-      return compilationResult.get(PARAM_SOURCE).toString();
+      return compilationResult.get(PARAM_SOURCE, scope).toString();
     } finally {
       stopWatch.stop();
       LOG.debug(stopWatch.prettyPrint());
@@ -55,7 +56,7 @@ public class TypeScriptCompiler {
 
   private void throwCompilationError(final NativeArray errors) {
     final StringBuilder sb = new StringBuilder();
-    for (final Object error : errors) {
+    for (final Object error : errors.getAllIds()) {
       sb.append(error.toString()).append("\n");
     }
     LOG.debug("Compilation errors: {}", sb);
@@ -70,7 +71,7 @@ public class TypeScriptCompiler {
    * @return compilation command.
    */
   private String getCompilationCommand(final String input) {
-    return String.format("compilerWrapper.compile(%s, %s)", WroUtil.toJSMultiLineString(input),
+    return String.format("%s %s", WroUtil.toJSMultiLineString(input),
         ecmaScriptVersion);
   }
 

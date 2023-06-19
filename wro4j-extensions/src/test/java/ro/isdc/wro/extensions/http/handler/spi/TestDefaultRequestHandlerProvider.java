@@ -6,8 +6,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -15,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.model.group.processor.Injector;

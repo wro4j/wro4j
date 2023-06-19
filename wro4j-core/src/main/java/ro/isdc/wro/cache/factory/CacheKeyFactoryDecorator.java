@@ -1,10 +1,8 @@
 package ro.isdc.wro.cache.factory;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.util.AbstractDecorator;
-
 
 /**
  * Decorator for {@link CacheKeyFactory} object.

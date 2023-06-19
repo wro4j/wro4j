@@ -2,13 +2,12 @@ package ro.isdc.wro.extensions.http.handler;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.http.handler.RequestHandler;
 import ro.isdc.wro.http.handler.RequestHandlerSupport;

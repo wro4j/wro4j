@@ -7,9 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Properties;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.extensions.processor.css.RhinoLessCssProcessor;

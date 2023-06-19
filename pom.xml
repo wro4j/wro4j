@@ -75,6 +75,7 @@
 
 	<properties>
 		<!-- General properties -->
+		<java.version>9</java.version>
 		<maven.compile.encoding>UTF-8</maven.compile.encoding>
 		<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -83,18 +84,19 @@
 		<!-- Dependencies -->
 		<ant.version>1.10.11</ant.version>
 		<bourbon-gem-jar.version>2.1.0</bourbon-gem-jar.version>
-		<closure.version>v20201102</closure.version>
+		<closure.version>v20230502</closure.version>
 		<commons-exec.version>1.3</commons-exec.version>
 		<commons-io.version>2.8.0</commons-io.version>
 		<commons-lang.version>3.11</commons-lang.version>
 		<commons-pool.version>2.9.0</commons-pool.version>
 		<dojo-shrinksafe.version>1.7.2</dojo-shrinksafe.version>
-		<groovy.version>3.0.7</groovy.version>
+		<groovy.version>4.0.12</groovy.version>
 		<gson.version>2.8.9</gson.version>
 		<guava.version>30.0-android</guava.version>
-		<jsp-api.version>2.3.3</jsp-api.version>
+		<jakarta-jsp-api.version>3.1.1</jakarta-jsp-api.version>
+		<jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
 		<less4j.version>1.17.2</less4j.version>
-		<maven.version>3.6.3</maven.version>
+		<maven.version>3.8.6</maven.version>
 		<maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 		<mockito.version>3.6.0</mockito.version>
 		<jruby.version>9.2.13.0</jruby.version>
@@ -102,9 +104,8 @@
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<rhino.version>1.7.13</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
-		<servlet-api.version>4.0.1</servlet-api.version>
-		<slf4j.version>1.7.30</slf4j.version>
-		<spring.version>5.3.1</spring.version>
+		<slf4j.version>2.0.7</slf4j.version>
+		<spring.version>6.0.10</spring.version>
 		<webjars-coffee-script.version>1.11.0</webjars-coffee-script.version>
 		<webjars-domelementtype.version>2.0.1</webjars-domelementtype.version>
 		<webjars-entities.version>2.1.0</webjars-entities.version>
@@ -117,23 +118,24 @@
 		<webjars-json2.version>20140204</webjars-json2.version>
 		<webjars-less.version>1.3.3</webjars-less.version>
 		<webjars-locator.version>0.40</webjars-locator.version>
+		<webjars-minimatch.version>5.1.6</webjars-minimatch.version>
 
 		<!-- Maven plugins -->
-		<buildnumber-maven-plugin.version>1.4</buildnumber-maven-plugin.version>
-		<error_prone_core.version>2.3.4</error_prone_core.version>
-		<gmavenplus-plugin.version>1.11.0</gmavenplus-plugin.version>
-		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-		<maven-bundle-plugin.version>4.2.1</maven-bundle-plugin.version>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
+		<error_prone_core.version>2.20.0</error_prone_core.version>
+		<gmavenplus-plugin.version>3.0.0</gmavenplus-plugin.version>
+		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 		<maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
-		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-		<maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+		<maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
+		<maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
+		<maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+		<versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -248,15 +250,15 @@
 
 			<!-- Provided by container -->
 			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>${servlet-api.version}</version>
+				<groupId>jakarta.servlet</groupId>
+				<artifactId>jakarta.servlet-api</artifactId>
+				<version>${jakarta-servlet-api.version}</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>javax.servlet.jsp</groupId>
-				<artifactId>javax.servlet.jsp-api</artifactId>
-				<version>${jsp-api.version}</version>
+				<groupId>jakarta.servlet.jsp</groupId>
+				<artifactId>jakarta.servlet.jsp-api</artifactId>
+				<version>${jakarta-jsp-api.version}</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -308,7 +310,7 @@
 				<version>${ant.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.groovy</groupId>
+				<groupId>org.apache.groovy</groupId>
 				<artifactId>groovy</artifactId>
 				<version>${groovy.version}</version>
 			</dependency>
@@ -407,6 +409,11 @@
 				<artifactId>webjars-locator</artifactId>
 				<version>${webjars-locator.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>minimatch</artifactId>
+				<version>${webjars-minimatch.version}</version>
+			</dependency>
 
 			<!-- Unit tests -->
 			<dependency>
@@ -475,8 +482,9 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
-						<source>9</source>
-						<target>9</target>
+						<release>${java.version}</release>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
 						<encoding>UTF-8</encoding>
 						<showWarnings>true</showWarnings>
 						<compilerArgs>
@@ -486,7 +494,6 @@
 								-Xep:AssistedInjectAndInjectOnSameConstructor:WARN
 								-Xep:AutoFactoryAtInject:WARN -Xep:ClassName:WARN
 								-Xep:ComparisonContractViolated:WARN -Xep:DepAnn:WARN
-								-Xep:DivZero:WARN
 								-Xep:EmptyIf:WARN
 								-Xep:FuzzyEqualsShouldNotBeUsedInEqualsMethod:WARN
 								-Xep:InjectInvalidTargetingOnScopingAnnotation:WARN
@@ -496,37 +503,33 @@
 								-Xep:InjectedConstructorAnnotations:WARN
 								-Xep:InsecureCryptoUsage:WARN
 								-Xep:IterablePathParameter:WARN
-								-Xep:JMockTestWithoutRunWithOrRuleAnnotation:WARN
 								-Xep:Java7ApiChecker:WARN
-								-Xep:JavaxInjectOnFinalField:WARN
-								-Xep:LockMethodChecker:WARN -Xep:LongLiteralLowerCaseSuffix:WARN
+								-Xep:LongLiteralLowerCaseSuffix:WARN
 								-Xep:NoAllocation:WARN
 								-Xep:NumericEquality:WARN
-								-Xep:ParameterPackage:WARN
-								-Xep:StaticOrDefaultInterfaceMethod:WARN -Xep:UnlockMethod:WARN
-								-Xep:AnnotateFormatMethod:WARN -Xep:AnnotationPosition:WARN
+								-Xep:StaticOrDefaultInterfaceMethod:WARN
+								-Xep:AnnotateFormatMethod:WARN
+								-Xep:AnnotationPosition:WARN
 								-Xep:AssertFalse:WARN
 								-Xep:AssistedInjectAndInjectOnConstructors:WARN
 								-Xep:BinderIdentityRestoredDangerously:WARN
 								-Xep:BindingToUnqualifiedCommonType:WARN
-								-Xep:ConstructorInvokesOverridable:WARN
-								-Xep:ConstructorLeaksThis:WARN
-								-Xep:EmptyTopLevelDeclaration:WARN -Xep:EqualsBrokenForNull:WARN
+								-Xep:EmptyTopLevelDeclaration:WARN
+								-Xep:EqualsBrokenForNull:WARN
 								-Xep:ExpectedExceptionChecker:WARN
-								-Xep:FunctionalInterfaceClash:WARN -Xep:HardCodedSdCardPath:WARN
-								-Xep:InconsistentOverloads:WARN -Xep:InvalidParam:WARN
+								-Xep:FunctionalInterfaceClash:WARN
+								-Xep:HardCodedSdCardPath:WARN
+								-Xep:InconsistentOverloads:WARN
+								-Xep:InvalidParam:WARN
 								-Xep:InvalidThrows:WARN
 								-Xep:MissingDefault:WARN
 								-Xep:MutableMethodReturnType:WARN
-								-Xep:NoFunctionalReturnType:WARN
 								-Xep:NonCanonicalStaticMemberImport:WARN
-								-Xep:NullableDereference:WARN
 								-Xep:PrimitiveArrayPassedToVarargsMethod:WARN
-								-Xep:ProtosAsKeyOfSetOrMap:WARN -Xep:ProvidesFix:WARN
 								-Xep:QualifierWithTypeUse:WARN -Xep:RedundantThrows:WARN
 								-Xep:ReturnFromVoid:WARN
 								-Xep:StaticQualifiedUsingExpression:WARN
-								-Xep:StringEquality:WARN -Xep:SystemExitOutsideMain:WARN
+								-Xep:SystemExitOutsideMain:WARN
 								-Xep:TestExceptionChecker:WARN
 								-Xep:UnnecessaryDefaultInEnumSwitch:WARN
 								-Xep:UnusedException:WARN
@@ -534,20 +537,20 @@
 								-Xep:ClassNamedLikeTypeParameter:WARN
 								-Xep:ConstantField:WARN
 								-Xep:EmptySetMultibindingContributions:WARN
-								-Xep:ExpectedExceptionRefactoring:WARN -Xep:FieldCanBeFinal:WARN
+								-Xep:FieldCanBeFinal:WARN
 								-Xep:FieldMissingNullable:WARN -Xep:ImmutableRefactoring:WARN
-								-Xep:LambdaFunctionalInterface:WARN -Xep:MethodCanBeStatic:WARN
+								-Xep:LambdaFunctionalInterface:WARN
+								-Xep:MethodCanBeStatic:WARN
 								-Xep:MixedArrayDimensions:WARN
 								-Xep:MultiVariableDeclaration:WARN
 								-Xep:MultipleTopLevelClasses:WARN
 								-Xep:MultipleUnaryOperatorsInMethodCall:WARN
-								-Xep:PackageLocation:WARN -Xep:ParameterComment:WARN
-								-Xep:ParameterNotNullable:WARN
+								-Xep:PackageLocation:WARN
+								-Xep:ParameterComment:WARN
 								-Xep:PrivateConstructorForNoninstantiableModule:WARN
 								-Xep:PrivateConstructorForUtilityClass:WARN
 								-Xep:RemoveUnusedImports:WARN -Xep:ReturnMissingNullable:WARN
 								-Xep:ScopeOnModule:WARN -Xep:SwitchDefault:WARN
-								-Xep:TestExceptionRefactoring:WARN
 								-Xep:ThrowsUncheckedException:WARN -Xep:TryFailRefactoring:WARN
 								-Xep:TypeParameterNaming:WARN
 								-Xep:UngroupedOverloads:WARN
@@ -647,8 +650,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>9</source>
-					<target>9</target>
+					<release>${java.version}</release>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -730,7 +734,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx2048m -XX:MaxPermSize=512m</argLine>
+					<argLine>-Xmx2048m</argLine>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -4,8 +4,6 @@
  */
 package ro.isdc.wro.config.factory;
 
-import javax.servlet.FilterConfig;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.servlet.FilterConfig;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.config.support.DeploymentMode;

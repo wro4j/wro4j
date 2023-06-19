@@ -8,12 +8,11 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.util.Properties;
 
-import javax.servlet.FilterConfig;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.FilterConfig;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.config.support.DeploymentMode;

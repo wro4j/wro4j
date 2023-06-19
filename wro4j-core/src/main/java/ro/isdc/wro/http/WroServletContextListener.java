@@ -2,13 +2,12 @@ package ro.isdc.wro.http;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import ro.isdc.wro.config.factory.ServletContextPropertyWroConfigurationFactory;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;

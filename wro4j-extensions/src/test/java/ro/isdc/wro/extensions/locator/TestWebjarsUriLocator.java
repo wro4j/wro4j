@@ -14,79 +14,77 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ro.isdc.wro.config.Context;
+import ro.isdc.wro.extensions.ExternalLibrary;
 import ro.isdc.wro.model.resource.locator.UriLocator;
-
 
 /**
  * @author Alex Objelean
  */
 public class TestWebjarsUriLocator {
-  private UriLocator victim;
 
-  @BeforeClass
-  public static void onBeforeClass() {
-    assertEquals(0, Context.countActive());
-  }
+	private UriLocator victim;
 
-  @AfterClass
-  public static void onAfterClass() {
-    assertEquals(0, Context.countActive());
-  }
+	@BeforeClass
+	public static void onBeforeClass() {
+		assertEquals(0, Context.countActive());
+	}
 
-  @Before
-  public void setUp() {
-    victim = new WebjarsUriLocator();
-  }
+	@AfterClass
+	public static void onAfterClass() {
+		assertEquals(0, Context.countActive());
+	}
 
-  @Test
-  public void shouldCreateValidUri() {
-    assertEquals("webjars:/path/to/resource.js", WebjarsUriLocator.createUri("/path/to/resource.js"));
-  }
+	@Before
+	public void setUp() {
+		victim = new WebjarsUriLocator();
+	}
 
-  @Test(expected = NullPointerException.class)
-  public void cannotCreateValidUriFromNullArgument() {
-    WebjarUriLocator.createUri(null);
-  }
+	@Test
+	public void shouldCreateValidUri() {
+		assertEquals("webjars:/path/to/resource.js", WebjarsUriLocator.createUri("/path/to/resource.js"));
+	}
 
-  @Test
-  public void shouldAcceptKnownUri() {
-    assertTrue(victim.accept(WebjarsUriLocator.createUri("/path/to/resource.js")));
-  }
+	@Test(expected = NullPointerException.class)
+	public void cannotCreateValidUriFromNullArgument() {
+		WebjarUriLocator.createUri(null);
+	}
 
-  @Test
-  public void shouldNotAcceptUnknown() {
-    assertFalse(victim.accept("http://www.server.com/path/to/resource.js"));
-  }
+	@Test
+	public void shouldAcceptKnownUri() {
+		assertTrue(victim.accept(WebjarsUriLocator.createUri("/path/to/resource.js")));
+	}
 
-  @Test
-  public void shouldFindValidWebjar()
-      throws Exception {
-    assertNotEmpty(victim.locate("webjars:jquery.js"));
-    assertNotEmpty(victim.locate("webjars:jquery/3.5.1/jquery.js"));
-    assertNotEmpty(victim.locate("webjars:/jquery/3.5.1/jquery.js"));
-  }
+	@Test
+	public void shouldNotAcceptUnknown() {
+		assertFalse(victim.accept("http://www.server.com/path/to/resource.js"));
+	}
 
-  @Test(expected = IOException.class)
-  public void cannotFindInvalidWebjar()
-      throws Exception {
-    victim.locate("webjars:invalid.js");
-  }
+	@Test
+	public void shouldFindValidWebjar() throws Exception {
+		assertNotEmpty(victim.locate("webjars:jquery.js"));
+		assertNotEmpty(victim.locate("webjars:jquery/" + ExternalLibrary.JQUERY.version() + "/jquery.js"));
+		assertNotEmpty(victim.locate("webjars:/jquery/" + ExternalLibrary.JQUERY.version() + "/jquery.js"));
+	}
 
-  @Test
-  public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar()
-      throws IOException {
-    assertNotEmpty(victim.locate("webjars:webjarFail.js"));
-  }
+	@Test(expected = IOException.class)
+	public void cannotFindInvalidWebjar() throws Exception {
+		victim.locate("webjars:invalid.js");
+	}
 
-  private void assertNotEmpty(final InputStream stream)
-      throws IOException {
-    IOUtils.read(stream, new byte[] {});
-    stream.close();
-  }
+	@Test
+	public void shouldNotFailWhenThereIsAWebjarResourceOutsideOfJar() throws IOException {
+		assertNotEmpty(victim.locate("webjars:webjarFail.js"));
+	}
 
-  @Test
-  public void shouldLocateWebjarResourceContainingQuestionMarkInUri()
-      throws Exception {
-    victim.locate("webjars:font-awesome/5.15.1/webfonts/fa-regular-400.woff?v=5.15.1");
-  }
+	private void assertNotEmpty(final InputStream stream) throws IOException {
+		IOUtils.read(stream, new byte[] {});
+		stream.close();
+	}
+
+	@Test
+	public void shouldLocateWebjarResourceContainingQuestionMarkInUri() throws Exception {
+		victim.locate("webjars:font-awesome/" + ExternalLibrary.FONT_AWESOME.version() + "/webfonts/fa-regular-400.woff?v="
+				+ ExternalLibrary.FONT_AWESOME.version());
+	}
+
 }

@@ -7,12 +7,11 @@ package ro.isdc.wro.config.factory;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.util.ObjectFactory;
 
