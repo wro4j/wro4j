@@ -75,7 +75,7 @@
 
 	<properties>
 		<!-- General properties -->
-		<java.version>9</java.version>
+		<java.version>17</java.version>
 		<maven.compile.encoding>UTF-8</maven.compile.encoding>
 		<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
