@@ -1,12 +1,11 @@
 package ro.isdc.wro.http.support;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;
 import ro.isdc.wro.http.WroServletContextListener;

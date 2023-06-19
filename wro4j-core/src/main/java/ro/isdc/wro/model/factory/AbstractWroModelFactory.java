@@ -6,8 +6,7 @@ package ro.isdc.wro.model.factory;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletContext;
-
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.model.group.Inject;

@@ -107,7 +107,7 @@ public class GoogleClosureCompressorProcessor
     try (reader; writer) {
       final String fileName = resource == null ? "wro4j-processed-file.js" : resource.getUri();
       final SourceFile[] input = new SourceFile[] {
-        SourceFile.fromInputStream(fileName, new ByteArrayInputStream(content.getBytes(getEncoding())))
+        SourceFile.builder().withPath(fileName).withContent(new ByteArrayInputStream(content.getBytes(getEncoding()))).build()
       };
       SourceFile[] externs = getExterns(resource);
       if (externs == null) {

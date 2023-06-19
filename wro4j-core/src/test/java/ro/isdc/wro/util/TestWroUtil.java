@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.config.Context;
 
 

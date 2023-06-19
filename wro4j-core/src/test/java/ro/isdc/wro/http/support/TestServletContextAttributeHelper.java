@@ -2,9 +2,6 @@ package ro.isdc.wro.http.support;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.WroFilter;

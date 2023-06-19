@@ -7,17 +7,17 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.manager.factory.BaseWroManagerFactory;
 import ro.isdc.wro.manager.factory.DefaultWroManagerFactory;
@@ -57,7 +57,7 @@ public class TestWroServletContextListener {
         final Object value = invocation.getArguments()[1];
         return map.put(key, value);
       }
-    }).when(mockServletContext).setAttribute(Mockito.anyString(), Mockito.anyObject());
+    }).when(mockServletContext).setAttribute(Mockito.anyString(), ArgumentMatchers.any());
     Mockito.doAnswer(new Answer<Object>() {
       public Object answer(final InvocationOnMock invocation)
           throws Throwable {

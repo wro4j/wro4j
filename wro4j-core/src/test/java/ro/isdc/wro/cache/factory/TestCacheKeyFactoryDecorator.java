@@ -4,11 +4,11 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**

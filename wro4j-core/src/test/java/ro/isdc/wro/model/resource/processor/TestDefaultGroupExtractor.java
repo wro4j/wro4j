@@ -5,8 +5,6 @@ package ro.isdc.wro.model.resource.processor;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.model.group.DefaultGroupExtractor;
 import ro.isdc.wro.model.resource.ResourceType;

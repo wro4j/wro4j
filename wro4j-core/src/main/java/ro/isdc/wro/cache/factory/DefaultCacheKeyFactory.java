@@ -2,8 +2,7 @@ package ro.isdc.wro.cache.factory;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.config.ReadOnlyContext;
 import ro.isdc.wro.config.jmx.WroConfiguration;

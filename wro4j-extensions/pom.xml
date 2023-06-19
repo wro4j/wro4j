@@ -29,8 +29,8 @@
 			<artifactId>rhino</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
 		</dependency>
 
 		<!-- Other Dependencies -->
@@ -75,7 +75,7 @@
 			<artifactId>commons-pool2</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy</artifactId>
 		</dependency>
 		<dependency>
@@ -145,6 +145,10 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>less</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>minimatch</artifactId>
 		</dependency>
 
 		<!-- This dependency has provided scope to allow WroTestUtils use Assert -->

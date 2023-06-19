@@ -6,12 +6,11 @@ package ro.isdc.wro.manager.factory;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.FilterConfig;
-
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.FilterConfig;
 import ro.isdc.wro.cache.CacheKey;
 import ro.isdc.wro.cache.CacheStrategy;
 import ro.isdc.wro.cache.CacheValue;

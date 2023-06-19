@@ -8,10 +8,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.StringWriter;
 import java.util.concurrent.Callable;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,6 +16,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import ro.isdc.wro.WroRuntimeException;
 import ro.isdc.wro.config.Context;
 import ro.isdc.wro.http.support.DelegatingServletOutputStream;
