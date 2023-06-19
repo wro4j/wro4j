@@ -27,6 +27,8 @@ import ro.isdc.wro.util.StopWatch;
  * @author Alex Objelean
  */
 public class TestTaskExecutor {
+
+  private static final int DEFAULT_DELAY = 200;
   private static final Logger LOG = LoggerFactory.getLogger(TestTaskExecutor.class);
 
   private TaskExecutor<Void> victim;
@@ -73,7 +75,7 @@ public class TestTaskExecutor {
   public void shouldHaveMinimalOverheadWhenRunningASingleTask()
       throws Exception {
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
-    final long delay = 100;
+    final long delay = DEFAULT_DELAY;
     callables.add(createSlowCallable(delay));
 
     final long start = System.currentTimeMillis();
@@ -91,7 +93,7 @@ public class TestTaskExecutor {
   public void shouldBeFasterWhenRunningMultipleSlowTasks()
       throws Exception {
     final Collection<Callable<Void>> callables = new ArrayList<Callable<Void>>();
-    final long delay = 100;
+    final long delay = DEFAULT_DELAY;
     final int times = 10;
     for (int i = 0; i < times; i++) {
       callables.add(createSlowCallable(delay));
