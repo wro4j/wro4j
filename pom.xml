@@ -111,7 +111,7 @@
 		<webjars-entities.version>2.1.0</webjars-entities.version>
 		<webjars-envjs.version>1.2</webjars-envjs.version>
 		<webjars-font-awesome.version>5.15.1</webjars-font-awesome.version>
-		<webjars-handlebars.version>4.7.6</webjars-handlebars.version>
+		<webjars-handlebars.version>4.7.7</webjars-handlebars.version>
 		<webjars-jquery.version>3.5.1</webjars-jquery.version>
 		<webjars-jshint.version>2.11.0</webjars-jshint.version>
 		<webjars-jslint.version>20140708-394bf29</webjars-jslint.version>
