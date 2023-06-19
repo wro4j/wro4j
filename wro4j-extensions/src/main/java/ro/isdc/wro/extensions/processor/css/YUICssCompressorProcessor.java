@@ -24,7 +24,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  * YUICssCompressorProcessor. Use YUI css compression utility for processing a css resource.
  *
  * @author Alex Objelean
- * @created Created on Dec 4, 2008
  */
 @Minimize
 @SupportedResourceType(ResourceType.CSS)

@@ -19,7 +19,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  *
  * @author Alex Objelean
  * @since 1.7.0
- * @created 17 Apr 2013
  */
 public class ChainedProcessor
     implements ResourcePreProcessor {

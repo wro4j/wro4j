@@ -17,8 +17,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the sass.js version <code>0.5.0</code> project:
- * {@link https://github.com/visionmedia/sass.js}.
+ * The underlying implementation use <a href="https://github.com/visionmedia/sass.js">the sass.js project</a> version <code>0.5.0</code>.
  *
  * @author Alex Objelean
  */

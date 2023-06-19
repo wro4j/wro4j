@@ -11,7 +11,6 @@ import ro.isdc.wro.util.WroUtil;
  * should work also with browsers which do not support dataURI's.
  *
  * @author Alex Objelean
- * @created 20 Feb 2013
  * @since 1.6.3
  */
 public class FallbackCssDataUriUrlInspector extends CssUrlInspector {

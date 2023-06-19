@@ -10,7 +10,6 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
  *
  * @author Eivind Barstad Waaler
  * @since 1.4.7
- * @created 10 May 2012
  */
 public class HoganJs
     extends AbstractJsTemplateCompiler {

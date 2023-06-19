@@ -10,7 +10,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * implemented by a class which already implements {@link ObjectFactory}.
  *
  * @author Alex Objelean
- * @date 22 Aug 2013
  * @since 1.7.1
  */
 public interface PropertiesFactory {

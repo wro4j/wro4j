@@ -10,12 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * Handler interface for components that process HTTP request. Typically implemented to provide api functionality for
  * the WroFilter. Handlers are applied before the processing in the WroFilter, and only one handler can be applied. If
  * one handler is applied, other handlers are skipped and processing is not performed.
- * <p/>
+ *
  * It is recommended to accept requests for the uri's containing the following path:
  * {@link RequestHandlerSupport#PATH_API}.
  * 
  * @author Ivar Conradi Østhus
- * @created 19 May 2012
  * @since 1.4.7
  */
 public interface RequestHandler {

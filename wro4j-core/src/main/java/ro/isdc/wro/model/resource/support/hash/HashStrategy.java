@@ -13,7 +13,6 @@ import java.io.InputStream;
  *
  * @author Alex Objelean
  * @since 1.4.7
- * @created 17 Jun 2012
  */
 public interface HashStrategy {
   /**

@@ -18,7 +18,6 @@ import ro.isdc.wro.model.resource.ResourceType;
  * Default implementation capable of extracting a single group from the request.
  *
  * @author Alex Objelean
- * @created Created on Nov 3, 2008
  */
 public class DefaultGroupExtractor
   implements GroupExtractor {
@@ -46,7 +45,7 @@ public class DefaultGroupExtractor
   }
 
   /**
-   * Extracts the resource type, by parsing the uri & finds the extension. If extension is valid ('css' or 'js'),
+   * Extracts the resource type, by parsing the uri and finds the extension. If extension is valid ('css' or 'js'),
    * returns corresponding ResourceType, otherwise throws exception.
    * <p>
    * Valid examples of uri are: <code>/context/somePath/test.js</code> or <code>/context/somePath/test.css</code>

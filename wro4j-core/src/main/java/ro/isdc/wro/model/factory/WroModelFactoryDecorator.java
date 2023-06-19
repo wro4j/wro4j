@@ -11,7 +11,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  * Decorates a {@link WroModelFactory}.
  *
  * @author Alex Objelean
- * @created 13 Mar 2011
  */
 public class WroModelFactoryDecorator extends AbstractDecorator<WroModelFactory>
     implements WroModelFactory {

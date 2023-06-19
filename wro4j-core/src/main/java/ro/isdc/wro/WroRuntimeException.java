@@ -13,7 +13,6 @@ import ro.isdc.wro.model.resource.Resource;
  * Base Wro Runtime exception. All exceptions will extend this runtime exception.
  *
  * @author Alex Objelean
- * @created Created on Nov 3, 2008
  */
 public class WroRuntimeException
     extends RuntimeException {
@@ -70,8 +69,8 @@ public class WroRuntimeException
   }
 
   /**
-   * @param resourceUri
-   *          The name of the resource being processed when exception occurs.
+   * @param resource
+   *          The resource being processed when exception occurs.
    */
   public WroRuntimeException setResource(final Resource resource) {
     this.resource = resource;

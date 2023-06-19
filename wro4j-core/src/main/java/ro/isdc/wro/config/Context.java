@@ -72,9 +72,9 @@ public class Context
 
 
   /**
-   * DO NOT CALL THIS METHOD UNLESS YOU ARE SURE WHAT YOU ARE DOING.
-   * <p/>
-   * sets the {@link WroConfiguration} singleton instance.
+   * <p>DO NOT CALL THIS METHOD UNLESS YOU ARE SURE WHAT YOU ARE DOING.</p>
+   *
+   * <p>Sets the {@link WroConfiguration} singleton instance.</p>
    */
   public void setConfig(final WroConfiguration config) {
     notNull(config);
@@ -184,11 +184,11 @@ public class Context
   }
 
   /**
-   * Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
-   * with the correlationId. In order to remove context, call {@link Context#unset()}.
-   * <p/>
-   * Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
-   * parent thread. This simulates the {@link InheritableThreadLocal} functionality.
+   * <p>Remove the correlationId from the current thread. This operation will not remove the {@link Context} associated
+   * with the correlationId. In order to remove context, call {@link Context#unset()}.</p>
+   *
+   * <p>Unsetting correlationId is useful when you create child threads which needs to access the correlationId from the
+   * parent thread. This simulates the {@link InheritableThreadLocal} functionality.</p>
    */
   public static void unsetCorrelationId() {
     CORRELATION_ID.remove();

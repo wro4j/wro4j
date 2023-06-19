@@ -27,7 +27,6 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
  * uriLocators.
  *
  * @author Alex Objelean
- * @created Created on Nov 10, 2008
  */
 public class UrlUriLocator extends WildcardUriLocatorSupport {
   /**
@@ -97,8 +96,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
   }
 
   /**
-   * The read & connect timeout value (in milliseconds) used to limit wait period to a reasonable value. By default
-   * {@value WroConfiguration#DEFAULT_CONNECTION_TIMEOUT} ms is used.
+   * The read and connect timeout value (in milliseconds) used to limit wait period to a reasonable value.
    */
   public void setTimeout(int timeout) {
     this.timeout = timeout;

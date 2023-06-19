@@ -10,11 +10,10 @@ import ro.isdc.wro.extensions.locator.WebjarUriLocator;
 
 
 /**
- * Apply JsHint script checking utility.
- * <p/>
- * Using untagged version (committed: 2012-11-13 05:25:37). <br/>
- * The jshint script was slightly modified, by removing the part where the arguments are processed, since it is not
- * used.
+ * <p>Apply JsHint script checking utility.</p>
+ *
+ * <p>Using untagged version (committed: 2012-11-13 05:25:37). The jshint script was slightly modified, by removing the part where the arguments are processed, since it is not
+ * used.</p>
  *
  * @author Alex Objelean
  * @since 1.3.5

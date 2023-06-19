@@ -29,7 +29,6 @@ import ro.isdc.wro.util.WroUtil;
  * A filter responsible for gzipping all content served through this filter.
  *
  * @author Alex Objelean
- * @created 11 Apr 2013
  * @since 1.7.0
  */
 public class GzipFilter

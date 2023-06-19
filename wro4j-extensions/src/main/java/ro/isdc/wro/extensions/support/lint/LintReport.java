@@ -10,10 +10,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Encapsulates information about lint errors associated with a collection of resources. This class is generic, the type
- * <T> describe the type of lint errors.
+ * {@code <T>} describe the type of lint errors.
  *
  * @author Alex Objelean
- * @created 16 Sep 2012
  * @since 1.5.0
  */
 public final class LintReport<T> {

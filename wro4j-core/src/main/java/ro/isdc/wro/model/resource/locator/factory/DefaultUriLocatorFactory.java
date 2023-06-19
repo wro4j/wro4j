@@ -18,7 +18,6 @@ import ro.isdc.wro.util.provider.ProviderFinder;
  * the resulted list won't remove duplicates.
  *
  * @author Alex Objelean
- * @created 15 May 2011
  * @since 1.3.7
  */
 public final class DefaultUriLocatorFactory extends SimpleUriLocatorFactory {

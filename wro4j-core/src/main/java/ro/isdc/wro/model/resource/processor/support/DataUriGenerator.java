@@ -20,13 +20,12 @@ import ro.isdc.wro.util.Base64;
  * 
  * @author Alex Objelean
  * @author Ivar Conradi Østhus
- * @created May 7, 2010
  */
 public class DataUriGenerator {
   private static final String DATA_URI_PREFIX = "data:";
   
   /**
-   * Generate the dataUri as string associated to the passed InputStream with encoding & type based on provided
+   * Generate the dataUri as string associated to the passed InputStream with encoding and type based on provided
    * fileName.
    */
   public String generateDataURI(final InputStream inputStream, final String fileName)

@@ -21,7 +21,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @since 1.6.3
- * @created 18 Jan 2013
  */
 public class TypeScriptCompiler {
   private static final String PARAM_ERRORS = "errors";

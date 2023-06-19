@@ -17,7 +17,6 @@ import ro.isdc.wro.util.provider.ProviderFinder;
  * {@link RequestHandlerProvider} found in classpath.
  *
  * @author Ivar Conradi Østhus
- * @created 19 May 2012
  * @since 1.4.7
  */
 public class DefaultRequestHandlerFactory

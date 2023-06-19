@@ -12,7 +12,6 @@ import ro.isdc.wro.model.spi.ModelFactoryProvider;
 
 /**
  * @author Alex Objelean
- * @created 4 Jan 2013
  * @since 1.6.3
  */
 public class ConfigurableModelFactory

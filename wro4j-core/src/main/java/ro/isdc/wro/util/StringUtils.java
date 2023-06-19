@@ -12,10 +12,9 @@ import java.util.List;
 
 /**
  * StringUtils Utility class. This class contains Utility methods for
- * manipulating strings. Inspired from commons & spring.
+ * manipulating strings. Inspired from commons and Spring.
  *
  * @author Alex Objelean
- * @created Created on Feb 27, 2009
  */
 public final class StringUtils {
   /**

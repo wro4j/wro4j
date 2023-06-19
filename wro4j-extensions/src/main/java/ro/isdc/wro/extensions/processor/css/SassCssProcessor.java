@@ -28,7 +28,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * A processor using sass engine:
  *
  * @author Alex Objelean
- * @created 27 Oct 2010
  */
 @SupportedResourceType(ResourceType.CSS)
 public class SassCssProcessor
@@ -89,9 +88,6 @@ public class SassCssProcessor
 
   /**
    * Method for processing with Rhino based engine
-   *
-   * @param content
-   * @return
    */
   protected SassCss newEngine() {
     return new SassCss();

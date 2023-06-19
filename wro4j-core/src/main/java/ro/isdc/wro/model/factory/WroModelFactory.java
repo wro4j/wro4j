@@ -11,7 +11,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * Creates a {@link WroModel} object. The concrete implementation must synchronize the instantiation of the model.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public interface WroModelFactory extends ObjectFactory<WroModel> {
   /**

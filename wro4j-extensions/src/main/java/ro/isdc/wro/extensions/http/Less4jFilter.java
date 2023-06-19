@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  *
  * @author Alex Objelean
  * @since 1.7.4
- * @created 20 Mar 2014
  */
 public class Less4jFilter
     extends AbstractProcessorsFilter {

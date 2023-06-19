@@ -37,7 +37,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test less css processor.
  *
  * @author Alex Objelean
- * @created Created on Apr 21, 2010
  */
 public class TestRhinoLessCssProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(TestRhinoLessCssProcessor.class);

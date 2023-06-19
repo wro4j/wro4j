@@ -21,7 +21,6 @@ import ro.isdc.wro.model.resource.support.hash.HashStrategy;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 14 Oct 2012
  */
 public class ResourceChangeDetector {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceChangeDetector.class);

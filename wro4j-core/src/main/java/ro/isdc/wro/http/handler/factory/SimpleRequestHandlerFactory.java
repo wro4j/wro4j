@@ -12,7 +12,6 @@ import ro.isdc.wro.http.handler.RequestHandler;
  * A {@link RequestHandlerFactory} which holds {@link RequestHandler}'s in a list.
  *
  * @author Alex Objelean
- * @created 25 May 2012
  * @since 1.4.7
  */
 public class SimpleRequestHandlerFactory

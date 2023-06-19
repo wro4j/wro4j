@@ -27,7 +27,6 @@ import com.google.gson.reflect.TypeToken;
  * Encapsulates common code for utilities like jsHint or jsLint.
  *
  * @author Alex Objelean
- * @created 19 Sept 2011
  * @since 1.4.2
  */
 public abstract class AbstractLinter {

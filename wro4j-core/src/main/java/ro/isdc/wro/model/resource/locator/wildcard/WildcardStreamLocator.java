@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.Resource;
  * Defines the way resources containing wildcard characters are located.
  *
  * @author Alex Objelean
- * @created 8 May, 2010
  */
 public interface WildcardStreamLocator {
   /**

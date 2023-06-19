@@ -12,14 +12,12 @@ import org.apache.commons.lang3.Validate;
 import ro.isdc.wro.cache.CacheStrategy;
 
 /**
- * Default CacheStrategy implementation using a {@link Map} to store values
- * in memory.
- * <p>
- * Memory caches are thread-safe in all operations.
- * </p>
+ * <p>Default CacheStrategy implementation using a {@link Map} to store values
+ * in memory.</p>
+ *
+ * <p>Memory caches are thread-safe in all operations.</p>
  *
  * @author Alex Objelean
- * @created Created on Nov 18, 2008
  */
 public class MemoryCacheStrategy<K, V> implements CacheStrategy<K, V> {
   /**

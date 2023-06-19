@@ -20,7 +20,6 @@ import org.sonatype.plexus.build.incremental.BuildContext;
  * not available - the alternate storage (a properties file stored in the file system) is used.
  *
  * @author Alex Objelean
- * @created 1 Sep 2013
  * @since 1.7.1
  */
 public class BuildContextHolder {
@@ -76,15 +75,11 @@ public class BuildContextHolder {
     }
   }
 
-  /**
-   * @VisibleForTesting
-   */
   File newFallbackStorageFile(final File rootFolder) {
     return new File(rootFolder, FALLBACK_STORAGE_FILE_NAME);
   }
 
   /**
-   * @VisibleForTesting
    * @return the File where the fallback storage is persisted.
    */
   File getFallbackStorageFile() {

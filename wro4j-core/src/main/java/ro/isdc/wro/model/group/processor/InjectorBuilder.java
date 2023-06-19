@@ -45,7 +45,6 @@ import ro.isdc.wro.util.ProxyFactory.TypedObjectFactory;
  *
  * @author Alex Objelean
  * @since 1.4.3
- * @created 6 Jan 2012
  */
 public class InjectorBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(InjectorBuilder.class);
@@ -65,8 +64,6 @@ public class InjectorBuilder {
 
   /**
    * Use factory method {@link InjectorBuilder#create(WroManagerFactory)} instead.
-   *
-   * @VisibleForTesting
    */
   public InjectorBuilder() {
 	  super();
@@ -296,18 +293,12 @@ public class InjectorBuilder {
     };
   }
 
-  /**
-   * @VisibleForTesting
-   */
   public InjectorBuilder setResourceWatcher(final ResourceWatcher resourceWatcher) {
     notNull(resourceWatcher);
     this.resourceWatcher = resourceWatcher;
     return this;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   public InjectorBuilder setDispatcherLocator(final DispatcherStreamLocator dispatcherLocator) {
     notNull(dispatcherLocator);
     this.dispatcherLocator = dispatcherLocator;

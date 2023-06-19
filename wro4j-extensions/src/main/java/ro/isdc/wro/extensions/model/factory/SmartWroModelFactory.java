@@ -34,7 +34,6 @@ import ro.isdc.wro.util.WroUtil;
  * When used, this factory will make it possible to migrate easily from xml to groovy (or json) DSL seamlessly.
  *
  * @author Alex Objelean
- * @created 6 Aug 2011
  * @since 1.4.0
  */
 public class SmartWroModelFactory

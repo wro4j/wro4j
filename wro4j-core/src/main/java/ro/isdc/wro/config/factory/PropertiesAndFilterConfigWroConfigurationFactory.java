@@ -20,7 +20,6 @@ import ro.isdc.wro.config.jmx.WroConfiguration;
  * file).
  *
  * @author Alex Objelean
- * @created 17 Jun 2011
  * @since 1.3.8
  */
 public class PropertiesAndFilterConfigWroConfigurationFactory

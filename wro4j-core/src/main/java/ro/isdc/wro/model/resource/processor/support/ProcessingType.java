@@ -5,7 +5,6 @@ package ro.isdc.wro.model.resource.processor.support;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 16 Oct 2012
  */
 public enum ProcessingType {
   /**

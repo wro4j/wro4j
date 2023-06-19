@@ -11,7 +11,6 @@ import org.apache.commons.io.FilenameUtils;
  *
  * @author Alex Objelean
  * @since 1.4.4
- * @created 4 Feb 2012
  */
 public final class WildcardContext {
   private String uri;

@@ -30,7 +30,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Alex Objelean
  * @since 1.6.3
- * @created 21 Jan 2013
  */
 @SupportedResourceType(ResourceType.JS)
 public class RhinoTypeScriptProcessor

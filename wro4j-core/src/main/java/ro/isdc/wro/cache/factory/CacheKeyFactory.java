@@ -8,7 +8,6 @@ import ro.isdc.wro.cache.CacheKey;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 19 Oct 2012
  */
 public interface CacheKeyFactory {
   /**

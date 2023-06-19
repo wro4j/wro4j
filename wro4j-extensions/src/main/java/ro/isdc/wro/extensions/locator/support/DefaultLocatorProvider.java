@@ -14,7 +14,6 @@ import ro.isdc.wro.util.Ordered;
  * {@link UriLocator} implementations from core module.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class DefaultLocatorProvider

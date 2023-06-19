@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
  *
  * @author Alex Objelean
  * @since 1.4.5
- * @created 22 Mar 2012
  */
 public class CoffeeScriptFilter
     extends AbstractProcessorsFilter {

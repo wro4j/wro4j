@@ -12,7 +12,6 @@ import java.io.InputStream;
  * An input stream which allows to be read multiple times. The only condition is to call reset or close method after reading it.
  *
  * @author Alex Objelean
- * @created 18 Aug 2010
  */
 public class UnclosableBufferedInputStream
     extends BufferedInputStream {

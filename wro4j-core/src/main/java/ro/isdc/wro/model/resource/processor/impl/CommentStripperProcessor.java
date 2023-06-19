@@ -17,10 +17,9 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * CommentStripperProcessor. Removes both type of comments. It uses both: multi line & single line comment strippers.
+ * CommentStripperProcessor. Removes both type of comments. It uses both: multi line and single line comment strippers.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
  */
 public class CommentStripperProcessor
     implements ResourcePreProcessor, ResourcePostProcessor {

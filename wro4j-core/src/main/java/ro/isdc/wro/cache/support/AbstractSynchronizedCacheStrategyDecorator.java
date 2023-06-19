@@ -19,7 +19,6 @@ import ro.isdc.wro.cache.CacheStrategy;
  * which cause high memory and CPU consumption.
  *
  * @author Alex Objelean
- * @created 30 Apr 2012
  * @since 1.4.6
  */
 public abstract class AbstractSynchronizedCacheStrategyDecorator<K, V>

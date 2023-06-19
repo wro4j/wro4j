@@ -17,7 +17,6 @@ import ro.isdc.wro.extensions.processor.support.template.AbstractJsTemplateCompi
  *
  * @author Eivind Barstad Waaler
  * @since 1.4.5
- * @created 8 Mar 2012
  */
 public class DustJs extends AbstractJsTemplateCompiler {
   private static final Logger LOG = LoggerFactory.getLogger(DustJs.class);

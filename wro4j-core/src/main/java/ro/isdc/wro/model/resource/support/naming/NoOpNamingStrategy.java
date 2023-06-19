@@ -10,7 +10,6 @@ import java.io.InputStream;
  * The simplest implementation of {@link NamingStrategy} which preserve the original name.
  *
  * @author Alex Objelean
- * @created 15 Aug 2010
  */
 public class NoOpNamingStrategy
   implements NamingStrategy {

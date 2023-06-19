@@ -35,7 +35,7 @@ import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
  * For the moment this {@link WildcardStreamLocator} only supports a single wildcard.
  * </p>
  *
- * @author Matias Mirabelli <matias.mirabelli@globant.com>
+ * @author <a href="mailto:matias.mirabelli@globant.com">Matias Mirabelli</a>
  * @since 1.3.6
  */
 public class JarWildcardStreamLocator

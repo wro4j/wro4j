@@ -22,12 +22,12 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * CssLint script engine utility. The underlying implementation uses CSSLint script utility<br/>
- * {@link https ://github.com/stubbornella/csslint}. The underlying csslint version is 0.9.10.
+ * CssLint script engine utility. The underlying implementation uses
+ * <a href="https://github.com/stubbornella/csslint">CSSLint script utility</a>.
+ * The underlying csslint version is 0.9.10.
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 19 Jun 2011
  */
 public class CssLint {
   private static final Logger LOG = LoggerFactory.getLogger(CssLint.class);

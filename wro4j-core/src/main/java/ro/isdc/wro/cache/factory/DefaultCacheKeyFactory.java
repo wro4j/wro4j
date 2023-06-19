@@ -18,7 +18,6 @@ import ro.isdc.wro.model.resource.ResourceType;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 19 Oct 2012
  */
 public class DefaultCacheKeyFactory
     implements CacheKeyFactory {

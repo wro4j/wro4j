@@ -49,8 +49,7 @@ import com.google.javascript.jscomp.CompilationLevel;
  * The implementation which contributes with processors from core module.
  *
  * @author Alex Objelean
- * @auther Thilo Planz
- * @created 1 Jun 2012
+ * @author Thilo Planz
  */
 public class DefaultProcessorProvider
     implements ProcessorProvider {

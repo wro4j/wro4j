@@ -29,15 +29,14 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
 
 
 /**
- * Uses ngmin node utility.
- * <p/>
- * Ngmin is a "pre-minifier" for AngularJS. It modifies Angular code to prevent errors that may arise from minification.
- * <p/>
- * More details can be found here: http://www.thinkster.io/pick/XlWneEZCqY/angularjs-ngmin
+ * <p>Uses ngmin node utility.</p>
+ *
+ * <p>Ngmin is a "pre-minifier" for AngularJS. It modifies Angular code to prevent errors that may arise from minification.</p>
+ *
+ * <p>More details can be found here: http://www.thinkster.io/pick/XlWneEZCqY/angularjs-ngmin</p>
  *
  * @author Janek L.B
  * @since 1.7.4
- * @created 26 Jan 2014
  */
 @SupportedResourceType(ResourceType.JS)
 public class NgMinProcessor
@@ -73,9 +72,6 @@ public class NgMinProcessor
     process(null, reader, writer);
   }
 
-  /**
-   * @VisibleForTesting
-   */
   void doProcess(final InputStream in, final OutputStream out)
       throws ExecuteException, IOException {
     final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();

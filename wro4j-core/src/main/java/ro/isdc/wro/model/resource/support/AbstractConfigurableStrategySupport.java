@@ -27,7 +27,6 @@ import ro.isdc.wro.util.provider.ProviderFinder;
  * @param <P>
  *          provider type
  * @author Alex Objelean
- * @created 26 Jun 2012
  * @since 1.4.7
  */
 public abstract class AbstractConfigurableStrategySupport<S, P> {
@@ -64,7 +63,6 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
 
   /**
    * @return a set of available strategies.
-   * @VisibleForTesting
    */
   public final Collection<S> getAvailableStrategies() {
     return getStrategyMap().values();
@@ -107,11 +105,7 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   /**
    * Utility method which copies all entries from source into target. Entries with the same keys from target will be
    * overridden with entries from source. This operation is similar to {@link Map#putAll(Map)}, but it doesn't require
-   * changing generics to construction like
-   *
-   * <pre>
-   * <? extends String, ? extends S>
-   * </pre>
+   * changing generics to wildcards.
    *
    * @param source
    *          the map from where the entries will be copied into target.
@@ -160,8 +154,8 @@ public abstract class AbstractConfigurableStrategySupport<S, P> {
   }
 
   /**
+   * This method is not final only for testing purposes.
    * @return the {@link ProviderFinder} used to find all strategies.
-   * @VisibleForTesting This method is not final only for testing purposes.
    */
   protected ProviderFinder<P> getProviderFinder() {
     if (providerFinder == null) {

@@ -23,7 +23,6 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * 
  * @author Alex Objelean
  * @since 1.5.0
- * @created 15 Sep 2012
  */
 public abstract class AbstractReportXmlFormatter<T> {
   private Document doc;

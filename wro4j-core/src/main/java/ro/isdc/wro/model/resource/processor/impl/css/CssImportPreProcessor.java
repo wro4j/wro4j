@@ -21,12 +21,12 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingType;
 
 
 /**
- * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
- * preProcessor & postProcessor. It is necessary because preProcessor is responsible for updating model with found
- * imported resources, while post processor removes import occurrences.
- * <p/>
- * When processor finds an import which is not valid, it will check the
- * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
+ * <p>CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
+ * preProcessor and postProcessor. It is necessary because preProcessor is responsible for updating model with found
+ * imported resources, while post processor removes import occurrences.</p>
+ *
+ * <p>When processor finds an import which is not valid, it will check the
+ * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.</p>
  *
  * @author Alex Objelean
  */

@@ -9,7 +9,6 @@ import java.util.Map;
  * core module.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class DefaultNamingStrategyProvider

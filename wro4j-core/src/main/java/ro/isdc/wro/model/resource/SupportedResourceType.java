@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
  * processor will be applied for any type of resource.
  *
  * @author Alex Objelean
- * @created Created on Jan 4, 2010
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

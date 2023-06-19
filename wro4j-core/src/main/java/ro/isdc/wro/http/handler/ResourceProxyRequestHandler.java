@@ -38,7 +38,6 @@ import ro.isdc.wro.model.resource.support.ResourceAuthorizationManager;
  * </ul>
  *
  * @author Ivar Conradi Østhus
- * @created 19 May 2012
  * @since 1.4.7
  */
 public class ResourceProxyRequestHandler
@@ -97,11 +96,11 @@ public class ResourceProxyRequestHandler
   }
 
   /**
-   * Used to identify whether the {@link HttpServletResponse#SC_NOT_MODIFIED} or {@link HttpServletResponse#SC_OK}
+   * <p>Used to identify whether the {@link HttpServletResponse#SC_NOT_MODIFIED} or {@link HttpServletResponse#SC_OK}
    * should be returned. Currently a single timestamp is used to detect the change for all resources. This might be no
-   * accurate, but at least it allows sending NOT_MODIFIED header much often resulting in less load on the server.
-   * <p/>
-   * Override this method if a different way detecting change is required.
+   * accurate, but at least it allows sending NOT_MODIFIED header much often resulting in less load on the server.</p>
+   *
+   * <p>Override this method if a different way detecting change is required.</p>
    *
    * @return true if the requested resource is changed on the server and the latest version should be returned.
    */

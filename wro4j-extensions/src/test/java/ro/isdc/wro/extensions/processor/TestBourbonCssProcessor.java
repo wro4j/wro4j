@@ -22,7 +22,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test BourbonCssProcessor.
  *
  * @author Simon van der Sluis
- * @created Created on Apr 21, 2010
  */
 public class TestBourbonCssProcessor {
 

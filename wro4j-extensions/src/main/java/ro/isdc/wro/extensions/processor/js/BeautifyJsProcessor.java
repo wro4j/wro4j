@@ -30,7 +30,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Alex Objelean
  * @since 1.3.1
- * @created 7 Nov 2010
  */
 @SupportedResourceType(ResourceType.JS)
 public class BeautifyJsProcessor
@@ -87,14 +86,12 @@ public class BeautifyJsProcessor
     }
   }
 
-
   /**
    * Invoked when a processing exception occurs.
    */
   protected void onException(final WroRuntimeException e) {
     throw e;
   }
-
 
   /**
    * {@inheritDoc}

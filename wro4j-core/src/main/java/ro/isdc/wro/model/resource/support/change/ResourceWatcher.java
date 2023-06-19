@@ -53,7 +53,6 @@ import ro.isdc.wro.util.WroUtil;
  * containing obsolete resources. This class is thread-safe.
  *
  * @author Alex Objelean
- * @created 06 Aug 2012
  * @since 1.4.8
  */
 public class ResourceWatcher
@@ -164,13 +163,13 @@ public class ResourceWatcher
   }
 
   /**
-   * Will try an asynchronous check if the async configuration is enabled. If async check is not configured, a
+   * <p>Will try an asynchronous check if the async configuration is enabled. If async check is not configured, a
    * synchronous check will be performed. The async check assumes that the {@link ResourceWatcherRequestHandler} is
-   * enabled.
-   * <p/>
-   * If the async check is not allowed (the request was not passed through {@link WroFilter}) - no check will be
+   * enabled.</p>
+   *
+   * <p>If the async check is not allowed (the request was not passed through {@link WroFilter}) - no check will be
    * performed. This is important for use-cases when wro resource is included using a taglib which performs a wro api
-   * call directly, without being invoked through {@link WroFilter}.
+   * call directly, without being invoked through {@link WroFilter}.</p>
    *
    * @return true if the actual check invocation was performed. This is important to decide if the resource change
    *         should be skipped or not.

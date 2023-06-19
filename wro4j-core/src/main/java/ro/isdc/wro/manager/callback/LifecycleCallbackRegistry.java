@@ -23,7 +23,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * order to allow successful lifecycle execution.
  *
  * @author Alex Objelean
- * @created Created on 8 Dec 2011
  * @since 1.4.3
  */
 public class LifecycleCallbackRegistry

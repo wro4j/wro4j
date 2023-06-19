@@ -18,7 +18,6 @@ import ro.isdc.wro.model.resource.Resource;
  * exceptions by leaving the processed output unchanged, but in this case you may not benefit of global configuration.
  * 
  * @author Alex Objelean
- * @created Created on Nov 19, 2008
  */
 public interface ResourcePreProcessor {
   /**

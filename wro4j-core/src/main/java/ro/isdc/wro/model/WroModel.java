@@ -27,7 +27,6 @@ import ro.isdc.wro.model.group.Group;
  * The resource model encapsulates the information about all existing groups.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public final class WroModel {
   private static final Logger LOG = LoggerFactory.getLogger(WroModel.class);

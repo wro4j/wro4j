@@ -21,12 +21,9 @@ import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
- * A group is an entity holding a list of resources.
- * <p/>
- * This class is thread safe.
+ * A group is an entity holding a list of resources. This class is thread safe.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public final class Group implements Comparable<Group> {
   private static final Logger LOG = LoggerFactory.getLogger(Group.class);
@@ -99,11 +96,11 @@ public final class Group implements Comparable<Group> {
   }
 
   /**
-   * Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
+   * <p>Replace one resource with a list of other resources. The use case is related to wildcard expander functionality,
    * when resources containing wildcard are replaced with a list of wildcard-free resources. The order of resources is
-   * preserved.
-   * <p/>
-   * The implementation is synchronized, because it mutates the collection.
+   * preserved.</p>
+   *
+   * <p>The implementation is synchronized, because it mutates the collection.</p>
    *
    * @param resource
    *          to replace.
@@ -179,9 +176,9 @@ public final class Group implements Comparable<Group> {
   }
 
   /**
-   * Add a {@link Resource} to the collection of resources associated with this group.
-   * <p/>
-   * The implementation is synchronized, because it mutates the collection.
+   * <p>Add a {@link Resource} to the collection of resources associated with this group.</p>
+   *
+   * <p>The implementation is synchronized, because it mutates the collection.</p>
    *
    * @param resource
    *          {@link Resource} to add to this group (at the end).
@@ -200,9 +197,9 @@ public final class Group implements Comparable<Group> {
   }
 
   /**
-   * This method will replace all earlier defined resources with the provided list of resources.
-   * <p/>
-   * The implementation is synchronized, because it mutates the collection.
+   * <p>This method will replace all earlier defined resources with the provided list of resources.</p>
+   *
+   * <p>The implementation is synchronized, because it mutates the collection.</p>
    *
    * @param resources
    *          the resources to replace the underlying resources.

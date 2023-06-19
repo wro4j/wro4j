@@ -11,7 +11,6 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableSingleStrategy;
  * Uses the {@link NamingStrategy} implementation associated with an alias read from properties file.
  *
  * @author Alex Objelean
- * @created 17 Jun 2012
  * @since 1.4.7
  */
 public class ConfigurableNamingStrategy

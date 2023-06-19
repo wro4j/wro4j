@@ -22,7 +22,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @since 1.4.9
- * @created 27 Aug 2012
  */
 public class ResponseHeadersConfigurer {
   private static final Logger LOG = LoggerFactory.getLogger(ResponseHeadersConfigurer.class);

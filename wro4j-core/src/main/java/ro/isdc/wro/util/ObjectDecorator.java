@@ -1,12 +1,9 @@
 package ro.isdc.wro.util;
 
-
-
 /**
  * Describe a class which acts as a decorator. This class is used by injector to perform recursive injection. 
  * 
  * @author Alex Objelean
- * @created 4 May 2012
  * @since 1.4.6
  */
 public interface ObjectDecorator<T> {

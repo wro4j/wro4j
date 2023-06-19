@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
  *
  * @author Eivind Barstad Waaler
  * @since 1.4.5
- * @created 8 Mar 2012
  */
 @SupportedResourceType(ResourceType.JS)
 public class DustJsProcessor extends JsTemplateCompilerProcessor {

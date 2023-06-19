@@ -14,13 +14,11 @@ import ro.isdc.wro.http.ConfigurableWroFilter;
 import ro.isdc.wro.manager.factory.WroManagerFactory;
 
 /**
- * SpringWroFilter.<br>
  * A WroFilter capable to get a {@link WroManagerFactory} instance from spring
  * context. The filter must have initParam called <code>targetBeanName</code>
  * whose value will be looked up in the spring application context.
  *
  * @author Alex Objelean
- * @created Created on Dec 5, 2008
  */
 public final class SpringWroFilter extends ConfigurableWroFilter {
   /**

@@ -10,7 +10,6 @@ import ro.isdc.wro.util.LazyInitializer;
  * dependencies, which shouldn't be required as long as factory is not used.
  *
  * @author Alex Objelean
- * @created 6 Feb 2013
  * @since 1.6.3
  */
 public class LazyWroModelFactoryDecorator

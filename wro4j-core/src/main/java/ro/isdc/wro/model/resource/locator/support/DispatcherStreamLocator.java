@@ -39,8 +39,6 @@ public class DispatcherStreamLocator {
 	/**
 	 * Attribute indicating that the request is included from within a wro request
 	 * cycle. This is required to prevent {@link StackOverflowError}.
-	 *
-	 * @VisibleForTesting
 	 */
 	public static final String ATTRIBUTE_INCLUDED_BY_DISPATCHER = DispatcherStreamLocator.class.getName()
 			+ ".included_with_dispatcher";
@@ -207,7 +205,7 @@ public class DispatcherStreamLocator {
 
 	/**
 	 * @param timeout time (in millis) used when an external url is requested for
-	 *                both: connection & read.
+	 *                both connection and read.
 	 */
 	public void setTimeout(final int timeout) {
 		this.timeout = timeout;

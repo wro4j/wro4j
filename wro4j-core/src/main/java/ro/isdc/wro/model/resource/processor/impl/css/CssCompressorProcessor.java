@@ -21,7 +21,7 @@ import ro.isdc.wro.model.resource.processor.support.CssCompressor;
 
 
 /**
- * A processor implementation using {@link CssCompressor} algorithm. This processor can be used as both: PreProcessor &
+ * A processor implementation using {@link CssCompressor} algorithm. This processor can be used as both: PreProcessor and
  * postProcessor.<br/>
  * This processor is annotated with {@link Minimize} because it performs minimization.
  *

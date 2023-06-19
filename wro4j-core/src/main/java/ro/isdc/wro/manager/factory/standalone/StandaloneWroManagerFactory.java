@@ -18,7 +18,6 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  * a webContainer.
  *
  * @author Alex Objelean
- * @created Created on Nov 3, 2008
  */
 public class StandaloneWroManagerFactory extends BaseWroManagerFactory {
 

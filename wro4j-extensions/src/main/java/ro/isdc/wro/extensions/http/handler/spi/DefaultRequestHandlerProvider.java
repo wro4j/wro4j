@@ -15,7 +15,6 @@ import ro.isdc.wro.util.LazyInitializer;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 23 Sep 2012
  */
 public class DefaultRequestHandlerProvider implements RequestHandlerProvider {
   @Override

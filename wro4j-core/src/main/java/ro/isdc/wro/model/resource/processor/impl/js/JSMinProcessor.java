@@ -33,7 +33,6 @@ import ro.isdc.wro.model.resource.processor.support.JSMin;
  * minimization.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)

@@ -9,7 +9,6 @@ import static org.apache.commons.lang3.Validate.isTrue;
  * Make a distinction between resource type. Can be CSS or JS.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public enum ResourceType {
   CSS {

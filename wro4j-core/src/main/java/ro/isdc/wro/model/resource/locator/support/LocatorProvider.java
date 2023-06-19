@@ -4,14 +4,11 @@ import java.util.Map;
 
 import ro.isdc.wro.model.resource.locator.UriLocator;
 
-
-
 /**
  * All implementation of this interface will contribute to the list of available locators discovered during
  * application initialization.
  * 
  * @author Alex Objelean
- * @created 26 Jun 2012
  */
 public interface LocatorProvider {
   /**

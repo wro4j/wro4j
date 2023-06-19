@@ -36,7 +36,6 @@ import ro.isdc.wro.util.StopWatch;
  *
  * @author Alex Objelean
  * @since 1.4.5
- * @created 17 Mar 2012
  */
 public abstract class AbstractProcessorsFilter
     implements Filter {

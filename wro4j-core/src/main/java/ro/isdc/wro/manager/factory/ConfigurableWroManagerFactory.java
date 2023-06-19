@@ -36,10 +36,9 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
 
 
 /**
- * Allow configuring uriLocators & processors to add using initParams of the filter.
+ * Allow configuring uriLocators and processors to add using initParams of the filter.
  *
  * @author Alex Objelean
- * @created Created on Dec 31, 2009
  */
 public class ConfigurableWroManagerFactory extends BaseWroManagerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigurableWroManagerFactory.class);

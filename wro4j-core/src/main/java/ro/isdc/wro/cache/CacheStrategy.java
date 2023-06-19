@@ -4,13 +4,10 @@
 package ro.isdc.wro.cache;
 
 /**
- * CacheStrategy.java.
- * <p>
  * This interface will be implemented by all classes which will support a
  * caching strategy.
  *
  * @author Alex Objelean
- * @created Created on Nov 18, 2008
  */
 public interface CacheStrategy<K, V> {
   /**

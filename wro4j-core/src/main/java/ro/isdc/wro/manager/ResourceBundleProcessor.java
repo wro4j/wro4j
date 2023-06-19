@@ -29,7 +29,6 @@ import ro.isdc.wro.util.WroUtil;
  * Encapsulates the bundle creation.
  *
  * @author Alex Objelean
- * @created 18 Jun 2012
  * @since 1.4.7
  */
 public class ResourceBundleProcessor {

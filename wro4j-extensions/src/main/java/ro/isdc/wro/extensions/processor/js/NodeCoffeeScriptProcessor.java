@@ -40,11 +40,9 @@ import ro.isdc.wro.util.WroUtil;
  * </pre>
  *
  * It is possible to test whether the lessc utility is available using {@link NodeCoffeeScriptProcessor#isSupported()}
- * <p/>
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 10 Sep 2012
  */
 @SupportedResourceType(ResourceType.JS)
 public class NodeCoffeeScriptProcessor

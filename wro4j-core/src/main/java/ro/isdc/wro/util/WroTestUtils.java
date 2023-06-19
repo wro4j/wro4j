@@ -62,7 +62,6 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  * WroTestUtils.
  *
  * @author Alex Objelean
- * @created Created on Nov 28, 2008
  */
 public class WroTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(WroTestUtils.class);
@@ -122,9 +121,6 @@ public class WroTestUtils {
     return processor;
   }
 
-  /**
-   * @return the injector
-   */
   public static void initProcessor(final ResourcePostProcessor processor) {
     initProcessor((ResourcePreProcessor) new ProcessorDecorator(processor));
   }
@@ -132,10 +128,10 @@ public class WroTestUtils {
   /**
    * Compare contents of two resources (files) by performing some sort of processing on input resource.
    *
-   * @param inputResourceUri
-   *          uri of the resource to process.
-   * @param expectedContentResourceUri
-   *          uri of the resource to compare with processed content.
+   * @param resultReader
+   *          The reader of the resource to process.
+   * @param expectedReader
+   *          The expected reader of the resource to compare with processed content.
    * @param processor
    *          a closure used to process somehow the input content.
    */
@@ -177,7 +173,7 @@ public class WroTestUtils {
   }
 
   /**
-   * Compares two strings by removing trailing spaces & tabs for correct comparison.
+   * Compares two strings by removing trailing spaces and tabs for correct comparison.
    */
   public static void compare(final String expected, final String actual) {
     try {

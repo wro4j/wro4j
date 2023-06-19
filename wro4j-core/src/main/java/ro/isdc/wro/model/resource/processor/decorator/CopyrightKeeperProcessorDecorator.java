@@ -27,7 +27,6 @@ import ro.isdc.wro.util.WroUtil;
    * removed, our processor will put them back.
    *
  * @author Alex Objelean
- * @created 14 May 2011
  * @since 1.3.7
  */
 public class CopyrightKeeperProcessorDecorator

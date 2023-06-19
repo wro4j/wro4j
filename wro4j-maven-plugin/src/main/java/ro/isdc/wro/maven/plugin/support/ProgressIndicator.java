@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.Resource;
  *
  * @author Alex Objelean
  * @since 1.7.0
- * @created 27 May 2013
  */
 public class ProgressIndicator {
   private static final int DEFAULT_TIMEOUT_DELAY = 5000;
@@ -104,16 +103,10 @@ public class ProgressIndicator {
     return totalFoundErrors;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   final int getTotalResources() {
     return totalResources;
   }
 
-  /**
-   * @VisibleForTesting
-   */
   final int getTotalResourcesWithErrors() {
     return totalResourcesWithErrors;
   }

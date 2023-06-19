@@ -15,7 +15,6 @@ import ro.isdc.wro.util.WroUtil;
  * fluent interface implementation for this class.
  *
  * @author Alex Objelean
- * @created 19 Feb 2013
  * @since 1.6.3
  */
 public class CssImportInspector {

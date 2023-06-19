@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * method doesn't do anything. This class should be used as a base class for all implementation.
  *
  * @author Alex Objelean
- * @created 31 May 2012
  * @since 1.4.7
  */
 public class RequestHandlerSupport

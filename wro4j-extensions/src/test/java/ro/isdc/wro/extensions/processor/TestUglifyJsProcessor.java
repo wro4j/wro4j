@@ -32,7 +32,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * TestUglifyJsProcessor.
  *
  * @author Alex Objelean
- * @created Created on Apr 21, 2010
  */
 public class TestUglifyJsProcessor {
   private File testFolder;

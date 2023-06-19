@@ -27,10 +27,9 @@ import ro.isdc.wro.util.WroUtil;
  * Processor of css resources, responsible for replacing variables. (@see
  * http://disruptive-innovations.com/zoo/cssvariables/). This is a pre processor, because it makes sense to apply
  * variables only on the same css. <br/>
- * This processor is implemented as both: preprocessor & postprocessor.
+ * This processor is implemented as both: preprocessor and postprocessor.
  * 
  * @author Alex Objelean
- * @created Created on Jul 05, 2009
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssVariablesProcessor

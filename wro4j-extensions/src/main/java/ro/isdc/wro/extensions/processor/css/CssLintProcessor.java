@@ -28,11 +28,11 @@ import ro.isdc.wro.util.ObjectFactory;
 
 /**
  * Processor which analyze the css code and warns you found problems. The processing result won't change no matter if the processed script
- * contains errors or not. The underlying implementation uses CSSLint script utility {@link https ://github.com/stubbornella/csslint}.
+ * contains errors or not. The underlying implementation uses CSSLint script utility
+ * <a href="https://github.com/stubbornella/csslint">https://github.com/stubbornella/csslint</a>.
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 19 Jun 2011
  */
 @SupportedResourceType(ResourceType.CSS)
 public class CssLintProcessor implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {

@@ -16,12 +16,11 @@ import ro.isdc.wro.util.WroUtil;
 
 /**
  * This RequestHandler will reload the model on HTTP requests to "wroAPI/reloadModel"
- * <p/>
+ *
  * This handler is available only in debug mode by default. You can change this behavior by overriding
  * {@link RequestHandler#isEnabled()} method.
  *
  * @author Ivar Conradi Østhus
- * @created 19 May 2012
  * @since 1.4.7
  */
 public class ReloadModelRequestHandler

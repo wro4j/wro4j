@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.Validate.notNull;
  * Templated decorator.
  *
  * @author Alex Objelean
- * @created 25 Apr 2012
  * @since 1.4.6
  */
 public abstract class AbstractDecorator<T>

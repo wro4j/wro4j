@@ -27,7 +27,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test ruby sass css processor.
  *
  * @author Simon van der Sluis
- * @created Created on Apr 21, 2010
  */
 public class TestRubySassCssProcessor {
   /** Location (base) of ruby sass css test resources. */
@@ -79,7 +78,6 @@ public class TestRubySassCssProcessor {
    * Test ruby sass css processor with multi-threads.
    *
    * @author Simon van der Sluis
-   * @created Created on Apr 21, 2010
    */
   @Test
   public void shouldBeThreadSafeWhenInitializingProcessor()

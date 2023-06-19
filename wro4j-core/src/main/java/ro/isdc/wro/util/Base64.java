@@ -16,7 +16,7 @@ package ro.isdc.wro.util;
  * <code>byte[] myByteArray = Base64.decode( encoded );</code>
  *
  * <p>
- * The <tt>options</tt> parameter, which appears in a few places, is used to pass several pieces of information to the
+ * The {@code options} parameter, which appears in a few places, is used to pass several pieces of information to the
  * encoder. In the "higher level" methods such as encodeBytes( bytes, options ) the options parameter can be used to
  * indicate such things as first gzipping the bytes before encoding them, not inserting linefeeds, and encoding using
  * the URL-safe and Ordered dialects.
@@ -1052,7 +1052,7 @@ public class Base64 {
    * @param options encode options such as URL_SAFE
    * @return the decoded data
    * @throws java.io.IOException if there is an error
-   * @throws NullPointerException if <tt>s</tt> is null
+   * @throws NullPointerException if {@code s} is null
    * @since 1.4
    */
   public static byte[] decode(final String s, final int options)
@@ -1128,7 +1128,7 @@ public class Base64 {
   /* ******** I N N E R C L A S S I N P U T S T R E A M ******** */
 
   /**
-   * A {@link Base64.InputStream} will read data from another <tt>java.io.InputStream</tt>, given in the constructor,
+   * A {@link Base64.InputStream} will read data from another {@code java.io.InputStream}, given in the constructor,
    * and encode/decode to/from Base64 notation on the fly.
    *
    * @see Base64
@@ -1150,7 +1150,7 @@ public class Base64 {
     /**
      * Constructs a {@link Base64.InputStream} in DECODE mode.
      *
-     * @param in the <tt>java.io.InputStream</tt> from which to read data.
+     * @param in the {@code java.io.InputStream} from which to read data.
      * @since 1.3
      */
     public InputStream(final java.io.InputStream in) {
@@ -1159,20 +1159,19 @@ public class Base64 {
 
 
     /**
-     * Constructs a {@link Base64.InputStream} in either ENCODE or DECODE mode.
-     * <p>
-     * Valid options:
+     * <p>Constructs a {@link Base64.InputStream} in either ENCODE or DECODE mode.</p>
+     * <p>Valid options:</p>
      *
      * <pre>
-         *   ENCODE or DECODE: Encode or Decode as data is read.
-         *   DO_BREAK_LINES: break lines at 76 characters
-         *     (only meaningful when encoding)</i>
-         * </pre>
+     *   ENCODE or DECODE: Encode or Decode as data is read.
+     *   DO_BREAK_LINES: break lines at 76 characters
+     *     (only meaningful when encoding)
+     * </pre>
      * <p>
      * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
      *
      *
-     * @param in the <tt>java.io.InputStream</tt> from which to read data.
+     * @param in the {@code java.io.InputStream} from which to read data.
      * @param options Specified options
      * @see Base64#ENCODE
      * @see Base64#DECODE
@@ -1332,7 +1331,7 @@ public class Base64 {
   /* ******** I N N E R C L A S S O U T P U T S T R E A M ******** */
 
   /**
-   * A {@link Base64.OutputStream} will write data to another <tt>java.io.OutputStream</tt>, given in the constructor,
+   * A {@link Base64.OutputStream} will write data to another {@code java.io.OutputStream}, given in the constructor,
    * and encode/decode to/from Base64 notation on the fly.
    *
    * @see Base64
@@ -1355,7 +1354,7 @@ public class Base64 {
     /**
      * Constructs a {@link Base64.OutputStream} in ENCODE mode.
      *
-     * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
+     * @param out the {@code java.io.OutputStream} to which data will be written.
      * @since 1.3
      */
     public OutputStream(final java.io.OutputStream out) {
@@ -1364,19 +1363,18 @@ public class Base64 {
 
 
     /**
-     * Constructs a {@link Base64.OutputStream} in either ENCODE or DECODE mode.
-     * <p>
-     * Valid options:
+     * <p>Constructs a {@link Base64.OutputStream} in either ENCODE or DECODE mode.</p>
+     * <p>Valid options:</p>
      *
      * <pre>
-         *   ENCODE or DECODE: Encode or Decode as data is read.
-         *   DO_BREAK_LINES: don't break lines at 76 characters
-         *     (only meaningful when encoding)</i>
-         * </pre>
+     *   ENCODE or DECODE: Encode or Decode as data is read.
+     *   DO_BREAK_LINES: don't break lines at 76 characters
+     *     (only meaningful when encoding)
+     * </pre>
      * <p>
      * Example: <code>new Base64.OutputStream( out, Base64.ENCODE )</code>
      *
-     * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
+     * @param out the {@code java.io.OutputStream} to which data will be written.
      * @param options Specified options.
      * @see Base64#ENCODE
      * @see Base64#DECODE

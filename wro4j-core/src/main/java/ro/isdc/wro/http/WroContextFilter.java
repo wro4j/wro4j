@@ -18,78 +18,71 @@ import ro.isdc.wro.config.Context;
 import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.http.support.ServletContextAttributeHelper;
 
-
 /**
- * This filter is responsible for setting the {@link Context} to the current request cycle. This is required if you want
- * to use {@link ServletContextAttributeHelper} in order to access wro related attributes from within a tag or a
- * servlet. Usually this filter will be mapped to all requests:
- * 
- * <pre>
- *  <filter-mapping>
- *     <filter-name>wroContextFilter</filter-name>
- *     <url-pattern>/*</url-pattern>
- *  </filter-mapping>
- * 
- * </pre>
+ * This filter is responsible for setting the {@link Context} to the current
+ * request cycle. This is required if you want to use
+ * {@link ServletContextAttributeHelper} in order to access wro related
+ * attributes from within a tag or a servlet. Usually this filter will be mapped
+ * to all requests using the {@code /*} URL pattern on the filter named
+ * {@code wroContextFilter}.
  * 
  * @author Alex Objelean
- * @created 12 May 2012
  * @since 1.4.7
  */
-public class WroContextFilter
-  implements Filter {
-  private FilterConfig filterConfig;
+public class WroContextFilter implements Filter {
+	private FilterConfig filterConfig;
 
-  /**
-   * {@inheritDoc}
-   */
-  public void init(final FilterConfig filterConfig)
-      throws ServletException {
-    this.filterConfig = filterConfig;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
-      throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest) req;
-    final HttpServletResponse response = (HttpServletResponse) res;
-    //preserve current correlationId to ensure proper clean up during nested requests.
-    final String originalCorrelationId = Context.isContextSet() ? Context.getCorrelationId() : null;
-    Context.set(Context.webContext(request, response, this.filterConfig), getWroConfiguration());
-    final String correlationId = Context.getCorrelationId();
-    try {
-      chain.doFilter(request, response);
-    } finally {
-      Context.setCorrelationId(correlationId);
-      Context.unset();
-      if (originalCorrelationId != null) {
-        Context.setCorrelationId(originalCorrelationId);
-      }
-    }
-  }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void init(final FilterConfig filterConfig) throws ServletException {
+		this.filterConfig = filterConfig;
+	}
 
-  /**
-   * @return the {@link WroConfiguration} extracted from {@link ServletContext} if exist or default one otherwise. 
-   */
-  private WroConfiguration getWroConfiguration() {
-    final WroConfiguration configAttribute = getServletContextAttributeHelper().getWroConfiguration();
-    return configAttribute != null ? configAttribute : new WroConfiguration();
-  }
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
+			throws IOException, ServletException {
+		final HttpServletRequest request = (HttpServletRequest) req;
+		final HttpServletResponse response = (HttpServletResponse) res;
+		// preserve current correlationId to ensure proper clean up during nested
+		// requests.
+		final String originalCorrelationId = Context.isContextSet() ? Context.getCorrelationId() : null;
+		Context.set(Context.webContext(request, response, this.filterConfig), getWroConfiguration());
+		final String correlationId = Context.getCorrelationId();
+		try {
+			chain.doFilter(request, response);
+		} finally {
+			Context.setCorrelationId(correlationId);
+			Context.unset();
+			if (originalCorrelationId != null) {
+				Context.setCorrelationId(originalCorrelationId);
+			}
+		}
+	}
 
-  /**
-   * @VisibleForTesting
-   * @return the instance responsible for {@link WroConfiguration} lookup.
-   */
-  ServletContextAttributeHelper getServletContextAttributeHelper() {
-    return ServletContextAttributeHelper.create(filterConfig);
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public void destroy() {
-    Context.destroy();
-  }
+	/**
+	 * @return the {@link WroConfiguration} extracted from {@link ServletContext} if
+	 *         exist or default one otherwise.
+	 */
+	private WroConfiguration getWroConfiguration() {
+		final WroConfiguration configAttribute = getServletContextAttributeHelper().getWroConfiguration();
+		return configAttribute != null ? configAttribute : new WroConfiguration();
+	}
+
+	/**
+	 * @VisibleForTesting
+	 * @return the instance responsible for {@link WroConfiguration} lookup.
+	 */
+	ServletContextAttributeHelper getServletContextAttributeHelper() {
+		return ServletContextAttributeHelper.create(filterConfig);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void destroy() {
+		Context.destroy();
+	}
 }

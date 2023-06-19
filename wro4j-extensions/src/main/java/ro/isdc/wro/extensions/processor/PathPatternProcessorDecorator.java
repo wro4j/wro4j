@@ -18,15 +18,14 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * A {@link ProcessorDecorator} with Ant path style support. This processor requires AntPathMatcher provided by spring
- * framework.
- * <p/>
- * The implementation is inspired from <a href="https://github.com/jknack/modern-web-app">mwa</a> project created by
- * Edgar Espina.
+ * <p>A {@link ProcessorDecorator} with Ant path style support. This processor requires AntPathMatcher provided by spring
+ * framework.</p>
+ *
+ * <p>The implementation is inspired from <a href="https://github.com/jknack/modern-web-app">mwa</a> project created by
+ * Edgar Espina.</p>
  * 
  * @author Alex Objelean
  * @since 1.5.0
- * @created 15 Sep 2012
  */
 public final class PathPatternProcessorDecorator
     extends ProcessorDecorator {

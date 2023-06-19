@@ -19,7 +19,6 @@ import ro.isdc.wro.model.resource.support.naming.NamingStrategy;
  * Default implementation of {@link ConfigurableProvider} which provides nothing by default.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class ConfigurableProviderSupport

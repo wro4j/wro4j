@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.Validate.notNull;
  * A simple decorator for {@link LazyInitializer}.
  *
  * @author Alex Objelean
- * @created 29 Jan 2014
  * @since 1.7.4
  */
 public class LazyInitializerDecorator<T>

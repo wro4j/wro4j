@@ -15,7 +15,6 @@ import ro.isdc.wro.model.resource.processor.SupportAware;
  * with specific message when processor is not supported.
  *
  * @author Alex Objelean
- * @created 7 Oct 2012
  * @since 1.6.0
  */
 public class SupportAwareProcessorDecorator

@@ -13,7 +13,6 @@ import ro.isdc.wro.model.factory.WroModelFactory;
  * This factory uses the {@link SmartWroModelFactory} and it is recommended to be used as the default one when possible.
  *
  * @author Alex Objelean
- * @created 9 Aug 2011
  * @since 1.4.0
  */
 public class ExtensionsStandaloneManagerFactory extends DefaultStandaloneContextAwareManagerFactory {

@@ -9,7 +9,6 @@ import ro.isdc.wro.WroRuntimeException;
  * This exception is thrown when the group a recursively referring each-other.
  *
  * @author Alex Objelean
- * @created Created on Nov 10, 2008
  */
 public class RecursiveGroupDefinitionException extends WroRuntimeException {
   /**

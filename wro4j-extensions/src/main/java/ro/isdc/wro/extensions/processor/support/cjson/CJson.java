@@ -16,7 +16,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the cjson project: {@link http://stevehanov.ca/blog/index.php?id=104}.
+ * The underlying implementation uses <a href="http://stevehanov.ca/blog/index.php?id=104">the cjson project</a>.
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -24,7 +24,6 @@ import ro.isdc.wro.util.WroUtil;
 public class CJson {
   private static final Logger LOG = LoggerFactory.getLogger(CJson.class);
   private ScriptableObject scope;
-
 
   /**
    * Initialize script builder for evaluation.

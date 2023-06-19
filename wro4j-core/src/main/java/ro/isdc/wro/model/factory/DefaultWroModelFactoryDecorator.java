@@ -22,14 +22,13 @@ import ro.isdc.wro.util.Transformer;
 
 
 /**
- * Decorates the model factory with callback registry calls & other useful factories. Another responsibility of this
- * decorator is make model creation thread safe.
- * <p/>
- * This class doesn't extend {@link AbstractDecorator} because we have to enhance the decorated object with new
- * decorators.
+ * <p>Decorates the model factory with callback registry calls and other useful factories. Another responsibility of this
+ * decorator is make model creation thread safe.</p>
+ *
+ * <p>This class doesn't extend {@link AbstractDecorator} because we have to enhance the decorated object with new
+ * decorators.</p>
  *
  * @author Alex Objelean
- * @created 13 Mar 2011
  * @since 1.4.6
  */
 public final class DefaultWroModelFactoryDecorator

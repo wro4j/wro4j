@@ -9,13 +9,12 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
 
 
 /**
- * Simple decorator for {@link WroManagerFactory}.
- * <p/>
- * This class implements als the {@link StandaloneContextAware} in order to allow decoration of factories used in
- * standalone context (example: maven plugin).
+ * <p>Simple decorator for {@link WroManagerFactory}.</p>
+ *
+ * <p>This class implements als the {@link StandaloneContextAware} in order to allow decoration of factories used in
+ * standalone context (example: maven plugin).</p>
  *
  * @author Alex Objelean
- * @created 23 Jun 2012
  * @since 1.4.7
  */
 public class WroManagerFactoryDecorator

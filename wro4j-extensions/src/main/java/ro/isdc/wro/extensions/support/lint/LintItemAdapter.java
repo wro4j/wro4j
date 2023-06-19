@@ -9,7 +9,6 @@ import ro.isdc.wro.extensions.processor.support.linter.LinterError;
  * Adapts various objects to {@link LintItem}
  * 
  * @author Alex Objelean
- * @created 17 Sep 2012
  * @since 1.5.0
  */
 @SuppressWarnings("serial")

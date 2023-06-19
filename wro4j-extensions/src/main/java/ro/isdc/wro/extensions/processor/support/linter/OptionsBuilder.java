@@ -17,7 +17,6 @@ import ro.isdc.wro.WroRuntimeException;
  * Responsible for building json representations of the options consumed by linter code.
  *
  * @author Alex Objelean
- * @created 22 Nov 2011
  * @since 1.4.2
  */
 public class OptionsBuilder {

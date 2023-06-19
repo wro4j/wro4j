@@ -15,7 +15,6 @@ import ro.isdc.wro.model.resource.SupportedResourceType;
  * runtime in java.
  *
  * @author Alex Objelean
- * @created 20 May 2011
  * @since 1.3.7
  */
 public interface SupportedResourceTypeAware {

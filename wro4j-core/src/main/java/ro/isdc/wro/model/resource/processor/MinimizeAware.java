@@ -9,7 +9,6 @@ package ro.isdc.wro.model.resource.processor;
  * annotation.
  *
  * @author Alex Objelean
- * @created 2 June 2011
  * @since 1.3.8
  */
 public interface MinimizeAware {

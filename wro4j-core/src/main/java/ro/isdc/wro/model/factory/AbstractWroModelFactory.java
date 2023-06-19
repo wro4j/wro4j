@@ -16,7 +16,6 @@ import ro.isdc.wro.model.group.Inject;
  * To be used by the implementations which load the model from a resource provided as stream.
  * 
  * @author Alex Objelean
- * @created 9 Aug 2011
  * @since 1.4.0
  */
 public abstract class AbstractWroModelFactory

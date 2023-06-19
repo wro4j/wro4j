@@ -18,7 +18,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * Load the WroManagerFactory configured in {@link WroConfiguration} or loads a default one if none is configured.
  *
  * @author Alex Objelean
- * @created 7 May 2012
  * @since 1.4.6
  */
 public class DefaultWroManagerFactory
@@ -128,7 +127,6 @@ public class DefaultWroManagerFactory
   }
 
   /**
-   * @VisibleForTesting
    * @return the inner factory.
    */
   public final WroManagerFactory getFactory() {

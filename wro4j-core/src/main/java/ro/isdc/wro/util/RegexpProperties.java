@@ -18,7 +18,6 @@ import org.apache.commons.lang3.Validate;
  * 
  * @author Alex Objelean
  * @since 1.4.7
- * @created 11 Jun 2012
  */
 public class RegexpProperties {
   private final Properties properties;

@@ -10,7 +10,6 @@ import ro.isdc.wro.model.resource.processor.factory.SimpleProcessorsFactory;
  * An implementation with no processors set.
  *
  * @author Alex Objelean
- * @created Created on May 4, 2010
  */
 public final class NoProcessorsWroManagerFactory extends BaseWroManagerFactory {
   /**

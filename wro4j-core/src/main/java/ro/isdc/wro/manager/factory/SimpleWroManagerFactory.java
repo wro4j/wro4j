@@ -7,7 +7,6 @@ import ro.isdc.wro.manager.WroManager;
  * Always returns the same instance of {@link WroManager}.
  *
  * @author Alex Objelean
- * @created 17 Dec 2012
  * @since 1.6.2
  */
 public class SimpleWroManagerFactory

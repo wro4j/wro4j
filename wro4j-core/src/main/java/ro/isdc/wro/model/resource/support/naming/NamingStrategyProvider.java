@@ -6,7 +6,6 @@ import java.util.Map;
  * A service provider responsible for providing new implementations of {@link NamingStrategy}.
  * 
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public interface NamingStrategyProvider {

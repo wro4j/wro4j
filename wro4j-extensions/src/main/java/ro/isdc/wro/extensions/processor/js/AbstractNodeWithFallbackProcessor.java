@@ -15,13 +15,12 @@ import ro.isdc.wro.util.DestroyableLazyInitializer;
 
 
 /**
- * An abstract processor which should be extended by processors which can provide both: node & a fallback (usually
+ * An abstract processor which should be extended by processors which can provide both: node and a fallback (usually
  * rhino) implementation of processor. The node version of processor is preferred, but if unavailable - the fallback
  * will be used.
  *
  * @author Alex Objelean
  * @since 1.6.3
- * @created 21 Jan 2013
  */
 public abstract class AbstractNodeWithFallbackProcessor
     implements ResourcePreProcessor, ResourcePostProcessor, Destroyable {
@@ -45,7 +44,6 @@ public abstract class AbstractNodeWithFallbackProcessor
 
   /**
    * @return {@link ResourcePreProcessor} used as a primary processor.
-   * @VisibleForTesting
    */
   protected abstract ResourcePreProcessor createNodeProcessor();
 
@@ -65,7 +63,6 @@ public abstract class AbstractNodeWithFallbackProcessor
    * Factory method for creating a fallback processor.
    *
    * @return {@link ResourcePreProcessor} used as a fallback processor.
-   * @VisibleFortesTesting
    */
   protected abstract ResourcePreProcessor createFallbackProcessor();
 

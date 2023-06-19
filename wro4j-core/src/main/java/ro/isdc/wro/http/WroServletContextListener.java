@@ -21,7 +21,6 @@ import ro.isdc.wro.manager.factory.WroManagerFactory;
  * name (defaulted to "default").
  *
  * @author Alex Objelean
- * @created 6 May 2012
  * @since 1.4.6
  */
 public class WroServletContextListener

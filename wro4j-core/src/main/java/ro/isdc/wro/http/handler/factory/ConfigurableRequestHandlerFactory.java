@@ -20,7 +20,6 @@ import ro.isdc.wro.model.resource.support.AbstractConfigurableMultipleStrategy;
  * A {@link RequestHandler} implementation which is easy to configure using a {@link Properties} object.
  * 
  * @author Alex Objelean
- * @created 30 Jul 2011
  * @since 1.5.0
  */
 public class ConfigurableRequestHandlerFactory

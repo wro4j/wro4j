@@ -23,7 +23,6 @@ import ro.isdc.wro.util.Function;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 15 Sep 2012
  */
 public class ReportXmlFormatter
     extends AbstractReportXmlFormatter<LintItem> {

@@ -7,7 +7,6 @@ import java.util.Comparator;
  * Classes implementing this interface signal to the classes that load them that order is significant.
  *
  * @author Moandji Ezana
- * @created 9 Jan 2013
  * @since 1.6.2
  */
 public interface Ordered {

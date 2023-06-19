@@ -14,7 +14,6 @@ import ro.isdc.wro.model.resource.processor.support.ProcessingCriteria;
  * Decorates the processor with a set of common useful decorators during each processing.
  *
  * @author Alex Objelean
- * @created 7 Oct 2012
  * @since 1.6.0
  */
 public class DefaultProcessorDecorator

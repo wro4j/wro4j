@@ -29,7 +29,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Simon van der Sluis
  * @since 1.4.6
- * @created 2/03/12
  */
 @SupportedResourceType(ResourceType.CSS)
 public class RubySassCssProcessor

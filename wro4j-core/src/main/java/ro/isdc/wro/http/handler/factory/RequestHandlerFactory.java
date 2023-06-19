@@ -11,7 +11,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * invoked for each request. It is up to implementation to cache the requestHandler's creation.
  * 
  * @author Ivar Conradi Østhus
- * @created 19 May 2012
  * @since 1.4.7
  */
 public interface RequestHandlerFactory

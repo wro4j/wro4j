@@ -32,7 +32,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Alex Objelean
  * @since 1.3.5
- * @created 1 Mar 2011
  */
 @SupportedResourceType(ResourceType.JS)
 public abstract class AbstractLinterProcessor

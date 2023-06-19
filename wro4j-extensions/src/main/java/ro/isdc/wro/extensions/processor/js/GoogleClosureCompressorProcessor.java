@@ -40,12 +40,12 @@ import ro.isdc.wro.util.ObjectFactory;
 
 
 /**
- * Uses Google closure compiler for js minimization.
- * <p/>
- * In order to make this class {@link Context} agnostic, set the encoding explicitly using
- * {@link GoogleClosureCompressorProcessor#setEncoding(String)}.
+ * <p>Uses Google closure compiler for js minimization.</p>
  *
- * @see http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html
+ * <p>In order to make this class {@link Context} agnostic, set the encoding explicitly using
+ * {@link GoogleClosureCompressorProcessor#setEncoding(String)}.</p>
+ *
+ * See <a href="http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html">http://blog.bolinfest.com/2009/11/calling-closure-compiler-from-java.html</a>
  * @author Alex Objelean
  */
 @Minimize

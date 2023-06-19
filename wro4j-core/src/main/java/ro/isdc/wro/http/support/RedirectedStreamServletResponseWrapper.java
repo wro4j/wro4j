@@ -25,7 +25,6 @@ import ro.isdc.wro.model.resource.locator.UrlUriLocator;
  *
  * @author Alex Objelean
  * @since 1.4.5
- * @created 18 Mar 2012
  */
 public class RedirectedStreamServletResponseWrapper
     extends HttpServletResponseWrapper {

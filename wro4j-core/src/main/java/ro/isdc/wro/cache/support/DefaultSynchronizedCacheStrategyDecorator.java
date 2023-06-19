@@ -29,7 +29,6 @@ import ro.isdc.wro.util.SchedulerHelper;
  * Responsible for invoking {@link GroupsProcessor} when cache key is missed.
  *
  * @author Alex Objelean
- * @crated 2 May 2012
  * @since 1.4.6
  */
 public class DefaultSynchronizedCacheStrategyDecorator

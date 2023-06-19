@@ -23,15 +23,14 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * Rewrites background images by replacing the url with data uri of the image. If the replacement is not successful, it
- * is left unchanged.
- * <p/>
- * Attention: This processor should be added before {@link CssUrlRewritingProcessor}, otherwise the url's won't be
- * replaced. For more details, @see <a href="http://en.wikipedia.org/wiki/Data_URI_scheme">DataUri Scheme on
- * Wikipedia</a>
+ * <p>Rewrites background images by replacing the url with data uri of the image. If the replacement is not successful, it
+ * is left unchanged.</p>
+ *
+ * <p>Attention: This processor should be added before {@link CssUrlRewritingProcessor}, otherwise the URLs won't be
+ * replaced. For more details, see <a href="http://en.wikipedia.org/wiki/Data_URI_scheme">DataUri Scheme on
+ * Wikipedia</a></p>
  *
  * @author Alex Objelean
- * @created May 9, 2010
  */
 public class CssDataUriPreProcessor
     extends AbstractCssUrlRewritingProcessor {
@@ -133,7 +132,6 @@ public class CssDataUriPreProcessor
 
   /**
    * @return the DataUriGenerator class responsible for transforming streams into base64 encoded strings.
-   * @VisibleForTesting
    */
   protected DataUriGenerator getDataUriGenerator() {
     if (dataUriGenerator == null) {

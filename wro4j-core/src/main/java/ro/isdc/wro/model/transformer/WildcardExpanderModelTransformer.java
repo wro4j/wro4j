@@ -29,15 +29,15 @@ import ro.isdc.wro.util.Transformer;
 
 
 /**
- * A decorator which looks up for resources containing wildcards and replaces them with the corresponding collection of
- * specific resources. For example, a resource of this type:
- * <p/>
+ * <p>A decorator which looks up for resources containing wildcards and replaces them with the corresponding collection of
+ * specific resources. For example, a resource of this type:</p>
+ *
  * {@code
  *   <js>/path/to/**.js</js>
  * }
- * <p/>
- * can be transformed into:
- * <p/>
+ *
+ * <p>can be transformed into:</p>
+ *
  * {@code
  *   <js>/path/to/a1.js</js>
  * } <br/>
@@ -47,12 +47,11 @@ import ro.isdc.wro.util.Transformer;
  * {@code
  *   <js>/path/to/a3.js</js>
  * } <br/>
- * <p/>
- * This model transformation is also known as wildcard expander, because it mutates the model after it is built by
- * adding resources to the group which contains resources with wildcard uri.
+ *
+ * <p>This model transformation is also known as wildcard expander, because it mutates the model after it is built by
+ * adding resources to the group which contains resources with wildcard uri.</p>
  *
  * @author Alex Objelean
- * @created 18 Jul 2011
  * @since 1.4.0
  */
 @SuppressWarnings("serial")

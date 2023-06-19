@@ -32,12 +32,11 @@ import ro.isdc.wro.util.StopWatch;
 
 
 /**
- * Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.
- * <p/>
- * This class is thread-safe because it doesn't have any state.
+ * <p>Creates {@link ro.isdc.wro.model.WroModel} from a groovy DSL.</p>
+ *
+ * <p>This class is thread-safe because it doesn't have any state.</p>
  *
  * @author Romain Philibert
- * @created 19 Jul 2011
  * @since 1.4.0
  */
 public class GroovyModelFactory

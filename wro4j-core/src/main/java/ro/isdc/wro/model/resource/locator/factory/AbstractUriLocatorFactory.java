@@ -19,7 +19,6 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * uriLocator from the supplied list which will accept the url.
  *
  * @author Alex Objelean
- * @created Created on Nov 4, 2008
  */
 public abstract class AbstractUriLocatorFactory implements UriLocatorFactory {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractUriLocatorFactory.class);

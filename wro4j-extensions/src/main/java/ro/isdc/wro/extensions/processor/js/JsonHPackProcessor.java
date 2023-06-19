@@ -30,7 +30,6 @@ import ro.isdc.wro.util.ObjectFactory;
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 7 Jun 2011
  */
 @Minimize
 @SupportedResourceType(ResourceType.JS)

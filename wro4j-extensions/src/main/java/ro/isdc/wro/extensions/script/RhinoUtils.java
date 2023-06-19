@@ -22,8 +22,8 @@ import org.mozilla.javascript.ScriptableObject;
  * <p>
  * This class can be used directly in Rhino.
  * <p>
- * This class was inspired from {@link http
- * ://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java}
+ * This class was inspired from
+ * <a href="http://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java">http://mongodb-rhino.googlecode.com/svn/trunk/modules/com.mongodb.rhino/src/com/mongodb/rhino/JSON.java</a>
  * 
  * @author Alex Objelean
  * @since 1.3.6
@@ -81,7 +81,6 @@ public class RhinoUtils {
    * @param object
    *          A Rhino native object
    * @return The JSON string
-   * @see RhinoUtils#convertSpecial(Object)
    */
   public static String toJson(final Object object) {
     return toJson(object, true);

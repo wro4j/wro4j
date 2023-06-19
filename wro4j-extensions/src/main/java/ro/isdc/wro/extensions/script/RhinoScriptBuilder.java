@@ -86,7 +86,6 @@ public final class RhinoScriptBuilder {
    * Add a client side environment to the script context (client-side aware).
    *
    * @return {@link RhinoScriptBuilder} used to chain evaluation of the scripts.
-   * @throws IOException
    */
   public RhinoScriptBuilder addClientSideEnvironment() {
     try {
@@ -158,7 +157,6 @@ public final class RhinoScriptBuilder {
 	 * @param script     the string representation of the script to evaluate.
 	 * @param sourceName the name of the evaluated script.
 	 * @return evaluated object.
-	 * @throws IOException if the script couldn't be retrieved.
 	 */
 	public RhinoScriptBuilder evaluateChain(final String script, final String sourceName) {
 		notNull(script);
@@ -189,7 +187,6 @@ public final class RhinoScriptBuilder {
 	 * @param script     string representation of the script to evaluate.
 	 * @param sourceName the name of the evaluated script.
 	 * @return evaluated object.
-	 * @throws IOException if the script couldn't be retrieved.
 	 */
 	public Object evaluate(final String script, final String sourceName) {
 		notNull(script);

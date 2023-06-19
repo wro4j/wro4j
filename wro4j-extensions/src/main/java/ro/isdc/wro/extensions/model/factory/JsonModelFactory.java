@@ -21,14 +21,13 @@ import com.google.gson.reflect.TypeToken;
 
 
 /**
- * TODO: validate duplicate groups & null resource type
- * <p/>
- * Creates {@link WroModel} from a json.
- * <p/>
- * This class is thread-safe because it doesn't have any state..
+ * <p>TODO: validate duplicate groups and null resource type</p>
+ *
+ * <p>Creates {@link WroModel} from a json.</p>
+ *
+ * <p>This class is thread-safe because it doesn't have any state.</p>
  *
  * @author Alex Objelean
- * @created 13 Mar 2011
  * @since 1.3.6
  */
 public class JsonModelFactory

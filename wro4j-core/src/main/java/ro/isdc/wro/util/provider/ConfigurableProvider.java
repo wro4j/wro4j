@@ -12,7 +12,6 @@ import ro.isdc.wro.model.spi.ModelFactoryProvider;
  * Bring all providers in a single place. Simplifies the way providers are implemented.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public interface ConfigurableProvider

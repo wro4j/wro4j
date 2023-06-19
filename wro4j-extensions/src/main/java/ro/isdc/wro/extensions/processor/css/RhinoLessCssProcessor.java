@@ -27,80 +27,27 @@ import ro.isdc.wro.util.ObjectFactory;
 /**
  * A processor using lessCss engine: @see http://www.asual.com/lesscss/
  * <p>
- * The main css goodies are: <br/>
+ * The main css goodies are:
  * <ul>
  * <li>Variables - Variables allow you to specify widely used values in a single place, and then re-use them throughout
- * the style sheet, making global changes as easy as changing one line of code.<br/>
- *
- * <pre>
- * @brand_color: #4D926F;
- * #header { color: @brand_color; }
- * h2 { color: @brand_color; }
- * </pre>
- *
+ * the style sheet, making global changes as easy as changing one line of code.
  * </li>
  * <li>Mixins - Mixins allow you to embed all the properties of a class into another class by simply including the class
  * name as one of its properties. It's just like variables, but for whole classes. Mixins can also behave like
- * functions, and take arguments, as seen in the example bellow.</br>
- *
- * <pre>
- *  .rounded_corners (@radius: 5px) {
- *   -moz-border-radius: @radius;
- *   -webkit-border-radius: @radius;
- *   border-radius: @radius;
- * }
- *
- * #header {
- *   .rounded_corners;
- * }
- *
- * #footer {
- *   .rounded_corners(10px);
- * }
- * </pre>
- *
+ * functions, and take arguments.
  * </li>
  * <li>Nested Rules - Rather than constructing long selector names to specify inheritance, in Less you can simply nest
- * selectors inside other selectors. This makes inheritance clear and style sheets shorter </br>
- *
- * <pre>
- * #header {
- *   color: red;
- *   a {
- *     font-weight: bold;
- *     text-decoration: none;
- *   }
- * }
- * </pre>
- *
+ * selectors inside other selectors. This makes inheritance clear and style sheets shorter.
  * </li>
  * <li>Operations - Are some elements in your style sheet proportional to other elements? Operations let you add,
  * subtract, divide and multiply property values and colors, giving you the power to do create complex relationships
- * between properties.</br>
- *
- * <pre>
- *  @the-border: 1px;
- * @base-color: #111;
- *
- * #header {
- *   color: @base-color * 3;
- *   border-left: @the-border;
- *   border-right: @the-border * 2;
- * }
- *
- * #footer {
- *   color: (@base-color + #111) * 1.5;
- * }
- * </pre>
- *
+ * between properties.
  * </li>
  * </ul>
  * If processing encounter any issues during processing, no change will be applied to the resource.
- * <p/>
  *
  * @author Alex Objelean
  * @since 1.2.6
- * @created 21 Apr 2010
  */
 @SupportedResourceType(ResourceType.CSS)
 public class RhinoLessCssProcessor

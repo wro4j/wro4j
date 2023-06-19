@@ -17,7 +17,6 @@ import ro.isdc.wro.util.AbstractDecorator;
  * {@link InjectableUriLocatorFactoryDecorator#getInstance(String)} getInstance method is invoked.
  *
  * @author Alex Objelean
- * @created 7 Mar 2014
  * @since 1.7.4
  */
 public class InjectableUriLocatorFactoryDecorator extends AbstractDecorator<UriLocatorFactory>

@@ -22,7 +22,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * the pool fails.
  *
  * @author Alex Objelean
- * @created 10 Nov 2011
  * @since 1.4.2
  */
 public class ObjectPoolHelper<T> {

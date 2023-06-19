@@ -46,7 +46,6 @@ import ro.isdc.wro.util.Transformer;
  * injection logic by creating an {@link Injector} and injecting where it is appropriate.
  *
  * @author Alex Objelean
- * @created Created on Dec 30, 2009
  */
 public class BaseWroManagerFactory
     implements WroManagerFactory {
@@ -269,8 +268,6 @@ public class BaseWroManagerFactory
   }
 
   /**
-   * @param servletContext
-   *          {@link ServletContext} which could be useful for creating dynamic {@link WroModel}.
    * @return {@link WroModelFactory} implementation
    */
   protected WroModelFactory newModelFactory() {
@@ -312,8 +309,9 @@ public class BaseWroManagerFactory
   }
 
   /**
-   * @param hashBuilder
-   *          the hashBuilder to set
+   * @param hashStrategy
+   *          the hash strategy to set
+   * @return the factory, in order to chain calls.
    */
   public BaseWroManagerFactory setHashStrategy(final HashStrategy hashStrategy) {
     this.hashStrategy = hashStrategy;

@@ -20,7 +20,6 @@ import ro.isdc.wro.model.resource.processor.impl.js.SemicolonAppenderPreProcesso
  *
  * @author Alex Objelean
  * @since 1.3.8
- * @created 17 Jun 2011
  */
 public class GoogleAdvancedStandaloneManagerFactory extends ExtensionsStandaloneManagerFactory {
   @Override

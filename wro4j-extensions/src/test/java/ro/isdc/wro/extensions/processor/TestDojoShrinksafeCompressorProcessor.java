@@ -19,7 +19,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test Dojo Shrinksafe compressor processor.
  *
  * @author Alex Objelean
- * @created Created on Nov 6, 2010
  */
 public class TestDojoShrinksafeCompressorProcessor {
   @Test

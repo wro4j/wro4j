@@ -35,12 +35,12 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
- * preProcessor & postProcessor. It is necessary because preProcessor is responsible for updating model with found
- * imported resources, while post processor removes import occurrences.
- * <p/>
- * When processor finds an import which is not valid, it will check the
- * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.
+ * <p>CssImport Processor responsible for handling css <code>@import</code> statement. It is implemented as both:
+ * preProcessor and postProcessor. It is necessary because preProcessor is responsible for updating model with found
+ * imported resources, while post processor removes import occurrences.</p>
+ *
+ * <p>When processor finds an import which is not valid, it will check the
+ * {@link WroConfiguration#isIgnoreMissingResources()} flag. If it is set to false, the processor will fail.</p>
  *
  * @author Alex Objelean
  */
@@ -82,7 +82,8 @@ public abstract class AbstractCssImportPreProcessor
 
   /**
    * Useful to check that there is no memory leak after processing completion.
-   * @VisibleForTesting
+   * 
+   * @return The context map.
    */
   protected final Map<String, Pair<List<String>, Stack<String>>> getContextMap() {
     return contextMap;
@@ -181,6 +182,7 @@ public abstract class AbstractCssImportPreProcessor
   /**
    * Extracts a list of imports from css content.
    *
+   * @param css The CSS file in which the imports should be looked up.
    * @return a list of found imports.
    */
   protected List<String> findImports(final String css) {
@@ -216,6 +218,8 @@ public abstract class AbstractCssImportPreProcessor
    *          the css to transform.
    * @param importedResources
    *          the list of found imports.
+   * @return A string containing the transformed CSS content.
+   * @throws IOException when the transformation cannot be done.
    */
   protected abstract String doTransform(final String cssContent, final List<Resource> importedResources)
       throws IOException;
@@ -231,8 +235,6 @@ public abstract class AbstractCssImportPreProcessor
   /**
    * Invoked when a recursive import is detected. Used to assert the recursive import detection correct behavior. By
    * default this method does nothing.
-   *
-   * @VisibleForTesting
    */
   protected void onRecursiveImportDetected() {
   }

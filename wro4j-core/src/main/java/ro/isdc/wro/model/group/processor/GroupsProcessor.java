@@ -35,7 +35,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
  * Default group processor which perform preProcessing, merge and postProcessing on groups resources.
  *
  * @author Alex Objelean
- * @created Created on Nov 3, 2008
  */
 public class GroupsProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(GroupsProcessor.class);

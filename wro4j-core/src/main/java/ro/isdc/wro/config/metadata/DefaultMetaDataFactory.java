@@ -12,7 +12,6 @@ import java.util.Map;
  *
  * @author Alex Objelean
  * @since 1.6.0
- * @created 20 Oct 2012
  */
 public class DefaultMetaDataFactory
     implements MetaDataFactory {

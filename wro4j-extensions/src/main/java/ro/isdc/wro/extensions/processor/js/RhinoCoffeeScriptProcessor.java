@@ -30,7 +30,6 @@ import ro.isdc.wro.util.ObjectFactory;
  * Uses coffee script library loaded from the webjar to compile to javascript code.
  *
  * @author Alex Objelean
- * @created 26 Mar 2011
  * @since 1.3.6
  */
 @SupportedResourceType(ResourceType.JS)

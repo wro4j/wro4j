@@ -21,7 +21,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test json hpack processor.
  *
  * @author Alex Objelean
- * @created Created on June 07, 2011
  */
 public class TestJsonHPackProcessor {
 

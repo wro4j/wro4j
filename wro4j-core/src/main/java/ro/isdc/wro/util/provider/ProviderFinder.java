@@ -18,7 +18,6 @@ import ro.isdc.wro.util.Ordered;
  * Helps to find available providers of any supported type.
  *
  * @author Alex Objelean
- * @created 16 Jun 2012
  * @since 1.4.7
  */
 public class ProviderFinder<T> {

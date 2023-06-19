@@ -8,11 +8,10 @@ import ro.isdc.wro.model.resource.ResourceType;
 
 
 /**
- * Perform processing of the uri and extracts group & resource related informations: name of the group, resource type
+ * Perform processing of the uri and extracts group and resource related informations: name of the group, resource type
  * and whether the result should produce minimized version.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public interface GroupExtractor {
   /**

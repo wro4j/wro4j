@@ -21,7 +21,6 @@ import ro.isdc.wro.model.resource.Resource;
  * will not be reflected.
  *
  * @author Alex Objelean
- * @created 21 Sep 2012
  * @since 1.5.0
  */
 public class WroModelInspector {
@@ -44,7 +43,7 @@ public class WroModelInspector {
   }
 
   /**
-   * @param resource
+   * @param resourceUri
    *          the {@link Resource} to search in all available groups.
    * @return t collection of group names containing provided resource. If the resource is not availalbe, an empty collection
    *         will be returned.

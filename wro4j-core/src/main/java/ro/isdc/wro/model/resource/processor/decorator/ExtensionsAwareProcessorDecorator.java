@@ -19,15 +19,14 @@ import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
 
 /**
- * Enforce decorated processors to be applied only on predefined extension. The extenions should be of this form: "js",
- * "coffee", "css", etc. Usage example:
- * <p/>
+ * <p>Enforce decorated processors to be applied only on predefined extension. The extenions should be of this form: "js",
+ * "coffee", "css", etc. Usage example:</p>
+ *
  * <code>
  * ExtensionsAwareProcessorDecorator.decorate(decoratedProcessor).addExtension("js");
  * </code>
  *
  * @author Alex Objelean
- * @created 16 Sep 2011
  * @since 1.4.1
  */
 public class ExtensionsAwareProcessorDecorator

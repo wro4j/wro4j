@@ -15,7 +15,7 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * The underlying implementation use the json.hpack project: {@link https://github.com/WebReflection/json.hpack}.
+ * The underlying implementation use <a href="https://github.com/WebReflection/json.hpack">the json.hpack project</a>.
  *
  * @author Alex Objelean
  * @since 1.3.8
@@ -77,7 +77,7 @@ public class JsonHPack {
   }
 
   /**
-   * @param data css content to process.
+   * @param rawData css content to process.
    * @return processed css content.
    */
   public String pack(final String rawData) {

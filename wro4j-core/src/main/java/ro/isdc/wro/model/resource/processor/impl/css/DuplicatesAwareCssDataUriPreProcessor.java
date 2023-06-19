@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
  * detect duplicated image url and avoid replacing it with dataUri.
  *
  * @author Alex Objelean
- * @created May 9, 2010
  */
 public class DuplicatesAwareCssDataUriPreProcessor
   extends CssDataUriPreProcessor {

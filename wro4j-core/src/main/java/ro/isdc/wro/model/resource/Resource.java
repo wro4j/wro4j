@@ -16,7 +16,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * Encapsulates information about a resource. This class is not final because we need to mock it in unit tests.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public class Resource {
   /**

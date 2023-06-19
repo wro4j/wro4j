@@ -68,7 +68,6 @@ import ro.isdc.wro.util.Transformer;
  * <code>@Inject</code> annotation on its fields.
  *
  * @author Alex Objelean
- * @created Created on Oct 30, 2008
  */
 public class WroManager
     implements WroConfigurationChangeListener {
@@ -175,9 +174,9 @@ public class WroManager
   }
 
   /**
-   * Format the version of the resource in the path. Default implementation use hash as a folder: <hash>/groupName.js.
+   * Format the version of the resource in the path. Default implementation use hash as a folder: {@code <hash>/groupName.js}.
    * The implementation can be changed to follow a different versioning style, like version parameter:
-   * /groupName.js?version=<hash>
+   * {@code /groupName.js?version=<hash>}
    *
    * @param hash
    *          Hash of the resource.

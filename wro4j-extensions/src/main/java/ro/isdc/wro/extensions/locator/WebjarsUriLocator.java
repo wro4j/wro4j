@@ -23,7 +23,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @author Paul Podgorsek
- * @created 5 Oct 2015
  * @since 1.8.0
  */
 public class WebjarsUriLocator implements UriLocator {

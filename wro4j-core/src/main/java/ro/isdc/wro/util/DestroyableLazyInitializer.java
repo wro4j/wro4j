@@ -13,7 +13,6 @@ import ro.isdc.wro.model.resource.processor.Destroyable;
  * A subclass of {@link LazyInitializer} allows to destroy the created object.
  *
  * @author Alex Objelean
- * @created 24 Oct 2011
  * @since 1.4.2
  */
 public abstract class DestroyableLazyInitializer<T> extends LazyInitializer<T> {

@@ -14,7 +14,6 @@ import ro.isdc.wro.util.Function;
  * doing something with the files associated with one wildcard resource element.
  *
  * @author Alex Objelean
- * @created 20 Jul 2011
  * @since 1.4.0
  */
 public interface WildcardExpanderHandlerAware {

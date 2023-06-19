@@ -6,7 +6,6 @@ package ro.isdc.wro.model.resource.processor;
  * Linux, but unsupported on other platforms), or if certain prerequisites are met.
  * 
  * @author Alex Objelean
- * @created 11 Sep 2012
  * @since 1.5.0
  */
 public interface SupportAware {

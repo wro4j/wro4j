@@ -10,7 +10,6 @@ import ro.isdc.wro.model.resource.locator.UriLocator;
  * An {@link UriLocator} which knows how to handle wildcards and provides {@link WildcardStreamLocator} implementation.
  *
  * @author Alex Objelean
- * @created Created on May 09, 2010
  */
 public abstract class WildcardUriLocatorSupport
   implements UriLocator {

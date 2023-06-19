@@ -17,7 +17,6 @@ import ro.isdc.wro.util.WroUtil;
  *
  * @author Alex Objelean
  * @since 1.5.0
- * @created 22 Sep 2012
  */
 public class ConfigurableAntPathPatternsResourceAuthorizationManager
     implements ResourceAuthorizationManager {

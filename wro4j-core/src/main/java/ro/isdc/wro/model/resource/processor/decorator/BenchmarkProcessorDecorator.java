@@ -18,7 +18,6 @@ import ro.isdc.wro.util.StopWatch;
  *
  * @author Alex Objelean
  * @since 1.6.3
- * @created 12 Jan 2013
  */
 public class BenchmarkProcessorDecorator
     extends ProcessorDecorator {

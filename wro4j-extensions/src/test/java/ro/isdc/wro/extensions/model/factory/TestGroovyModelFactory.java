@@ -44,7 +44,6 @@ import ro.isdc.wro.util.WroTestUtils;
  * Test {@link GroovyModelFactory}
  *
  * @author Romain Philibert
- * @created 19 Jul 2011
  */
 public class TestGroovyModelFactory {
   private static final Logger LOG = LoggerFactory.getLogger(TestGroovyModelFactory.class);

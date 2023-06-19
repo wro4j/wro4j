@@ -10,7 +10,6 @@ import ro.isdc.wro.model.resource.processor.factory.ProcessorsFactory;
 
 /**
  * @author Alex Objelean
- * @created 31 Jul 2011
  * @since 1.4.0
  */
 public class ConfigurableStandaloneContextAwareManagerFactory extends DefaultStandaloneContextAwareManagerFactory {

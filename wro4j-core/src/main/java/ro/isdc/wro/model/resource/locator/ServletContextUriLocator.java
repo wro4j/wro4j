@@ -26,15 +26,14 @@ import ro.isdc.wro.util.WroUtil;
 
 
 /**
- * UriLocator capable to read the resources relative to servlet context. The resource reader will attempt to locate a
+ * <p>UriLocator capable to read the resources relative to servlet context. The resource reader will attempt to locate a
  * physic resource under the servlet context and if the resource does not exist, will try to use requestDispatcher. This
- * kind of resources will be accepted if their prefix is '/'.
- * <p/>
- * This locator can be used only within a wro4j request cycle. In other words, the {@link Context} instance should be
- * available in the {@link ThreadLocal} associated with the thread invoking this locator.
+ * kind of resources will be accepted if their prefix is '/'.</p>
+ *
+ * <p>This locator can be used only within a wro4j request cycle. In other words, the {@link Context} instance should be
+ * available in the {@link ThreadLocal} associated with the thread invoking this locator.</p>
  *
  * @author Alex Objelean, Ivar Conradi Østhus
- * @created Created on Nov 10 2008
  */
 public class ServletContextUriLocator
     extends WildcardUriLocatorSupport {
@@ -237,7 +236,6 @@ public class ServletContextUriLocator
 
   /**
    * @return the strategy used by this locator.
-   * @VisibleForTesting
    */
   public LocatorStrategy getLocatorStrategy() {
     return locatorStrategy;
