@@ -75,6 +75,7 @@
 
 	<properties>
 		<!-- General properties -->
+		<java.version>9</java.version>
 		<maven.compile.encoding>UTF-8</maven.compile.encoding>
 		<maven.test.compile.encoding>UTF-8</maven.test.compile.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -120,21 +121,21 @@
 		<webjars-minimatch.version>5.1.6</webjars-minimatch.version>
 
 		<!-- Maven plugins -->
-		<buildnumber-maven-plugin.version>1.4</buildnumber-maven-plugin.version>
-		<error_prone_core.version>2.3.4</error_prone_core.version>
-		<gmavenplus-plugin.version>1.11.0</gmavenplus-plugin.version>
-		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-		<maven-bundle-plugin.version>4.2.1</maven-bundle-plugin.version>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
+		<error_prone_core.version>2.20.0</error_prone_core.version>
+		<gmavenplus-plugin.version>3.0.0</gmavenplus-plugin.version>
+		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 		<maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
-		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-		<maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+		<maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
+		<maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
+		<maven-release-plugin.version>3.0.1</maven-release-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+		<versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -481,8 +482,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
-						<source>9</source>
-						<target>9</target>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
 						<encoding>UTF-8</encoding>
 						<showWarnings>true</showWarnings>
 						<compilerArgs>
@@ -492,7 +493,6 @@
 								-Xep:AssistedInjectAndInjectOnSameConstructor:WARN
 								-Xep:AutoFactoryAtInject:WARN -Xep:ClassName:WARN
 								-Xep:ComparisonContractViolated:WARN -Xep:DepAnn:WARN
-								-Xep:DivZero:WARN
 								-Xep:EmptyIf:WARN
 								-Xep:FuzzyEqualsShouldNotBeUsedInEqualsMethod:WARN
 								-Xep:InjectInvalidTargetingOnScopingAnnotation:WARN
@@ -502,37 +502,34 @@
 								-Xep:InjectedConstructorAnnotations:WARN
 								-Xep:InsecureCryptoUsage:WARN
 								-Xep:IterablePathParameter:WARN
-								-Xep:JMockTestWithoutRunWithOrRuleAnnotation:WARN
 								-Xep:Java7ApiChecker:WARN
 								-Xep:JavaxInjectOnFinalField:WARN
-								-Xep:LockMethodChecker:WARN -Xep:LongLiteralLowerCaseSuffix:WARN
+								-Xep:LongLiteralLowerCaseSuffix:WARN
 								-Xep:NoAllocation:WARN
 								-Xep:NumericEquality:WARN
-								-Xep:ParameterPackage:WARN
-								-Xep:StaticOrDefaultInterfaceMethod:WARN -Xep:UnlockMethod:WARN
-								-Xep:AnnotateFormatMethod:WARN -Xep:AnnotationPosition:WARN
+								-Xep:StaticOrDefaultInterfaceMethod:WARN
+								-Xep:AnnotateFormatMethod:WARN
+								-Xep:AnnotationPosition:WARN
 								-Xep:AssertFalse:WARN
 								-Xep:AssistedInjectAndInjectOnConstructors:WARN
 								-Xep:BinderIdentityRestoredDangerously:WARN
 								-Xep:BindingToUnqualifiedCommonType:WARN
-								-Xep:ConstructorInvokesOverridable:WARN
-								-Xep:ConstructorLeaksThis:WARN
-								-Xep:EmptyTopLevelDeclaration:WARN -Xep:EqualsBrokenForNull:WARN
+								-Xep:EmptyTopLevelDeclaration:WARN
+								-Xep:EqualsBrokenForNull:WARN
 								-Xep:ExpectedExceptionChecker:WARN
-								-Xep:FunctionalInterfaceClash:WARN -Xep:HardCodedSdCardPath:WARN
-								-Xep:InconsistentOverloads:WARN -Xep:InvalidParam:WARN
+								-Xep:FunctionalInterfaceClash:WARN
+								-Xep:HardCodedSdCardPath:WARN
+								-Xep:InconsistentOverloads:WARN
+								-Xep:InvalidParam:WARN
 								-Xep:InvalidThrows:WARN
 								-Xep:MissingDefault:WARN
 								-Xep:MutableMethodReturnType:WARN
-								-Xep:NoFunctionalReturnType:WARN
 								-Xep:NonCanonicalStaticMemberImport:WARN
-								-Xep:NullableDereference:WARN
 								-Xep:PrimitiveArrayPassedToVarargsMethod:WARN
-								-Xep:ProtosAsKeyOfSetOrMap:WARN -Xep:ProvidesFix:WARN
 								-Xep:QualifierWithTypeUse:WARN -Xep:RedundantThrows:WARN
 								-Xep:ReturnFromVoid:WARN
 								-Xep:StaticQualifiedUsingExpression:WARN
-								-Xep:StringEquality:WARN -Xep:SystemExitOutsideMain:WARN
+								-Xep:SystemExitOutsideMain:WARN
 								-Xep:TestExceptionChecker:WARN
 								-Xep:UnnecessaryDefaultInEnumSwitch:WARN
 								-Xep:UnusedException:WARN
@@ -540,20 +537,20 @@
 								-Xep:ClassNamedLikeTypeParameter:WARN
 								-Xep:ConstantField:WARN
 								-Xep:EmptySetMultibindingContributions:WARN
-								-Xep:ExpectedExceptionRefactoring:WARN -Xep:FieldCanBeFinal:WARN
+								-Xep:FieldCanBeFinal:WARN
 								-Xep:FieldMissingNullable:WARN -Xep:ImmutableRefactoring:WARN
-								-Xep:LambdaFunctionalInterface:WARN -Xep:MethodCanBeStatic:WARN
+								-Xep:LambdaFunctionalInterface:WARN
+								-Xep:MethodCanBeStatic:WARN
 								-Xep:MixedArrayDimensions:WARN
 								-Xep:MultiVariableDeclaration:WARN
 								-Xep:MultipleTopLevelClasses:WARN
 								-Xep:MultipleUnaryOperatorsInMethodCall:WARN
-								-Xep:PackageLocation:WARN -Xep:ParameterComment:WARN
-								-Xep:ParameterNotNullable:WARN
+								-Xep:PackageLocation:WARN
+								-Xep:ParameterComment:WARN
 								-Xep:PrivateConstructorForNoninstantiableModule:WARN
 								-Xep:PrivateConstructorForUtilityClass:WARN
 								-Xep:RemoveUnusedImports:WARN -Xep:ReturnMissingNullable:WARN
 								-Xep:ScopeOnModule:WARN -Xep:SwitchDefault:WARN
-								-Xep:TestExceptionRefactoring:WARN
 								-Xep:ThrowsUncheckedException:WARN -Xep:TryFailRefactoring:WARN
 								-Xep:TypeParameterNaming:WARN
 								-Xep:UngroupedOverloads:WARN
@@ -653,8 +650,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>9</source>
-					<target>9</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -736,7 +733,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx2048m -XX:MaxPermSize=512m</argLine>
+					<argLine>-Xmx2048m</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
