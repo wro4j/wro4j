@@ -132,13 +132,28 @@ public class DispatcherStreamLocator {
 	public InputStream locateExternal(final HttpServletRequest request, final String location)
 			throws IOException {
 		String requestProtocol = request.getScheme();
+
 		if (request.getHeader("X-Forwarded-Proto") != null) {
 			requestProtocol = request.getHeader("X-Forwarded-Proto");
 		}
-		final String requestServerName = request.getServerName();
 
-		final String absolutePath = requestProtocol + "://" + requestServerName + location;
+		final String requestServerName = request.getServerName();
+        StringBuilder absolutePathBuilder = new StringBuilder();
+
+        if (requestProtocol != null) {
+            absolutePathBuilder.append(requestProtocol).append("://");
+        }
+
+        if (requestServerName != null) {
+            absolutePathBuilder.append(requestServerName);
+        }
+
+        absolutePathBuilder.append(location);
+
+		final String absolutePath = absolutePathBuilder.toString();
+
 		LOG.debug("locateExternalUri: {}", absolutePath);
+
 		return createExternalResourceLocator().locate(absolutePath);
 	}
 
