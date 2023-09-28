@@ -62,7 +62,7 @@
 		<!-- Add explicitly compile scope, because it is by default test -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-reload4j</artifactId>
 			<optional>true</optional>
 			<scope>compile</scope>
 		</dependency>
