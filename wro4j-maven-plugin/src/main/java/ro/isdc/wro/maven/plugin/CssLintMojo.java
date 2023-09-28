@@ -11,6 +11,7 @@ import java.io.Writer;
 import org.apache.commons.io.output.NullWriter;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import ro.isdc.wro.WroRuntimeException;
@@ -25,98 +26,95 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import ro.isdc.wro.model.resource.processor.ResourcePreProcessor;
 
-
 /**
  * Maven plugin used to validate css code defined in wro model.
  *
  * @author Alex Objelean
+ * @author Paul Podgorsek
  * @since 1.3.8
  */
 @Mojo(name = "csslint", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CssLintMojo
-    extends AbstractLinterMojo<CssLintError> {
-  /**
-   * File where the report will be written.
-   *
-   * @parameter default-value="${project.build.directory}/wro4j-reports/csslint.xml" property="reportFile"
-   * @optional
-   */
-  private File reportFile;
-  /**
-   * The preferred format of the report.
-   *
-   * @parameter property="reportFormat"
-   * @optional
-   */
-  private String reportFormat = FormatterType.LINT.getFormat();
+public class CssLintMojo extends AbstractLinterMojo<CssLintError> {
 
-  @Override
-  protected ResourcePreProcessor createResourceProcessor() {
-    return new CssLintProcessor() {
-      @Override
-      public void process(final Resource resource, final Reader reader, final Writer writer)
-          throws IOException {
-        getProgressIndicator().onProcessingResource(resource);
-        // use StringWriter to discard the merged processed result (linting is useful only for reporting errors).
-        super.process(resource, reader, new NullWriter());
-      }
+	/**
+	 * File where the report will be written.
+	 */
+	@Parameter(defaultValue = "${project.build.directory}/wro4j-reports/csslint.xml")
+	private File reportFile;
 
-      @Override
-      protected void onException(final WroRuntimeException e) {
-        CssLintMojo.this.onException(e);
-      }
+	/**
+	 * The preferred format of the report.
+	 */
+	@Parameter
+	private String reportFormat = FormatterType.LINT.getFormat();
 
-      @Override
-      protected void onCssLintException(final CssLintException e, final Resource resource) {
-        getProgressIndicator().addFoundErrors(e.getErrors().size());
-        getLog().error(
-            e.getErrors().size() + " errors found while processing resource: " + resource.getUri() + " Errors are: "
-                + e.getErrors());
-        // collect found errors
-        addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
-        if (isFailAllowed()) {
-          throw e;
-        }
-      };
-    }.setOptionsAsString(getOptions());
-  }
+	@Override
+	protected ResourcePreProcessor createResourceProcessor() {
+		return new CssLintProcessor() {
+			@Override
+			public void process(final Resource resource, final Reader reader, final Writer writer) throws IOException {
+				getProgressIndicator().onProcessingResource(resource);
+				// use StringWriter to discard the merged processed result (linting is useful
+				// only for reporting errors).
+				super.process(resource, reader, new NullWriter());
+			}
 
-  @Override
-  protected boolean wantProcessGroup(final String groupName, final ResourceType resourceType) {
-    return resourceType == ResourceType.CSS;
-  }
+			@Override
+			protected void onException(final WroRuntimeException e) {
+				CssLintMojo.this.onException(e);
+			}
 
-  @Override
-  protected ReportXmlFormatter createXmlFormatter(final LintReport<CssLintError> lintReport, final FormatterType type) {
-    return ReportXmlFormatter.createForCssLintError(lintReport, type);
-  }
+			@Override
+			protected void onCssLintException(final CssLintException e, final Resource resource) {
+				getProgressIndicator().addFoundErrors(e.getErrors().size());
+				getLog().error(e.getErrors().size() + " errors found while processing resource: " + resource.getUri()
+						+ " Errors are: " + e.getErrors());
+				// collect found errors
+				addReport(ResourceLintReport.create(resource.getUri(), e.getErrors()));
+				if (isFailAllowed()) {
+					throw e;
+				}
+			};
+		}.setOptionsAsString(getOptions());
+	}
 
-  @Override
-  protected File getReportFile() {
-    return reportFile;
-  }
+	@Override
+	protected boolean wantProcessGroup(final String groupName, final ResourceType resourceType) {
+		return resourceType == ResourceType.CSS;
+	}
 
-  @Override
-  protected String getReportFormat() {
-    return reportFormat;
-  }
+	@Override
+	protected ReportXmlFormatter createXmlFormatter(final LintReport<CssLintError> lintReport,
+			final FormatterType type) {
+		return ReportXmlFormatter.createForCssLintError(lintReport, type);
+	}
 
-  void setReportFile(final File reportFile) {
-    this.reportFile = reportFile;
-  }
+	@Override
+	protected File getReportFile() {
+		return reportFile;
+	}
 
-  /**
-   * @param reportFormat
-   *          the preferred report format.
-   */
-  void setReportFormat(final String reportFormat) {
-    this.reportFormat = reportFormat;
-  }
+	@Override
+	protected String getReportFormat() {
+		return reportFormat;
+	}
 
-  /**
-   * Used by unit test to check if mojo doesn't fail.
-   */
-  @Override
-  void onException(final Exception e) {
-  }
+	void setReportFile(final File reportFile) {
+		this.reportFile = reportFile;
+	}
+
+	/**
+	 * @param reportFormat the preferred report format.
+	 */
+	void setReportFormat(final String reportFormat) {
+		this.reportFormat = reportFormat;
+	}
+
+	/**
+	 * Used by unit test to check if mojo doesn't fail.
+	 */
+	@Override
+	void onException(final Exception e) {
+	}
+
 }

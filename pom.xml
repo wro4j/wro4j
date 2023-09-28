@@ -26,7 +26,7 @@
     </description>
 
 	<issueManagement>
-		<system>github</system>
+		<system>GitHub</system>
 		<url>https://github.com/wro4j/wro4j/issues</url>
 	</issueManagement>
 
@@ -134,7 +134,6 @@
 
 		<!-- Maven plugins -->
 		<buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
-		<error_prone_core.version>2.20.0</error_prone_core.version>
 		<gmavenplus-plugin.version>3.0.0</gmavenplus-plugin.version>
 		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
 		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
@@ -500,90 +499,10 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
-						<release>${java.version}</release>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
 						<encoding>UTF-8</encoding>
 						<showWarnings>true</showWarnings>
-						<compilerArgs>
-							<arg>-XDcompilePolicy=simple</arg>
-							<arg>-Xplugin:ErrorProne -XepAllErrorsAsWarnings
-								-Xep:AndroidJdkLibsChecker:WARN
-								-Xep:AssistedInjectAndInjectOnSameConstructor:WARN
-								-Xep:AutoFactoryAtInject:WARN -Xep:ClassName:WARN
-								-Xep:ComparisonContractViolated:WARN -Xep:DepAnn:WARN
-								-Xep:EmptyIf:WARN
-								-Xep:FuzzyEqualsShouldNotBeUsedInEqualsMethod:WARN
-								-Xep:InjectInvalidTargetingOnScopingAnnotation:WARN
-								-Xep:InjectMoreThanOneQualifier:WARN
-								-Xep:InjectScopeAnnotationOnInterfaceOrAbstractClass:WARN
-								-Xep:InjectScopeOrQualifierAnnotationRetention:WARN
-								-Xep:InjectedConstructorAnnotations:WARN
-								-Xep:InsecureCryptoUsage:WARN
-								-Xep:IterablePathParameter:WARN
-								-Xep:Java7ApiChecker:WARN
-								-Xep:LongLiteralLowerCaseSuffix:WARN
-								-Xep:NoAllocation:WARN
-								-Xep:NumericEquality:WARN
-								-Xep:StaticOrDefaultInterfaceMethod:WARN
-								-Xep:AnnotateFormatMethod:WARN
-								-Xep:AnnotationPosition:WARN
-								-Xep:AssertFalse:WARN
-								-Xep:AssistedInjectAndInjectOnConstructors:WARN
-								-Xep:BinderIdentityRestoredDangerously:WARN
-								-Xep:BindingToUnqualifiedCommonType:WARN
-								-Xep:EmptyTopLevelDeclaration:WARN
-								-Xep:EqualsBrokenForNull:WARN
-								-Xep:ExpectedExceptionChecker:WARN
-								-Xep:FunctionalInterfaceClash:WARN
-								-Xep:HardCodedSdCardPath:WARN
-								-Xep:InconsistentOverloads:WARN
-								-Xep:InvalidParam:WARN
-								-Xep:InvalidThrows:WARN
-								-Xep:MissingDefault:WARN
-								-Xep:MutableMethodReturnType:WARN
-								-Xep:NonCanonicalStaticMemberImport:WARN
-								-Xep:PrimitiveArrayPassedToVarargsMethod:WARN
-								-Xep:QualifierWithTypeUse:WARN -Xep:RedundantThrows:WARN
-								-Xep:ReturnFromVoid:WARN
-								-Xep:StaticQualifiedUsingExpression:WARN
-								-Xep:SystemExitOutsideMain:WARN
-								-Xep:TestExceptionChecker:WARN
-								-Xep:UnnecessaryDefaultInEnumSwitch:WARN
-								-Xep:UnusedException:WARN
-								-Xep:BooleanParameter:WARN
-								-Xep:ClassNamedLikeTypeParameter:WARN
-								-Xep:ConstantField:WARN
-								-Xep:EmptySetMultibindingContributions:WARN
-								-Xep:FieldCanBeFinal:WARN
-								-Xep:FieldMissingNullable:WARN
-								-Xep:ImmutableRefactoring:WARN
-								-Xep:LambdaFunctionalInterface:WARN
-								-Xep:MethodCanBeStatic:WARN
-								-Xep:MixedArrayDimensions:WARN
-								-Xep:MultiVariableDeclaration:WARN
-								-Xep:MultipleTopLevelClasses:WARN
-								-Xep:MultipleUnaryOperatorsInMethodCall:WARN
-								-Xep:PackageLocation:WARN
-								-Xep:ParameterComment:WARN
-								-Xep:PrivateConstructorForNoninstantiableModule:WARN
-								-Xep:PrivateConstructorForUtilityClass:WARN
-								-Xep:RemoveUnusedImports:WARN -Xep:ReturnMissingNullable:WARN
-								-Xep:ScopeOnModule:WARN -Xep:SwitchDefault:WARN
-								-Xep:ThrowsUncheckedException:WARN -Xep:TryFailRefactoring:WARN
-								-Xep:TypeParameterNaming:WARN
-								-Xep:UngroupedOverloads:WARN
-								-Xep:UnnecessarySetDefault:WARN
-								-Xep:UnnecessaryStaticImport:WARN -Xep:UseBinds:WARN
-								-Xep:WildcardImport:WARN</arg>
-						</compilerArgs>
-						<annotationProcessorPaths>
-							<path>
-								<groupId>com.google.errorprone</groupId>
-								<artifactId>error_prone_core</artifactId>
-								<version>${error_prone_core.version}</version>
-							</path>
-						</annotationProcessorPaths>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -806,7 +725,7 @@
 				<module>wro4j-core</module>
 				<module>wro4j-extensions</module>
 				<module>wro4j-maven-plugin</module>
-				<!-- <module>wro4j-osgi</module> -->
+				<module>wro4j-osgi</module>
 			</modules>
 		</profile>
 	</profiles>
