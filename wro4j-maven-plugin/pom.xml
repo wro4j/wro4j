@@ -68,4 +68,22 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<executions>
+					<!-- if you want to generate help goal -->
+					<execution>
+						<id>help-goal</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
