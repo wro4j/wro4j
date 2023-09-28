@@ -32,7 +32,6 @@ import ro.isdc.wro.util.Function;
  * Default implementation of {@link WildcardStreamLocator}.
  *
  * @author Alex Objelean
- * @created May 8, 2010
  */
 public class DefaultWildcardStreamLocator
     implements WildcardStreamLocator, WildcardExpanderHandlerAware {
