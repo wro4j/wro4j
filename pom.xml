@@ -116,7 +116,7 @@
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<rhino.version>1.7.13</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
-		<slf4j.version>2.0.7</slf4j.version>
+		<slf4j.version>2.0.9</slf4j.version>
 		<spring.version>6.0.10</spring.version>
 		<webjars-coffee-script.version>1.11.0</webjars-coffee-script.version>
 		<webjars-domelementtype.version>2.0.1</webjars-domelementtype.version>
@@ -248,7 +248,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
+				<artifactId>slf4j-reload4j</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -455,7 +455,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-reload4j</artifactId>
 		</dependency>
 
 		<!-- Tests -->
