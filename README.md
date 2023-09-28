@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/wro4j/wro4j/master/docs/wro4j-logo.png"> Web Resource Optimizer for Java
+# <img src="https://raw.githubusercontent.com/wro4j/wro4j/master/docs/wro4j-logo.png" style="max-height:1.2em;max-width: 100%;vertical-align: bottom;"> Web Resource Optimizer for Java
 
 [![Join the chat at https://gitter.im/wro4j/wro4j](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wro4j/wro4j?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://api.travis-ci.org/wro4j/wro4j.svg)](http://travis-ci.org/wro4j/wro4j)
