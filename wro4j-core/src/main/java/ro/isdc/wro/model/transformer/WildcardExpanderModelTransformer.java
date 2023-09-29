@@ -18,6 +18,7 @@ import ro.isdc.wro.model.WroModel;
 import ro.isdc.wro.model.group.Group;
 import ro.isdc.wro.model.group.Inject;
 import ro.isdc.wro.model.resource.Resource;
+import ro.isdc.wro.model.resource.locator.ClasspathUriLocator;
 import ro.isdc.wro.model.resource.locator.UriLocator;
 import ro.isdc.wro.model.resource.locator.factory.UriLocatorFactory;
 import ro.isdc.wro.model.resource.locator.wildcard.DefaultWildcardStreamLocator;
@@ -26,7 +27,6 @@ import ro.isdc.wro.model.resource.locator.wildcard.WildcardStreamLocator;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
 import ro.isdc.wro.util.Function;
 import ro.isdc.wro.util.Transformer;
-
 
 /**
  * <p>A decorator which looks up for resources containing wildcards and replaces them with the corresponding collection of
@@ -187,26 +187,43 @@ public class WildcardExpanderModelTransformer
           LOG.debug("baseNameFolder: {}", baseNameFolder);
           for (final File file : files) {
             final String resourcePath = getFullPathNoEndSeparator(resource);
-            LOG.debug("\tresourcePath: {}", resourcePath);
-            LOG.debug("\tfile path: {}", file.getPath());
-
             String filePath = file.getPath();
             String resourcePathWithoutProtocol;
             final String computedResourceUri;
 
-            if (resourcePath.startsWith("classpath:")) {
-              resourcePathWithoutProtocol = resourcePath.replaceFirst("classpath:", StringUtils.EMPTY);
-            }
-            else {
-              resourcePathWithoutProtocol = baseNameFolder;
+            LOG.debug("\tResource path: {}", resourcePath);
+            LOG.debug("\tFile path: {}", filePath);
+
+            if (resourcePath.startsWith(ClasspathUriLocator.PREFIX)) {
+              resourcePathWithoutProtocol = resourcePath.replaceFirst(ClasspathUriLocator.PREFIX, StringUtils.EMPTY);
+            } else {
+              resourcePathWithoutProtocol = resourcePath;
             }
 
+            LOG.debug("\tResource path without protocol: {}", resourcePathWithoutProtocol);
+
+            String baseNameTrimmedFromResourcePath;
+
             if (StringUtils.isEmpty(resourcePathWithoutProtocol)) {
-              computedResourceUri = resourcePath + filePath;
+              baseNameTrimmedFromResourcePath = baseNameFolder;
+            } else {
+              baseNameTrimmedFromResourcePath = baseNameFolder.replaceFirst(".*" + resourcePathWithoutProtocol,
+                  StringUtils.EMPTY);
             }
-            else {
-              computedResourceUri = resourcePath + filePath.replaceFirst(".*" + resourcePathWithoutProtocol, "");
+
+            LOG.debug("\tBase folder name trimmed from resource path: {}", baseNameTrimmedFromResourcePath);
+
+            String filePathWithoutStart = StringUtils.removeStart(filePath, baseNameTrimmedFromResourcePath)
+                .replace('\\', '/');
+
+            if (StringUtils.isEmpty(resourcePathWithoutProtocol)) {
+              computedResourceUri = resourcePath + filePathWithoutStart;
+            } else {
+              computedResourceUri = resourcePath
+                  + filePathWithoutStart.replaceFirst(".*" + resourcePathWithoutProtocol, StringUtils.EMPTY);
             }
+
+            LOG.debug("\tComputed resource URI: {}", computedResourceUri);
 
             final Resource expandedResource = Resource.create(computedResourceUri, resource.getType());
             LOG.debug("\texpanded resource: {}", expandedResource);
