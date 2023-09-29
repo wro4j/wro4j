@@ -23,13 +23,13 @@ In order to get started with Wro4j's runtime solution, you have to follow only 3
 
 ```xml
 <filter>
-	<filter-name>WebResourceOptimizer</filter-name>
-	<filter-class>ro.isdc.wro.http.WroFilter</filter-class>
+  <filter-name>WebResourceOptimizer</filter-name>
+  <filter-class>ro.isdc.wro.http.WroFilter</filter-class>
 </filter>
 
 <filter-mapping>
-	<filter-name>WebResourceOptimizer</filter-name>
-	<url-pattern>/wro/*</url-pattern>
+  <filter-name>WebResourceOptimizer</filter-name>
+  <url-pattern>/wro/*</url-pattern>
 </filter-mapping>
 ```
 
@@ -37,11 +37,11 @@ In order to get started with Wro4j's runtime solution, you have to follow only 3
 
 ```xml
 <groups xmlns="http://www.isdc.ro/wro">
-	<group name="all">
-		<css>/asset/*.css</css>
-		<js>/asset/*.js</js>
-	</group>
-</groups> 		
+  <group name="all">
+    <css>/asset/*.css</css>
+    <js>/asset/*.js</js>
+  </group>
+</groups>
 ```
 
 ### Step 3: Use optimized resources
@@ -49,16 +49,16 @@ In order to get started with Wro4j's runtime solution, you have to follow only 3
 ```html
 <html>
   <head>
-	<title>Web Page using wro4j</title>
-	<link rel="stylesheet" type="text/css" href="/wro/all.css" />
-	<script type="text/javascript" src="/wro/all.js"/>
+    <title>Web Page using wro4j</title>
+    <link rel="stylesheet" type="text/css" href="/wro/all.css" />
+    <script type="text/javascript" src="/wro/all.js"/>
   </head>
-<body>
-<!-- Insert body of your page here -->
-</body>
-</html>		
+  <body>
+    <!-- Insert body of your page here -->
+  </body>
+</html>
 ```
-		
+
 ## Documentation
 
 The documentation for this project is located [here](http://wro4j.readthedocs.org/en/stable/)
@@ -71,7 +71,7 @@ Found a bug? Report it to the [issue tracker](https://github.com/wro4j/wro4j/iss
 
 If you have any questions or suggestions, please feel free to post a comment to the [discussion group](https://groups.google.com/forum/#!forum/wro4j)
 
-[Follow me](http://twitter.com/#!/wro4j) on Twitter.
+[Follow us](http://twitter.com/#!/wro4j) on Twitter.
 
 ## License
 
