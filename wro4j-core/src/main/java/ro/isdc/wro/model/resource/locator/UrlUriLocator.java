@@ -11,12 +11,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 
-import ro.isdc.wro.config.jmx.WroConfiguration;
 import ro.isdc.wro.config.support.ConfigConstants;
 import ro.isdc.wro.model.resource.locator.support.LocatorProvider;
 import ro.isdc.wro.model.resource.locator.wildcard.WildcardUriLocatorSupport;
@@ -78,7 +77,7 @@ public class UrlUriLocator extends WildcardUriLocatorSupport {
       final String fullPath = FilenameUtils.getFullPath(uri);
       final URL url = new URL(fullPath);
       return getWildcardStreamLocator().locateStream(uri,
-          new File(URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name())));
+          new File(URLDecoder.decode(url.getFile(), Charset.defaultCharset())));
     }
     final URL url = new URL(uri);
     final URLConnection connection = url.openConnection();
