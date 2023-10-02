@@ -95,7 +95,9 @@ public class Less4jProcessor
       throws IOException {
     try {
       final LessSource lessSource = new RelativeAwareLessSource(resource, IOUtils.toString(reader), locatorFactory);
-      final CompilationResult result = compiler.compile(lessSource);
+      final LessCompiler.Configuration configuration = new LessCompiler.Configuration();
+      configuration.getSourceMapConfiguration().setLinkSourceMap(false);
+      final CompilationResult result = compiler.compile(lessSource, configuration);
       logWarnings(result);
       writer.write(result.getCss());
     } catch (final Less4jException e) {
