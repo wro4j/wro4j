@@ -9,6 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -107,7 +111,11 @@ public class TestModelAsJsonRequestHandler {
   public void shouldGenerateModelAsJson()
       throws Exception {
     victim.handle(mockRequest, mockResponse);
-    assertEquals(readJsonFile("wroModel_simple.json"), outputStream.toString());
+    ObjectMapper mapper = new ObjectMapper(); 
+    mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true); 
+    ObjectNode expected = mapper.readValue(readJsonFile("wroModel_simple.json"), ObjectNode.class); 
+    ObjectNode actual = mapper.readValue(outputStream.toString(), ObjectNode.class); 
+    assertEquals(expected, actual); 
   }
 
   @Test
