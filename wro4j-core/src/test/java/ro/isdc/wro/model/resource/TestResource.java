@@ -20,7 +20,7 @@ public class TestResource {
     Resource.create(null, null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void shouldNotAcceptNullUri2() {
     Resource.create(null);
   }

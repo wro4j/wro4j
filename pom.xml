@@ -97,7 +97,7 @@
 		<bourbon-gem-jar.version>2.1.0</bourbon-gem-jar.version>
 		<closure.version>v20230502</closure.version>
 		<commons-exec.version>1.3</commons-exec.version>
-		<commons-io.version>2.11.0</commons-io.version>
+		<commons-io.version>2.14.0</commons-io.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-pool.version>2.11.1</commons-pool.version>
 		<dojo-shrinksafe.version>1.7.2</dojo-shrinksafe.version>
