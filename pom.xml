@@ -114,7 +114,7 @@
 		<jruby.version>9.4.3.0</jruby.version>
 		<junit.version>4.13.2</junit.version>
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
-		<rhino.version>1.7.13</rhino.version>
+		<rhino.version>1.7.14.1</rhino.version>
 		<sass-java-gems.version>3.4.20.0</sass-java-gems.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<spring.version>6.0.10</spring.version>
